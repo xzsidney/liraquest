@@ -15,7 +15,7 @@ import {
   FamilyClassSkill,
   FamilyCharacterSkill
 } from '../models';
-import { notifyTaskApprovedRealTime } from '../services/familySocketService';
+import { notifyTaskApprovedRealTime } from '../sockets/familySocketService';
 import { Op } from 'sequelize';
 
 export class FamilyController {
