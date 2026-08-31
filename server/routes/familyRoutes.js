@@ -15,7 +15,7 @@ router.use(authenticateToken);
 router.post('/create', authorizeRoles('ADMIN', 'PARENT'), createFamily);
 router.post('/join', joinFamily);
 router.get('/my-family', getMyFamily);
-router.get('/analytics', getFamilyAnalytics);
+router.get('/analytics', authorizeRoles('ADMIN', 'PARENT'), getFamilyAnalytics);
 
 export default router;
 

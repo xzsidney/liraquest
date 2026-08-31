@@ -359,7 +359,7 @@ async function fetchCatalogs() {
 // ========================================================
 function switchChildTerminalTab(tab) {
   state.childTerminalTab = tab;
-  const tabs = ['tasks', 'studies', 'clan-dashboard', 'history', 'profile'];
+  const tabs = ['tasks', 'studies', 'history', 'profile'];
 
   tabs.forEach((t) => {
     const navBtn = document.getElementById(`child-nav-${t}`);
@@ -378,8 +378,6 @@ function switchChildTerminalTab(tab) {
 
   if (tab === 'tasks') {
     renderChildTasksBoard();
-  } else if (tab === 'clan-dashboard') {
-    loadClanAnalyticsDashboard();
   } else if (tab === 'history') {
     renderChildHistoryTab();
   } else if (tab === 'profile') {
