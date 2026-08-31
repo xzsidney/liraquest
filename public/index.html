@@ -1648,10 +1648,178 @@
         justify-content: center;
       }
 
+      /* Navbar Mobile Limpa */
+      #nav-auth-logged {
+        gap: 8px;
+      }
+
+      .desktop-nav-only {
+        display: none !important;
+      }
+
+      .mobile-menu-trigger {
+        display: flex !important;
+        align-items: center;
+        gap: 8px;
+        background: rgba(30, 58, 138, 0.4);
+        border: 1px solid rgba(212, 175, 55, 0.5);
+        padding: 4px 10px 4px 6px;
+        border-radius: 20px;
+        color: #ffffff;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 0.85rem;
+      }
+
       /* Oculta footer fixo redundante no mobile */
       footer {
         padding-bottom: 80px;
       }
+    }
+
+    /* ===================================================== */
+    /* 🚪 GAVETA LATERAL DESLIZANTE (MOBILE DRAWER)          */
+    /* ===================================================== */
+    .drawer-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 2500;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .drawer-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .drawer-content {
+      position: fixed;
+      top: 0;
+      right: -320px;
+      width: 300px;
+      max-width: 85vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.98);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-left: 1px solid rgba(212, 175, 55, 0.25);
+      z-index: 2600;
+      display: flex;
+      flex-direction: column;
+      box-shadow: -10px 0 40px rgba(0, 0, 0, 0.8);
+      transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow-y: auto;
+    }
+
+    .drawer-overlay.open .drawer-content {
+      right: 0;
+    }
+
+    .drawer-header {
+      padding: 20px 16px;
+      background: linear-gradient(135deg, rgba(128, 0, 32, 0.45), rgba(30, 58, 138, 0.45));
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .drawer-user-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .drawer-user-photo {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      border: 2px solid var(--accent);
+      object-fit: cover;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .drawer-stats-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 12px 16px;
+      background: rgba(0, 0, 0, 0.25);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .drawer-stat-chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 6px 10px;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .drawer-menu-list {
+      display: flex;
+      flex-direction: column;
+      padding: 12px 8px;
+      gap: 4px;
+      flex: 1;
+    }
+
+    .drawer-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      color: #e2e8f0;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+      transition: all 0.2s ease;
+    }
+
+    .drawer-item span.icon {
+      font-size: 1.25rem;
+      width: 24px;
+      text-align: center;
+    }
+
+    .drawer-item:hover, .drawer-item:active {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fde047;
+    }
+
+    .drawer-item.highlight-realm {
+      background: linear-gradient(135deg, rgba(128, 0, 32, 0.7), rgba(212, 175, 55, 0.3));
+      border: 1px solid rgba(212, 175, 55, 0.5);
+      color: #fde047;
+      font-weight: 700;
+      margin: 8px 0;
+    }
+
+    .drawer-item.logout {
+      color: #f87171;
+      margin-top: auto;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 16px;
     }
   </style>
 </head>
@@ -1674,16 +1842,120 @@
 
       <!-- Ações da Navbar quando logado -->
       <div id="nav-auth-logged" class="nav-actions" style="display: none;">
-        <button id="nav-btn-avatar" class="btn btn-gold btn-sm" style="display: none;" onclick="handleAccessAvatar()">
+        <!-- Elementos do Desktop -->
+        <button id="nav-btn-avatar" class="btn btn-gold btn-sm desktop-nav-only" style="display: none;" onclick="handleAccessAvatar()">
           ⚔️ Acessar Avatar
         </button>
-        <span id="nav-user-badge" class="role-badge">Perfil</span>
-        <span id="nav-user-name" style="font-weight: 700;">Usuário</span>
-        <button class="btn btn-secondary btn-sm" onclick="redirectToUserHome()">Meu Painel</button>
-        <button class="btn btn-danger btn-sm" onclick="handleLogout()">Sair</button>
+        <span id="nav-user-badge" class="role-badge desktop-nav-only">Perfil</span>
+        <span id="nav-user-name" class="desktop-nav-only" style="font-weight: 700;">Usuário</span>
+        <button class="btn btn-secondary btn-sm desktop-nav-only" onclick="redirectToUserHome()">Meu Painel</button>
+        <button class="btn btn-danger btn-sm desktop-nav-only" onclick="handleLogout()">Sair</button>
+
+        <!-- Botão Disparador do Menu Gaveta (Exclusivo Celular/Mobile) -->
+        <button id="mobile-menu-trigger-btn" class="mobile-menu-trigger" onclick="openMobileDrawer()" style="display: none;">
+          <div id="nav-mobile-photo-box" style="width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; overflow: hidden; background: rgba(0,0,0,0.4);">👤</div>
+          <span style="font-size: 1.1rem; line-height: 1;">☰</span>
+        </button>
       </div>
     </div>
   </nav>
+
+  <!-- ======================================================== -->
+  <!-- 🚪 GAVETA LATERAL DESLIZANTE (DRAWER MOBILE - TODOS)      -->
+  <!-- ======================================================== -->
+  <div id="mobile-drawer-overlay" class="drawer-overlay" onclick="closeMobileDrawer(event)">
+    <div id="mobile-drawer" class="drawer-content" onclick="event.stopPropagation()">
+      
+      <!-- Cabeçalho do Drawer com Foto e Perfil -->
+      <div class="drawer-header">
+        <div class="drawer-user-box">
+          <div id="drawer-user-photo" class="drawer-user-photo">👤</div>
+          <div style="overflow: hidden;">
+            <h4 id="drawer-user-name" style="font-size: 1.05rem; color: #ffffff; margin: 0 0 2px 0; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">Herói</h4>
+            <span id="drawer-user-role-badge" class="role-badge badge-child" style="font-size: 0.7rem;">⚔️ Filho</span>
+            <span id="drawer-user-rank" style="display: block; font-size: 0.72rem; color: #fde047; font-weight: 700; margin-top: 2px;">🌱 Recruta do Lar</span>
+          </div>
+        </div>
+        <button onclick="closeMobileDrawer()" style="background: transparent; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; padding: 4px;">✕</button>
+      </div>
+
+      <!-- Saldos Rápidos (Filho) -->
+      <div id="drawer-child-stats-row" class="drawer-stats-row">
+        <div class="drawer-stat-chip">
+          <span style="font-size: 0.68rem; color: var(--text-muted);">FICHAS DO LAR</span>
+          <span id="drawer-tokens-val" style="font-size: 1.05rem; font-weight: 800; color: #fde047;">🎟️ 0</span>
+        </div>
+        <div class="drawer-stat-chip">
+          <span style="font-size: 0.68rem; color: var(--text-muted);">ENERGIA</span>
+          <span id="drawer-energy-val" style="font-size: 1.05rem; font-weight: 800; color: #93c5fd;">⚡ 0</span>
+        </div>
+      </div>
+
+      <!-- Links de Navegação do Filho -->
+      <div id="drawer-menu-child" class="drawer-menu-list">
+        <button class="drawer-item" onclick="switchChildTerminalTab('tasks'); closeMobileDrawer();">
+          <span class="icon">📋</span> Mural de Missões
+        </button>
+        <button class="drawer-item" onclick="switchChildTerminalTab('hero-dashboard'); closeMobileDrawer();">
+          <span class="icon">📊</span> Painel do Herói (Nível & XP)
+        </button>
+        <button class="drawer-item" onclick="switchChildTerminalTab('shop'); closeMobileDrawer();">
+          <span class="icon">🏪</span> Loja do Lar (Recompensas)
+        </button>
+        <button class="drawer-item" onclick="switchChildTerminalTab('studies'); closeMobileDrawer();">
+          <span class="icon">📚</span> Foco & Estudos (Pomodoro)
+        </button>
+        <button class="drawer-item" onclick="switchChildTerminalTab('history'); closeMobileDrawer();">
+          <span class="icon">📜</span> Histórico de Provas
+        </button>
+        
+        <!-- Destaque para o Reino Virtual RPG -->
+        <button class="drawer-item highlight-realm" onclick="handleAccessAvatar(); closeMobileDrawer();">
+          <span class="icon">⚔️</span> Terminal do Avatar (RPG)
+        </button>
+
+        <button class="drawer-item" onclick="switchChildTerminalTab('profile'); closeMobileDrawer();">
+          <span class="icon">👤</span> Meus Dados Cadastrais
+        </button>
+
+        <button class="drawer-item logout" onclick="handleLogout(); closeMobileDrawer();">
+          <span class="icon">🚪</span> Sair da Conta
+        </button>
+      </div>
+
+      <!-- Links de Navegação do Pai / Guardião -->
+      <div id="drawer-menu-parent" class="drawer-menu-list" style="display: none;">
+        <button class="drawer-item" onclick="switchParentTerminalTab('submissions'); closeMobileDrawer();">
+          <span class="icon">🔍</span> Provas Pendentes
+        </button>
+        <button class="drawer-item" onclick="switchParentTerminalTab('tasks'); closeMobileDrawer();">
+          <span class="icon">📋</span> Gestão de Missões
+        </button>
+        <button class="drawer-item" onclick="switchParentTerminalTab('shop'); closeMobileDrawer();">
+          <span class="icon">🏪</span> Loja do Lar & Vales
+        </button>
+        <button class="drawer-item" onclick="switchParentTerminalTab('clan-dashboard'); closeMobileDrawer();">
+          <span class="icon">📊</span> Painel do Clã
+        </button>
+        <button class="drawer-item" onclick="switchParentTerminalTab('clan'); closeMobileDrawer();">
+          <span class="icon">🏰</span> Filhos & Clã Familiar
+        </button>
+
+        <button class="drawer-item highlight-realm" onclick="handleAccessAvatar(); closeMobileDrawer();">
+          <span class="icon">⚔️</span> Terminal do Avatar (RPG)
+        </button>
+
+        <button class="drawer-item" onclick="switchParentTerminalTab('profile'); closeMobileDrawer();">
+          <span class="icon">👤</span> Meu Perfil Real
+        </button>
+
+        <button class="drawer-item logout" onclick="handleLogout(); closeMobileDrawer();">
+          <span class="icon">🚪</span> Sair da Conta
+        </button>
+      </div>
+
+    </div>
+  </div>
 
   <!-- Conteúdo Principal Dinâmico (6 Telas) -->
   <main class="main-content">
@@ -2337,25 +2609,6 @@
     <section id="view-child" style="display: none;">
       <div class="child-layout-container">
         
-        <!-- HEADER MOBILE COMPACTO (EXCLUSIVO PARA CELULAR) -->
-        <div class="child-mobile-header">
-          <div class="child-mobile-user-info">
-            <div id="child-mobile-photo-box" class="child-mobile-photo">👤</div>
-            <div>
-              <div id="child-mobile-name" style="font-weight: 800; color: #ffffff; font-size: 0.95rem; line-height: 1.2;">Jovem Herói</div>
-              <div id="child-mobile-rank" style="font-size: 0.72rem; color: #fde047; font-weight: 700;">🌱 Recruta do Lar</div>
-            </div>
-          </div>
-          <div class="child-mobile-chips">
-            <div class="mobile-chip mobile-chip-tokens" title="Fichas do Lar">
-              🎟️ <span id="child-mobile-tokens">0</span>
-            </div>
-            <div class="mobile-chip mobile-chip-energy" title="Energia de Aventura">
-              ⚡ <span id="child-mobile-energy">0</span>
-            </div>
-          </div>
-        </div>
-
         <!-- BARRA LATERAL (SIDEBAR) DO FILHO COM PERFIL, SALDOS, STREAK E ABAS (DESKTOP) -->
         <aside class="child-sidebar">
           

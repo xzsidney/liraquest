@@ -165,6 +165,16 @@ function updateNavbar() {
       navUserBadge.className = `role-badge badge-${state.user.role.toLowerCase()}`;
     }
 
+    // Atualiza foto e menu móvel
+    const mobilePhotoBox = document.getElementById('nav-mobile-photo-box');
+    if (mobilePhotoBox) {
+      if (state.user.profile_photo_url) {
+        mobilePhotoBox.innerHTML = `<img src="${state.user.profile_photo_url}" alt="Foto" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.parentElement.innerHTML='👤';">`;
+      } else {
+        mobilePhotoBox.innerHTML = '👤';
+      }
+    }
+
     // Botão de acesso ao avatar no topo (exibido para perfil Filho)
     if (navBtnAvatar) {
       if (state.user.role === 'CHILD' || state.user.role === 'ADMIN') {
@@ -183,6 +193,64 @@ function updateNavbar() {
   } else {
     if (navAuthGuest) navAuthGuest.style.display = 'flex';
     if (navAuthLogged) navAuthLogged.style.display = 'none';
+  }
+}
+
+// ─── CONTROLE DO MENU GAVETA DESLIZANTE (MOBILE DRAWER) ────
+function openMobileDrawer() {
+  const drawerOverlay = document.getElementById('mobile-drawer-overlay');
+  if (!drawerOverlay) return;
+
+  // Sincronizar dados do usuário no Drawer
+  if (state.user) {
+    const nameEl = document.getElementById('drawer-user-name');
+    const roleBadgeEl = document.getElementById('drawer-user-role-badge');
+    const rankEl = document.getElementById('drawer-user-rank');
+    const photoBox = document.getElementById('drawer-user-photo');
+    const childStatsRow = document.getElementById('drawer-child-stats-row');
+    const menuChild = document.getElementById('drawer-menu-child');
+    const menuParent = document.getElementById('drawer-menu-parent');
+
+    if (nameEl) nameEl.innerText = state.user.name || 'Herói';
+    if (roleBadgeEl) {
+      roleBadgeEl.innerText = formatRoleName(state.user.role);
+      roleBadgeEl.className = `role-badge badge-${state.user.role.toLowerCase()}`;
+    }
+
+    if (photoBox) {
+      if (state.user.profile_photo_url) {
+        photoBox.innerHTML = `<img src="${state.user.profile_photo_url}" alt="Foto" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;" onerror="this.parentElement.innerHTML='👤';">`;
+      } else {
+        photoBox.innerHTML = '👤';
+      }
+    }
+
+    if (state.user.role === 'CHILD') {
+      if (rankEl) rankEl.style.display = 'block';
+      if (childStatsRow) childStatsRow.style.display = 'grid';
+      if (menuChild) menuChild.style.display = 'flex';
+      if (menuParent) menuParent.style.display = 'none';
+
+      // Sincronizar saldos
+      const tokensEl = document.getElementById('drawer-tokens-val');
+      const energyEl = document.getElementById('drawer-energy-val');
+      if (tokensEl) tokensEl.innerText = `🎟️ ${state.progress?.family_tokens || 0}`;
+      if (energyEl) energyEl.innerText = `⚡ ${state.progress?.adventure_energy || 0}`;
+    } else {
+      if (rankEl) rankEl.style.display = 'none';
+      if (childStatsRow) childStatsRow.style.display = 'none';
+      if (menuChild) menuChild.style.display = 'none';
+      if (menuParent) menuParent.style.display = 'flex';
+    }
+  }
+
+  drawerOverlay.classList.add('open');
+}
+
+function closeMobileDrawer(e) {
+  const drawerOverlay = document.getElementById('mobile-drawer-overlay');
+  if (drawerOverlay) {
+    drawerOverlay.classList.remove('open');
   }
 }
 
