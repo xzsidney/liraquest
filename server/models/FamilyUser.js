@@ -75,3 +75,5 @@ FamilyUser.init(
     underscored: true,
   }
 );
+
+export default FamilyUser;
