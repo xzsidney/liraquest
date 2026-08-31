@@ -150,20 +150,11 @@ Os monstros e vilões do jogo são **metáforas diretas da desordem e dos maus h
 
 Para manter a clareza e evitar confusão entre lazer real e progressão virtual, o sistema adota duas carteiras independentes:
 
-```
-┌──────────────────────────────────────┬──────────────────────────────────────┐
-│        CARTEIRA DA VIDA REAL         │        CARTEIRA DO REINO VIRTUAL     │
-├──────────────────────────────────────┼──────────────────────────────────────┤
-│ • Moeda: Fichas do Lar (Tokens)      │ • Moeda: Ouro do Reino (Gold)        │
-│ • Origem: Cumprir tarefas do dia a dia│ • Origem: Vencer monstros e baús     │
-│ • Onde Gasta: Loja da Família        │ • Onde Gasta: Loja do Jogo           │
-│ • Exemplos:                          │ • Exemplos:                          │
-│   - Escolher o sabor da pizza        │   - Espada Flamejante (+10 Força)    │
-│   - 1 hora extra de jogos/telas      │   - Poção de Vida Grande             │
-│   - Escolher o passeio do domingo    │   - Armadura de Cavaleiro Real       │
-│   - Pequenos brinquedos/guloseimas   │   - Mascote Fiel (Bônus passivo)     │
-└──────────────────────────────────────┴──────────────────────────────────────┘
-```
+### 8.1 A Loja do Lar (Recompensas Familiares & Vales Reais)
+A **Loja do Lar** é a ponte definitiva que transforma disciplina em benefícios concretos para **todos os membros da casa (Filhos e Pais)**:
+* **Para os Filhos:** Onde trocam suas **🎟️ Fichas do Lar** conquistadas nas tarefas por vales reais (ex: *1h Extra de Videogame*, *Noite da Pizza*, *Passeio no Parque*, *Comprar um Livro*).
+* **Para os Pais (Guardiões):** Onde gerenciam o cardápio de combinados da casa (CRUD completo com custo em fichas e perfis permitidos), aprovam resgates e **também podem resgatar seus próprios vales** (ex: *Vale Futebol com os Amigos*, *Dormir até mais tarde*, *Noite do Hambúrguer*).
+* **Fluxo de Resgate Seguro:** O membro escolhe a recompensa ➔ O saldo em fichas é validado e deduzido ➔ Uma solicitação de resgate é gerada com status `⏳ Aguardando Aprovação` ➔ O pai valida e entrega o benefício, mudando o status para `✅ Aprovado / Entregue`. Se cancelado, as fichas retornam instantaneamente ao saldo do membro.
 
 ---
 

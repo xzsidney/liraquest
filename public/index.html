@@ -1814,7 +1814,7 @@
             </div>
           </div>
 
-          <!-- MENU DE 5 ABAS DO GUARDIÃO -->
+          <!-- MENU DE 6 ABAS DO GUARDIÃO -->
           <div class="sidebar-menu">
             <button id="parent-nav-submissions" class="sidebar-menu-btn active" onclick="switchParentTerminalTab('submissions')">
               <span style="font-size: 1.15rem;">🔍</span> Provas Pendentes
@@ -1822,6 +1822,10 @@
             </button>
             <button id="parent-nav-tasks" class="sidebar-menu-btn" onclick="switchParentTerminalTab('tasks')">
               <span style="font-size: 1.15rem;">📋</span> Gestão de Missões (CRUD)
+            </button>
+            <button id="parent-nav-shop" class="sidebar-menu-btn" onclick="switchParentTerminalTab('shop')">
+              <span style="font-size: 1.15rem;">🏪</span> Loja do Lar & Vales
+              <span id="parent-nav-shop-badge" class="tab-badge-count" style="display: none; margin-left: auto; background: #f59e0b; color: #000; font-weight: 800;">0</span>
             </button>
             <button id="parent-nav-clan-dashboard" class="sidebar-menu-btn" onclick="switchParentTerminalTab('clan-dashboard')">
               <span style="font-size: 1.15rem;">📊</span> Painel do Clã
@@ -1838,6 +1842,62 @@
 
         <!-- ÁREA PRINCIPAL COM AS ABAS DO GUARDIÃO -->
         <main class="child-content-card">
+
+          <!-- ==================== ABA: LOJA DO LAR & RECOMPENSAS (PAI) ==================== -->
+          <div id="parent-panel-shop" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+              <div>
+                <h2 style="font-size: 1.5rem; color: #ffffff; display: flex; align-items: center; gap: 10px;">
+                  <span>🏪</span> Loja do Lar (Recompensas da Família)
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">
+                  Cadastre prêmios reais da casa, aprove resgates dos filhos e resgate seus próprios vales!
+                </p>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <div style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); padding: 8px 16px; border-radius: 12px; font-weight: 800; color: #fde047; font-size: 0.95rem;">
+                  🎟️ Seu Saldo: <span id="parent-shop-token-balance">0</span> Fichas
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="openCreateRewardModal()">
+                  ➕ Nova Recompensa
+                </button>
+              </div>
+            </div>
+
+            <!-- Sub-abas da Loja do Pai -->
+            <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 12px; flex-wrap: wrap;">
+              <button id="parent-subtab-btn-showcase" class="btn btn-secondary btn-sm active" onclick="switchParentShopSubtab('showcase')" style="border-radius: 8px;">
+                🛍️ Vitrine de Vales
+              </button>
+              <button id="parent-subtab-btn-redemptions" class="btn btn-secondary btn-sm" onclick="switchParentShopSubtab('redemptions')" style="border-radius: 8px;">
+                📥 Resgates do Clã <span id="parent-shop-pending-redemptions-badge" style="display: none; background: #ef4444; color: #fff; padding: 2px 6px; border-radius: 10px; font-size: 0.75rem; margin-left: 4px;">0</span>
+              </button>
+              <button id="parent-subtab-btn-crud" class="btn btn-secondary btn-sm" onclick="switchParentShopSubtab('crud')" style="border-radius: 8px;">
+                ⚙️ Gerenciar Catálogo
+              </button>
+            </div>
+
+            <!-- SUB-PAINEL 1: VITRINE DE VALES -->
+            <div id="parent-shop-subpanel-showcase">
+              <div id="parent-shop-rewards-grid" class="tasks-grid">
+                <!-- Preenchido via JS -->
+              </div>
+            </div>
+
+            <!-- SUB-PAINEL 2: RESGATES DO CLÃ -->
+            <div id="parent-shop-subpanel-redemptions" style="display: none;">
+              <div id="parent-shop-redemptions-list" style="display: flex; flex-direction: column; gap: 12px;">
+                <!-- Preenchido via JS -->
+              </div>
+            </div>
+
+            <!-- SUB-PAINEL 3: GERENCIAR CATÁLOGO (CRUD) -->
+            <div id="parent-shop-subpanel-crud" style="display: none;">
+              <div id="parent-shop-crud-list" style="display: flex; flex-direction: column; gap: 10px;">
+                <!-- Preenchido via JS -->
+              </div>
+            </div>
+          </div>
           
           <!-- ==================== ABA: PAINEL DO CLÃ (DASHBOARD ANALÍTICO) ==================== -->
           <div id="parent-panel-clan-dashboard" style="display: none;">
@@ -2160,13 +2220,16 @@
             </div>
           </div>
 
-          <!-- MENU LATERAL COM AS 5 ABAS -->
+          <!-- MENU LATERAL COM AS 6 ABAS -->
           <div class="sidebar-menu">
             <button id="child-nav-tasks" class="sidebar-menu-btn active" onclick="switchChildTerminalTab('tasks')">
               <span>📋</span> Missões do Dia
             </button>
             <button id="child-nav-hero-dashboard" class="sidebar-menu-btn" onclick="switchChildTerminalTab('hero-dashboard')">
               <span>📊</span> Painel do Herói
+            </button>
+            <button id="child-nav-shop" class="sidebar-menu-btn" onclick="switchChildTerminalTab('shop')">
+              <span>🏪</span> Loja do Lar
             </button>
             <button id="child-nav-studies" class="sidebar-menu-btn" onclick="switchChildTerminalTab('studies')">
               <span>📚</span> Foco & Estudos
@@ -2182,6 +2245,47 @@
 
         <!-- ÁREA PRINCIPAL DE CONTEÚDO DO TERMINAL DO FILHO -->
         <div class="child-content-card">
+
+          <!-- PAINEL: 🏪 LOJA DO LAR (RECOMPENSAS DA FAMÍLIA - FILHO) -->
+          <div id="child-panel-shop" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+              <div>
+                <h2 style="font-size: 1.5rem; color: #ffffff; display: flex; align-items: center; gap: 10px;">
+                  <span>🏪</span> Loja do Lar (Recompensas da Família)
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">
+                  Troque suas Fichas do Lar por recompensas da vida real combinadas com seus pais!
+                </p>
+              </div>
+              <div style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); padding: 8px 18px; border-radius: 12px; font-weight: 800; color: #fde047; font-size: 1.05rem;">
+                🎟️ Seu Saldo: <span id="child-shop-token-balance">0</span> Fichas
+              </div>
+            </div>
+
+            <!-- Sub-abas da Loja do Filho -->
+            <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 12px; flex-wrap: wrap;">
+              <button id="child-subtab-btn-showcase" class="btn btn-secondary btn-sm active" onclick="switchChildShopSubtab('showcase')" style="border-radius: 8px;">
+                🛍️ Vitrine de Recompensas
+              </button>
+              <button id="child-subtab-btn-my-vouchers" class="btn btn-secondary btn-sm" onclick="switchChildShopSubtab('my-vouchers')" style="border-radius: 8px;">
+                🎟️ Meus Vales Resgatados
+              </button>
+            </div>
+
+            <!-- SUB-PAINEL 1: VITRINE DE RECOMPENSAS -->
+            <div id="child-shop-subpanel-showcase">
+              <div id="child-shop-rewards-grid" class="tasks-grid">
+                <!-- Preenchido via JS -->
+              </div>
+            </div>
+
+            <!-- SUB-PAINEL 2: MEUS VALES RESGATADOS -->
+            <div id="child-shop-subpanel-my-vouchers" style="display: none;">
+              <div id="child-shop-vouchers-list" style="display: flex; flex-direction: column; gap: 12px;">
+                <!-- Preenchido via JS -->
+              </div>
+            </div>
+          </div>
           
           <!-- PAINEL: 📊 PAINEL DO HERÓI (PROGRESSO REAL DO USUÁRIO) -->
           <div id="child-panel-hero-dashboard" style="display: none;">
@@ -2890,9 +2994,92 @@
 
       <div class="class-selection-grid" id="switch-classes-grid"></div>
 
-      <button id="btn-confirm-class-switch" class="btn btn-primary" style="width: 100%;" onclick="handleConfirmClassSwitch()">
-        Confirmar Mudança de Classe
-      </button>
+  <!-- ======================================================== -->
+  <!-- MODAL: GESTÃO DE RECOMPENSA (CRIAR / EDITAR - PAI)       -->
+  <!-- ======================================================== -->
+  <div id="reward-crud-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="max-width: 520px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 id="reward-crud-modal-title" style="font-size: 1.25rem; color: #ffffff;">🎁 Nova Recompensa da Família</h3>
+        <button class="btn btn-secondary btn-sm" onclick="closeRewardCrudModal()">✕</button>
+      </div>
+
+      <form id="reward-crud-form">
+        <input type="hidden" id="reward-crud-id">
+
+        <div class="form-group">
+          <label class="form-label" for="reward-crud-title">Título da Recompensa</label>
+          <input type="text" id="reward-crud-title" class="form-input" placeholder="Ex: Noite da Pizza, Vale Futebol, 1h Videogame" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reward-crud-desc">Descrição / Detalhes</label>
+          <textarea id="reward-crud-desc" class="form-input" rows="2" placeholder="Descreva como e quando esta recompensa pode ser usada..."></textarea>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <div class="form-group">
+            <label class="form-label" for="reward-crud-cost">Custo (Fichas do Lar)</label>
+            <input type="number" id="reward-crud-cost" class="form-input" min="1" max="1000" value="25" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reward-crud-category">Categoria</label>
+            <select id="reward-crud-category" class="form-select">
+              <option value="GASTRONOMY">🍕 Gastronomia</option>
+              <option value="ENTERTAINMENT">🎮 Lazer & Telas</option>
+              <option value="OUTING">⚽ Passeios & Hobbies</option>
+              <option value="GIFT">🎁 Presentes & Compras</option>
+              <option value="PRIVILEGE">🛌 Privilégios</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <div class="form-group">
+            <label class="form-label" for="reward-crud-icon">Ícone / Emoji</label>
+            <input type="text" id="reward-crud-icon" class="form-input" value="🎁" maxlength="10" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reward-crud-profile">Disponível Para</label>
+            <select id="reward-crud-profile" class="form-select">
+              <option value="ALL">👨‍👩‍👧‍👦 Toda a Família</option>
+              <option value="CHILD">⚔️ Apenas Filhos</option>
+              <option value="PARENT">🛡️ Apenas Pais</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 24px;">
+          <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="closeRewardCrudModal()">Cancelar</button>
+          <button type="submit" id="btn-save-reward-submit" class="btn btn-primary" style="flex: 1;">💾 Salvar Recompensa</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: CONFIRMAR RESGATE DE VALE COM FICHAS DO LAR       -->
+  <!-- ======================================================== -->
+  <div id="reward-redeem-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="max-width: 440px; text-align: center;">
+      <div id="reward-redeem-icon" style="font-size: 3.5rem; margin-bottom: 10px;">🎁</div>
+      <h3 id="reward-redeem-title" style="font-size: 1.35rem; color: #ffffff; margin-bottom: 8px;">Confirmar Resgate</h3>
+      <p id="reward-redeem-desc" style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">
+        Você deseja resgatar este vale utilizando suas Fichas do Lar?
+      </p>
+
+      <div style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35); padding: 12px; border-radius: 12px; margin-bottom: 20px; font-size: 1.1rem; color: #fde047; font-weight: 800;">
+        Custo: <span id="reward-redeem-cost">0</span> Fichas do Lar
+      </div>
+
+      <input type="hidden" id="reward-redeem-target-id">
+
+      <div style="display: flex; gap: 10px;">
+        <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="closeRewardRedeemModal()">Cancelar</button>
+        <button type="button" id="btn-confirm-redeem" class="btn btn-primary" style="flex: 1;" onclick="handleConfirmRedeem()">
+          🎟️ Confirmar Resgate
+        </button>
+      </div>
     </div>
   </div>
 

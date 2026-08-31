@@ -9,6 +9,7 @@ const API = {
   shop: '/api/shop',
   upload: '/api/upload',
   progress: '/api/progress',
+  rewards: '/api/rewards',
 };
 
 const state = {
@@ -53,6 +54,11 @@ function getAvatarDisplay(avatarKey) {
   if (!avatarKey) return '⚔️';
   const found = AVATAR_OPTIONS.find((a) => a.key === avatarKey);
   return found ? found.icon : '⚔️';
+}
+
+function escapeQuotes(str) {
+  if (!str) return '';
+  return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
 }
 
 // Ícones visuais dos 6 Atributos
@@ -359,7 +365,7 @@ async function fetchCatalogs() {
 // ========================================================
 function switchChildTerminalTab(tab) {
   state.childTerminalTab = tab;
-  const tabs = ['tasks', 'hero-dashboard', 'studies', 'history', 'profile'];
+  const tabs = ['tasks', 'hero-dashboard', 'shop', 'studies', 'history', 'profile'];
 
   tabs.forEach((t) => {
     const navBtn = document.getElementById(`child-nav-${t}`);
@@ -380,6 +386,8 @@ function switchChildTerminalTab(tab) {
     renderChildTasksBoard();
   } else if (tab === 'hero-dashboard') {
     loadChildHeroDashboard();
+  } else if (tab === 'shop') {
+    loadChildRewardsShop();
   } else if (tab === 'history') {
     renderChildHistoryTab();
   } else if (tab === 'profile') {
@@ -1584,7 +1592,7 @@ state.parentSelectedCategoryFilter = 'ALL';
 
 function switchParentTerminalTab(tab) {
   state.parentActiveTab = tab;
-  const tabs = ['submissions', 'tasks', 'clan-dashboard', 'clan', 'profile'];
+  const tabs = ['submissions', 'tasks', 'shop', 'clan-dashboard', 'clan', 'profile'];
 
   tabs.forEach((t) => {
     const btn = document.getElementById(`parent-nav-${t}`);
@@ -1605,6 +1613,7 @@ function switchParentTerminalTab(tab) {
     loadParentReviewedHistory();
   }
   if (tab === 'tasks') loadParentTasks();
+  if (tab === 'shop') loadParentRewardsShop();
   if (tab === 'clan-dashboard') loadClanAnalyticsDashboard();
   if (tab === 'clan') loadParentFamilyData();
   if (tab === 'profile') renderParentProfileInfo();
@@ -2185,6 +2194,631 @@ async function loadParentReviewedHistory() {
     }
   } catch (err) {
     console.error('Erro ao carregar histórico de avaliações:', err);
+  }
+}
+
+// ========================================================
+// 🏪 LOJA DO LAR & RECOMPENSAS DA FAMÍLIA (FILHOS & PAIS)
+// ========================================================
+
+state.parentShopSubtab = 'showcase';
+state.childShopSubtab = 'showcase';
+state.rewardsCatalog = [];
+
+function switchChildShopSubtab(subtab) {
+  state.childShopSubtab = subtab;
+  const showcaseBtn = document.getElementById('child-subtab-btn-showcase');
+  const vouchersBtn = document.getElementById('child-subtab-btn-my-vouchers');
+  const showcasePanel = document.getElementById('child-shop-subpanel-showcase');
+  const vouchersPanel = document.getElementById('child-shop-subpanel-my-vouchers');
+
+  if (showcaseBtn) showcaseBtn.classList.toggle('active', subtab === 'showcase');
+  if (vouchersBtn) vouchersBtn.classList.toggle('active', subtab === 'my-vouchers');
+
+  if (showcasePanel) showcasePanel.style.display = subtab === 'showcase' ? 'block' : 'none';
+  if (vouchersPanel) vouchersPanel.style.display = subtab === 'my-vouchers' ? 'block' : 'none';
+
+  if (subtab === 'showcase') loadChildRewardsShop();
+  if (subtab === 'my-vouchers') loadChildMyVouchers();
+}
+
+function switchParentShopSubtab(subtab) {
+  state.parentShopSubtab = subtab;
+  const tabs = ['showcase', 'redemptions', 'crud'];
+
+  tabs.forEach((t) => {
+    const btn = document.getElementById(`parent-subtab-btn-${t}`);
+    const panel = document.getElementById(`parent-shop-subpanel-${t}`);
+    if (btn) btn.classList.toggle('active', t === subtab);
+    if (panel) panel.style.display = t === subtab ? 'block' : 'none';
+  });
+
+  if (subtab === 'showcase') loadParentRewardsShop();
+  if (subtab === 'redemptions') loadParentRedemptions();
+  if (subtab === 'crud') loadParentRewardsCrud();
+}
+
+// ─── CARREGAMENTO DE RECOMPENSAS (FILHO) ────────────────
+async function loadChildRewardsShop() {
+  const container = document.getElementById('child-shop-rewards-grid');
+  const balanceEl = document.getElementById('child-shop-token-balance');
+  if (!container) return;
+
+  try {
+    const res = await fetch(API.rewards, {
+      headers: { Authorization: `Bearer ${state.token}` },
+    });
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      state.rewardsCatalog = data.rewards || [];
+      const balance = data.token_balance || 0;
+      if (balanceEl) balanceEl.innerText = balance;
+
+      if (state.rewardsCatalog.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column: 1/-1; background: rgba(15, 23, 42, 0.6); border: 1px dashed var(--border-card); border-radius: 16px; padding: 32px; text-align: center;">
+            <span style="font-size: 2.5rem; display: block; margin-bottom: 8px;">🏪</span>
+            <h4 style="color: #ffffff; font-size: 1.1rem; margin-bottom: 6px;">Nenhuma recompensa disponível no momento</h4>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Peça para seus pais cadastrarem recompensas na Loja do Lar!</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = state.rewardsCatalog
+        .map((r) => {
+          const canAfford = balance >= r.token_cost;
+          const diff = r.token_cost - balance;
+
+          return `
+            <div class="task-card" style="border-color: rgba(245, 158, 11, 0.3); display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                  <span style="font-size: 2rem;">${r.icon || '🎁'}</span>
+                  <span class="reward-pill-token" style="font-size: 0.85rem; font-weight: 800;">
+                    🎟️ ${r.token_cost} Fichas
+                  </span>
+                </div>
+                <h4 style="font-size: 1.15rem; color: #ffffff; margin-bottom: 6px;">${r.title}</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 14px;">
+                  ${r.description || 'Recompensa especial da família.'}
+                </p>
+              </div>
+
+              <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px; margin-top: 10px;">
+                ${
+                  canAfford
+                    ? `
+                  <button class="btn btn-gold" style="width: 100%; font-weight: 700;" onclick="openRewardRedeemModal('${r.id}', '${escapeQuotes(r.title)}', '${r.icon}', ${r.token_cost}, '${escapeQuotes(r.description || '')}')">
+                    🎟️ Resgatar Vale
+                  </button>
+                `
+                    : `
+                  <button class="btn btn-secondary" style="width: 100%; opacity: 0.6; cursor: not-allowed;" disabled>
+                    🔒 Faltam ${diff} Ficha(s)
+                  </button>
+                `
+                }
+              </div>
+            </div>
+          `;
+        })
+        .join('');
+    }
+  } catch (err) {
+    console.error('Erro ao carregar loja de recompensas do filho:', err);
+  }
+}
+
+// ─── MEUS VALES RESGATADOS (FILHO) ──────────────────────
+async function loadChildMyVouchers() {
+  const container = document.getElementById('child-shop-vouchers-list');
+  if (!container) return;
+
+  try {
+    const res = await fetch(`${API.rewards}/redemptions/my`, {
+      headers: { Authorization: `Bearer ${state.token}` },
+    });
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      const list = data.redemptions || [];
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div style="background: rgba(15, 23, 42, 0.6); border: 1px dashed var(--border-card); border-radius: 16px; padding: 32px; text-align: center;">
+            <span style="font-size: 2.5rem; display: block; margin-bottom: 8px;">🎟️</span>
+            <h4 style="color: #ffffff; font-size: 1.1rem; margin-bottom: 6px;">Você ainda não resgatou nenhum vale</h4>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Cumpra missões diárias para ganhar Fichas do Lar e resgatar prêmios!</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = list
+        .map((v) => {
+          const r = v.reward || {};
+          const isPending = v.status === 'PENDING';
+          const isApproved = v.status === 'APPROVED';
+          const isDelivered = v.status === 'DELIVERED';
+
+          const badge = isPending
+            ? '<span class="status-badge" style="background: rgba(245,158,11,0.2); color: #fde047; border: 1px solid rgba(245,158,11,0.4);">⏳ Aguardando Aprovação</span>'
+            : isApproved
+            ? '<span class="status-badge" style="background: rgba(34,197,94,0.2); color: #4ade80; border: 1px solid rgba(34,197,94,0.4);">✅ Vale Aprovado • Pronto para Uso</span>'
+            : isDelivered
+            ? '<span class="status-badge" style="background: rgba(59,130,246,0.2); color: #93c5fd; border: 1px solid rgba(59,130,246,0.4);">🎉 Utilizado / Entregue</span>'
+            : '<span class="status-badge" style="background: rgba(239,68,68,0.2); color: #fca5a5; border: 1px solid rgba(239,68,68,0.4);">❌ Cancelado (Fichas Estornadas)</span>';
+
+          const dateStr = new Date(v.created_at || v.createdAt).toLocaleDateString('pt-BR');
+
+          return `
+            <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-card); border-radius: 14px; padding: 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+              <div style="display: flex; align-items: center; gap: 16px;">
+                <span style="font-size: 2.2rem;">${r.icon || '🎁'}</span>
+                <div>
+                  <h4 style="font-size: 1.15rem; color: #ffffff; margin: 0 0 4px 0;">${r.title || 'Vale Recompensa'}</h4>
+                  <span style="font-size: 0.82rem; color: var(--text-muted);">Resgatado em ${dateStr} por <strong>${v.token_cost} Fichas</strong></span>
+                  ${v.notes ? `<p style="font-size: 0.8rem; color: #cbd5e1; margin: 4px 0 0 0;">💬 "${v.notes}"</p>` : ''}
+                </div>
+              </div>
+              <div>${badge}</div>
+            </div>
+          `;
+        })
+        .join('');
+    }
+  } catch (err) {
+    console.error('Erro ao carregar vales do filho:', err);
+  }
+}
+
+// ─── CARREGAMENTO DE RECOMPENSAS (PAI) ──────────────────
+async function loadParentRewardsShop() {
+  const container = document.getElementById('parent-shop-rewards-grid');
+  const balanceEl = document.getElementById('parent-shop-token-balance');
+  if (!container) return;
+
+  try {
+    const res = await fetch(API.rewards, {
+      headers: { Authorization: `Bearer ${state.token}` },
+    });
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      state.rewardsCatalog = data.rewards || [];
+      const balance = data.token_balance || 0;
+      if (balanceEl) balanceEl.innerText = balance;
+
+      if (state.rewardsCatalog.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column: 1/-1; background: rgba(15, 23, 42, 0.6); border: 1px dashed var(--border-card); border-radius: 16px; padding: 32px; text-align: center;">
+            <span style="font-size: 2.5rem; display: block; margin-bottom: 8px;">🏪</span>
+            <h4 style="color: #ffffff; font-size: 1.1rem; margin-bottom: 6px;">Nenhuma recompensa cadastrada</h4>
+            <button class="btn btn-primary btn-sm" onclick="openCreateRewardModal()" style="margin-top: 10px;">➕ Cadastrar Primeira Recompensa</button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = state.rewardsCatalog
+        .filter((r) => r.is_active)
+        .map((r) => {
+          const canAfford = balance >= r.token_cost;
+          return `
+            <div class="task-card" style="border-color: rgba(245, 158, 11, 0.3); display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                  <span style="font-size: 2rem;">${r.icon || '🎁'}</span>
+                  <span class="reward-pill-token" style="font-size: 0.85rem; font-weight: 800;">
+                    🎟️ ${r.token_cost} Fichas
+                  </span>
+                </div>
+                <h4 style="font-size: 1.15rem; color: #ffffff; margin-bottom: 6px;">${r.title}</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 14px;">
+                  ${r.description || 'Recompensa da família.'}
+                </p>
+              </div>
+
+              <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px; margin-top: 10px;">
+                ${
+                  canAfford
+                    ? `
+                  <button class="btn btn-gold" style="width: 100%; font-weight: 700;" onclick="openRewardRedeemModal('${r.id}', '${escapeQuotes(r.title)}', '${r.icon}', ${r.token_cost}, '${escapeQuotes(r.description || '')}')">
+                    🎟️ Resgatar Vale do Guardião
+                  </button>
+                `
+                    : `
+                  <button class="btn btn-secondary" style="width: 100%; opacity: 0.6; cursor: not-allowed;" disabled>
+                    🔒 Custa ${r.token_cost} Fichas
+                  </button>
+                `
+                }
+              </div>
+            </div>
+          `;
+        })
+        .join('');
+    }
+  } catch (err) {
+    console.error('Erro ao carregar loja dos pais:', err);
+  }
+}
+
+// ─── RESGATES PENDENTES DO CLÃ (PAI) ────────────────────
+async function loadParentRedemptions() {
+  const container = document.getElementById('parent-shop-redemptions-list');
+  const badge = document.getElementById('parent-shop-pending-redemptions-badge');
+  const navBadge = document.getElementById('parent-nav-shop-badge');
+  if (!container) return;
+
+  try {
+    const res = await fetch(`${API.rewards}/redemptions/family`, {
+      headers: { Authorization: `Bearer ${state.token}` },
+    });
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      const list = data.redemptions || [];
+      const pendingCount = list.filter((r) => r.status === 'PENDING').length;
+
+      if (badge) {
+        badge.innerText = pendingCount;
+        badge.style.display = pendingCount > 0 ? 'inline-block' : 'none';
+      }
+      if (navBadge) {
+        navBadge.innerText = pendingCount;
+        navBadge.style.display = pendingCount > 0 ? 'inline-block' : 'none';
+      }
+
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div style="background: rgba(15, 23, 42, 0.6); border: 1px dashed var(--border-card); border-radius: 16px; padding: 32px; text-align: center;">
+            <span style="font-size: 2.5rem; display: block; margin-bottom: 8px;">📥</span>
+            <h4 style="color: #ffffff; font-size: 1.1rem; margin-bottom: 6px;">Nenhum resgate pendente no momento</h4>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Quando os membros da família resgatarem vales na Loja do Lar, os pedidos aparecerão aqui.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = list
+        .map((v) => {
+          const r = v.reward || {};
+          const u = v.user || {};
+          const isPending = v.status === 'PENDING';
+          const isApproved = v.status === 'APPROVED';
+          const isDelivered = v.status === 'DELIVERED';
+
+          const dateStr = new Date(v.created_at || v.createdAt).toLocaleDateString('pt-BR');
+
+          return `
+            <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-card); border-radius: 14px; padding: 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+              <div style="display: flex; align-items: center; gap: 16px;">
+                <span style="font-size: 2.2rem;">${r.icon || '🎁'}</span>
+                <div>
+                  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                    <strong style="color: #ffffff; font-size: 1.1rem;">${r.title || 'Vale Recompensa'}</strong>
+                    <span class="role-badge" style="font-size: 0.72rem;">${u.name || 'Membro'}</span>
+                  </div>
+                  <span style="font-size: 0.82rem; color: var(--text-muted);">
+                    Solicitado por <strong>${u.name}</strong> • <strong>${v.token_cost} Fichas</strong> • Data: ${dateStr}
+                  </span>
+                </div>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 8px;">
+                ${
+                  isPending
+                    ? `
+                  <button class="btn btn-success btn-sm" onclick="handleReviewRedemption('${v.id}', 'APPROVED')">
+                    ✅ Aprovar Vale
+                  </button>
+                  <button class="btn btn-danger btn-sm" onclick="handleReviewRedemption('${v.id}', 'CANCELLED')">
+                    ❌ Cancelar & Estornar
+                  </button>
+                `
+                    : isApproved
+                    ? `
+                  <span class="status-badge" style="background: rgba(34,197,94,0.2); color: #4ade80; border: 1px solid rgba(34,197,94,0.4);">
+                    ✅ Aprovado
+                  </span>
+                  <button class="btn btn-primary btn-sm" onclick="handleReviewRedemption('${v.id}', 'DELIVERED')">
+                    🎉 Marcar como Entregue
+                  </button>
+                `
+                    : isDelivered
+                    ? `
+                  <span class="status-badge" style="background: rgba(59,130,246,0.2); color: #93c5fd; border: 1px solid rgba(59,130,246,0.4);">
+                    🎉 Entregue
+                  </span>
+                `
+                    : `
+                  <span class="status-badge" style="background: rgba(239,68,68,0.2); color: #fca5a5; border: 1px solid rgba(239,68,68,0.4);">
+                    ❌ Cancelado
+                  </span>
+                `
+                }
+              </div>
+            </div>
+          `;
+        })
+        .join('');
+    }
+  } catch (err) {
+    console.error('Erro ao carregar resgates do clã:', err);
+  }
+}
+
+// ─── CRUD DE RECOMPENSAS (PAI) ──────────────────────────
+async function loadParentRewardsCrud() {
+  const container = document.getElementById('parent-shop-crud-list');
+  if (!container) return;
+
+  try {
+    const res = await fetch(API.rewards, {
+      headers: { Authorization: `Bearer ${state.token}` },
+    });
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      state.rewardsCatalog = data.rewards || [];
+
+      if (state.rewardsCatalog.length === 0) {
+        container.innerHTML = `
+          <div style="background: rgba(15, 23, 42, 0.6); border: 1px dashed var(--border-card); border-radius: 16px; padding: 32px; text-align: center;">
+            <span style="font-size: 2.5rem; display: block; margin-bottom: 8px;">⚙️</span>
+            <h4 style="color: #ffffff; font-size: 1.1rem; margin-bottom: 6px;">Nenhuma recompensa cadastrada</h4>
+            <button class="btn btn-primary btn-sm" onclick="openCreateRewardModal()" style="margin-top: 10px;">➕ Cadastrar Recompensa</button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = state.rewardsCatalog
+        .map((r) => {
+          return `
+            <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-card); border-radius: 14px; padding: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+              <div style="display: flex; align-items: center; gap: 14px;">
+                <span style="font-size: 2rem;">${r.icon || '🎁'}</span>
+                <div>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <strong style="color: #ffffff; font-size: 1.05rem;">${r.title}</strong>
+                    <span class="role-badge" style="font-size: 0.75rem;">🎟️ ${r.token_cost} Fichas</span>
+                    ${!r.is_active ? '<span style="background: rgba(239,68,68,0.2); color: #fca5a5; font-size: 0.72rem; padding: 2px 6px; border-radius: 6px;">Pausada</span>' : ''}
+                  </div>
+                  <span style="font-size: 0.8rem; color: var(--text-muted);">${r.description || 'Sem descrição.'}</span>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 6px;">
+                <button class="btn btn-secondary btn-sm" onclick="openEditRewardModal('${r.id}')">✏️ Editar</button>
+                <button class="btn btn-secondary btn-sm" onclick="handleToggleReward('${r.id}')">${r.is_active ? '⏸️ Pausar' : '▶️ Ativar'}</button>
+                <button class="btn btn-danger btn-sm" onclick="handleDeleteReward('${r.id}')">🗑️</button>
+              </div>
+            </div>
+          `;
+        })
+        .join('');
+    }
+  } catch (err) {
+    console.error('Erro ao carregar lista de gestão de recompensas:', err);
+  }
+}
+
+// ─── AÇÕES & MODAIS DE RESGATE E CRUD ───────────────────
+function openRewardRedeemModal(rewardId, title, icon, cost, desc) {
+  const targetInput = document.getElementById('reward-redeem-target-id');
+  const titleEl = document.getElementById('reward-redeem-title');
+  const iconEl = document.getElementById('reward-redeem-icon');
+  const costEl = document.getElementById('reward-redeem-cost');
+  const descEl = document.getElementById('reward-redeem-desc');
+
+  if (targetInput) targetInput.value = rewardId;
+  if (titleEl) titleEl.innerText = title;
+  if (iconEl) iconEl.innerText = icon || '🎁';
+  if (costEl) costEl.innerText = cost;
+  if (descEl) descEl.innerText = desc || 'Você deseja resgatar este vale utilizando suas Fichas do Lar?';
+
+  const modal = document.getElementById('reward-redeem-modal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeRewardRedeemModal() {
+  const modal = document.getElementById('reward-redeem-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+async function handleConfirmRedeem() {
+  const rewardId = document.getElementById('reward-redeem-target-id')?.value;
+  const btn = document.getElementById('btn-confirm-redeem');
+  if (!rewardId) return;
+
+  if (btn) {
+    btn.disabled = true;
+    btn.innerText = 'Resgatando...';
+  }
+
+  try {
+    const res = await fetch(`${API.rewards}/${rewardId}/redeem`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${state.token}`,
+      },
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || 'Erro ao resgatar recompensa.');
+    }
+
+    closeRewardRedeemModal();
+    showToast(data.message, 'success');
+
+    // Recarregar loja e saldo
+    if (state.user?.role === 'PARENT') {
+      loadParentRewardsShop();
+    } else {
+      loadChildRewardsShop();
+      loadChildHeroDashboard();
+    }
+  } catch (err) {
+    showToast(err.message, 'error');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerText = '🎟️ Confirmar Resgate';
+    }
+  }
+}
+
+function openCreateRewardModal() {
+  const idEl = document.getElementById('reward-crud-id');
+  const modalTitle = document.getElementById('reward-crud-modal-title');
+  const titleEl = document.getElementById('reward-crud-title');
+  const descEl = document.getElementById('reward-crud-desc');
+  const costEl = document.getElementById('reward-crud-cost');
+  const catEl = document.getElementById('reward-crud-category');
+  const iconEl = document.getElementById('reward-crud-icon');
+  const profEl = document.getElementById('reward-crud-profile');
+
+  if (idEl) idEl.value = '';
+  if (modalTitle) modalTitle.innerText = '🎁 Nova Recompensa da Família';
+  if (titleEl) titleEl.value = '';
+  if (descEl) descEl.value = '';
+  if (costEl) costEl.value = '25';
+  if (catEl) catEl.value = 'ENTERTAINMENT';
+  if (iconEl) iconEl.value = '🎁';
+  if (profEl) profEl.value = 'ALL';
+
+  const modal = document.getElementById('reward-crud-modal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function openEditRewardModal(rewardId) {
+  const reward = state.rewardsCatalog.find((r) => r.id === rewardId);
+  if (!reward) return;
+
+  const idEl = document.getElementById('reward-crud-id');
+  const modalTitle = document.getElementById('reward-crud-modal-title');
+  const titleEl = document.getElementById('reward-crud-title');
+  const descEl = document.getElementById('reward-crud-desc');
+  const costEl = document.getElementById('reward-crud-cost');
+  const catEl = document.getElementById('reward-crud-category');
+  const iconEl = document.getElementById('reward-crud-icon');
+  const profEl = document.getElementById('reward-crud-profile');
+
+  if (idEl) idEl.value = reward.id;
+  if (modalTitle) modalTitle.innerText = '✏️ Editar Recompensa';
+  if (titleEl) titleEl.value = reward.title;
+  if (descEl) descEl.value = reward.description || '';
+  if (costEl) costEl.value = reward.token_cost;
+  if (catEl) catEl.value = reward.category;
+  if (iconEl) iconEl.value = reward.icon || '🎁';
+  if (profEl) profEl.value = reward.allowed_profile || 'ALL';
+
+  const modal = document.getElementById('reward-crud-modal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeRewardCrudModal() {
+  const modal = document.getElementById('reward-crud-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+async function handleSaveRewardCrud(e) {
+  e?.preventDefault();
+  const rewardId = document.getElementById('reward-crud-id')?.value;
+  const title = document.getElementById('reward-crud-title')?.value.trim();
+  const description = document.getElementById('reward-crud-desc')?.value.trim();
+  const token_cost = parseInt(document.getElementById('reward-crud-cost')?.value, 10) || 20;
+  const category = document.getElementById('reward-crud-category')?.value;
+  const icon = document.getElementById('reward-crud-icon')?.value.trim() || '🎁';
+  const allowed_profile = document.getElementById('reward-crud-profile')?.value || 'ALL';
+
+  const isEdit = Boolean(rewardId);
+  const url = isEdit ? `${API.rewards}/${rewardId}` : API.rewards;
+  const method = isEdit ? 'PUT' : 'POST';
+
+  try {
+    const res = await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${state.token}`,
+      },
+      body: JSON.stringify({ title, description, token_cost, category, icon, allowed_profile }),
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || 'Erro ao salvar recompensa.');
+    }
+
+    closeRewardCrudModal();
+    showToast(data.message, 'success');
+    loadParentRewardsShop();
+    loadParentRewardsCrud();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+async function handleToggleReward(rewardId) {
+  try {
+    const res = await fetch(`${API.rewards}/${rewardId}/toggle`, {
+      method: 'PATCH',
+      headers: { Authorization: `Bearer ${state.token}` },
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) throw new Error(data.message);
+
+    showToast(data.message, 'success');
+    loadParentRewardsCrud();
+    loadParentRewardsShop();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+async function handleDeleteReward(rewardId) {
+  if (!confirm('Tem certeza que deseja excluir esta recompensa da Loja do Lar?')) return;
+
+  try {
+    const res = await fetch(`${API.rewards}/${rewardId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${state.token}` },
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) throw new Error(data.message);
+
+    showToast('Recompensa excluída com sucesso!', 'success');
+    loadParentRewardsCrud();
+    loadParentRewardsShop();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+async function handleReviewRedemption(redemptionId, status) {
+  try {
+    const res = await fetch(`${API.rewards}/redemptions/${redemptionId}/review`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${state.token}`,
+      },
+      body: JSON.stringify({ status }),
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.success) throw new Error(data.message);
+
+    showToast(data.message, 'success');
+    loadParentRedemptions();
+  } catch (err) {
+    showToast(err.message, 'error');
   }
 }
 
@@ -2885,6 +3519,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const taskCrudForm = document.getElementById('task-crud-form');
   if (taskCrudForm) taskCrudForm.addEventListener('submit', handleSaveTaskCrud);
+
+  const rewardCrudForm = document.getElementById('reward-crud-form');
+  if (rewardCrudForm) rewardCrudForm.addEventListener('submit', handleSaveRewardCrud);
 
   const createTaskForm = document.getElementById('create-task-form');
   if (createTaskForm) createTaskForm.addEventListener('submit', handleCreateTask);

@@ -110,8 +110,23 @@ Este documento cataloga todos os endpoints REST e eventos de WebSocket (Socket.I
 
 ---
 
+## 9. Módulo da Loja do Lar & Recompensas da Família (`/api/rewards`)
 
-## 9. WebSockets em Tempo Real (Socket.IO) — *Fase 4*
+| Método | Rota | Autenticação | Descrição |
+|:---|:---|:---|:---|
+| `GET` | `/api/rewards` | JWT | Lista as recompensas ativas da família e retorna saldo de Fichas do Lar do usuário (auto-seeda 10 recompensas padrão se vazio) |
+| `POST` | `/api/rewards` | JWT (`PARENT` / `ADMIN`) | Cria uma nova recompensa da vida real (`title`, `description`, `token_cost`, `category`, `icon`, `allowed_profile`) |
+| `PUT` | `/api/rewards/:rewardId` | JWT (`PARENT` / `ADMIN`) | Atualiza uma recompensa existente da família |
+| `PATCH` | `/api/rewards/:rewardId/toggle` | JWT (`PARENT` / `ADMIN`) | Alterna o status ativo/pausado da recompensa (`is_active: true/false`) |
+| `DELETE` | `/api/rewards/:rewardId` | JWT (`PARENT` / `ADMIN`) | Exclui uma recompensa do catálogo |
+| `POST` | `/api/rewards/:rewardId/redeem` | JWT | Resgata um vale da vida real consumindo Fichas do Lar do usuário e gerando solicitação no clã |
+| `GET` | `/api/rewards/redemptions/my` | JWT | Lista os vales resgatados pelo usuário atual |
+| `GET` | `/api/rewards/redemptions/family` | JWT (`PARENT` / `ADMIN`) | Pais consultam todos os resgates solicitados pelos membros do clã |
+| `POST` | `/api/rewards/redemptions/:redemptionId/review` | JWT (`PARENT` / `ADMIN`) | Pais avaliam o resgate (`APPROVED`, `DELIVERED` ou `CANCELLED` com estorno das fichas) |
+
+---
+
+## 10. WebSockets em Tempo Real (Socket.IO) — *Fase 4*
 
 ### Eventos de Sala Familiar
 - `join_family_room`: Conexão do usuário à sala exclusiva do seu clã familiar (`family_{id}`).

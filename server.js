@@ -13,6 +13,7 @@ import taskRoutes from './server/routes/taskRoutes.js';
 import shopRoutes from './server/routes/shopRoutes.js';
 import uploadRoutes from './server/routes/uploadRoutes.js';
 import progressRoutes from './server/routes/progressRoutes.js';
+import rewardRoutes from './server/routes/rewardRoutes.js';
 
 
 dotenv.config();
@@ -40,6 +41,7 @@ app.use('/api/tasks', taskRoutes);
 app.use('/api/shop', shopRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/progress', progressRoutes);
+app.use('/api/rewards', rewardRoutes);
 
 
 // Health check & status

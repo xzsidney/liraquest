@@ -19,6 +19,8 @@ import { Task } from './Task.js';
 import { TaskSubmission } from './TaskSubmission.js';
 import { Event } from './Event.js';
 import { Battle } from './Battle.js';
+import { FamilyReward } from './FamilyReward.js';
+import { FamilyRewardRedemption } from './FamilyRewardRedemption.js';
 
 // ==========================================
 // 1. Associações de Usuário & Família
@@ -104,6 +106,24 @@ Family.hasMany(Battle, { foreignKey: 'family_id', as: 'battles' });
 Battle.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
 Battle.belongsTo(DefinitionMonster, { foreignKey: 'monster_id', as: 'monster' });
 
+// ==========================================
+// 6. Associações da Loja do Lar (Recompensas Reais)
+// ==========================================
+Family.hasMany(FamilyReward, { foreignKey: 'family_id', as: 'rewards' });
+FamilyReward.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
+
+FamilyUser.hasMany(FamilyReward, { foreignKey: 'created_by', as: 'created_rewards' });
+FamilyReward.belongsTo(FamilyUser, { foreignKey: 'created_by', as: 'creator' });
+
+FamilyReward.hasMany(FamilyRewardRedemption, { foreignKey: 'reward_id', as: 'redemptions' });
+FamilyRewardRedemption.belongsTo(FamilyReward, { foreignKey: 'reward_id', as: 'reward' });
+
+FamilyUser.hasMany(FamilyRewardRedemption, { foreignKey: 'user_id', as: 'reward_redemptions' });
+FamilyRewardRedemption.belongsTo(FamilyUser, { foreignKey: 'user_id', as: 'user' });
+
+FamilyUser.hasMany(FamilyRewardRedemption, { foreignKey: 'reviewed_by', as: 'reviewed_redemptions' });
+FamilyRewardRedemption.belongsTo(FamilyUser, { foreignKey: 'reviewed_by', as: 'reviewer' });
+
 export {
   sequelize,
   FamilyUser,
@@ -125,4 +145,6 @@ export {
   TaskSubmission,
   Event,
   Battle,
+  FamilyReward,
+  FamilyRewardRedemption,
 };

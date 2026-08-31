@@ -326,3 +326,41 @@ Histórico de batalhas e Raids cooperativas familiares.
 | `status` | `ENUM('IN_PROGRESS','VICTORY','DEFEAT')` | Não | Resultado da batalha |
 | `battle_log` | `JSON` | Sim | Log completo de ações dos turnos |
 | `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+
+---
+
+## 5. Módulo da Loja do Lar & Recompensas Familiares
+
+### 🎁 `family_rewards`
+Armazena o catálogo de recompensas da vida real criadas para a família.
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único da recompensa |
+| `family_id` | `UUID` (FK) | Não | Família dona da recompensa (`families.id`) |
+| `created_by` | `UUID` (FK) | Não | Usuário pai que criou a recompensa (`family_users.id`) |
+| `title` | `VARCHAR(100)` | Não | Título da recompensa (ex: "Noite da Pizza", "Vale Futebol") |
+| `description` | `TEXT` | Sim | Detalhes de como usufruir da recompensa |
+| `token_cost` | `INT` | Não | Custo em 🎟️ Fichas do Lar (padrão: 20) |
+| `category` | `ENUM('GASTRONOMY','ENTERTAINMENT','OUTING','GIFT','PRIVILEGE')` | Não | Categoria temática |
+| `icon` | `VARCHAR(20)` | Não | Emoji/ícone de exibição (ex: 🍕, 🎮, ⚽, 🎁, 🛌) |
+| `allowed_profile` | `ENUM('ALL','CHILD','PARENT')` | Não | Quem pode resgatar |
+| `is_active` | `BOOLEAN` | Não | Flag se a recompensa está ativa na vitrine (default: `true`) |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+
+### 🎟️ `family_reward_redemptions`
+Histórico de vales resgatados pelos membros com suas Fichas do Lar.
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único do resgate |
+| `reward_id` | `UUID` (FK) | Não | Recompensa resgatada (`family_rewards.id`) |
+| `family_id` | `UUID` (FK) | Não | Família onde ocorreu o resgate (`families.id`) |
+| `user_id` | `UUID` (FK) | Não | Membro que comprou o vale (`family_users.id`) |
+| `token_cost` | `INT` | Não | Quantidade de Fichas do Lar gastas |
+| `status` | `ENUM('PENDING','APPROVED','DELIVERED','CANCELLED')` | Não | Estado do vale |
+| `reviewed_by` | `UUID` (FK) | Sim | Guardião (Pai) que avaliou/entregou (`family_users.id`) |
+| `reviewed_at` | `DATETIME` | Sim | Data e hora da avaliação |
+| `notes` | `TEXT` | Sim | Observações adicionais |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+
