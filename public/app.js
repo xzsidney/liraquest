@@ -353,7 +353,7 @@ async function fetchCatalogs() {
 // ========================================================
 function switchChildTerminalTab(tab) {
   state.childTerminalTab = tab;
-  const tabs = ['tasks', 'studies', 'history', 'profile'];
+  const tabs = ['tasks', 'studies', 'clan-dashboard', 'history', 'profile'];
 
   tabs.forEach((t) => {
     const navBtn = document.getElementById(`child-nav-${t}`);
@@ -372,6 +372,8 @@ function switchChildTerminalTab(tab) {
 
   if (tab === 'tasks') {
     renderChildTasksBoard();
+  } else if (tab === 'clan-dashboard') {
+    loadClanAnalyticsDashboard();
   } else if (tab === 'history') {
     renderChildHistoryTab();
   } else if (tab === 'profile') {
@@ -1527,7 +1529,7 @@ state.parentSelectedCategoryFilter = 'ALL';
 
 function switchParentTerminalTab(tab) {
   state.parentActiveTab = tab;
-  const tabs = ['submissions', 'tasks', 'clan', 'profile'];
+  const tabs = ['submissions', 'tasks', 'clan-dashboard', 'clan', 'profile'];
 
   tabs.forEach((t) => {
     const btn = document.getElementById(`parent-nav-${t}`);
@@ -1548,6 +1550,7 @@ function switchParentTerminalTab(tab) {
     loadParentReviewedHistory();
   }
   if (tab === 'tasks') loadParentTasks();
+  if (tab === 'clan-dashboard') loadClanAnalyticsDashboard();
   if (tab === 'clan') loadParentFamilyData();
   if (tab === 'profile') renderParentProfileInfo();
 }
@@ -1715,6 +1718,214 @@ function copyClanInviteCode() {
     showToast(`Código do Clã: ${code}`, 'info');
   });
 }
+
+// ─────────────────────────────────────────────────────────
+// 📊 PAINEL DO CLÃ (DASHBOARD ANALÍTICO & CONTROLE FAMILIAR)
+// ─────────────────────────────────────────────────────────
+async function loadClanAnalyticsDashboard() {
+  if (!state.token) return;
+
+  try {
+    const res = await fetch(`${API.family}/analytics`, {
+      headers: { Authorization: `Bearer ${state.token}` },
+    });
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      console.warn('Não foi possível carregar o painel do clã:', data.message);
+      return;
+    }
+
+    const { clanStats, topPerformer, needsAttention, members } = data;
+
+    // Atualizar Contadores Globais (Pai e Filho)
+    const updateText = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) el.innerText = val;
+    };
+
+    updateText('clan-dash-online-count', `${clanStats.onlineMembersCount} / ${clanStats.totalMembers}`);
+    updateText('child-clan-dash-online-count', `${clanStats.onlineMembersCount} / ${clanStats.totalMembers}`);
+
+    updateText('clan-dash-tasks-count', clanStats.totalClanTasks);
+    updateText('child-clan-dash-tasks-count', clanStats.totalClanTasks);
+
+    updateText('clan-dash-gold-count', `${clanStats.totalClanGold}`);
+    updateText('child-clan-dash-gold-count', `${clanStats.totalClanGold}`);
+
+    updateText('clan-dash-streak-count', `${clanStats.maxClanStreak}d`);
+    updateText('child-clan-dash-streak-count', `${clanStats.maxClanStreak}d`);
+
+    // Renderizar Card 1: Campeão da Casa (Mais Tarefas)
+    const renderTopCard = (containerId) => {
+      const el = document.getElementById(containerId);
+      if (!el) return;
+
+      if (!topPerformer || topPerformer.total_approved_tasks === 0) {
+        el.innerHTML = `
+          <div>
+            <span style="font-size: 0.8rem; color: #fbbf24; font-weight: 700; text-transform: uppercase;">👑 Campeão da Casa</span>
+            <h3 style="font-size: 1.25rem; color: #ffffff; margin: 6px 0;">Em Disputa Aberta!</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">
+              Nenhum herói concluiu missões ainda. Quem cumprir a primeira tarefa assumirá a liderança do ranking da casa!
+            </p>
+          </div>
+          <div style="margin-top: 14px;">
+            <span class="role-badge" style="background: rgba(245,158,11,0.2); color: #fbbf24; border: 1px solid rgba(245,158,11,0.4);">
+              ⚔️ Liderança Disponível
+            </span>
+          </div>
+        `;
+        return;
+      }
+
+      const avatarIcon = topPerformer.hero ? getAvatarDisplay(topPerformer.hero.avatar_value) : '👑';
+      const streak = topPerformer.progress?.current_streak || 0;
+
+      el.innerHTML = `
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+            <span style="font-size: 0.8rem; color: #fbbf24; font-weight: 700; text-transform: uppercase;">👑 Campeão da Casa</span>
+            <span class="role-badge" style="background: rgba(245,158,11,0.25); color: #fde047; border: 1px solid rgba(245,158,11,0.5);">
+              🏆 Mais Produtivo
+            </span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 12px;">
+            <div class="avatar-circle" style="width: 52px; height: 52px; font-size: 1.5rem; background: rgba(0,0,0,0.5); border: 2px solid var(--gold);">
+              ${avatarIcon}
+            </div>
+            <div>
+              <h3 style="font-size: 1.25rem; color: #ffffff; margin: 0;">${topPerformer.name}</h3>
+              <span style="color: #c084fc; font-size: 0.82rem;">${topPerformer.hero ? `Herói: ${topPerformer.hero.name} • Nível ${topPerformer.hero.level}` : 'Herói do Clã'}</span>
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <span class="reward-pill-xp" style="font-size: 0.8rem;">⭐ ${topPerformer.total_approved_tasks} Missões Concluídas</span>
+            <span class="reward-pill-gold" style="font-size: 0.8rem;">💰 ${topPerformer.hero?.gold || 0} Ouro</span>
+            <span style="background: rgba(249,115,22,0.2); color: #fb923c; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">🔥 Streak: ${streak} dias</span>
+          </div>
+        </div>
+        <p style="font-size: 0.8rem; color: #4ade80; margin-top: 14px; margin-bottom: 0;">
+          ✨ Parabéns pelo empenho exemplar nos hábitos da casa!
+        </p>
+      `;
+    };
+
+    renderTopCard('clan-dash-top-performer-card');
+    renderTopCard('child-clan-dash-top-performer-card');
+
+    // Renderizar Card 2: Herói em Foco (Menos Tarefas / Apoio)
+    const renderAttentionCard = (containerId) => {
+      const el = document.getElementById(containerId);
+      if (!el) return;
+
+      if (!needsAttention || needsAttention.id === topPerformer?.id) {
+        el.innerHTML = `
+          <div>
+            <span style="font-size: 0.8rem; color: #93c5fd; font-weight: 700; text-transform: uppercase;">🌱 Equilíbrio do Clã</span>
+            <h3 style="font-size: 1.25rem; color: #ffffff; margin: 6px 0;">Todos no Mesmo Ritmo!</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">
+              Todos os membros da família estão avançando juntos em perfeita harmonia. Continuem com a cooperação diária!
+            </p>
+          </div>
+          <div style="margin-top: 14px;">
+            <span class="role-badge" style="background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.3);">
+              ✨ Família Unida
+            </span>
+          </div>
+        `;
+        return;
+      }
+
+      const avatarIcon = needsAttention.hero ? getAvatarDisplay(needsAttention.hero.avatar_value) : '🌱';
+
+      el.innerHTML = `
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+            <span style="font-size: 0.8rem; color: #93c5fd; font-weight: 700; text-transform: uppercase;">🌱 Herói em Foco</span>
+            <span class="role-badge" style="background: rgba(59,130,246,0.2); color: #93c5fd; border: 1px solid rgba(59,130,246,0.4);">
+              🤝 Precisa de Apoio
+            </span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 12px;">
+            <div class="avatar-circle" style="width: 52px; height: 52px; font-size: 1.5rem; background: rgba(0,0,0,0.5); border: 2px solid #3b82f6;">
+              ${avatarIcon}
+            </div>
+            <div>
+              <h3 style="font-size: 1.25rem; color: #ffffff; margin: 0;">${needsAttention.name}</h3>
+              <span style="color: #93c5fd; font-size: 0.82rem;">${needsAttention.hero ? `Herói: ${needsAttention.hero.name}` : 'Aventureiro'}</span>
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <span style="background: rgba(255,255,255,0.08); color: #cbd5e1; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem;">📋 ${needsAttention.total_approved_tasks} Missões Feitas</span>
+            <span style="background: rgba(245,158,11,0.15); color: #fde047; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem;">🎯 Pronto para novos desafios</span>
+          </div>
+        </div>
+        <p style="font-size: 0.8rem; color: #93c5fd; margin-top: 14px; margin-bottom: 0;">
+          💡 Dica: Que tal realizar uma missão rápida hoje para subir de nível e ganhar ouro?
+        </p>
+      `;
+    };
+
+    renderAttentionCard('clan-dash-needs-attention-card');
+    renderAttentionCard('child-clan-dash-needs-attention-card');
+
+    // Renderizar Lista de Membros com Presença Online
+    const renderMembersList = (containerId) => {
+      const el = document.getElementById(containerId);
+      if (!el) return;
+
+      el.innerHTML = members
+        .map((m) => {
+          const isParent = m.role === 'PARENT' || m.role === 'ADMIN';
+          const avatarIcon = m.hero ? getAvatarDisplay(m.hero.avatar_value) : isParent ? '🛡️' : '👤';
+          const roleBadge = isParent
+            ? '<span class="role-badge badge-parent" style="font-size: 0.72rem;">🛡️ Guardião</span>'
+            : '<span class="role-badge badge-child" style="font-size: 0.72rem;">⚔️ Herói Filho</span>';
+
+          const presenceBadge = m.presence.is_online
+            ? '<span style="background: rgba(34,197,94,0.2); color: #4ade80; border: 1px solid rgba(34,197,94,0.4); padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">🟢 Online agora</span>'
+            : `<span style="background: rgba(148,163,184,0.1); color: #94a3b8; border: 1px solid rgba(148,163,184,0.2); padding: 4px 10px; border-radius: 12px; font-size: 0.75rem;">${m.presence.label}</span>`;
+
+          return `
+            <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-card); border-radius: 14px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+              <div style="display: flex; align-items: center; gap: 14px;">
+                <div class="avatar-circle" style="width: 44px; height: 44px; font-size: 1.3rem; border: 2px solid rgba(212,175,55,0.4); background: rgba(0,0,0,0.5);">
+                  ${avatarIcon}
+                </div>
+                <div>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <strong style="color: #ffffff; font-size: 0.98rem;">${m.name}</strong>
+                    ${roleBadge}
+                  </div>
+                  <span style="font-size: 0.78rem; color: var(--text-muted);">${m.hero ? `Herói: ${m.hero.name} (Nv. ${m.hero.level})` : m.email}</span>
+                </div>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+                ${!isParent ? `
+                  <div style="text-align: right; font-size: 0.8rem;">
+                    <span style="color: #cbd5e1; display: block;">Hoje: <strong>${m.progress?.tasks_completed_today || 0}</strong> | Total: <strong>${m.total_approved_tasks || 0}</strong> missões</span>
+                    <span style="color: #fde047;">💰 ${m.hero?.gold || 0} Ouro • 🔥 ${m.progress?.current_streak || 0}d streak</span>
+                  </div>
+                ` : ''}
+                <div>
+                  ${presenceBadge}
+                </div>
+              </div>
+            </div>
+          `;
+        })
+        .join('');
+    };
+
+    renderMembersList('clan-dash-members-list');
+    renderMembersList('child-clan-dash-members-list');
+  } catch (err) {
+    console.error('Erro ao carregar dashboard analítico do clã:', err);
+  }
+}
+
 
 // ─────────────────────────────────────────────────────────
 // 🔍 VALIDADOR DE PROVAS PENDENTES (AVALIAÇÃO EM TEMPO REAL)

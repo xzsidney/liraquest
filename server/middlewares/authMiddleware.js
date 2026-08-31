@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { FamilyUser } from '../models/FamilyUser.js';
+import { recordUserActivity } from '../utils/userPresence.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'liraquest_family_rpg_secret_key_2026';
 
@@ -26,6 +27,9 @@ export const authenticateToken = async (req, res, next) => {
         message: 'Usuário associado ao token não foi encontrado.',
       });
     }
+
+    // Registrar presença em tempo real
+    recordUserActivity(user.id);
 
     req.user = user;
     next();

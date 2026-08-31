@@ -1814,7 +1814,7 @@
             </div>
           </div>
 
-          <!-- MENU DE 4 ABAS DO GUARDIÃO -->
+          <!-- MENU DE 5 ABAS DO GUARDIÃO -->
           <div class="sidebar-menu">
             <button id="parent-nav-submissions" class="sidebar-menu-btn active" onclick="switchParentTerminalTab('submissions')">
               <span style="font-size: 1.15rem;">🔍</span> Provas Pendentes
@@ -1822,6 +1822,9 @@
             </button>
             <button id="parent-nav-tasks" class="sidebar-menu-btn" onclick="switchParentTerminalTab('tasks')">
               <span style="font-size: 1.15rem;">📋</span> Gestão de Missões (CRUD)
+            </button>
+            <button id="parent-nav-clan-dashboard" class="sidebar-menu-btn" onclick="switchParentTerminalTab('clan-dashboard')">
+              <span style="font-size: 1.15rem;">📊</span> Painel do Clã
             </button>
             <button id="parent-nav-clan" class="sidebar-menu-btn" onclick="switchParentTerminalTab('clan')">
               <span style="font-size: 1.15rem;">🏰</span> Filhos & Clã Familiar
@@ -1833,8 +1836,74 @@
 
         </aside>
 
-        <!-- ÁREA PRINCIPAL COM AS 4 ABAS DO GUARDIÃO -->
+        <!-- ÁREA PRINCIPAL COM AS ABAS DO GUARDIÃO -->
         <main class="child-content-card">
+          
+          <!-- ==================== ABA: PAINEL DO CLÃ (DASHBOARD ANALÍTICO) ==================== -->
+          <div id="parent-panel-clan-dashboard" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+              <div>
+                <h2 style="font-size: 1.5rem; color: #ffffff; display: flex; align-items: center; gap: 10px;">
+                  <span>📊</span> Painel de Controle do Clã
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">
+                  Métricas em tempo real, presença da família e acompanhamento de desempenho dos heróis.
+                </p>
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="loadClanAnalyticsDashboard()">
+                🔄 Atualizar Dados
+              </button>
+            </div>
+
+            <!-- GRID DE MÉTRICAS GLOBAIS DO CLÃ -->
+            <div class="stats-grid" style="margin-bottom: 24px;">
+              <div class="stat-card" style="border-color: rgba(34, 197, 94, 0.35);">
+                <span class="stat-label">🟢 Presença Online</span>
+                <span id="clan-dash-online-count" class="stat-number" style="color: #4ade80; font-size: 1.4rem;">0 / 0</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">Membros conectados</span>
+              </div>
+              <div class="stat-card" style="border-color: rgba(59, 130, 246, 0.35);">
+                <span class="stat-label">📋 Missões Concluídas</span>
+                <span id="clan-dash-tasks-count" class="stat-number" style="color: #60a5fa; font-size: 1.4rem;">0</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">Total aprovado no clã</span>
+              </div>
+              <div class="stat-card" style="border-color: rgba(245, 158, 11, 0.35);">
+                <span class="stat-label">💰 Tesouro da Família</span>
+                <span id="clan-dash-gold-count" class="stat-number" style="color: #fde047; font-size: 1.4rem;">0</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">Ouro total acumulado</span>
+              </div>
+              <div class="stat-card" style="border-color: rgba(249, 115, 22, 0.35);">
+                <span class="stat-label">🔥 Maior Sequência</span>
+                <span id="clan-dash-streak-count" class="stat-number" style="color: #fb923c; font-size: 1.4rem;">0d</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">Recorde de dias ativos</span>
+              </div>
+            </div>
+
+            <!-- DESTAQUES: CAMPEÃO DA CASA vs HERÓI EM FOCO (2 CARDS) -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 28px;">
+              
+              <!-- CARD 1: CAMPEÃO DA CASA (MAIS TAREFAS) -->
+              <div id="clan-dash-top-performer-card" style="background: linear-gradient(135deg, rgba(128, 0, 32, 0.4), rgba(245, 158, 11, 0.15)); border: 1px solid rgba(212, 175, 55, 0.45); border-radius: 18px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; min-height: 200px;">
+                <!-- Preenchido via JS -->
+              </div>
+
+              <!-- CARD 2: HERÓI EM FOCO (MENOS TAREFAS / INCENTIVO) -->
+              <div id="clan-dash-needs-attention-card" style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.4), rgba(15, 23, 42, 0.8)); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 18px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; min-height: 200px;">
+                <!-- Preenchido via JS -->
+              </div>
+
+            </div>
+
+            <!-- LISTA & STATUS DE TODOS OS MEMBROS DO CLÃ -->
+            <div style="margin-top: 10px;">
+              <h3 style="font-size: 1.2rem; color: #ffffff; margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
+                <span>👥</span> Desempenho & Presença de Todos os Membros
+              </h3>
+              <div id="clan-dash-members-list" style="display: flex; flex-direction: column; gap: 10px;">
+                <!-- Preenchido via JS -->
+              </div>
+            </div>
+          </div>
           
           <!-- ==================== ABA 1: VALIDADOR DE PROVAS PENDENTES ==================== -->
           <div id="parent-panel-submissions">
@@ -2091,13 +2160,16 @@
             </div>
           </div>
 
-          <!-- MENU LATERAL COM AS 4 ABAS -->
+          <!-- MENU LATERAL COM AS 5 ABAS -->
           <div class="sidebar-menu">
             <button id="child-nav-tasks" class="sidebar-menu-btn active" onclick="switchChildTerminalTab('tasks')">
               <span>📋</span> Missões do Dia
             </button>
             <button id="child-nav-studies" class="sidebar-menu-btn" onclick="switchChildTerminalTab('studies')">
               <span>📚</span> Foco & Estudos
+            </button>
+            <button id="child-nav-clan-dashboard" class="sidebar-menu-btn" onclick="switchChildTerminalTab('clan-dashboard')">
+              <span>📊</span> Painel do Clã
             </button>
             <button id="child-nav-history" class="sidebar-menu-btn" onclick="switchChildTerminalTab('history')">
               <span>📜</span> Histórico
@@ -2110,6 +2182,72 @@
 
         <!-- ÁREA PRINCIPAL DE CONTEÚDO DO TERMINAL DO FILHO -->
         <div class="child-content-card">
+          
+          <!-- PAINEL: 📊 PAINEL DO CLÃ (DASHBOARD ANALÍTICO FILHO) -->
+          <div id="child-panel-clan-dashboard" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+              <div>
+                <h2 style="font-size: 1.5rem; color: #ffffff; display: flex; align-items: center; gap: 10px;">
+                  <span>📊</span> Painel de Controle do Clã
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">
+                  Acompanhe o progresso coletivo da sua família e o ranking dos heróis da casa!
+                </p>
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="loadClanAnalyticsDashboard()">
+                🔄 Atualizar Dados
+              </button>
+            </div>
+
+            <!-- GRID DE MÉTRICAS GLOBAIS DO CLÃ -->
+            <div class="stats-grid" style="margin-bottom: 24px;">
+              <div class="stat-card" style="border-color: rgba(34, 197, 94, 0.35);">
+                <span class="stat-label">🟢 Presença Online</span>
+                <span id="child-clan-dash-online-count" class="stat-number" style="color: #4ade80; font-size: 1.4rem;">0 / 0</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">Membros conectados</span>
+              </div>
+              <div class="stat-card" style="border-color: rgba(59, 130, 246, 0.35);">
+                <span class="stat-label">📋 Missões Concluídas</span>
+                <span id="child-clan-dash-tasks-count" class="stat-number" style="color: #60a5fa; font-size: 1.4rem;">0</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">Total aprovado no clã</span>
+              </div>
+              <div class="stat-card" style="border-color: rgba(245, 158, 11, 0.35);">
+                <span class="stat-label">💰 Tesouro da Família</span>
+                <span id="child-clan-dash-gold-count" class="stat-number" style="color: #fde047; font-size: 1.4rem;">0</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">Ouro total acumulado</span>
+              </div>
+              <div class="stat-card" style="border-color: rgba(249, 115, 22, 0.35);">
+                <span class="stat-label">🔥 Maior Sequência</span>
+                <span id="child-clan-dash-streak-count" class="stat-number" style="color: #fb923c; font-size: 1.4rem;">0d</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">Recorde de dias ativos</span>
+              </div>
+            </div>
+
+            <!-- DESTAQUES: CAMPEÃO DA CASA vs HERÓI EM FOCO (2 CARDS) -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 28px;">
+              
+              <!-- CARD 1: CAMPEÃO DA CASA (MAIS TAREFAS) -->
+              <div id="child-clan-dash-top-performer-card" style="background: linear-gradient(135deg, rgba(128, 0, 32, 0.4), rgba(245, 158, 11, 0.15)); border: 1px solid rgba(212, 175, 55, 0.45); border-radius: 18px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; min-height: 200px;">
+                <!-- Preenchido via JS -->
+              </div>
+
+              <!-- CARD 2: HERÓI EM FOCO (MENOS TAREFAS / INCENTIVO) -->
+              <div id="child-clan-dash-needs-attention-card" style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.4), rgba(15, 23, 42, 0.8)); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 18px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; min-height: 200px;">
+                <!-- Preenchido via JS -->
+              </div>
+
+            </div>
+
+            <!-- LISTA & STATUS DE TODOS OS MEMBROS DO CLÃ -->
+            <div style="margin-top: 10px;">
+              <h3 style="font-size: 1.2rem; color: #ffffff; margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
+                <span>👥</span> Desempenho & Presença de Todos os Membros
+              </h3>
+              <div id="child-clan-dash-members-list" style="display: flex; flex-direction: column; gap: 10px;">
+                <!-- Preenchido via JS -->
+              </div>
+            </div>
+          </div>
           
           <!-- PAINEL 1: 📋 MISSÕES DO DIA -->
           <div id="child-panel-tasks">

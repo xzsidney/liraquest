@@ -4,8 +4,12 @@ import {
   FamilyMember,
   FamilyUser,
   Character,
+  Task,
+  TaskSubmission,
+  UserProgress,
 } from '../models/index.js';
 import { ensureFamilyHasTasks } from './userProgressController.js';
+import { getUserPresence } from '../utils/userPresence.js';
 
 /**
  * Gera um código de convite amigável e único (ex: LIRA-7842)
@@ -204,3 +208,165 @@ export const getMyFamily = async (req, res) => {
     });
   }
 };
+
+/**
+ * Retorna as análises completas para o Painel do Clã (Dashboard da Família)
+ * - Membros com presença online em tempo real
+ * - Top Herói (quem fez mais tarefas)
+ * - Herói em Foco (quem precisa de incentivo)
+ * - Métricas consolidadas do clã
+ */
+export const getFamilyAnalytics = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // Localizar família do usuário
+    const membership = await FamilyMember.findOne({
+      where: { user_id: userId },
+      include: [{ model: Family, as: 'family' }],
+    });
+
+    if (!membership || !membership.family) {
+      return res.status(404).json({
+        success: false,
+        message: 'Você ainda não está vinculado a nenhuma família.',
+      });
+    }
+
+    const familyId = membership.family.id;
+
+    // Buscar todos os membros com User, Character e Progress
+    const familyMembers = await FamilyMember.findAll({
+      where: { family_id: familyId },
+      include: [
+        {
+          model: FamilyUser,
+          as: 'user',
+          attributes: ['id', 'name', 'email', 'role', 'phone', 'school_or_work', 'profile_photo_url'],
+          include: [
+            { model: Character, as: 'character' },
+            { model: UserProgress, as: 'progress' },
+          ],
+        },
+      ],
+    });
+
+    // Buscar contagem de tarefas ativas e pendências
+    const [totalActiveTasks, pendingSubmissionsCount] = await Promise.all([
+      Task.count({ where: { family_id: familyId, is_active: true } }),
+      TaskSubmission.count({
+        include: [{ model: Task, as: 'task', where: { family_id: familyId }, required: true }],
+        where: { status: 'PENDING' },
+      }),
+    ]);
+
+    // Processar dados de cada membro
+    const processedMembers = await Promise.all(
+      familyMembers.map(async (m) => {
+        const u = m.user;
+        if (!u) return null;
+
+        const presence = getUserPresence(u.id);
+        const hero = u.character;
+        const progress = u.progress;
+
+        // Contar tarefas aprovadas do usuário
+        const approvedCount = await TaskSubmission.count({
+          where: { user_id: u.id, status: 'APPROVED' },
+        });
+
+        // Contar tarefas submetidas hoje
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+        const submittedTodayCount = await TaskSubmission.count({
+          where: {
+            user_id: u.id,
+            created_at: { [sequelize.Sequelize.Op.gte]: todayStart },
+          },
+        });
+
+        return {
+          id: u.id,
+          name: u.name,
+          email: u.email,
+          role: u.role,
+          role_in_family: m.role_in_family,
+          profile_photo_url: u.profile_photo_url,
+          presence,
+          hero: hero
+            ? {
+                id: hero.id,
+                name: hero.name,
+                level: hero.level || 1,
+                gold: hero.gold || 0,
+                avatar_value: hero.avatar_value,
+              }
+            : null,
+          progress: {
+            tasks_completed_today: progress?.tasks_completed_today || submittedTodayCount,
+            tasks_completed_total: progress?.tasks_completed_total || approvedCount,
+            current_streak: progress?.current_streak || 0,
+            longest_streak: progress?.longest_streak || 0,
+            token_balance: progress?.token_balance || 0,
+            energy_balance: progress?.energy_balance || 0,
+          },
+          total_approved_tasks: approvedCount,
+        };
+      })
+    );
+
+    const validMembers = processedMembers.filter(Boolean);
+    const children = validMembers.filter((m) => m.role === 'CHILD');
+
+    // Ordenar filhos por total de tarefas concluídas (decrescente)
+    const sortedChildren = [...children].sort(
+      (a, b) => (b.total_approved_tasks || 0) - (a.total_approved_tasks || 0)
+    );
+
+    const topPerformer = sortedChildren.length > 0 ? sortedChildren[0] : null;
+    const needsAttention =
+      sortedChildren.length > 1
+        ? sortedChildren[sortedChildren.length - 1]
+        : sortedChildren.length === 1 && sortedChildren[0].total_approved_tasks === 0
+        ? sortedChildren[0]
+        : null;
+
+    // Métricas consolidadas do clã
+    const totalClanTasks = validMembers.reduce((acc, m) => acc + (m.total_approved_tasks || 0), 0);
+    const totalClanGold = validMembers.reduce((acc, m) => acc + (m.hero?.gold || 0), 0);
+    const totalClanTokens = validMembers.reduce((acc, m) => acc + (m.progress?.token_balance || 0), 0);
+    const maxClanStreak = validMembers.reduce((acc, m) => Math.max(acc, m.progress?.current_streak || 0), 0);
+
+    const onlineMembersCount = validMembers.filter((m) => m.presence.is_online).length;
+
+    return res.json({
+      success: true,
+      family: {
+        id: membership.family.id,
+        name: membership.family.name,
+        invite_code: membership.family.invite_code,
+      },
+      clanStats: {
+        totalMembers: validMembers.length,
+        totalChildren: children.length,
+        onlineMembersCount,
+        totalClanTasks,
+        totalClanGold,
+        totalClanTokens,
+        maxClanStreak,
+        totalActiveTasks,
+        pendingSubmissionsCount,
+      },
+      topPerformer,
+      needsAttention,
+      members: validMembers,
+    });
+  } catch (error) {
+    console.error('❌ Erro ao calcular análises do clã:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Erro interno ao consultar painel do clã.',
+    });
+  }
+};
+

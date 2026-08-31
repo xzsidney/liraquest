@@ -4,6 +4,7 @@ import {
   createFamily,
   joinFamily,
   getMyFamily,
+  getFamilyAnalytics,
 } from '../controllers/familyController.js';
 
 const router = express.Router();
@@ -14,5 +15,7 @@ router.use(authenticateToken);
 router.post('/create', authorizeRoles('ADMIN', 'PARENT'), createFamily);
 router.post('/join', joinFamily);
 router.get('/my-family', getMyFamily);
+router.get('/analytics', getFamilyAnalytics);
 
 export default router;
+

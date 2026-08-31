@@ -47,6 +47,8 @@ Este documento cataloga todos os endpoints REST e eventos de WebSocket (Socket.I
 | `POST` | `/api/family/create` | JWT (`PARENT` / `ADMIN`) | Cria uma nova família e gera código único (ex: `LIRA-7842`) |
 | `POST` | `/api/family/join` | JWT | Ingressa em uma família através do código de convite |
 | `GET` | `/api/family/my-family` | JWT | Retorna dados da família do usuário, membros e heróis vinculados |
+| `GET` | `/api/family/analytics` | JWT | Retorna métricas do Painel do Clã (membros online em tempo real, Top Herói que mais fez tarefas, Herói em foco e totais do clã) |
+
 
 ---
 
