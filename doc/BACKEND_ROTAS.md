@@ -21,6 +21,8 @@ Este documento cataloga todos os endpoints REST e eventos de WebSocket (Socket.I
 | `POST` | `/api/auth/login` | Pública | Autentica e retorna token JWT com dados do usuário |
 | `GET` | `/api/auth/me` | JWT | Retorna os dados do usuário autenticado atual |
 | `GET` | `/api/auth/users` | JWT (`ADMIN`) | Lista todos os usuários cadastrados no sistema |
+| `GET` | `/testeBD` (ou `/api/testeBD`) | Pública | Rota diagnóstica que testa a conexão com o banco MySQL e retorna status em JSON |
+
 
 ---
 

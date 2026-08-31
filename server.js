@@ -52,6 +52,55 @@ app.get('/api/status', (req, res) => {
   });
 });
 
+// Rota Diagnóstica de Teste do Banco de Dados: http://liraquest.com.br/testeBD
+app.get(['/testeBD', '/api/testeBD'], async (req, res) => {
+  const startTime = Date.now();
+  try {
+    await sequelize.authenticate();
+    const responseTimeMs = Date.now() - startTime;
+
+    const rawUrl = process.env.DATABASE_URL || '';
+    const maskedUrl = rawUrl ? rawUrl.replace(/:([^:@]+)@/, ':****@') : 'Não definida no .env';
+
+    return res.json({
+      success: true,
+      status: 'Conectado com sucesso! 🎉',
+      message: '✅ A conexão entre o Node.js e o banco MySQL da Hostinger está 100% operacional!',
+      database: {
+        dialect: sequelize.getDialect(),
+        database_name: sequelize.config.database || 'N/A',
+        host: sequelize.config.host || 'localhost',
+        port: sequelize.config.port || 3306,
+        response_time_ms: `${responseTimeMs}ms`,
+      },
+      env_check: {
+        has_database_url: Boolean(process.env.DATABASE_URL),
+        masked_database_url: maskedUrl,
+        node_env: process.env.NODE_ENV || 'production',
+      },
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    const responseTimeMs = Date.now() - startTime;
+    return res.status(500).json({
+      success: false,
+      status: 'Falha na conexão com o banco de dados',
+      message: '❌ Não foi possível conectar ao MySQL. Verifique as credenciais no arquivo .env.',
+      error_details: {
+        message: error.message,
+        code: error.code || error.original?.code || 'UNKNOWN_ERROR',
+        name: error.name,
+      },
+      env_check: {
+        has_database_url: Boolean(process.env.DATABASE_URL),
+        node_env: process.env.NODE_ENV || 'production',
+      },
+      timestamp: new Date().toISOString(),
+    });
+  }
+});
+
+
 // Fallback para SPA (Single Page Application)
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
