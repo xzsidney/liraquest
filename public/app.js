@@ -177,7 +177,6 @@ async function handleRegister(e) {
   const name = document.getElementById('reg-name').value.trim();
   const email = document.getElementById('reg-email').value.trim();
   const password = document.getElementById('reg-password').value;
-  const role = document.getElementById('reg-role').value;
   const btnSubmit = document.getElementById('btn-register-submit');
 
   if (!name || !email || !password) {
@@ -192,7 +191,7 @@ async function handleRegister(e) {
     const res = await fetch(`${API_BASE}/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password, role }),
+      body: JSON.stringify({ name, email, password, role: 'CHILD' }),
     });
 
     const data = await res.json();
