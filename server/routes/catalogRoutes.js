@@ -5,6 +5,7 @@ import {
   getSkillsByClass,
   getItems,
   getMonsters,
+  getDefinitionTasks,
 } from '../controllers/catalogController.js';
 
 const router = express.Router();
@@ -15,5 +16,7 @@ router.get('/classes', getClasses);
 router.get('/skills/:classId', getSkillsByClass);
 router.get('/items', getItems);
 router.get('/monsters', getMonsters);
+router.get('/tasks', getDefinitionTasks);
+
 
 export default router;

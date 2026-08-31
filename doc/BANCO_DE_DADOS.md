@@ -166,6 +166,26 @@ Catálogo de monstros e chefes para o motor de combate Phaser e Raids.
 | `sprite_key` | `VARCHAR(100)` | Sim | Chave do sprite visual |
 | `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
 
+### 📋 `definition_tasks`
+Catálogo oficial das 42 tarefas padrão da vida real (Domestic, Study, Health, Creative, Social).
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único UUID |
+| `slug` | `VARCHAR(100)` (Unique) | Não | Identificador legível (ex: `'arrumar-cama'`) |
+| `name` | `VARCHAR(150)` | Não | Nome da missão exibido no app |
+| `description` | `TEXT` | Sim | Instruções práticas |
+| `category` | `ENUM(...)` | Não | `DOMESTIC`, `STUDY`, `HEALTH`, `CREATIVE`, `SOCIAL` |
+| `difficulty` | `ENUM(...)` | Não | `EASY`, `MEDIUM`, `HARD` |
+| `allowed_profile` | `ENUM(...)` | Não | `ALL`, `CHILD_ONLY`, `ADULT_ONLY` |
+| `reward_xp` | `INT` | Não | XP concedido ao completar |
+| `reward_gold` | `INT` | Não | Ouro concedido ao completar |
+| `reward_energy` | `INT` | Não | ⚡ Energia de Aventura concedida |
+| `estimated_time` | `VARCHAR(50)` | Sim | Tempo estimado (ex: `'5-10 min'`) |
+| `requires_proof` | `BOOLEAN` | Não | Se exige foto/texto como prova |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+
+
 ---
 
 ## 4. Módulo de Personagem (`characters` e `character_*`)

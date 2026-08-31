@@ -4,7 +4,9 @@ import {
   DefinitionSkill,
   DefinitionItem,
   DefinitionMonster,
+  DefinitionTask,
 } from '../models/index.js';
+
 
 /**
  * Lista todos os 6 atributos fundamentais do RPG
@@ -122,3 +124,27 @@ export const getMonsters = async (req, res) => {
     });
   }
 };
+
+/**
+ * Lista o catálogo oficial de 42 tarefas padrão do LiraQuest
+ */
+export const getDefinitionTasks = async (req, res) => {
+  try {
+    const tasks = await DefinitionTask.findAll({
+      order: [['category', 'ASC'], ['difficulty', 'ASC'], ['name', 'ASC']],
+    });
+    return res.json({
+      success: true,
+      count: tasks.length,
+      tasks,
+    });
+  } catch (error) {
+    console.error('❌ Erro ao buscar catálogo de tarefas:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Erro interno ao buscar catálogo de tarefas.',
+    });
+  }
+};
+
+

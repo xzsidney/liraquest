@@ -33,6 +33,8 @@ Este documento cataloga todos os endpoints REST e eventos de WebSocket (Socket.I
 | `GET` | `/api/catalog/skills/:classId` | Pública | Lista as habilidades da Árvore de Talentos de uma classe específica |
 | `GET` | `/api/catalog/items` | Pública | Lista os itens e recompensas disponíveis na Loja do Reino |
 | `GET` | `/api/catalog/monsters` | Pública | Lista os monstros e chefes cadastrados |
+| `GET` | `/api/catalog/tasks` | Pública | Lista o catálogo oficial de 42 tarefas padrão da vida real |
+
 
 ---
 

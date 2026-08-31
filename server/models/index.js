@@ -8,7 +8,9 @@ import { DefinitionClass } from './DefinitionClass.js';
 import { DefinitionSkill } from './DefinitionSkill.js';
 import { DefinitionItem } from './DefinitionItem.js';
 import { DefinitionMonster } from './DefinitionMonster.js';
+import { DefinitionTask } from './DefinitionTask.js';
 import { Character } from './Character.js';
+
 import { CharacterClass } from './CharacterClass.js';
 import { CharacterAttribute } from './CharacterAttribute.js';
 import { CharacterSkill } from './CharacterSkill.js';
@@ -113,6 +115,7 @@ export {
   DefinitionSkill,
   DefinitionItem,
   DefinitionMonster,
+  DefinitionTask,
   Character,
   CharacterClass,
   CharacterAttribute,
