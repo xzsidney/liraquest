@@ -87,7 +87,17 @@ Este documento cataloga todos os endpoints REST e eventos de WebSocket (Socket.I
 
 ---
 
-## 8. WebSockets em Tempo Real (Socket.IO) — *Fase 4*
+## 8. Módulo de Progresso do Terminal do Usuário (`/api/progress`)
+
+| Método | Rota | Autenticação | Descrição |
+|:---|:---|:---|:---|
+| `GET` | `/api/progress/me` | JWT | Retorna o registro de progresso (Energia, Fichas do Lar, Streak, estatísticas) |
+| `GET` | `/api/progress/dashboard` | JWT | Retorna pacote unificado para o Terminal do Usuário (progress + tarefas pendentes + aprovadas hoje + histórico) |
+
+---
+
+
+## 9. WebSockets em Tempo Real (Socket.IO) — *Fase 4*
 
 ### Eventos de Sala Familiar
 - `join_family_room`: Conexão do usuário à sala exclusiva do seu clã familiar (`family_{id}`).

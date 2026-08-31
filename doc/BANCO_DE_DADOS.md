@@ -34,7 +34,24 @@ Armazena a conta de acesso ao sistema (Mundo Real).
 | `profile_photo_url` | `VARCHAR(255)` | Sim | URL da foto real do usuário |
 | `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
 
+### 📈 `user_progress`
+Armazena o estado vivo, saldos do mundo real e estatísticas do usuário no Terminal do Usuário (relação 1:1 com `family_users`).
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único do progresso |
+| `user_id` | `UUID` (FK) | Não | Referência a `family_users.id` (Único / 1:1) |
+| `adventure_energy` | `INT` | Não | ⚡ Energia de Aventura para batalhas/masmorras |
+| `family_tokens` | `INT` | Não | 🏠 Fichas do Lar para recompensas da vida real |
+| `tasks_done_total` | `INT` | Não | 📊 Total acumulado de tarefas aprovadas |
+| `tasks_done_today` | `INT` | Não | 📅 Tarefas aprovadas no dia de hoje |
+| `streak_days` | `INT` | Não | 🔥 Dias consecutivos com tarefas completadas |
+| `best_streak_days` | `INT` | Não | 🏆 Maior streak histórica alcançada |
+| `last_active_date` | `DATEONLY` | Sim | 📆 Data da última tarefa aprovada ('YYYY-MM-DD') |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+
 ---
+
 
 ## 2. Módulo Familiar (Clãs)
 
@@ -238,7 +255,13 @@ Missões da vida real criadas pelos Pais (Guardiões).
 | `description` | `TEXT` | Sim | Detalhes e instruções |
 | `xp_reward` | `INT` | Não | XP concedido ao herói |
 | `gold_reward` | `INT` | Não | Ouro concedido ao herói |
-| `category` | `VARCHAR(50)` | Não | Categoria (Estudos, Limpeza, Saúde, etc.) |
+| `energy_reward` | `INT` | Não | ⚡ Energia de Aventura concedida ao herói |
+| `token_reward` | `INT` | Não | 🏠 Fichas do Lar concedidas ao usuário real |
+| `category` | `ENUM('DOMESTIC','STUDY','HEALTH','CREATIVE','SOCIAL','GERAL')` | Não | Categoria da missão |
+| `difficulty` | `ENUM('EASY','MEDIUM','HARD')` | Não | Dificuldade da tarefa |
+| `allowed_profile` | `ENUM('ALL','CHILD_ONLY','ADULT_ONLY')` | Não | Perfil com permissão de visualizar |
+| `requires_proof` | `BOOLEAN` | Não | Se exige foto/texto como prova |
+| `estimated_time` | `VARCHAR(50)` | Sim | Tempo estimado de execução (ex: '15-20 min') |
 | `is_active` | `BOOLEAN` | Não | Status da tarefa |
 | `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
 

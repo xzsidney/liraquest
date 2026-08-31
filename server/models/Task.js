@@ -46,8 +46,46 @@ Task.init(
       validate: { min: 0 },
     },
     category: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.ENUM('DOMESTIC', 'STUDY', 'HEALTH', 'CREATIVE', 'SOCIAL', 'GERAL'),
       defaultValue: 'GERAL',
+    },
+    // Dificuldade da tarefa — determina quanto de Energia de Aventura é concedida
+    difficulty: {
+      type: DataTypes.ENUM('EASY', 'MEDIUM', 'HARD'),
+      allowNull: false,
+      defaultValue: 'MEDIUM',
+    },
+    // ⚡ Energia de Aventura concedida ao herói quando aprovada
+    energy_reward: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 2,
+      validate: { min: 0 },
+    },
+    // 🏠 Fichas do Lar concedidas ao usuário real quando aprovada
+    token_reward: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+      validate: { min: 0 },
+    },
+    // Define quem pode ver e realizar esta tarefa
+    allowed_profile: {
+      type: DataTypes.ENUM('ALL', 'CHILD_ONLY', 'ADULT_ONLY'),
+      allowNull: false,
+      defaultValue: 'ALL',
+    },
+    // Se o filho precisa enviar foto ou texto como comprovação
+    requires_proof: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+    },
+    // Tempo estimado de execução exibido no card (ex: '15-20 min')
+    estimated_time: {
+      type: DataTypes.STRING(50),
+      allowNull: true,
+      defaultValue: null,
     },
     is_active: {
       type: DataTypes.BOOLEAN,

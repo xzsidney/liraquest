@@ -8,6 +8,8 @@ import {
   Character,
   CharacterClass,
 } from '../models/index.js';
+import { creditTaskRewards } from './userProgressController.js';
+
 
 /**
  * Cria uma nova missão da vida real (exclusivo para PARENT ou ADMIN)
@@ -241,44 +243,53 @@ export const reviewSubmission = async (req, res) => {
 
     let leveledUp = false;
     let newLevel = 1;
+    let updatedProgress = null;
 
-    // Se aprovada, creditar XP e Ouro automaticamente
-    if (status === 'APPROVED' && submission.character_id) {
-      const hero = await Character.findByPk(submission.character_id);
-      if (hero) {
-        // Creditar ouro
-        const goldGain = submission.task.gold_reward || 0;
-        await hero.update({ gold: hero.gold + goldGain });
+    // Se aprovada, creditar XP e Ouro no herói E recompensas reais no user_progress
+    if (status === 'APPROVED') {
+      // ── 1. Recompensas do Mundo Virtual (Herói RPG) ──
+      if (submission.character_id) {
+        const hero = await Character.findByPk(submission.character_id);
+        if (hero) {
+          // Creditar Ouro do Reino
+          const goldGain = submission.task.gold_reward || 0;
+          await hero.update({ gold: hero.gold + goldGain });
 
-        // Creditar XP na classe ativa
-        const xpGain = submission.task.xp_reward || 0;
-        let classProgress = await CharacterClass.findOne({
-          where: { character_id: hero.id, class_id: hero.current_class_id },
-        });
-
-        if (classProgress) {
-          let currentXP = classProgress.xp + xpGain;
-          let currentLevel = classProgress.level;
-          let reqXP = currentLevel * 100;
-
-          while (currentXP >= reqXP) {
-            currentXP -= reqXP;
-            currentLevel += 1;
-            leveledUp = true;
-            reqXP = currentLevel * 100;
-          }
-
-          await classProgress.update({
-            xp: currentXP,
-            level: currentLevel,
+          // Creditar XP na classe ativa + calcular Level Up
+          const xpGain = submission.task.xp_reward || 0;
+          let classProgress = await CharacterClass.findOne({
+            where: { character_id: hero.id, class_id: hero.current_class_id },
           });
 
-          newLevel = currentLevel;
+          if (classProgress) {
+            let currentXP = classProgress.xp + xpGain;
+            let currentLevel = classProgress.level;
+            let reqXP = currentLevel * 100;
+
+            while (currentXP >= reqXP) {
+              currentXP -= reqXP;
+              currentLevel += 1;
+              leveledUp = true;
+              reqXP = currentLevel * 100;
+            }
+
+            await classProgress.update({ xp: currentXP, level: currentLevel });
+            newLevel = currentLevel;
+          }
         }
+      }
+
+      // ── 2. Recompensas do Mundo Real (Terminal do Usuário) ──
+      // Credita: Energia de Aventura, Fichas do Lar, Streak, Contadores
+      try {
+        updatedProgress = await creditTaskRewards(submission.user_id, submission.task);
+      } catch (progressError) {
+        // Não falha a aprovação se o progress der erro — apenas loga
+        console.error('⚠️ Erro ao creditar recompensas no user_progress:', progressError);
       }
     }
 
-    // Atualizar submissão
+    // Atualizar submissão com resultado da avaliação
     await submission.update({
       status,
       feedback: feedback ? feedback.trim() : null,
@@ -286,14 +297,19 @@ export const reviewSubmission = async (req, res) => {
       reviewed_at: new Date(),
     });
 
+    const energyCredited = submission.task.energy_reward || 0;
+    const tokensCredited = submission.task.token_reward || 0;
+
     return res.json({
       success: true,
-      message: status === 'APPROVED'
-        ? `🎉 Missão aprovada! ${submission.task.xp_reward} XP e ${submission.task.gold_reward} Ouro creditados ao herói!`
-        : 'Missão rejeitada com feedback para o herói.',
+      message:
+        status === 'APPROVED'
+          ? `🎉 Missão aprovada! ${submission.task.xp_reward} XP, ${submission.task.gold_reward} Ouro, ${energyCredited} ⚡ Energia e ${tokensCredited} 🏠 Fichas creditados!`
+          : 'Missão rejeitada com feedback para o herói.',
       leveledUp,
       newLevel,
       submission,
+      progress: updatedProgress,
     });
   } catch (error) {
     console.error('❌ Erro ao avaliar comprovação:', error);

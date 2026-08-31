@@ -1,6 +1,8 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { FamilyUser } from '../models/FamilyUser.js';
+import { UserProgress } from '../models/UserProgress.js';
+
 
 const JWT_SECRET = process.env.JWT_SECRET || 'liraquest_family_rpg_secret_key_2026';
 const JWT_EXPIRES_IN = '7d';
@@ -51,6 +53,10 @@ export const register = async (req, res) => {
       password: hashedPassword,
       role: userRole,
     });
+
+    // Criar automaticamente o registro de progresso do Terminal do Usuário (1:1)
+    await UserProgress.create({ user_id: newUser.id });
+
 
     // Geração do token JWT
     const token = jwt.sign(

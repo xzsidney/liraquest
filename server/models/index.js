@@ -2,6 +2,7 @@ import { sequelize } from '../config/database.js';
 import { FamilyUser } from './FamilyUser.js';
 import { Family } from './Family.js';
 import { FamilyMember } from './FamilyMember.js';
+import { UserProgress } from './UserProgress.js';
 import { DefinitionAttribute } from './DefinitionAttribute.js';
 import { DefinitionClass } from './DefinitionClass.js';
 import { DefinitionSkill } from './DefinitionSkill.js';
@@ -20,6 +21,11 @@ import { Battle } from './Battle.js';
 // ==========================================
 // 1. Associações de Usuário & Família
 // ==========================================
+
+// Progresso do Terminal do Usuário (1:1)
+FamilyUser.hasOne(UserProgress, { foreignKey: 'user_id', as: 'progress' });
+UserProgress.belongsTo(FamilyUser, { foreignKey: 'user_id', as: 'user' });
+
 FamilyUser.hasOne(Character, { foreignKey: 'user_id', as: 'character' });
 Character.belongsTo(FamilyUser, { foreignKey: 'user_id', as: 'user' });
 
@@ -99,6 +105,7 @@ Battle.belongsTo(DefinitionMonster, { foreignKey: 'monster_id', as: 'monster' })
 export {
   sequelize,
   FamilyUser,
+  UserProgress,
   Family,
   FamilyMember,
   DefinitionAttribute,
