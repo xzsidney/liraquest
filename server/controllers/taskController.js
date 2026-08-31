@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { Op } from 'sequelize';
 import {
   Task,
   TaskSubmission,
@@ -7,8 +8,9 @@ import {
   FamilyUser,
   Character,
   CharacterClass,
+  DefinitionTask,
 } from '../models/index.js';
-import { creditTaskRewards } from './userProgressController.js';
+import { creditTaskRewards, ensureFamilyHasTasks } from './userProgressController.js';
 
 
 /**
@@ -63,23 +65,59 @@ export const createTask = async (req, res) => {
 };
 
 /**
- * Lista todas as missões ativas da família do usuário
+ * Lista todas as missões ativas da família do usuário (ou catálogo global se sem família)
  */
 export const listFamilyTasks = async (req, res) => {
   try {
     const userId = req.user.id;
-    const membership = await FamilyMember.findOne({ where: { user_id: userId } });
+    const membership = await FamilyMember.findOne({
+      where: { user_id: userId },
+      include: [{ model: Family, as: 'family' }],
+    });
 
-    if (!membership) {
+    if (!membership || !membership.family_id) {
+      // Usuário sem família: retorna catálogo global
+      const defTasks = await DefinitionTask.findAll({
+        where: {
+          allowed_profile: {
+            [Op.in]:
+              req.user.role === 'PARENT' || req.user.role === 'ADMIN'
+                ? ['ALL', 'ADULT_ONLY']
+                : ['ALL', 'CHILD_ONLY'],
+          },
+        },
+        order: [['difficulty', 'ASC'], ['created_at', 'ASC']],
+      });
+
       return res.json({
         success: true,
-        tasks: [],
-        message: 'Usuário não vinculado a uma família.',
+        count: defTasks.length,
+        tasks: defTasks.map((d) => ({
+          id: d.id,
+          title: d.name,
+          description: d.description,
+          category: d.category,
+          difficulty: d.difficulty || 'MEDIUM',
+          xp_reward: d.reward_xp || 50,
+          gold_reward: d.reward_gold || 10,
+          energy_reward: d.reward_energy || (d.difficulty === 'EASY' ? 1 : d.difficulty === 'HARD' ? 4 : 2),
+          token_reward: d.difficulty === 'EASY' ? 5 : d.difficulty === 'HARD' ? 30 : 15,
+          estimated_time: d.estimated_time || '15-20 min',
+          requires_proof: d.requires_proof !== false,
+          submissions: [],
+        })),
+        message: 'Missões do catálogo global LiraQuest.',
       });
     }
 
+    const familyId = membership.family_id;
+    const creatorId = membership.family?.created_by || userId;
+
+    // Garantir que a família possui as tarefas de catálogo
+    await ensureFamilyHasTasks(familyId, creatorId);
+
     const tasks = await Task.findAll({
-      where: { family_id: membership.family_id, is_active: true },
+      where: { family_id: familyId, is_active: true },
       include: [
         { model: FamilyUser, as: 'creator', attributes: ['id', 'name', 'role'] },
         { model: FamilyUser, as: 'assignee', attributes: ['id', 'name'] },
@@ -123,7 +161,36 @@ export const submitTaskProof = async (req, res) => {
       });
     }
 
-    const task = await Task.findByPk(taskId);
+    let task = await Task.findByPk(taskId);
+
+    // Se não encontrou em Task, verificar se o taskId é do DefinitionTask
+    if (!task) {
+      const defTask = await DefinitionTask.findByPk(taskId);
+      if (defTask) {
+        // Obter ou criar família temporária/usuário para persistir a instância
+        const membership = await FamilyMember.findOne({ where: { user_id: userId } });
+        const familyId = membership ? membership.family_id : userId;
+
+        task = await Task.create({
+          id: randomUUID().toLowerCase(),
+          family_id: familyId,
+          created_by: userId,
+          assigned_to: userId,
+          title: defTask.name,
+          description: defTask.description,
+          category: defTask.category,
+          difficulty: defTask.difficulty || 'MEDIUM',
+          xp_reward: defTask.reward_xp || 50,
+          gold_reward: defTask.reward_gold || 10,
+          energy_reward: defTask.reward_energy || (defTask.difficulty === 'EASY' ? 1 : defTask.difficulty === 'HARD' ? 4 : 2),
+          token_reward: defTask.difficulty === 'EASY' ? 5 : defTask.difficulty === 'HARD' ? 30 : 15,
+          estimated_time: defTask.estimated_time || '15-20 min',
+          requires_proof: defTask.requires_proof !== false,
+          is_active: true,
+        });
+      }
+    }
+
     if (!task || !task.is_active) {
       return res.status(404).json({
         success: false,

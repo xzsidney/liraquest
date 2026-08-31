@@ -5,6 +5,7 @@ import {
   FamilyUser,
   Character,
 } from '../models/index.js';
+import { ensureFamilyHasTasks } from './userProgressController.js';
 
 /**
  * Gera um código de convite amigável e único (ex: LIRA-7842)
@@ -58,6 +59,9 @@ export const createFamily = async (req, res) => {
       user_id: userId,
       role_in_family: 'GUARDIAN',
     });
+
+    // Inicializar tarefas padrão para a nova família
+    await ensureFamilyHasTasks(family.id, userId);
 
     return res.status(201).json({
       success: true,
