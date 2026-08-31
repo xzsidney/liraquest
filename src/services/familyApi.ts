@@ -1,4 +1,4 @@
-export const API_URL = import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' ? 'http://localhost:3001' : 'https://api.liragames.com.br');
+export const API_URL = import.meta.env.VITE_API_URL || '';
 
 export function getDisplayImageUrl(url?: string | null): string {
   if (!url) return 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=500';

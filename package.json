@@ -10,6 +10,8 @@
     "build:sprites": "npx tsx scripts/generateMugenRegistry.ts",
     "build:client": "npm run build:sprites && vue-tsc -b && vite build",
     "build": "npm run build:client",
+    "db:sync": "tsx scripts/syncDatabase.ts",
+    "db:seed": "tsx scripts/seedFamilyData.ts",
     "start": "node --loader tsx server.ts",
     "prod": "tsx server.ts"
   },

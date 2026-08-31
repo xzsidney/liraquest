@@ -10,7 +10,7 @@ export const incomingBattleInvite = ref<any | null>(null);
 
 export function getFamilySocket(): Socket {
   if (!socket) {
-    const baseUrl = import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' ? 'http://localhost:3001' : window.location.origin);
+    const baseUrl = import.meta.env.VITE_API_URL || undefined;
     
     socket = io(baseUrl, {
       transports: ['websocket', 'polling'],

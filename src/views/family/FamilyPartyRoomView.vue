@@ -522,7 +522,7 @@ const myCharacters = ref<any[]>([]);
 const selectedCharacterId = ref<string>('');
 const showClaimModal = ref<boolean>(false);
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' ? 'http://localhost:3001' : window.location.origin);
+const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 const avatarFileInput = ref<HTMLInputElement | null>(null);
 const uploadingAvatar = ref<boolean>(false);
 
