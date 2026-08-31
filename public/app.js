@@ -781,12 +781,27 @@ async function loadChildTerminalDashboard() {
   await loadChildTasksFallback();
 }
 
-function handleAccessAvatar() {
+async function handleAccessAvatar() {
   if (state.character) {
     navigateTo('avatar');
-  } else {
-    openHeroCreationWizard();
+    return;
   }
+
+  try {
+    const res = await fetch(`${API.character}/me`, {
+      headers: { Authorization: `Bearer ${state.token}` },
+    });
+    const data = await res.json();
+    if (res.ok && data.success && data.hasCharacter && data.character) {
+      state.character = data.character;
+      navigateTo('avatar');
+      return;
+    }
+  } catch (e) {
+    console.error('Erro ao verificar personagem:', e);
+  }
+
+  openHeroCreationWizard();
 }
 
 // --------------------------------------------------------
@@ -1931,44 +1946,48 @@ async function openHeroCreationWizard() {
   modal.style.display = 'flex';
 
   if (!state.classesCatalog || state.classesCatalog.length === 0) {
-    await loadPublicCatalogs();
+    await fetchClassesCatalog();
   }
 
   const avatarGrid = document.getElementById('wizard-avatar-grid');
-  avatarGrid.innerHTML = AVATAR_OPTIONS.map(
-    (av) => `
-      <div class="avatar-option ${state.selectedWizardAvatar === av.key ? 'selected' : ''}" onclick="selectWizardAvatar('${av.key}', event)">
-        <span class="avatar-option-icon">${av.icon}</span>
-        <span class="avatar-option-label">${av.label}</span>
-      </div>
-    `
-  ).join('');
-
-  const classesGrid = document.getElementById('wizard-classes-grid');
-  if (state.classesCatalog.length > 0 && !state.selectedWizardClassId) {
-    state.selectedWizardClassId = state.classesCatalog[0].id;
-  }
-
-  classesGrid.innerHTML = state.classesCatalog
-    .map(
-      (cls) => `
-        <div class="class-choice-card ${state.selectedWizardClassId === cls.id ? 'selected' : ''}" onclick="selectWizardClass('${cls.id}', event)">
-          <div class="class-choice-header">
-            <span class="class-choice-icon">${getClassIcon(cls.code)}</span>
-            <div>
-              <div class="class-choice-title">${cls.name}</div>
-              <div class="class-choice-role">${cls.combat_role}</div>
-            </div>
-          </div>
-          <div class="class-choice-desc">${cls.description || ''}</div>
-          <div class="class-choice-attributes">
-            <span class="attr-pill-primary">Principal: ${cls.primary_attribute?.name || 'CON'}</span>
-            <span class="attr-pill-secondary">Secundário: ${cls.secondary_attribute?.name || 'STR'}</span>
-          </div>
+  if (avatarGrid) {
+    avatarGrid.innerHTML = AVATAR_OPTIONS.map(
+      (av) => `
+        <div class="avatar-option ${state.selectedWizardAvatar === av.key ? 'selected' : ''}" onclick="selectWizardAvatar('${av.key}', event)">
+          <span class="avatar-option-icon">${av.icon}</span>
+          <span class="avatar-option-label">${av.label}</span>
         </div>
       `
-    )
-    .join('');
+    ).join('');
+  }
+
+  const classesGrid = document.getElementById('wizard-classes-grid');
+  if (classesGrid && state.classesCatalog && state.classesCatalog.length > 0) {
+    if (!state.selectedWizardClassId) {
+      state.selectedWizardClassId = state.classesCatalog[0].id;
+    }
+
+    classesGrid.innerHTML = state.classesCatalog
+      .map(
+        (cls) => `
+          <div class="class-choice-card ${state.selectedWizardClassId === cls.id ? 'selected' : ''}" onclick="selectWizardClass('${cls.id}', event)">
+            <div class="class-choice-header">
+              <span class="class-choice-icon">${getClassIcon(cls.code)}</span>
+              <div>
+                <div class="class-choice-title">${cls.name}</div>
+                <div class="class-choice-role">${cls.combat_role || 'Herói'}</div>
+              </div>
+            </div>
+            <div class="class-choice-desc">${cls.description || ''}</div>
+            <div class="class-choice-attributes">
+              <span class="attr-pill-primary">Principal: ${cls.primary_attribute?.name || 'CON'}</span>
+              <span class="attr-pill-secondary">Secundário: ${cls.secondary_attribute?.name || 'STR'}</span>
+            </div>
+          </div>
+        `
+      )
+      .join('');
+  }
 }
 
 function closeHeroCreationWizard() {
@@ -2002,6 +2021,18 @@ function getClassIcon(code) {
     case 'artifice_criativo': return '🛠️';
     case 'aventureiro_oportunista': return '🎲';
     default: return '⚔️';
+  }
+}
+
+async function fetchClassesCatalog() {
+  try {
+    const res = await fetch(`${API.catalog}/classes`);
+    const data = await res.json();
+    if (data.success && data.classes) {
+      state.classesCatalog = data.classes;
+    }
+  } catch (err) {
+    console.error('Erro ao buscar catálogo de classes:', err);
   }
 }
 
