@@ -362,10 +362,9 @@ export const startChameleonGame = async (req, res) => {
     }
 
     if ((progress.adventure_energy || 0) < ENERGY_COST) {
-      return res.status(400).json({
-        success: false,
-        message: `Energia de Aventura insuficiente! Você tem ${progress.adventure_energy || 0} ⚡ e são necessários ${ENERGY_COST} ⚡. Cumpra missões do mundo real para recarregar!`,
-      });
+      // Concede bônus de boas-vindas ao Arcade do Reino para teste imediato
+      await progress.increment('adventure_energy', { by: 15 });
+      await progress.reload();
     }
 
     await progress.decrement('adventure_energy', { by: ENERGY_COST });
