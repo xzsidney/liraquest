@@ -58,6 +58,7 @@ Este documento cataloga todos os endpoints REST e eventos de WebSocket (Socket.I
 | Método | Rota | Autenticação | Descrição |
 |:---|:---|:---|:---|
 | `GET` | `/api/character/me` | JWT | Retorna o herói, classe ativa, nível, atributos e habilidades do usuário |
+| `GET` | `/api/character/hero-dashboard` | JWT | Retorna o progresso real do usuário para o Painel do Herói (Level real, XP, Fichas, Ouro, Streak, Rank/Patente e métricas de hábitos da vida real) |
 | `POST` | `/api/character/create` | JWT | Cria o herói (Nome, Sexo, Avatar, Classe Inicial com atributos base) |
 | `PUT` | `/api/character/update-profile` | JWT | Salva dados reais do usuário (Telefone, Escola/Trabalho, Foto) |
 | `POST` | `/api/character/change-class` | JWT | Alterna classe ativa preservando o progresso (Multi-Classe) |

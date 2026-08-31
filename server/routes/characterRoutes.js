@@ -6,6 +6,7 @@ import {
   updateRealProfile,
   changeHeroClass,
 } from '../controllers/characterController.js';
+import { getMyHeroDashboard } from '../controllers/userProgressController.js';
 
 const router = express.Router();
 
@@ -13,6 +14,7 @@ const router = express.Router();
 router.use(authenticateToken);
 
 router.get('/me', getMyCharacter);
+router.get('/hero-dashboard', getMyHeroDashboard);
 router.post('/create', createCharacter);
 router.put('/update-profile', updateRealProfile);
 router.post('/change-class', changeHeroClass);

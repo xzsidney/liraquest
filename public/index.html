@@ -2160,10 +2160,13 @@
             </div>
           </div>
 
-          <!-- MENU LATERAL COM AS 4 ABAS -->
+          <!-- MENU LATERAL COM AS 5 ABAS -->
           <div class="sidebar-menu">
             <button id="child-nav-tasks" class="sidebar-menu-btn active" onclick="switchChildTerminalTab('tasks')">
               <span>📋</span> Missões do Dia
+            </button>
+            <button id="child-nav-hero-dashboard" class="sidebar-menu-btn" onclick="switchChildTerminalTab('hero-dashboard')">
+              <span>📊</span> Painel do Herói
             </button>
             <button id="child-nav-studies" class="sidebar-menu-btn" onclick="switchChildTerminalTab('studies')">
               <span>📚</span> Foco & Estudos
@@ -2179,6 +2182,106 @@
 
         <!-- ÁREA PRINCIPAL DE CONTEÚDO DO TERMINAL DO FILHO -->
         <div class="child-content-card">
+          
+          <!-- PAINEL: 📊 PAINEL DO HERÓI (PROGRESSO REAL DO USUÁRIO) -->
+          <div id="child-panel-hero-dashboard" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+              <div>
+                <h2 style="font-size: 1.5rem; color: #ffffff; display: flex; align-items: center; gap: 10px;">
+                  <span>📊</span> Painel do Herói
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">
+                  Acompanhe seu nível real, pontos de experiência (XP) e conquistas nos hábitos diários da casa.
+                </p>
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="loadChildHeroDashboard()">
+                🔄 Atualizar Dados
+              </button>
+            </div>
+
+            <!-- CARD DE DESTAQUE SUPERIOR: LEVEL REAL, RANK E BARRA DE XP -->
+            <div style="background: linear-gradient(135deg, rgba(128, 0, 32, 0.45), rgba(15, 23, 42, 0.85)); border: 1px solid rgba(212, 175, 55, 0.45); border-radius: 18px; padding: 24px; margin-bottom: 24px;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 14px; margin-bottom: 18px;">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                  <div style="width: 58px; height: 58px; border-radius: 16px; background: linear-gradient(135deg, #800020, #d4af37); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; border: 2px solid var(--gold); box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);">
+                    🏆
+                  </div>
+                  <div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      <h3 id="hero-dash-user-name" style="font-size: 1.35rem; color: #ffffff; margin: 0;">Jovem Herói</h3>
+                      <span id="hero-dash-rank-badge" class="role-badge" style="background: rgba(245, 158, 11, 0.25); color: #fde047; border: 1px solid rgba(245, 158, 11, 0.5);">Iniciante</span>
+                    </div>
+                    <span id="hero-dash-rank-title" style="color: #fbbf24; font-size: 0.95rem; font-weight: 700;">🌱 Recruta do Lar</span>
+                  </div>
+                </div>
+
+                <div style="text-align: right;">
+                  <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; display: block;">NÍVEL REAL DO USUÁRIO</span>
+                  <span id="hero-dash-level-number" style="font-size: 2.2rem; font-weight: 900; color: #fde047; line-height: 1;">1</span>
+                </div>
+              </div>
+
+              <!-- Barra de XP do Usuário -->
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.85rem;">
+                  <span style="color: #cbd5e1; font-weight: 600;">⭐ Experiência (XP Real Acumulada): <strong id="hero-dash-total-xp" style="color: #fde047;">0 XP</strong></span>
+                  <span id="hero-dash-xp-progress-text" style="color: var(--text-muted);">0 / 200 XP (0%)</span>
+                </div>
+                <div style="background: rgba(0, 0, 0, 0.5); border-radius: 12px; height: 16px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1); position: relative;">
+                  <div id="hero-dash-xp-fill" style="background: linear-gradient(90deg, #d4af37, #f59e0b, #4ade80); width: 0%; height: 100%; border-radius: 12px; transition: width 0.6s ease;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 0.75rem; color: var(--text-muted);">
+                  <span>Nível Atual</span>
+                  <span id="hero-dash-next-level-label">Próximo Nível: Nv. 2</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- GRID DE RECURSOS & ECONOMIA PESSOAL (4 CARDS) -->
+            <div class="stats-grid" style="margin-bottom: 24px;">
+              <div class="stat-card" style="border-color: rgba(245, 158, 11, 0.35);">
+                <span class="stat-label">🎟️ Fichas do Lar</span>
+                <span id="hero-dash-tokens" class="stat-number" style="color: #fde047; font-size: 1.5rem;">0</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">Para resgatar prêmios</span>
+              </div>
+              <div class="stat-card" style="border-color: rgba(251, 191, 36, 0.35);">
+                <span class="stat-label">💰 Ouro Ganho em Missões</span>
+                <span id="hero-dash-gold" class="stat-number" style="color: #fbbf24; font-size: 1.5rem;">0</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">Moedas acumuladas</span>
+              </div>
+              <div class="stat-card" style="border-color: rgba(59, 130, 246, 0.35);">
+                <span class="stat-label">⚡ Energia de Foco</span>
+                <span id="hero-dash-energy" class="stat-number" style="color: #60a5fa; font-size: 1.5rem;">0</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">Para missões e estudos</span>
+              </div>
+              <div class="stat-card" style="border-color: rgba(249, 115, 22, 0.35);">
+                <span class="stat-label">🔥 Sequência Ativa</span>
+                <span id="hero-dash-streak" class="stat-number" style="color: #fb923c; font-size: 1.5rem;">0d</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">Recorde: <strong id="hero-dash-best-streak">0d</strong></span>
+              </div>
+            </div>
+
+            <!-- GRID DE PRODUTIVIDADE & HÁBITOS (3 CARDS) -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
+              <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-card); border-radius: 14px; padding: 18px;">
+                <span style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">📋 Missões Cumpridas Hoje</span>
+                <div id="hero-dash-tasks-today" style="font-size: 1.6rem; font-weight: 800; color: #4ade80; margin: 8px 0;">0</div>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">Tarefas concluídas no dia</span>
+              </div>
+
+              <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-card); border-radius: 14px; padding: 18px;">
+                <span style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">⭐ Total de Missões da Vida Real</span>
+                <div id="hero-dash-tasks-total" style="font-size: 1.6rem; font-weight: 800; color: #ffffff; margin: 8px 0;">0</div>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">Responsabilidades aprovadas</span>
+              </div>
+
+              <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-card); border-radius: 14px; padding: 18px;">
+                <span style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">🎯 Taxa de Sucesso / Aprovação</span>
+                <div id="hero-dash-approval-rate" style="font-size: 1.6rem; font-weight: 800; color: #c084fc; margin: 8px 0;">100%</div>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">Validação de primeira pelos pais</span>
+              </div>
+            </div>
+          </div>
           
           <!-- PAINEL 1: 📋 MISSÕES DO DIA -->
           <div id="child-panel-tasks">

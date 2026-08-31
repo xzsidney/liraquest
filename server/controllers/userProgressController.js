@@ -326,3 +326,97 @@ export const getDashboardSummary = async (req, res) => {
     });
   }
 };
+
+/**
+ * Retorna os dados consolidados do "Painel do Herói" (Progresso Real do Usuário)
+ * Sem nenhuma informação do avatar virtual de combate
+ */
+export const getMyHeroDashboard = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const progress = await findOrCreateProgress(userId);
+
+    // Buscar todas as submissões do usuário
+    const [approvedSubs, totalSubsCount] = await Promise.all([
+      TaskSubmission.findAll({
+        where: { user_id: userId, status: 'APPROVED' },
+        include: [{ model: Task, as: 'task' }],
+      }),
+      TaskSubmission.count({ where: { user_id: userId } }),
+    ]);
+
+    // Calcular XP Real e Ouro acumulados por tarefas reais
+    const totalXp = approvedSubs.reduce((acc, s) => acc + (s.task?.xp_reward || 50), 0);
+    const totalGoldEarned = approvedSubs.reduce((acc, s) => acc + (s.task?.gold_reward || 10), 0);
+
+    // Cálculo do Level Real do Usuário (Curva progressiva: Nv 1 = 200xp, Nv 2 = 300xp, etc.)
+    let level = 1;
+    let xpRemaining = totalXp;
+    let xpNeededForNext = 200;
+
+    while (xpRemaining >= xpNeededForNext) {
+      xpRemaining -= xpNeededForNext;
+      level += 1;
+      xpNeededForNext = Math.round(200 + (level - 1) * 75);
+    }
+
+    const currentLevelXp = xpRemaining;
+    const nextLevelXp = xpNeededForNext;
+    const xpProgressPct = Math.min(100, Math.round((currentLevelXp / nextLevelXp) * 100));
+
+    // Patente / Rank do Usuário no Mundo Real
+    let rankTitle = '🌱 Recruta do Lar';
+    let rankBadge = 'Iniciante';
+    if (level >= 10) {
+      rankTitle = '🌟 Campeão Lendário da Família';
+      rankBadge = 'Mestre';
+    } else if (level >= 7) {
+      rankTitle = '👑 Cavaleiro de Elite';
+      rankBadge = 'Veterano';
+    } else if (level >= 4) {
+      rankTitle = '🛡️ Guardião Exemplar';
+      rankBadge = 'Avançado';
+    } else if (level >= 2) {
+      rankTitle = '⚔️ Herói Dedicado';
+      rankBadge = 'Intermediário';
+    }
+
+    const approvalRate = totalSubsCount > 0 
+      ? Math.round((approvedSubs.length / totalSubsCount) * 100) 
+      : 100;
+
+    return res.json({
+      success: true,
+      user: {
+        id: req.user.id,
+        name: req.user.name,
+        email: req.user.email,
+        profile_photo_url: req.user.profile_photo_url,
+      },
+      heroProgress: {
+        level,
+        totalXp,
+        currentLevelXp,
+        nextLevelXp,
+        xpProgressPct,
+        rankTitle,
+        rankBadge,
+        token_balance: progress.family_tokens || progress.token_balance || 0,
+        energy_balance: progress.adventure_energy || progress.energy_balance || 0,
+        totalGoldEarned,
+        current_streak: progress.streak_days || progress.current_streak || 0,
+        longest_streak: progress.best_streak_days || progress.longest_streak || 0,
+        tasks_completed_today: progress.tasks_done_today || progress.tasks_completed_today || 0,
+        tasks_completed_total: approvedSubs.length,
+        approvalRate,
+      },
+    });
+  } catch (error) {
+    console.error('❌ Erro ao buscar dados do Painel do Herói:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Erro interno ao consultar painel do herói.',
+    });
+  }
+};
+

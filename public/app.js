@@ -359,7 +359,7 @@ async function fetchCatalogs() {
 // ========================================================
 function switchChildTerminalTab(tab) {
   state.childTerminalTab = tab;
-  const tabs = ['tasks', 'studies', 'history', 'profile'];
+  const tabs = ['tasks', 'hero-dashboard', 'studies', 'history', 'profile'];
 
   tabs.forEach((t) => {
     const navBtn = document.getElementById(`child-nav-${t}`);
@@ -378,10 +378,61 @@ function switchChildTerminalTab(tab) {
 
   if (tab === 'tasks') {
     renderChildTasksBoard();
+  } else if (tab === 'hero-dashboard') {
+    loadChildHeroDashboard();
   } else if (tab === 'history') {
     renderChildHistoryTab();
   } else if (tab === 'profile') {
     renderChildProfileInfo();
+  }
+}
+
+async function loadChildHeroDashboard() {
+  if (!state.token) return;
+
+  try {
+    const res = await fetch(`${API.character}/hero-dashboard`, {
+      headers: { Authorization: `Bearer ${state.token}` },
+    });
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      console.warn('Não foi possível carregar o Painel do Herói:', data.message);
+      return;
+    }
+
+    const { user, heroProgress } = data;
+
+    // Atualizar Elementos da Interface
+    const setText = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) el.innerText = val;
+    };
+
+    setText('hero-dash-user-name', user.name || 'Jovem Herói');
+    setText('hero-dash-rank-badge', heroProgress.rankBadge);
+    setText('hero-dash-rank-title', heroProgress.rankTitle);
+    setText('hero-dash-level-number', heroProgress.level);
+    setText('hero-dash-total-xp', `${heroProgress.totalXp} XP`);
+    setText('hero-dash-xp-progress-text', `${heroProgress.currentLevelXp} / ${heroProgress.nextLevelXp} XP (${heroProgress.xpProgressPct}%)`);
+    setText('hero-dash-next-level-label', `Próximo Nível: Nv. ${heroProgress.level + 1}`);
+
+    const xpFill = document.getElementById('hero-dash-xp-fill');
+    if (xpFill) {
+      xpFill.style.width = `${heroProgress.xpProgressPct}%`;
+    }
+
+    setText('hero-dash-tokens', heroProgress.token_balance);
+    setText('hero-dash-gold', heroProgress.totalGoldEarned);
+    setText('hero-dash-energy', heroProgress.energy_balance);
+    setText('hero-dash-streak', `${heroProgress.current_streak}d`);
+    setText('hero-dash-best-streak', `${heroProgress.longest_streak}d`);
+
+    setText('hero-dash-tasks-today', heroProgress.tasks_completed_today);
+    setText('hero-dash-tasks-total', heroProgress.tasks_completed_total);
+    setText('hero-dash-approval-rate', `${heroProgress.approvalRate}%`);
+  } catch (err) {
+    console.error('Erro ao carregar Painel do Herói:', err);
   }
 }
 
