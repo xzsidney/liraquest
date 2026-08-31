@@ -1766,7 +1766,10 @@
           
           <!-- Cabeçalho do Guardião com Foto Quadrada -->
           <div class="sidebar-user-header">
-            <div id="parent-sidebar-photo-box" class="sidebar-square-photo" style="background: rgba(128, 0, 32, 0.4); border-color: rgba(212, 175, 55, 0.5);">🛡️</div>
+            <div class="user-square-photo-frame" id="parent-sidebar-photo-frame" style="width: 52px; height: 52px; cursor: pointer; flex-shrink: 0;" onclick="document.getElementById('parent-direct-file-input').click()" title="Clique para trocar foto">
+              <span id="parent-sidebar-photo-placeholder" style="font-size: 2rem;">🛡️</span>
+              <img id="parent-sidebar-photo-img" src="" alt="Foto" class="user-square-photo-img" style="display: none;" onerror="this.style.display='none'; document.getElementById('parent-sidebar-photo-placeholder').style.display='block';">
+            </div>
             <div style="overflow: hidden;">
               <h3 id="parent-user-name" style="font-size: 1.05rem; color: #ffffff; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">Guardião Sidney</h3>
               <span id="parent-user-email" style="color: var(--text-muted); font-size: 0.78rem; display: block; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">pai@liraquest.com</span>
@@ -1804,10 +1807,10 @@
           </div>
 
           <!-- MINI ESTATÍSTICA: FILHOS & MEMBROS -->
-          <div class="sidebar-mini-stats" style="grid-template-columns: 1fr;">
-            <div class="sidebar-mini-stat-card" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px;">
-              <span class="sidebar-mini-label">👥 Filhos Conectados</span>
-              <strong id="parent-sidebar-members-count" class="sidebar-mini-val" style="font-size: 1.1rem; color: #4ade80;">0</strong>
+          <div class="sidebar-mini-stats">
+            <div style="grid-column: 1/-1; display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: var(--text-muted); font-size: 0.72rem; font-weight: 700; text-transform: uppercase;">FILHOS CONECTADOS</span>
+              <span id="parent-sidebar-members-count" style="font-weight: 800; color: #4ade80; font-size: 1rem;">0 Membro(s)</span>
             </div>
           </div>
 
@@ -1935,55 +1938,96 @@
 
           <!-- ==================== ABA 4: MEU PERFIL REAL & PORTAL DO REINO ==================== -->
           <div id="parent-panel-profile" style="display: none;">
-            <div style="margin-bottom: 24px;">
-              <h2 style="font-size: 1.5rem; color: #ffffff; display: flex; align-items: center; gap: 10px;">
-                <span>👤</span> Meu Perfil de Guardião
-              </h2>
-              <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">
-                Atualize suas informações pessoais de contato e acesse seu avatar de RPG.
-              </p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+              <div>
+                <h2 style="font-size: 1.5rem; color: #ffffff; margin-bottom: 4px;">👤 Seus Dados Cadastrais</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Informações pessoais e vínculo familiar no LiraQuest.</p>
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="openParentEditProfileModal()">
+                ✏️ Editar Dados
+              </button>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-              <!-- Formulário de Perfil Real -->
-              <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-card); border-radius: 18px; padding: 22px;">
-                <h3 style="font-size: 1.1rem; color: #ffffff; margin-bottom: 16px;">Informações do Guardião</h3>
-                <form id="parent-real-profile-form">
-                  <div class="form-group">
-                    <label class="form-label" for="parent-real-name">Nome Completo</label>
-                    <input type="text" id="parent-real-name" class="form-input" placeholder="Seu nome" required>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+              
+              <!-- Card 1: Ficha Pessoal do Guardião com Foto Quadrada e Upload -->
+              <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 18px; padding: 24px;">
+                <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border-subtle);">
+                  <div style="position: relative; display: flex; flex-direction: column; align-items: center;">
+                    <div class="user-square-photo-frame" id="parent-profile-photo-display-frame" style="cursor: pointer;" onclick="document.getElementById('parent-direct-file-input').click()" title="Clique para enviar nova foto">
+                      <span id="parent-profile-photo-placeholder" style="font-size: 3.2rem;">🛡️</span>
+                      <img id="parent-profile-photo-img" src="" alt="Foto Real" class="user-square-photo-img" style="display: none;" onerror="this.style.display='none'; document.getElementById('parent-profile-photo-placeholder').style.display='block';">
+                    </div>
+                    <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 8px; padding: 4px 10px; font-size: 0.75rem;" onclick="document.getElementById('parent-direct-file-input').click()">
+                      📷 Trocar Foto
+                    </button>
+                    <input type="file" id="parent-direct-file-input" accept="image/*" style="display: none;" onchange="handleDirectParentPhotoUpload(event)">
                   </div>
-                  <div class="form-group">
-                    <label class="form-label" for="parent-real-phone">Telefone / WhatsApp</label>
-                    <input type="text" id="parent-real-phone" class="form-input" placeholder="(00) 00000-0000">
+                  <div>
+                    <h3 id="info-parent-name" style="font-size: 1.3rem; color: #ffffff; margin-bottom: 4px;">Guardião Sidney</h3>
+                    <span class="role-badge badge-parent" style="font-size: 0.75rem;">🛡️ Guardião da Família</span>
+                    <span id="parent-direct-upload-status" style="display: block; font-size: 0.75rem; color: var(--gold); margin-top: 6px;"></span>
                   </div>
-                  <div class="form-group">
-                    <label class="form-label" for="parent-real-work">Profissão / Empresa</label>
-                    <input type="text" id="parent-real-work" class="form-input" placeholder="Ex: Engenheiro, Autônomo">
+                </div>
+
+                <div class="info-data-grid">
+                  <div class="info-data-row">
+                    <span class="info-data-label">E-MAIL CADASTRADO</span>
+                    <span id="info-parent-email" class="info-data-val">pai@liraquest.com</span>
                   </div>
-                  <div class="form-group">
-                    <label class="form-label" for="parent-real-photo">URL da Foto de Perfil</label>
-                    <input type="text" id="parent-real-photo" class="form-input" placeholder="https://...">
+                  <div class="info-data-row">
+                    <span class="info-data-label">TELEFONE / WHATSAPP</span>
+                    <span id="info-parent-phone" class="info-data-val">Não informado</span>
                   </div>
-                  <button type="submit" id="btn-save-parent-profile" class="btn btn-primary" style="width: 100%;">
-                    💾 Salvar Dados do Perfil
-                  </button>
-                </form>
+                  <div class="info-data-row">
+                    <span class="info-data-label">EMPRESA / PROFISSÃO</span>
+                    <span id="info-parent-work" class="info-data-val">Não informado</span>
+                  </div>
+                </div>
               </div>
 
-              <!-- Card Portal do Avatar (RPG do Pai) -->
-              <div class="avatar-portal-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+              <!-- Card 2: Clã Familiar & Código de Convite -->
+              <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 18px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between;">
                 <div>
-                  <span style="font-size: 2.2rem; display: block; margin-bottom: 12px;">🛡️⚔️👑</span>
-                  <h3 style="font-size: 1.3rem; color: #ffffff; margin-bottom: 8px;">Portal do Avatar no Reino</h3>
-                  <p style="color: #cbd5e1; font-size: 0.9rem; line-height: 1.5; margin-bottom: 16px;">
-                    Como Guardião, você também pode criar seu Herói, participar das Raids multiplayer e guiar seus filhos no combate arcade 2D!
-                  </p>
+                  <h3 style="font-size: 1.2rem; margin-bottom: 16px; color: #93c5fd;">🏰 Clã Familiar</h3>
+                  
+                  <div>
+                    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 6px;">Você é o Guardião Chefe do:</p>
+                    <h4 id="parent-clan-name-display" style="font-size: 1.5rem; color: #ffffff; margin-bottom: 12px;">Clã Guardião Sidney (Pai)</h4>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
+                      <span style="font-size: 0.85rem; color: var(--text-muted);">Código do Clã:</span>
+                      <span id="parent-clan-code-display" style="background: rgba(30, 58, 138, 0.4); color: #93c5fd; padding: 4px 10px; border-radius: 6px; font-weight: 800; border: 1px solid rgba(59, 130, 246, 0.4); letter-spacing: 1px;">LIRA-0000</span>
+                      <button class="btn btn-gold btn-sm" onclick="copyClanInviteCode()" style="margin-left: 8px; padding: 4px 10px; font-size: 0.75rem;">📋 Copiar</button>
+                    </div>
+                    <p style="font-size: 0.85rem; color: #4ade80;">✅ Clã ativo. Compartilhe o código com seus filhos para recebimento de tarefas.</p>
+                  </div>
                 </div>
-                <button class="btn btn-gold" style="width: 100%; font-size: 1rem; padding: 12px;" onclick="handleAccessAvatar()">
-                  ⚔️ Acessar Meu Avatar de RPG
-                </button>
+
+                <div style="margin-top: 20px; padding: 14px; background: rgba(0, 0, 0, 0.3); border-radius: 12px; border: 1px solid var(--border-subtle);">
+                  <span style="font-size: 0.8rem; color: var(--text-muted); display: block;">💡 Informação:</span>
+                  <p style="font-size: 0.82rem; color: #cbd5e1; margin-top: 4px;">Após ingressar no clã, as tarefas atribuídas aos filhos aparecerão para eles e você avaliará as provas aqui.</p>
+                </div>
               </div>
+
+            </div>
+
+            <!-- CARD ESPECIAL: ATALHO PARA O TERMINAL DO AVATAR -->
+            <div class="avatar-portal-card" style="margin-top: 24px;">
+              <div style="display: flex; align-items: center; gap: 18px;">
+                <div style="font-size: 3rem; background: rgba(128, 0, 32, 0.5); width: 70px; height: 70px; border-radius: 16px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--accent); flex-shrink: 0;">
+                  ⚔️
+                </div>
+                <div>
+                  <h3 style="font-size: 1.4rem; color: #ffffff; margin-bottom: 4px;">Terminal do Avatar (Reino Virtual)</h3>
+                  <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 6px;">Acesse seu herói RPG, participe das Raids com seus filhos e encare masmorras!</p>
+                  <span style="display: inline-flex; align-items: center; gap: 6px; background: rgba(128, 0, 32, 0.35); color: #fde047; border: 1px solid rgba(212, 175, 55, 0.4); padding: 4px 10px; border-radius: 8px; font-size: 0.82rem; font-weight: 700;">
+                    🛡️ Guardião do Reino • Pronto para a Batalha
+                  </span>
+                </div>
+              </div>
+              <button class="btn btn-primary" style="padding: 12px 28px; font-size: 1.05rem;" onclick="handleAccessAvatar()">
+                ⚔️ Entrar no Reino
+              </button>
             </div>
           </div>
 
@@ -2264,6 +2308,52 @@
 
       </div>
     </section>
+
+    <!-- ======================================================== -->
+    <!-- MODAL: EDITAR DADOS CADASTRAIS (PAI / GUARDIÃO)         -->
+    <!-- ======================================================== -->
+    <div id="parent-edit-profile-modal" class="modal-overlay" style="display: none;">
+      <div class="modal-content" style="max-width: 480px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h3 style="font-size: 1.25rem; color: #ffffff;">✏️ Editar Dados do Guardião</h3>
+          <button class="btn btn-secondary btn-sm" onclick="closeParentEditProfileModal()">✕</button>
+        </div>
+
+        <form id="parent-modal-profile-form">
+          <!-- Upload de Imagem no Modal -->
+          <div class="form-group" style="background: rgba(15, 23, 42, 0.6); border: 1px dashed var(--border-card); border-radius: 12px; padding: 14px; text-align: center;">
+            <label class="form-label" style="margin-bottom: 8px;">📷 Upload de Foto do Computador / Celular</label>
+            <input type="file" id="parent-modal-photo-file-input" accept="image/*" style="display: none;" onchange="handleParentModalPhotoUpload(event)">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('parent-modal-photo-file-input').click()">
+              📁 Escolher Imagem (JPG, PNG, WEBP)
+            </button>
+            <div id="parent-modal-upload-loading" style="font-size: 0.8rem; color: var(--gold); margin-top: 6px; display: none;">⏳ Enviando imagem...</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="parent-modal-real-name">Nome Completo</label>
+            <input type="text" id="parent-modal-real-name" class="form-input" placeholder="Seu nome real" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="parent-modal-real-phone">Telefone / WhatsApp</label>
+            <input type="text" id="parent-modal-real-phone" class="form-input" placeholder="(11) 99999-9999">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="parent-modal-real-work">Empresa / Profissão</label>
+            <input type="text" id="parent-modal-real-work" class="form-input" placeholder="Ex: Engenharia / Autônomo">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="parent-modal-real-photo">URL da Foto de Perfil</label>
+            <input type="text" id="parent-modal-real-photo" class="form-input" placeholder="https://... ou preenchida pelo upload">
+          </div>
+          
+          <div style="display: flex; gap: 10px; margin-top: 24px;">
+            <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="closeParentEditProfileModal()">Cancelar</button>
+            <button type="submit" class="btn btn-primary" style="flex: 1;">💾 Salvar Alterações</button>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <!-- ======================================================== -->
     <!-- MODAL: EDITAR DADOS CADASTRAIS (FILHO)                   -->

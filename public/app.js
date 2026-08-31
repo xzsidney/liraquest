@@ -1617,6 +1617,12 @@ async function loadParentFamilyData() {
       if (codeLarge) codeLarge.innerText = code;
       if (titleLarge) titleLarge.innerText = fam.name;
 
+      // Atualizar Card de Clã na Aba Meu Perfil
+      const profClanName = document.getElementById('parent-clan-name-display');
+      const profClanCode = document.getElementById('parent-clan-code-display');
+      if (profClanName) profClanName.innerText = fam.name;
+      if (profClanCode) profClanCode.innerText = code;
+
       // Renderizar Grid de Filhos & Heróis
       renderParentChildrenGrid(members);
     }
@@ -2219,29 +2225,167 @@ function closePhotoLightbox() {
 // ─────────────────────────────────────────────────────────
 function renderParentProfileInfo() {
   if (!state.user) return;
-  const nameInput = document.getElementById('parent-real-name');
-  const phoneInput = document.getElementById('parent-real-phone');
-  const workInput = document.getElementById('parent-real-work');
-  const photoInput = document.getElementById('parent-real-photo');
 
-  if (nameInput) nameInput.value = state.user.name || '';
-  if (phoneInput) phoneInput.value = state.user.phone || '';
-  if (workInput) workInput.value = state.user.school_or_work || '';
-  if (photoInput) photoInput.value = state.user.profile_photo_url || '';
+  // Atualizar Sidebar do Pai
+  const sideName = document.getElementById('parent-user-name');
+  const sideEmail = document.getElementById('parent-user-email');
+  const sidePhotoImg = document.getElementById('parent-sidebar-photo-img');
+  const sidePhotoPlaceholder = document.getElementById('parent-sidebar-photo-placeholder');
+
+  if (sideName) sideName.innerText = state.user.name;
+  if (sideEmail) sideEmail.innerText = state.user.email;
+
+  if (state.user.profile_photo_url) {
+    if (sidePhotoImg) {
+      sidePhotoImg.src = state.user.profile_photo_url;
+      sidePhotoImg.style.display = 'block';
+    }
+    if (sidePhotoPlaceholder) sidePhotoPlaceholder.style.display = 'none';
+  } else {
+    if (sidePhotoImg) sidePhotoImg.style.display = 'none';
+    if (sidePhotoPlaceholder) sidePhotoPlaceholder.style.display = 'block';
+  }
+
+  // Atualizar Card 1: Ficha Pessoal na Aba Meu Perfil
+  const infoName = document.getElementById('info-parent-name');
+  const infoEmail = document.getElementById('info-parent-email');
+  const infoPhone = document.getElementById('info-parent-phone');
+  const infoWork = document.getElementById('info-parent-work');
+  const profPhotoImg = document.getElementById('parent-profile-photo-img');
+  const profPhotoPlaceholder = document.getElementById('parent-profile-photo-placeholder');
+
+  if (infoName) infoName.innerText = state.user.name || 'Guardião Sidney';
+  if (infoEmail) infoEmail.innerText = state.user.email || 'pai@liraquest.com';
+  if (infoPhone) infoPhone.innerText = state.user.phone || 'Não informado';
+  if (infoWork) infoWork.innerText = state.user.school_or_work || 'Não informado';
+
+  if (state.user.profile_photo_url) {
+    if (profPhotoImg) {
+      profPhotoImg.src = state.user.profile_photo_url;
+      profPhotoImg.style.display = 'block';
+    }
+    if (profPhotoPlaceholder) profPhotoPlaceholder.style.display = 'none';
+  } else {
+    if (profPhotoImg) profPhotoImg.style.display = 'none';
+    if (profPhotoPlaceholder) profPhotoPlaceholder.style.display = 'block';
+  }
+
+  // Preencher Inputs do Modal de Edição
+  const modalName = document.getElementById('parent-modal-real-name');
+  const modalPhone = document.getElementById('parent-modal-real-phone');
+  const modalWork = document.getElementById('parent-modal-real-work');
+  const modalPhoto = document.getElementById('parent-modal-real-photo');
+
+  if (modalName) modalName.value = state.user.name || '';
+  if (modalPhone) modalPhone.value = state.user.phone || '';
+  if (modalWork) modalWork.value = state.user.school_or_work || '';
+  if (modalPhoto) modalPhoto.value = state.user.profile_photo_url || '';
+}
+
+function openParentEditProfileModal() {
+  renderParentProfileInfo();
+  const modal = document.getElementById('parent-edit-profile-modal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeParentEditProfileModal() {
+  const modal = document.getElementById('parent-edit-profile-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+async function handleDirectParentPhotoUpload(e) {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  if (file.size > 5 * 1024 * 1024) {
+    showToast('A imagem deve ter no máximo 5MB.', 'warning');
+    return;
+  }
+
+  const statusEl = document.getElementById('parent-direct-upload-status');
+  if (statusEl) statusEl.innerText = '⏳ Enviando foto...';
+
+  const formData = new FormData();
+  formData.append('photo', file);
+
+  try {
+    const res = await fetch(`${API.upload}/profile-photo`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${state.token}`,
+      },
+      body: formData,
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || 'Erro ao enviar foto.');
+    }
+
+    state.user = data.user;
+    localStorage.setItem('liraquest_user', JSON.stringify(data.user));
+    renderParentProfileInfo();
+    updateNavbar();
+    showToast('Foto do Guardião atualizada com sucesso!', 'success');
+  } catch (err) {
+    showToast(err.message, 'error');
+  } finally {
+    if (statusEl) statusEl.innerText = '';
+    e.target.value = '';
+  }
+}
+
+async function handleParentModalPhotoUpload(e) {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  if (file.size > 5 * 1024 * 1024) {
+    showToast('A imagem deve ter no máximo 5MB.', 'warning');
+    return;
+  }
+
+  const loadingEl = document.getElementById('parent-modal-upload-loading');
+  if (loadingEl) loadingEl.style.display = 'block';
+
+  const formData = new FormData();
+  formData.append('photo', file);
+
+  try {
+    const res = await fetch(`${API.upload}/profile-photo`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${state.token}`,
+      },
+      body: formData,
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || 'Erro ao enviar foto.');
+    }
+
+    const photoInput = document.getElementById('parent-modal-real-photo');
+    if (photoInput) photoInput.value = data.url;
+
+    state.user = data.user;
+    localStorage.setItem('liraquest_user', JSON.stringify(data.user));
+    renderParentProfileInfo();
+    updateNavbar();
+    showToast('Foto carregada com sucesso!', 'success');
+  } catch (err) {
+    showToast(err.message, 'error');
+  } finally {
+    if (loadingEl) loadingEl.style.display = 'none';
+    e.target.value = '';
+  }
 }
 
 async function handleSaveParentRealProfile(e) {
   e?.preventDefault();
-  const name = document.getElementById('parent-real-name')?.value.trim();
-  const phone = document.getElementById('parent-real-phone')?.value.trim();
-  const school_or_work = document.getElementById('parent-real-work')?.value.trim();
-  const profile_photo_url = document.getElementById('parent-real-photo')?.value.trim();
-  const btn = document.getElementById('btn-save-parent-profile');
-
-  if (btn) {
-    btn.disabled = true;
-    btn.innerText = 'Salvando...';
-  }
+  const name = document.getElementById('parent-modal-real-name')?.value.trim();
+  const phone = document.getElementById('parent-modal-real-phone')?.value.trim();
+  const school_or_work = document.getElementById('parent-modal-real-work')?.value.trim();
+  const profile_photo_url = document.getElementById('parent-modal-real-photo')?.value.trim();
 
   try {
     const res = await fetch(`${API.character}/update-profile`, {
@@ -2260,16 +2404,12 @@ async function handleSaveParentRealProfile(e) {
 
     state.user = data.user;
     localStorage.setItem('liraquest_user', JSON.stringify(data.user));
-    await loadParentTerminalDashboard();
+    closeParentEditProfileModal();
+    renderParentProfileInfo();
     updateNavbar();
-    showToast('Perfil do Guardião atualizado com sucesso!', 'success');
+    showToast('Dados do Guardião atualizados com sucesso!', 'success');
   } catch (err) {
     showToast(err.message, 'error');
-  } finally {
-    if (btn) {
-      btn.disabled = false;
-      btn.innerText = '💾 Salvar Dados do Perfil';
-    }
   }
 }
 
@@ -2474,7 +2614,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const profileForm = document.getElementById('child-profile-form');
   if (profileForm) profileForm.addEventListener('submit', handleUpdateRealProfile);
 
-  const parentProfileForm = document.getElementById('parent-real-profile-form');
+  const parentProfileForm = document.getElementById('parent-modal-profile-form') || document.getElementById('parent-real-profile-form');
   if (parentProfileForm) parentProfileForm.addEventListener('submit', handleSaveParentRealProfile);
 
   const taskCrudForm = document.getElementById('task-crud-form');
