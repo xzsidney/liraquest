@@ -1731,6 +1731,14 @@ class ChameleonGameEngine {
   }
 }
 
+function handleAvatarBack() {
+  if (state.user?.role === 'PARENT' || state.user?.role === 'ADMIN') {
+    navigateTo('parent');
+  } else {
+    navigateTo('child');
+  }
+}
+
 async function loadAvatarTerminal() {
   if (!state.user || !state.token) {
     navigateTo('login');
@@ -1745,7 +1753,6 @@ async function loadAvatarTerminal() {
 
     if (!res.ok || !data.success || !data.hasCharacter || !data.character) {
       showToast('Você precisa criar um Avatar antes de acessar o Terminal RPG!', 'info');
-      navigateTo('child');
       openHeroCreationWizard();
       return;
     }
@@ -1764,6 +1771,15 @@ async function loadAvatarTerminal() {
     document.getElementById('avatar-header-name').innerText = char.name;
     document.getElementById('avatar-header-meta').innerText = `${currentClass} • Nível ${lvl}`;
     document.getElementById('avatar-header-gold').innerText = `💰 ${char.gold} Ouro`;
+
+    const backBtn = document.getElementById('avatar-back-btn');
+    if (backBtn) {
+      if (state.user?.role === 'PARENT' || state.user?.role === 'ADMIN') {
+        backBtn.innerText = '🛡️ Voltar ao Painel dos Pais';
+      } else {
+        backBtn.innerText = '👤 Voltar ao Perfil do Filho';
+      }
+    }
 
     // Renderizar Ficha Completa do Herói
     renderHeroHUD(char);
@@ -1956,12 +1972,19 @@ async function handleCreateCharacter(e) {
 
     const data = await res.json();
     if (!res.ok || !data.success) {
+      if (data.character) {
+        state.character = data.character;
+        showToast('Seu herói já está criado no Reino!', 'info');
+        closeHeroCreationWizard();
+        navigateTo('avatar');
+        return;
+      }
       throw new Error(data.message || 'Erro ao criar herói.');
     }
 
     showToast(data.message, 'success');
     closeHeroCreationWizard();
-    await loadCharacterData();
+    navigateTo('avatar');
   } catch (err) {
     showToast(err.message, 'error');
   } finally {
