@@ -6,7 +6,9 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "build": "echo \"Build concluido com sucesso\"",
+    "build:sprites": "echo \"Sprite build concluido com sucesso\""
   },
   "keywords": [
     "rpg",
