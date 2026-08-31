@@ -22,94 +22,93 @@ Este documento cataloga todos os endpoints REST e eventos de WebSocket (Socket.I
 | `GET` | `/api/auth/me` | JWT | Retorna os dados do usuário autenticado atual |
 | `GET` | `/api/auth/users` | JWT (`ADMIN`) | Lista todos os usuários cadastrados no sistema |
 
-### Detalhes dos Endpoints de Autenticação
+---
 
-#### `POST /api/auth/register`
+## 2. Módulo de Catálogo Global (`/api/catalog`)
+
+| Método | Rota | Autenticação | Descrição |
+|:---|:---|:---|:---|
+| `GET` | `/api/catalog/attributes` | Pública | Lista os 6 atributos fundamentais (`STR`, `AGI`, `CON`, `INT`, `CHA`, `LUK`) |
+| `GET` | `/api/catalog/classes` | Pública | Lista as 6 classes com atributos primários, secundários e habilidades |
+| `GET` | `/api/catalog/skills/:classId` | Pública | Lista as habilidades da Árvore de Talentos de uma classe específica |
+| `GET` | `/api/catalog/items` | Pública | Lista os itens e recompensas disponíveis na Loja do Reino |
+| `GET` | `/api/catalog/monsters` | Pública | Lista os monstros e chefes cadastrados |
+
+---
+
+## 3. Módulo Familiar / Clã (`/api/family`)
+
+| Método | Rota | Autenticação | Descrição |
+|:---|:---|:---|:---|
+| `POST` | `/api/family/create` | JWT (`PARENT` / `ADMIN`) | Cria uma nova família e gera código único (ex: `LIRA-7842`) |
+| `POST` | `/api/family/join` | JWT | Ingressa em uma família através do código de convite |
+| `GET` | `/api/family/my-family` | JWT | Retorna dados da família do usuário, membros e heróis vinculados |
+
+### Exemplo: `POST /api/family/join`
 - **Body:**
   ```json
   {
-    "name": "Nome Completo",
-    "email": "usuario@liraquest.com",
-    "password": "senhaSegura123"
-  }
-  ```
-- **Resposta Sucesso (201):**
-  ```json
-  {
-    "success": true,
-    "message": "Conta criada com sucesso!",
-    "token": "eyJhbGciOi...",
-    "user": {
-      "id": "uuid...",
-      "name": "Nome Completo",
-      "email": "usuario@liraquest.com",
-      "role": "CHILD",
-      "phone": null,
-      "school_or_work": null,
-      "profile_photo_url": null,
-      "created_at": "..."
-    }
-  }
-  ```
-
-#### `POST /api/auth/login`
-- **Body:**
-  ```json
-  {
-    "email": "usuario@liraquest.com",
-    "password": "senhaSegura123"
+    "invite_code": "LIRA-7842"
   }
   ```
 - **Resposta Sucesso (200):**
   ```json
   {
     "success": true,
-    "message": "Bem-vindo de volta, Nome!",
-    "token": "eyJhbGciOi...",
-    "user": { ... }
+    "message": "Você ingressou na família \"Clã Lira\" com sucesso!",
+    "family": { "id": "uuid...", "name": "Clã Lira", "invite_code": "LIRA-7842" }
   }
   ```
 
 ---
 
-## 2. Módulos Mapeados para as Próximas Fases
+## 4. Módulo de Personagem & Herói (`/api/character`)
 
-### 👨‍👩‍👧‍👦 Família & Clã (`/api/family`) — *Fase 2*
-- `POST /api/family/create`: Cria um novo clã familiar e gera código de convite (Restrito a `PARENT` / `ADMIN`).
-- `POST /api/family/join`: Entra em uma família existente utilizando o código de convite.
-- `GET /api/family/my-family`: Retorna os dados da família do usuário e lista todos os membros e heróis vinculados.
+| Método | Rota | Autenticação | Descrição |
+|:---|:---|:---|:---|
+| `GET` | `/api/character/me` | JWT | Retorna o herói, classe ativa, nível, atributos e habilidades do usuário |
+| `POST` | `/api/character/create` | JWT | Cria o herói (Nome, Sexo, Avatar, Classe Inicial com atributos base) |
+| `PUT` | `/api/character/update-profile` | JWT | Salva dados reais do usuário (Telefone, Escola/Trabalho, Foto) |
+| `POST` | `/api/character/change-class` | JWT | Alterna classe ativa preservando o progresso (Multi-Classe) |
 
-### ⚔️ Personagem do Herói (`/api/character`) — *Fase 2*
-- `GET /api/character/me`: Retorna o personagem do usuário autenticado (ou status indicando que ainda não foi criado).
-- `POST /api/character/create`: Cria o personagem do herói (Nome, Sexo, Avatar Foto/Sprite).
-- `PUT /api/character/update-profile`: Atualiza dados reais do perfil (Telefone, Escola/Trabalho, Foto).
-- `POST /api/character/change-class`: Troca a classe ativa preservando o progresso da classe anterior.
-- `POST /api/character/learn-skill`: Desbloqueia habilidade na Árvore de Talentos consumindo XP.
+### Exemplo: `POST /api/character/create`
+- **Body:**
+  ```json
+  {
+    "name": "Davi Valente",
+    "gender": "MALE",
+    "avatar_type": "SPRITE",
+    "avatar_value": "hero_warrior",
+    "initial_class_id": "6cacfc3a-d5fa-4860-bc50-c2c2bcf91359"
+  }
+  ```
+- **Resposta Sucesso (201):**
+  ```json
+  {
+    "success": true,
+    "message": "⚔️ O Herói \"Davi Valente\" (Guardião do Lar) nasceu no reino de LiraQuest!",
+    "character": {
+      "id": "uuid...",
+      "name": "Davi Valente",
+      "gold": 50,
+      "current_class": { "name": "Guardião do Lar" },
+      "attributes": [ ... ],
+      "skills": [ ... ]
+    }
+  }
+  ```
 
-### 📚 Catálogo Global (`/api/catalog`) — *Fase 2*
-- `GET /api/catalog/attributes`: Lista os 6 atributos (`STR`, `AGI`, `CON`, `INT`, `CHA`, `LUK`).
-- `GET /api/catalog/classes`: Lista as 6 classes de heróis e seus atributos primários/secundários.
-- `GET /api/catalog/skills/:classId`: Retorna a Árvore de Talentos completa de uma classe.
-- `GET /api/catalog/items`: Lista os itens e recompensas disponíveis na Loja do Reino.
+---
+
+## 5. Módulos Futuros (Fases 3 & 4)
 
 ### 📋 Tarefas & Missões (`/api/tasks`) — *Fase 3*
 - `GET /api/tasks`: Lista as missões disponíveis para a família do usuário.
 - `POST /api/tasks`: Cria uma nova missão (Pais).
 - `POST /api/tasks/:taskId/submit`: Filho envia prova da missão realizada (foto + texto).
-- `POST /api/tasks/submissions/:submissionId/review`: Pai aprova ou rejeita a prova enviada (creditando XP e Ouro automaticamente se aprovada).
+- `POST /api/tasks/submissions/:submissionId/review`: Pai aprova ou rejeita a prova enviada.
 
----
-
-## 3. WebSockets em Tempo Real (Socket.IO) — *Fase 4*
-
-### Eventos de Sala Familiar
-- `join_family_room`: O cliente se conecta à sala de eventos do seu clã familiar (`family_{id}`).
-- `task_submitted`: Notificação instantânea para os pais quando um filho submete uma prova.
-- `task_approved`: Notificação instantânea com efeito sonoro e visual para o herói quando sua missão é aprovada.
-
-### Eventos de Raid & Combate Cooperativo
-- `raid_lobby_join`: Heróis entram no saguão de preparação da Raid contra o Chefe.
-- `raid_start`: Início sincronizado do combate Phaser 2D em tempo real.
-- `raid_hero_action`: Envio da ação do turno do herói (ataque, habilidade, cura, poção).
-- `raid_turn_update`: Broadcast para todos os participantes do estado do campo, fila de iniciativa e dano causado.
-- `raid_victory` / `raid_defeat`: Fim da batalha com distribuição sincronizada de recompensas.
+### 🎮 WebSockets em Tempo Real (Socket.IO) — *Fase 4*
+- `join_family_room`: Conexão com o clã familiar em tempo real.
+- `task_submitted` & `task_approved`: Notificações instantâneas familiares.
+- `raid_lobby_join`, `raid_start`, `raid_hero_action`, `raid_turn_update`: Batalhas Phaser 2D em tempo real.
