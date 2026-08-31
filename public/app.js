@@ -1461,6 +1461,31 @@ class ChameleonGameEngine {
           }
         }
       }
+
+      // Se for iluminado diretamente pelo cone de luz da lanterna, perde a camuflagem (é revelado!)
+      if (this.player.isCamouflaged) {
+        if (!this.isMultiplayer) {
+          const distToSeeker = Math.hypot(this.player.x - this.seeker.x, this.player.y - this.seeker.y);
+          const angleToPlayer = Math.atan2(this.player.y - this.seeker.y, this.player.x - this.seeker.x);
+          let angleDiff = Math.abs(this.seeker.angle - angleToPlayer);
+          while (angleDiff > Math.PI) angleDiff = Math.abs(angleDiff - 2 * Math.PI);
+          if (distToSeeker <= this.seeker.flashlightRadius && angleDiff <= this.seeker.flashlightAngleSpread / 2) {
+            this.player.isCamouflaged = false;
+          }
+        } else {
+          for (const [id, rp] of this.remotePlayers.entries()) {
+            if (rp.isSeeker) {
+              const distToSeeker = Math.hypot(this.player.x - rp.x, this.player.y - rp.y);
+              const angleToPlayer = Math.atan2(this.player.y - rp.y, this.player.x - rp.x);
+              let angleDiff = Math.abs(rp.angle - angleToPlayer);
+              while (angleDiff > Math.PI) angleDiff = Math.abs(angleDiff - 2 * Math.PI);
+              if (distToSeeker <= 260 && angleDiff <= (Math.PI / 3.4) / 2) {
+                this.player.isCamouflaged = false;
+              }
+            }
+          }
+        }
+      }
     }
 
     // Emitir posição no multiplayer
@@ -1692,17 +1717,9 @@ class ChameleonGameEngine {
       this.ctx.fillStyle = '#94a3b8';
       this.ctx.fillText(`${label} (Pego)`, x, y - 18);
     } else if (isCamouflaged) {
-      this.ctx.setLineDash([4, 4]);
-      this.ctx.lineWidth = 2.5;
-      this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
-      this.ctx.beginPath();
-      this.ctx.arc(x, y, 14, 0, Math.PI * 2);
-      this.ctx.stroke();
-
-      this.ctx.font = '11px Inter, sans-serif';
-      this.ctx.fillStyle = '#ffffff';
-      this.ctx.textAlign = 'center';
-      this.ctx.fillText(`${label} (Camuflado)`, x, y - 18);
+      // 100% Invisível / Camuflado: Não desenha absolutamente nada (nem borda, nem nome!)
+      this.ctx.restore();
+      return;
     } else {
       this.ctx.beginPath();
       this.ctx.arc(x, y, 14, 0, Math.PI * 2);
