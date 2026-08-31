@@ -39,16 +39,33 @@ O grande diferencial do LiraQuest é a **separação conceitual e visual rigoros
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### 2.1 Terminal do Usuário (Painel da Vida Real)
+### 2.1 Terminal do Usuário (Painel da Vida Real do Filho)
 Representa a vida prática e a rotina do membro da família:
-* **Mural de Missões do Dia:** Lista de deveres organizados por períodos (Manhã, Tarde, Noite ou Fim de Semana).
-* **Controle de Autonomia:** A criança clica para marcar a conclusão da tarefa. O sistema avisa o pai para aprovação.
-* **Cofre de Fichas Reais:** Acúmulo de pontos destinados a serem trocados por privilégios reais.
-* **Loja do Lar (Recompensas da Vida Real):** Cardápio de combinados familiares criado e administrado pelos pais (ex: *"Escolher o filme da sexta-feira"*, *"Noite da Pizza"*, *"Ida ao parque"*).
+* **Mural de Missões do Dia:** Lista de deveres organizados por períodos e categorias com recompensas claras de Fichas, Ouro, XP e Energia.
+* **Painel do Herói (Evolução Real do Filho):** Central de acompanhamento da evolução pessoal do usuário no mundo real, contendo:
+  - **Nível Real do Usuário (Hábitos):** Nível de disciplina e consistência calculado a partir do XP real de tarefas cumpridas.
+  - **Barra de XP & Patentes do Lar:** Títulos de honra (*🌱 Recruta do Lar*, *⚔️ Herói Dedicado*, *🛡️ Guardião Exemplar*, *👑 Cavaleiro de Elite*, *🌟 Campeão Lendário*).
+  - **Cofre de Fichas Reais & Recursos:** Acúmulo de Fichas do Lar, Ouro e Energia de Foco.
+  - **Sequência (Streak 🔥):** Dias consecutivos cumprindo deveres sem quebra de rotina.
+  - **Métricas de Hábitos:** Tarefas concluídas no dia, total histórico e taxa de aprovação familiar.
+* **Foco & Estudos (Pomodoro Gamificado):** Temporizador para sessões de leitura e lição de casa.
+* **Histórico de Missões:** Extrato completo de comprovações e feedbacks dos pais.
 
-### 2.2 Terminal do Avatar (Painel do Reino Virtual)
+### 2.2 Terminal do Guardião (Painel de Gestão dos Pais)
+O centro de comando dos pais para coordenar e incentivar a família:
+* **Validador de Provas em Tempo Real:** Avaliação com 1 clique das fotos e relatos enviados pelos filhos, com aprovação e feedback pedagógico.
+* **Gestão de Missões (CRUD Completo):** Criação, edição, ativação/pausa e exclusão de tarefas personalizadas da casa.
+* **Painel do Clã (Dashboard Analítico da Família):**
+  - **Presença em Tempo Real:** Status de conexão de cada membro (`🟢 Online agora`, `🟡 Ausente há Xm`, `⚪ Visto há Xh`).
+  - **👑 Campeão da Casa (Mais Tarefas):** Destaque ao herói mais produtivo da semana/mês.
+  - **🌱 Herói em Foco (Apoio & Menos Tarefas):** Identificação acolhedora para incentivar quem precisa de apoio com tarefas acessíveis.
+  - **Métricas Globais do Clã:** Total de tarefas concluídas pela família, tesouro acumulado e recorde de streak do clã.
+* **Filhos & Clã Familiar:** Acompanhamento individual dos heróis vinculados e código de convite familiar em 1 clique.
+* **Seus Dados Cadastrais:** Gestão do perfil pessoal, telefone, profissão e foto real do guardião.
+
+### 2.3 Terminal do Avatar (Painel do Reino Virtual)
 Representa o herói de fantasia dentro do universo lúdico:
-* **Ficha do Herói:** Classe, nível, árvore de habilidades e atributos (Força, Agilidade, Constituição, Inteligência, Carisma, Sorte).
+* **Ficha do Herói:** Classe, nível de combate do avatar, árvore de habilidades e atributos (Força, Agilidade, Constituição, Inteligência, Carisma, Sorte).
 * **Energia de Ação:** O fôlego/energia que o avatar precisa para entrar nas batalhas e explorar masmorras é conquistado exclusivamente através do cumprimento das tarefas reais.
 * **Batalhas e Masmorras:** Modos de combate contra os monstros da desordem e chefes colossais.
 * **Loja Mágica do Reino:** Onde o ouro obtido nos combates é gasto para comprar itens do jogo (armas, poções, trajes e montarias virtuais).
