@@ -341,24 +341,83 @@ function switchChildTerminalTab(tab) {
     loadChildTasks();
     loadChildSubmissionsHistory();
   }
+  if (tab === 'profile') {
+    renderChildProfileInfo();
+  }
+}
+
+function renderChildProfileInfo() {
+  if (!state.user) return;
+
+  // Informações na Sidebar
+  document.getElementById('child-user-name').innerText = state.user.name;
+  document.getElementById('child-user-email').innerText = state.user.email;
+
+  const sidebarPhotoBox = document.getElementById('child-sidebar-photo-box');
+  if (sidebarPhotoBox) {
+    if (state.user.profile_photo_url) {
+      sidebarPhotoBox.innerHTML = `<img src="${state.user.profile_photo_url}" alt="Foto" class="user-square-photo-img" onerror="this.parentElement.innerHTML='👤';">`;
+    } else {
+      sidebarPhotoBox.innerHTML = '👤';
+    }
+  }
+
+  // Ficha Informativa de Dados
+  const infoName = document.getElementById('info-child-name');
+  const infoEmail = document.getElementById('info-child-email');
+  const infoPhone = document.getElementById('info-child-phone');
+  const infoSchool = document.getElementById('info-child-school');
+  const photoImg = document.getElementById('profile-photo-img');
+  const photoPlaceholder = document.getElementById('profile-photo-placeholder');
+
+  if (infoName) infoName.innerText = state.user.name || 'Jovem Filho';
+  if (infoEmail) infoEmail.innerText = state.user.email || '--';
+  if (infoPhone) infoPhone.innerText = state.user.phone || 'Não informado';
+  if (infoSchool) infoSchool.innerText = state.user.school_or_work || 'Não informado';
+
+  if (photoImg && photoPlaceholder) {
+    if (state.user.profile_photo_url) {
+      photoImg.src = state.user.profile_photo_url;
+      photoImg.style.display = 'block';
+      photoPlaceholder.style.display = 'none';
+    } else {
+      photoImg.style.display = 'none';
+      photoPlaceholder.style.display = 'block';
+    }
+  }
+
+  // Preencher formulário do modal de edição
+  const inputName = document.getElementById('child-real-name');
+  const inputPhone = document.getElementById('child-real-phone');
+  const inputSchool = document.getElementById('child-real-school');
+  const inputPhoto = document.getElementById('child-real-photo');
+
+  if (inputName) inputName.value = state.user.name || '';
+  if (inputPhone) inputPhone.value = state.user.phone || '';
+  if (inputSchool) inputSchool.value = state.user.school_or_work || '';
+  if (inputPhoto) inputPhoto.value = state.user.profile_photo_url || '';
+}
+
+function openEditProfileModal() {
+  renderChildProfileInfo();
+  const modal = document.getElementById('child-edit-profile-modal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeEditProfileModal() {
+  const modal = document.getElementById('child-edit-profile-modal');
+  if (modal) modal.style.display = 'none';
 }
 
 async function loadChildDashboard() {
   if (!state.user || !state.token) return;
 
-  // Informações do Usuário no Cabeçalho da Sidebar
-  document.getElementById('child-user-name').innerText = state.user.name;
-  document.getElementById('child-user-email').innerText = state.user.email;
-
   if (state.classesCatalog.length === 0) {
     await fetchCatalogs();
   }
 
-  // Preencher formulário de perfil do mundo real
-  document.getElementById('child-real-name').value = state.user.name || '';
-  document.getElementById('child-real-phone').value = state.user.phone || '';
-  document.getElementById('child-real-school').value = state.user.school_or_work || '';
-  document.getElementById('child-real-photo').value = state.user.profile_photo_url || '';
+  // Renderizar Ficha Informativa de Dados
+  renderChildProfileInfo();
 
   // Carregar dados da família
   loadChildFamilyData();
@@ -1319,8 +1378,10 @@ async function handleUpdateRealProfile(e) {
 
     state.user = data.user;
     localStorage.setItem('liraquest_user', JSON.stringify(data.user));
+    closeEditProfileModal();
+    renderChildProfileInfo();
     updateNavbar();
-    showToast('Dados do mundo real salvos com sucesso!', 'success');
+    showToast('Dados cadastrais atualizados com sucesso!', 'success');
   } catch (err) {
     showToast(err.message, 'error');
   }

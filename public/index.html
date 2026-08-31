@@ -515,13 +515,81 @@
       width: 56px;
       height: 56px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #800020, #1e3a8a);
-      border: 2px solid var(--accent);
+      background: #181f2e;
+      border: 2px solid var(--border-card);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 1.5rem;
-      box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+    }
+
+    /* Foto Quadrada Real do Usuário */
+    .user-square-photo-frame {
+      width: 120px;
+      height: 120px;
+      border-radius: 16px;
+      background: #181f2e;
+      border: 2px solid var(--border-card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .user-square-photo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .sidebar-square-photo {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      background: #181f2e;
+      border: 1px solid var(--border-card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    /* Ficha Informativa de Dados */
+    .info-data-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .info-data-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .info-data-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .info-data-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .info-data-val {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #ffffff;
+      word-break: break-word;
     }
 
     /* Tabs de Navegação no Dashboard dos Pais */
@@ -1645,11 +1713,11 @@
         <!-- BARRA LATERAL (SIDEBAR) DO FILHO COM OS 3 LINKS -->
         <aside class="child-sidebar">
           
-          <!-- Cabeçalho do Filho no Menu -->
+          <!-- Cabeçalho do Filho no Menu com Foto Quadrada -->
           <div class="sidebar-user-header">
-            <div id="child-header-avatar" class="avatar-circle">👤</div>
+            <div id="child-sidebar-photo-box" class="sidebar-square-photo">👤</div>
             <div style="overflow: hidden;">
-              <h3 id="child-user-name" style="font-size: 1.1rem; color: #ffffff; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">Jovem Filho</h3>
+              <h3 id="child-user-name" style="font-size: 1.05rem; color: #ffffff; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">Jovem Filho</h3>
               <span id="child-user-email" style="color: var(--text-muted); font-size: 0.78rem; display: block; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">filho@liraquest.com</span>
               <span class="role-badge badge-child" style="font-size: 0.7rem; padding: 2px 8px; margin-top: 4px;">👤 Usuário Filho</span>
             </div>
@@ -1667,11 +1735,6 @@
               <span>👤</span> Dados
             </button>
           </div>
-
-          <!-- Botão Sair da Conta -->
-          <button class="btn btn-danger btn-sm" style="width: 100%; margin-top: auto;" onclick="handleLogout()">
-            🚪 Sair da Conta
-          </button>
         </aside>
 
         <!-- ÁREA PRINCIPAL DE CONTEÚDO DO TERMINAL DO FILHO -->
@@ -1706,7 +1769,7 @@
             </div>
 
             <!-- Widget Pomodoro / Temporizador de Estudos -->
-            <div style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.4), rgba(15, 23, 42, 0.8)); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 20px; padding: 28px; text-align: center; margin-bottom: 28px;">
+            <div style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.3), rgba(15, 23, 42, 0.8)); border: 1px solid var(--border-card); border-radius: 20px; padding: 28px; text-align: center; margin-bottom: 28px;">
               <span class="home-feature-tag" style="display: inline-block; margin-bottom: 8px;">Foco & Concentração</span>
               <h3 style="font-size: 1.3rem; color: #ffffff; margin-bottom: 8px;">Temporizador de Estudo Focado</h3>
               
@@ -1730,13 +1793,13 @@
 
             <!-- Dicas e Metas de Estudos -->
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px;">
-              <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 18px;">
+              <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-card); border-radius: 16px; padding: 18px;">
                 <h4 style="font-size: 1.05rem; color: #facc15; margin-bottom: 8px;">📖 Técnicas de Alta Performance</h4>
                 <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
                   Estude em blocos de 25 minutos com 5 minutos de descanso. Evite celular e redes sociais durante o bloco.
                 </p>
               </div>
-              <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 18px;">
+              <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-card); border-radius: 16px; padding: 18px;">
                 <h4 style="font-size: 1.05rem; color: #60a5fa; margin-bottom: 8px;">🎯 Metas Diárias</h4>
                 <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
                   Completar as tarefas escolares do dia e realizar revisões regulares antes de cada prova.
@@ -1745,43 +1808,51 @@
             </div>
           </div>
 
-          <!-- PAINEL 3: 👤 DADOS PESSOAIS E CLÃ -->
+          <!-- PAINEL 3: 👤 FICHA INFORMATIVA DE DADOS -->
           <div id="child-panel-profile" style="display: none;">
-            <div style="margin-bottom: 24px;">
-              <h2 style="font-size: 1.5rem; color: #ffffff; margin-bottom: 4px;">👤 Seus Dados</h2>
-              <p style="color: var(--text-muted); font-size: 0.9rem;">Gerencie suas informações cadastrais e o vínculo com sua família.</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+              <div>
+                <h2 style="font-size: 1.5rem; color: #ffffff; margin-bottom: 4px;">👤 Seus Dados Cadastrais</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Informações pessoais e vínculo familiar no LiraQuest.</p>
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="openEditProfileModal()">
+                ✏️ Editar Dados
+              </button>
             </div>
 
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
               
-              <!-- Card 1: Dados Pessoais -->
-              <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(212, 175, 55, 0.18); border-radius: 18px; padding: 24px;">
-                <h3 style="font-size: 1.2rem; margin-bottom: 16px; color: #fde047;">👤 Dados Pessoais</h3>
-                <form id="child-profile-form">
-                  <div class="form-group">
-                    <label class="form-label" for="child-real-name">Nome Completo</label>
-                    <input type="text" id="child-real-name" class="form-input" placeholder="Seu nome real" required>
+              <!-- Card 1: Ficha Pessoal com Foto Quadrada -->
+              <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 18px; padding: 24px;">
+                <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border-subtle);">
+                  <div class="user-square-photo-frame" id="profile-photo-display-frame">
+                    <span id="profile-photo-placeholder" style="font-size: 3.2rem;">👤</span>
+                    <img id="profile-photo-img" src="" alt="Foto Real" class="user-square-photo-img" style="display: none;" onerror="this.style.display='none'; document.getElementById('profile-photo-placeholder').style.display='block';">
                   </div>
-                  <div class="form-group">
-                    <label class="form-label" for="child-real-phone">Telefone / WhatsApp</label>
-                    <input type="text" id="child-real-phone" class="form-input" placeholder="(11) 99999-9999">
+                  <div>
+                    <h3 id="info-child-name" style="font-size: 1.3rem; color: #ffffff; margin-bottom: 4px;">Nome do Filho</h3>
+                    <span class="role-badge badge-child" style="font-size: 0.75rem;">👤 Usuário Filho</span>
                   </div>
-                  <div class="form-group">
-                    <label class="form-label" for="child-real-school">Escola / Faculdade / Trabalho</label>
-                    <input type="text" id="child-real-school" class="form-input" placeholder="Ex: Colégio Anglo - 8º Ano">
+                </div>
+
+                <div class="info-data-grid">
+                  <div class="info-data-row">
+                    <span class="info-data-label">E-mail Cadastrado</span>
+                    <span id="info-child-email" class="info-data-val">filho@email.com</span>
                   </div>
-                  <div class="form-group">
-                    <label class="form-label" for="child-real-photo">URL da Foto de Perfil (Opcional)</label>
-                    <input type="url" id="child-real-photo" class="form-input" placeholder="https://...">
+                  <div class="info-data-row">
+                    <span class="info-data-label">Telefone / WhatsApp</span>
+                    <span id="info-child-phone" class="info-data-val">Não informado</span>
                   </div>
-                  <button type="submit" class="btn btn-primary btn-sm" style="width: 100%; margin-top: 8px;">
-                    💾 Salvar Dados
-                  </button>
-                </form>
+                  <div class="info-data-row">
+                    <span class="info-data-label">Escola / Faculdade / Trabalho</span>
+                    <span id="info-child-school" class="info-data-val">Não informado</span>
+                  </div>
+                </div>
               </div>
 
               <!-- Card 2: Família & Clã -->
-              <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(212, 175, 55, 0.18); border-radius: 18px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between;">
+              <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 18px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between;">
                 <div>
                   <h3 style="font-size: 1.2rem; margin-bottom: 16px; color: #93c5fd;">🏰 Clã Familiar</h3>
                   
@@ -1809,15 +1880,56 @@
                   </div>
                 </div>
 
-                <div style="margin-top: 20px; padding: 14px; background: rgba(0, 0, 0, 0.3); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.08);">
+                <div style="margin-top: 20px; padding: 14px; background: rgba(0, 0, 0, 0.3); border-radius: 12px; border: 1px solid var(--border-subtle);">
                   <span style="font-size: 0.8rem; color: var(--text-muted); display: block;">💡 Informação:</span>
-                  <p style="font-size: 0.82rem; color: #cbd5e1; margin-top: 4px;">Após ingressar no clã, as missões e tarefas atribuídas pelos seus pais aparecerão na aba Tarefas.</p>
+                  <p style="font-size: 0.82rem; color: #cbd5e1; margin-top: 4px;">Após ingressar no clã, as tarefas atribuídas pelos seus pais aparecerão na aba Tarefas.</p>
                 </div>
 
               </div>
 
             </div>
           </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- MODAL: EDITAR DADOS CADASTRAIS (FILHO)                   -->
+    <!-- ======================================================== -->
+    <div id="child-edit-profile-modal" class="modal-overlay" style="display: none;">
+      <div class="modal-content" style="max-width: 480px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h3 style="font-size: 1.25rem; color: #ffffff;">✏️ Editar Dados Pessoais</h3>
+          <button class="btn btn-secondary btn-sm" onclick="closeEditProfileModal()">✕</button>
+        </div>
+
+        <form id="child-profile-form">
+          <div class="form-group">
+            <label class="form-label" for="child-real-name">Nome Completo</label>
+            <input type="text" id="child-real-name" class="form-input" placeholder="Seu nome real" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="child-real-phone">Telefone / WhatsApp</label>
+            <input type="text" id="child-real-phone" class="form-input" placeholder="(11) 99999-9999">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="child-real-school">Escola / Faculdade / Trabalho</label>
+            <input type="text" id="child-real-school" class="form-input" placeholder="Ex: Colégio Anglo - 8º Ano">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="child-real-photo">URL da Foto de Perfil (Quadrado)</label>
+            <input type="url" id="child-real-photo" class="form-input" placeholder="https://exemplo.com/foto.jpg">
+          </div>
+          
+          <div style="display: flex; gap: 10px; margin-top: 24px;">
+            <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="closeEditProfileModal()">Cancelar</button>
+            <button type="submit" class="btn btn-primary" style="flex: 1;">💾 Salvar Alterações</button>
+          </div>
+        </form>
+      </div>
+    </div>
 
         </div>
 
