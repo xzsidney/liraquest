@@ -855,7 +855,7 @@ function updateStudyTimerDisplay() {
 // ========================================================
 function switchAvatarTab(tab) {
   state.avatarActiveTab = tab;
-  const tabs = ['sheet', 'tasks', 'shop'];
+  const tabs = ['sheet', 'arcade', 'tasks', 'shop'];
   
   tabs.forEach((t) => {
     const tabBtn = document.getElementById(`avatar-tab-btn-${t}`);
@@ -872,12 +872,561 @@ function switchAvatarTab(tab) {
     }
   });
 
-  if (tab === 'tasks') {
+  if (tab === 'arcade') {
+    loadArcadeHub();
+  } else if (tab === 'tasks') {
     loadChildTasks();
     loadChildSubmissionsHistory();
-  }
-  if (tab === 'shop') {
+  } else if (tab === 'shop') {
     loadShopItems();
+  }
+}
+
+// ========================================================
+// 🕹️ ARCADE DO REINO VIRTUAL & JOGO ESCONDE-ESCONDE CAMALEÃO
+// ========================================================
+
+let chameleonGameInstance = null;
+let currentChameleonColor = '#ef4444';
+
+function loadArcadeHub() {
+  const energyBalanceEl = document.getElementById('arcade-energy-balance');
+  if (energyBalanceEl) {
+    energyBalanceEl.innerText = state.progress?.adventure_energy || 0;
+  }
+}
+
+function openChameleonGameArena() {
+  document.getElementById('arcade-hub-view').style.display = 'none';
+  document.getElementById('chameleon-game-view').style.display = 'block';
+  document.getElementById('chameleon-start-screen').style.display = 'flex';
+  document.getElementById('chameleon-end-screen').style.display = 'none';
+
+  const energyDisplay = document.getElementById('chameleon-energy-display');
+  if (energyDisplay) {
+    energyDisplay.innerText = `${state.progress?.adventure_energy || 0} ⚡`;
+  }
+
+  // Inicializa o canvas em modo de espera
+  if (!chameleonGameInstance) {
+    chameleonGameInstance = new ChameleonGameEngine('chameleon-canvas');
+  }
+  chameleonGameInstance.drawIdlePreview(currentChameleonColor);
+}
+
+function closeChameleonGameArena() {
+  if (chameleonGameInstance) {
+    chameleonGameInstance.stop();
+  }
+  document.getElementById('chameleon-game-view').style.display = 'none';
+  document.getElementById('arcade-hub-view').style.display = 'block';
+  loadArcadeHub();
+}
+
+function selectChameleonColor(color, btn) {
+  currentChameleonColor = color;
+  document.querySelectorAll('.color-picker-btn').forEach((b) => b.classList.remove('selected'));
+  if (btn) btn.classList.add('selected');
+
+  if (chameleonGameInstance) {
+    chameleonGameInstance.setPlayerColor(color);
+    if (!chameleonGameInstance.isRunning) {
+      chameleonGameInstance.drawIdlePreview(color);
+    }
+  }
+}
+
+async function startChameleonGameSession() {
+  try {
+    const res = await fetch(`${API.character}/minigames/chameleon/start`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${state.token}`,
+      },
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      showToast(data.message || 'Energia insuficiente para jogar!', 'warning');
+      return;
+    }
+
+    // Atualizar saldo de energia local
+    if (state.progress) {
+      state.progress.adventure_energy = data.energy_remaining;
+    }
+    updateChildSidebarStats();
+    loadArcadeHub();
+
+    const energyDisplay = document.getElementById('chameleon-energy-display');
+    if (energyDisplay) {
+      energyDisplay.innerText = `${data.energy_remaining} ⚡`;
+    }
+
+    // Esconde overlays e inicia o jogo
+    document.getElementById('chameleon-start-screen').style.display = 'none';
+    document.getElementById('chameleon-end-screen').style.display = 'none';
+
+    if (!chameleonGameInstance) {
+      chameleonGameInstance = new ChameleonGameEngine('chameleon-canvas');
+    }
+    chameleonGameInstance.start(currentChameleonColor);
+  } catch (err) {
+    showToast('Erro ao iniciar partida.', 'error');
+  }
+}
+
+function handleDpadInput(dir, isPressed) {
+  if (chameleonGameInstance) {
+    chameleonGameInstance.setDpadKey(dir, isPressed);
+  }
+}
+
+// ─── MOTOR 2D DO JOGO ESCONDE-ESCONDE CAMALEÃO ───────────
+class ChameleonGameEngine {
+  constructor(canvasId) {
+    this.canvas = document.getElementById(canvasId);
+    this.ctx = this.canvas.getContext('2d');
+    this.width = this.canvas.width;
+    this.height = this.canvas.height;
+    this.isRunning = false;
+    this.animationFrameId = null;
+
+    // Teclas pressionadas
+    this.keys = { up: false, down: false, left: false, right: false };
+    this.bindControls();
+
+    // 4 Zonas de Plataformas Coloridas
+    this.platforms = [
+      { id: 'red', color: '#ef4444', name: 'Rubi', x: 40, y: 40, w: 330, h: 180 },
+      { id: 'blue', color: '#3b82f6', name: 'Safira', x: 430, y: 40, w: 330, h: 180 },
+      { id: 'green', color: '#22c55e', name: 'Esmeralda', x: 40, y: 280, w: 330, h: 180 },
+      { id: 'yellow', color: '#eab308', name: 'Ouro', x: 430, y: 280, w: 330, h: 180 },
+    ];
+
+    // Jogador (Camaleão)
+    this.player = {
+      x: 400,
+      y: 250,
+      radius: 14,
+      color: '#ef4444',
+      speed: 4.5,
+      isCamouflaged: false,
+    };
+
+    // Buscador com Lanterna (IA)
+    this.seeker = {
+      x: 100,
+      y: 100,
+      radius: 16,
+      angle: 0,
+      speed: 2.3,
+      alertSpeed: 3.8,
+      isAlert: false,
+      flashlightRadius: 260,
+      flashlightAngleSpread: Math.PI / 3.4, // ~53 graus
+      waypoints: [
+        { x: 100, y: 100 },
+        { x: 700, y: 100 },
+        { x: 700, y: 400 },
+        { x: 100, y: 400 },
+        { x: 400, y: 250 },
+      ],
+      currentWaypointIdx: 0,
+    };
+
+    // Cristais de Bônus 💎
+    this.crystals = [];
+    this.crystalsCollected = 0;
+    this.maxCrystals = 5;
+
+    // Tempo de Jogo
+    this.timeLimitSeconds = 45;
+    this.timeRemaining = 45;
+    this.timerInterval = null;
+    this.crystalSpawnInterval = null;
+  }
+
+  bindControls() {
+    window.addEventListener('keydown', (e) => {
+      if (!this.isRunning) return;
+      if (['ArrowUp', 'KeyW'].includes(e.code)) { this.keys.up = true; e.preventDefault(); }
+      if (['ArrowDown', 'KeyS'].includes(e.code)) { this.keys.down = true; e.preventDefault(); }
+      if (['ArrowLeft', 'KeyA'].includes(e.code)) { this.keys.left = true; e.preventDefault(); }
+      if (['ArrowRight', 'KeyD'].includes(e.code)) { this.keys.right = true; e.preventDefault(); }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      if (['ArrowUp', 'KeyW'].includes(e.code)) this.keys.up = false;
+      if (['ArrowDown', 'KeyS'].includes(e.code)) this.keys.down = false;
+      if (['ArrowLeft', 'KeyA'].includes(e.code)) this.keys.left = false;
+      if (['ArrowRight', 'KeyD'].includes(e.code)) this.keys.right = false;
+    });
+  }
+
+  setDpadKey(dir, isPressed) {
+    if (dir === 'UP') this.keys.up = isPressed;
+    if (dir === 'DOWN') this.keys.down = isPressed;
+    if (dir === 'LEFT') this.keys.left = isPressed;
+    if (dir === 'RIGHT') this.keys.right = isPressed;
+  }
+
+  setPlayerColor(color) {
+    this.player.color = color;
+  }
+
+  start(color) {
+    this.stop();
+    this.isRunning = true;
+    this.player.color = color || currentChameleonColor;
+    this.player.x = 400;
+    this.player.y = 250;
+    this.seeker.x = 100;
+    this.seeker.y = 100;
+    this.seeker.isAlert = false;
+    this.seeker.currentWaypointIdx = 0;
+    this.crystals = [];
+    this.crystalsCollected = 0;
+    this.timeRemaining = this.timeLimitSeconds;
+
+    this.spawnCrystal();
+    this.updateHUD();
+
+    // Iniciar temporizador
+    this.timerInterval = setInterval(() => {
+      if (!this.isRunning) return;
+      this.timeRemaining--;
+      this.updateHUD();
+
+      if (this.timeRemaining <= 0) {
+        this.endGame(true);
+      }
+    }, 1000);
+
+    // Spawner de Cristais
+    this.crystalSpawnInterval = setInterval(() => {
+      if (!this.isRunning) return;
+      if (this.crystals.length < this.maxCrystals) {
+        this.spawnCrystal();
+      }
+    }, 8000);
+
+    // Loop do Canvas
+    this.loop();
+  }
+
+  stop() {
+    this.isRunning = false;
+    if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
+    if (this.timerInterval) clearInterval(this.timerInterval);
+    if (this.crystalSpawnInterval) clearInterval(this.crystalSpawnInterval);
+    this.keys = { up: false, down: false, left: false, right: false };
+  }
+
+  spawnCrystal() {
+    const x = Math.floor(Math.random() * (this.width - 120)) + 60;
+    const y = Math.floor(Math.random() * (this.height - 120)) + 60;
+    this.crystals.push({ x, y, radius: 10, pulse: 0 });
+  }
+
+  updateHUD() {
+    const timerEl = document.getElementById('chameleon-timer-display');
+    const crystalsEl = document.getElementById('chameleon-crystals-display');
+    if (timerEl) timerEl.innerText = this.timeRemaining;
+    if (crystalsEl) crystalsEl.innerText = `${this.crystalsCollected}`;
+  }
+
+  loop() {
+    if (!this.isRunning) return;
+    this.update();
+    this.draw();
+    this.animationFrameId = requestAnimationFrame(() => this.loop());
+  }
+
+  update() {
+    // 1. Movimento do Jogador
+    let dx = 0;
+    let dy = 0;
+    if (this.keys.up) dy -= this.player.speed;
+    if (this.keys.down) dy += this.player.speed;
+    if (this.keys.left) dx -= this.player.speed;
+    if (this.keys.right) dx += this.player.speed;
+
+    // Normaliza velocidade diagonal
+    if (dx !== 0 && dy !== 0) {
+      dx *= 0.7071;
+      dy *= 0.7071;
+    }
+
+    this.player.x = Math.max(this.player.radius + 10, Math.min(this.width - this.player.radius - 10, this.player.x + dx));
+    this.player.y = Math.max(this.player.radius + 10, Math.min(this.height - this.player.radius - 10, this.player.y + dy));
+
+    // 2. Verificar Camuflagem
+    this.player.isCamouflaged = false;
+    for (const p of this.platforms) {
+      if (
+        this.player.x >= p.x &&
+        this.player.x <= p.x + p.w &&
+        this.player.y >= p.y &&
+        this.player.y <= p.y + p.h
+      ) {
+        if (p.color.toLowerCase() === this.player.color.toLowerCase()) {
+          this.player.isCamouflaged = true;
+          break;
+        }
+      }
+    }
+
+    // 3. Coleta de Cristais 💎
+    for (let i = this.crystals.length - 1; i >= 0; i--) {
+      const c = this.crystals[i];
+      c.pulse += 0.05;
+      const dist = Math.hypot(this.player.x - c.x, this.player.y - c.y);
+      if (dist < this.player.radius + c.radius) {
+        this.crystals.splice(i, 1);
+        this.crystalsCollected++;
+        this.updateHUD();
+        showToast('💎 Cristal Coletado! (+5 Ouro de bônus)', 'info');
+      }
+    }
+
+    // 4. IA do Buscador com Lanterna
+    const distToPlayer = Math.hypot(this.player.x - this.seeker.x, this.player.y - this.seeker.y);
+    const angleToPlayer = Math.atan2(this.player.y - this.seeker.y, this.player.x - this.seeker.x);
+
+    // Diferença angular
+    let angleDiff = Math.abs(this.seeker.angle - angleToPlayer);
+    while (angleDiff > Math.PI) angleDiff = Math.abs(angleDiff - 2 * Math.PI);
+
+    // Detecção da Lanterna
+    const isPlayerInLightCone =
+      distToPlayer <= this.seeker.flashlightRadius &&
+      angleDiff <= this.seeker.flashlightAngleSpread / 2;
+
+    if (isPlayerInLightCone) {
+      // Jogador foi atingido pelo cone de luz (mesmo se camuflado, a luz revela!)
+      this.seeker.isAlert = true;
+      this.seeker.angle = angleToPlayer;
+    } else if (distToPlayer < 45 && !this.player.isCamouflaged) {
+      // Perto demais sem estar camuflado
+      this.seeker.isAlert = true;
+      this.seeker.angle = angleToPlayer;
+    } else {
+      this.seeker.isAlert = false;
+    }
+
+    // Movimentação do Buscador
+    const currentSpeed = this.seeker.isAlert ? this.seeker.alertSpeed : this.seeker.speed;
+
+    if (this.seeker.isAlert) {
+      // Persegue o jogador
+      this.seeker.x += Math.cos(this.seeker.angle) * currentSpeed;
+      this.seeker.y += Math.sin(this.seeker.angle) * currentSpeed;
+    } else {
+      // Segue os Waypoints da Patrulha
+      const targetWp = this.seeker.waypoints[this.seeker.currentWaypointIdx];
+      const distWp = Math.hypot(targetWp.x - this.seeker.x, targetWp.y - this.seeker.y);
+      const targetAngle = Math.atan2(targetWp.y - this.seeker.y, targetWp.x - this.seeker.x);
+
+      // Suaviza a rotação da lanterna
+      this.seeker.angle += (targetAngle - this.seeker.angle) * 0.08;
+
+      this.seeker.x += Math.cos(targetAngle) * currentSpeed;
+      this.seeker.y += Math.sin(targetAngle) * currentSpeed;
+
+      if (distWp < 20) {
+        this.seeker.currentWaypointIdx = (this.seeker.currentWaypointIdx + 1) % this.seeker.waypoints.length;
+      }
+    }
+
+    // 5. Colisão e Captura
+    if (distToPlayer <= this.player.radius + this.seeker.radius) {
+      this.endGame(false);
+    }
+  }
+
+  draw() {
+    this.ctx.clearRect(0, 0, this.width, this.height);
+
+    // 1. Fundo Escuro Nobre
+    this.ctx.fillStyle = '#0b0f19';
+    this.ctx.fillRect(0, 0, this.width, this.height);
+
+    // 2. Plataformas Coloridas
+    for (const p of this.platforms) {
+      this.ctx.fillStyle = p.color;
+      this.ctx.globalAlpha = 0.85;
+      this.ctx.beginPath();
+      this.ctx.roundRect(p.x, p.y, p.w, p.h, 16);
+      this.ctx.fill();
+
+      // Borda sutil
+      this.ctx.lineWidth = 3;
+      this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+      this.ctx.stroke();
+
+      // Rótulo da cor
+      this.ctx.globalAlpha = 0.5;
+      this.ctx.fillStyle = '#ffffff';
+      this.ctx.font = 'bold 13px Inter, sans-serif';
+      this.ctx.fillText(p.name, p.x + 16, p.y + 26);
+    }
+    this.ctx.globalAlpha = 1.0;
+
+    // 3. Cristais 💎
+    for (const c of this.crystals) {
+      const scale = 1 + Math.sin(c.pulse) * 0.15;
+      this.ctx.save();
+      this.ctx.translate(c.x, c.y);
+      this.ctx.scale(scale, scale);
+      this.ctx.font = '20px serif';
+      this.ctx.textAlign = 'center';
+      this.ctx.textBaseline = 'middle';
+      this.ctx.fillText('💎', 0, 0);
+      this.ctx.restore();
+    }
+
+    // 4. Cone de Luz da Lanterna do Buscador (Luz Dinâmica)
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.moveTo(this.seeker.x, this.seeker.y);
+    const startAngle = this.seeker.angle - this.seeker.flashlightAngleSpread / 2;
+    const endAngle = this.seeker.angle + this.seeker.flashlightAngleSpread / 2;
+    this.ctx.arc(this.seeker.x, this.seeker.y, this.seeker.flashlightRadius, startAngle, endAngle);
+    this.ctx.closePath();
+
+    // Gradiente da Lanterna
+    const grad = this.ctx.createRadialGradient(
+      this.seeker.x,
+      this.seeker.y,
+      10,
+      this.seeker.x,
+      this.seeker.y,
+      this.seeker.flashlightRadius
+    );
+    if (this.seeker.isAlert) {
+      grad.addColorStop(0, 'rgba(239, 68, 68, 0.85)');
+      grad.addColorStop(0.7, 'rgba(239, 68, 68, 0.35)');
+      grad.addColorStop(1, 'rgba(239, 68, 68, 0)');
+    } else {
+      grad.addColorStop(0, 'rgba(253, 224, 71, 0.75)');
+      grad.addColorStop(0.7, 'rgba(253, 224, 71, 0.25)');
+      grad.addColorStop(1, 'rgba(253, 224, 71, 0)');
+    }
+    this.ctx.fillStyle = grad;
+    this.ctx.fill();
+    this.ctx.restore();
+
+    // 5. Buscador (Patrulheiro das Sombras)
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.arc(this.seeker.x, this.seeker.y, this.seeker.radius, 0, Math.PI * 2);
+    this.ctx.fillStyle = this.seeker.isAlert ? '#dc2626' : '#475569';
+    this.ctx.fill();
+    this.ctx.lineWidth = 3;
+    this.ctx.strokeStyle = '#ffffff';
+    this.ctx.stroke();
+
+    // Lanterna na mão do buscador
+    this.ctx.fillStyle = '#fde047';
+    this.ctx.beginPath();
+    this.ctx.arc(
+      this.seeker.x + Math.cos(this.seeker.angle) * 14,
+      this.seeker.y + Math.sin(this.seeker.angle) * 14,
+      6,
+      0,
+      Math.PI * 2
+    );
+    this.ctx.fill();
+    this.ctx.restore();
+
+    // 6. Jogador (Camaleão)
+    this.ctx.save();
+    if (this.player.isCamouflaged) {
+      // Camuflado: 100% invisível para a IA, com aura pontilhada visível para o jogador
+      this.ctx.setLineDash([4, 4]);
+      this.ctx.lineWidth = 2.5;
+      this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+      this.ctx.beginPath();
+      this.ctx.arc(this.player.x, this.player.y, this.player.radius, 0, Math.PI * 2);
+      this.ctx.stroke();
+
+      this.ctx.font = '12px Inter, sans-serif';
+      this.ctx.fillStyle = '#ffffff';
+      this.ctx.textAlign = 'center';
+      this.ctx.fillText('👻 Camuflado', this.player.x, this.player.y - 20);
+    } else {
+      // Visível
+      this.ctx.beginPath();
+      this.ctx.arc(this.player.x, this.player.y, this.player.radius, 0, Math.PI * 2);
+      this.ctx.fillStyle = this.player.color;
+      this.ctx.fill();
+      this.ctx.lineWidth = 3;
+      this.ctx.strokeStyle = '#ffffff';
+      this.ctx.stroke();
+    }
+    this.ctx.restore();
+  }
+
+  drawIdlePreview(color) {
+    this.player.color = color;
+    this.draw();
+  }
+
+  async endGame(isVictory) {
+    this.stop();
+
+    const endScreen = document.getElementById('chameleon-end-screen');
+    const iconEl = document.getElementById('chameleon-result-icon');
+    const titleEl = document.getElementById('chameleon-result-title');
+    const descEl = document.getElementById('chameleon-result-desc');
+    const goldEl = document.getElementById('chameleon-reward-gold');
+    const xpEl = document.getElementById('chameleon-reward-xp');
+
+    try {
+      const res = await fetch(`${API.character}/minigames/chameleon/complete`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${state.token}`,
+        },
+        body: JSON.stringify({
+          survivedSeconds: this.timeLimitSeconds - this.timeRemaining,
+          crystalsCollected: this.crystalsCollected,
+          isVictory,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        if (isVictory) {
+          if (iconEl) iconEl.innerText = '🎉';
+          if (titleEl) {
+            titleEl.innerText = 'VITÓRIA ÉPICA!';
+            titleEl.style.color = '#fde047';
+          }
+          if (descEl) descEl.innerText = `Você sobreviveu à patrulha por 45 segundos e coletou ${this.crystalsCollected} cristais!`;
+        } else {
+          if (iconEl) iconEl.innerText = '🚨';
+          if (titleEl) {
+            titleEl.innerText = 'VOCÊ FOI CAPTURADO!';
+            titleEl.style.color = '#ef4444';
+          }
+          if (descEl) descEl.innerText = `A lanterna encontrou você aos ${this.timeLimitSeconds - this.timeRemaining}s de fuga.`;
+        }
+
+        if (goldEl) goldEl.innerText = `💰 +${data.reward.goldEarned} Ouro`;
+        if (xpEl) xpEl.innerText = `⭐ +${data.reward.xpEarned} XP`;
+
+        if (endScreen) endScreen.style.display = 'flex';
+
+        // Atualizar perfil do Avatar no HUD
+        await loadCharacterData();
+      }
+    } catch (err) {
+      showToast('Erro ao registrar resultado da partida.', 'error');
+    }
   }
 }
 

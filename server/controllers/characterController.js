@@ -342,3 +342,121 @@ export const changeHeroClass = async (req, res) => {
     });
   }
 };
+
+/**
+ * Inicia uma partida do mini-game Esconde-Esconde Camaleão consumindo Energia de Aventura
+ */
+export const startChameleonGame = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const ENERGY_COST = 5;
+
+    let progress = await UserProgress.findOne({ where: { user_id: userId } });
+    if (!progress) {
+      progress = await UserProgress.create({
+        id: randomUUID().toLowerCase(),
+        user_id: userId,
+        adventure_energy: 10,
+      });
+    }
+
+    if ((progress.adventure_energy || 0) < ENERGY_COST) {
+      return res.status(400).json({
+        success: false,
+        message: `Energia de Aventura insuficiente! Você tem ${progress.adventure_energy || 0} ⚡ e são necessários ${ENERGY_COST} ⚡. Cumpra missões do mundo real para recarregar!`,
+      });
+    }
+
+    await progress.decrement('adventure_energy', { by: ENERGY_COST });
+    await progress.reload();
+
+    return res.json({
+      success: true,
+      message: `Partida iniciada! -${ENERGY_COST} Energia de Aventura.`,
+      energy_remaining: progress.adventure_energy,
+    });
+  } catch (error) {
+    console.error('❌ Erro ao iniciar partida de Esconde-Esconde:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Erro ao iniciar mini-game.',
+    });
+  }
+};
+
+/**
+ * Conclui a partida e credita recompensas de Ouro e XP do Avatar
+ */
+export const completeChameleonGame = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { survivedSeconds = 0, crystalsCollected = 0, isVictory = false } = req.body;
+
+    const character = await Character.findOne({ where: { user_id: userId } });
+    if (!character) {
+      return res.status(404).json({
+        success: false,
+        message: 'Herói não encontrado.',
+      });
+    }
+
+    let progress = await UserProgress.findOne({ where: { user_id: userId } });
+    if (!progress) {
+      progress = await UserProgress.create({
+        id: randomUUID().toLowerCase(),
+        user_id: userId,
+      });
+    }
+
+    if (!isVictory) {
+      // Recompensa de consolação proporcional ao tempo
+      const consolationGold = Math.min(10, Math.floor(survivedSeconds / 5)) + (crystalsCollected * 2);
+      const consolationXp = Math.min(15, Math.floor(survivedSeconds / 3));
+
+      await character.increment({ gold: consolationGold, xp: consolationXp });
+      await progress.increment({ total_gold_earned: consolationGold, total_xp_earned: consolationXp });
+      await character.reload();
+
+      return res.json({
+        success: true,
+        isVictory: false,
+        reward: {
+          goldEarned: consolationGold,
+          xpEarned: consolationXp,
+          currentGold: character.gold,
+          currentXp: character.xp,
+        },
+        message: `Você foi capturado! Mas sua coragem garantiu 💰 +${consolationGold} Ouro e ⭐ +${consolationXp} XP de consolação!`,
+      });
+    }
+
+    // Recompensa de Vitória
+    const baseGold = 30;
+    const crystalBonusGold = Math.min(25, crystalsCollected * 5);
+    const totalGoldEarned = baseGold + crystalBonusGold;
+    const totalXpEarned = 50;
+
+    await character.increment({ gold: totalGoldEarned, xp: totalXpEarned });
+    await progress.increment({ total_gold_earned: totalGoldEarned, total_xp_earned: totalXpEarned });
+    await character.reload();
+
+    return res.json({
+      success: true,
+      isVictory: true,
+      reward: {
+        goldEarned: totalGoldEarned,
+        crystalBonusGold,
+        xpEarned: totalXpEarned,
+        currentGold: character.gold,
+        currentXp: character.xp,
+      },
+      message: `🎉 VITÓRIA ÉPICA! Você sobreviveu à patrulha da lanterna e faturou 💰 +${totalGoldEarned} Ouro e ⭐ +${totalXpEarned} XP!`,
+    });
+  } catch (error) {
+    console.error('❌ Erro ao concluir partida de Esconde-Esconde:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Erro ao registrar recompensas do mini-game.',
+    });
+  }
+};

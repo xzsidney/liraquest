@@ -127,18 +127,21 @@ Os monstros e vilões do jogo são **metáforas diretas da desordem e dos maus h
 
 ## 🎮 7. Modos de Jogo & Experiências Virtuais
 
-### 7.1 Masmorras Solo & Desafios Diários
+### 7.1 Arcade do Reino Virtual & Mini-Jogos (Consumo de Energia de Aventura)
+O Arcade do Reino é o hub de lazer onde o Avatar gasta a **⚡ Energia de Aventura** ganha nas tarefas do mundo real para se divertir e faturar **💰 Ouro Virtual** e **⭐ XP**:
+1. 🔦 **Esconde-Esconde Camaleão (Lanterna Dinâmica):** O jogador comanda uma bolinha colorida em uma arena com 4 quadrantes de cores nobres (Rubi, Safira, Esmeralda, Ouro). Ao parar sobre a cor correspondente, fica 100% camuflado! O patrulheiro com lanterna cônica dinâmica varre a arena; se a luz tocar o camaleão, ele é revelado e perseguido. Sobreviver por 45 segundos garante vitória e coleta de cristais bônus de ouro.
+2. 📚 **Oráculo do Saber (Quiz Educativo):** Perguntas contra o relógio de matemática rápida, ciências e língua portuguesa para evoluir a Inteligência do herói.
+3. 📜 **Aventuras em Quest (Livro-Jogo 3 Escolhas):** Histórias ilustradas com caminhos ramificados baseadas nos atributos da ficha.
+4. ⚔️ **Arena de Batalha 2D:** Combates contra os Monstros da Casa.
+
+### 7.2 Masmorras Solo & Desafios Diários
 * O filho consome a **Energia de Aventura** ganha nas tarefas para entrar em masmorras curtas.
 * Batalhas rápidas em grid tático que testam seus equipamentos e atributos.
 
-### 7.2 Raids Familiares Cooperativas (Multiplayer em Tempo Real)
+### 7.3 Raids Familiares Cooperativas (Multiplayer em Tempo Real)
 * Eventos especiais em que a família entra na mesma sala (cada um em seu celular/tablet).
 * Sistema de combate em turnos com fila de iniciativa contra chefes poderosos.
 * O atributo **Carisma** e as magias de suporte tornam-se essenciais para que todos sobrevivam e compartilhem o tesouro.
-
-### 7.3 Aventuras Narrativas (Livro-Jogo Interativo)
-* Histórias ilustradas com caminhos ramificados e escolhas.
-* O avanço depende de testes dos 6 atributos do personagem, incentivando a tomada de decisões e o gosto pela leitura.
 
 ### 7.4 Foco do Herói (Temporizador Pomodoro Gamificado)
 * Um cronômetro que a criança aciona ao sentar para estudar ou ler.

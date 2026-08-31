@@ -5,6 +5,8 @@ import {
   createCharacter,
   updateRealProfile,
   changeHeroClass,
+  startChameleonGame,
+  completeChameleonGame,
 } from '../controllers/characterController.js';
 import { getMyHeroDashboard } from '../controllers/userProgressController.js';
 
@@ -18,5 +20,9 @@ router.get('/hero-dashboard', getMyHeroDashboard);
 router.post('/create', createCharacter);
 router.put('/update-profile', updateRealProfile);
 router.post('/change-class', changeHeroClass);
+
+// Mini-games do Reino Virtual
+router.post('/minigames/chameleon/start', startChameleonGame);
+router.post('/minigames/chameleon/complete', completeChameleonGame);
 
 export default router;

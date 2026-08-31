@@ -139,3 +139,13 @@ Este documento cataloga todos os endpoints REST e eventos de WebSocket (Socket.I
 - `raid_hero_action`: Envio da ação do turno do herói (ataque, habilidade, cura, poção).
 - `raid_turn_update`: Broadcast para todos os participantes do estado do campo e dano causado.
 - `raid_victory` / `raid_defeat`: Fim da batalha com distribuição sincronizada de recompensas.
+
+---
+
+## 11. Módulo de Mini-Games do Arcade do Reino (`/api/character/minigames`)
+
+| Método | Rota | Autenticação | Descrição |
+|:---|:---|:---|:---|
+| `POST` | `/api/character/minigames/chameleon/start` | JWT | Valida e debita 5 de Energia de Aventura (`adventure_energy`) para iniciar a partida do Esconde-Esconde Camaleão |
+| `POST` | `/api/character/minigames/chameleon/complete` | JWT | Registra o desfecho da partida (`survivedSeconds`, `crystalsCollected`, `isVictory`), creditando Ouro e XP com segurança no Avatar |
+
