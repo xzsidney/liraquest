@@ -369,7 +369,9 @@ function switchChildTerminalTab(tab) {
 
   tabs.forEach((t) => {
     const navBtn = document.getElementById(`child-nav-${t}`);
+    const mobileBtn = document.getElementById(`mobile-child-nav-${t}`);
     const panel = document.getElementById(`child-panel-${t}`);
+    
     if (navBtn) {
       if (t === tab) {
         navBtn.classList.add('active');
@@ -377,6 +379,15 @@ function switchChildTerminalTab(tab) {
         navBtn.classList.remove('active');
       }
     }
+
+    if (mobileBtn) {
+      if (t === tab) {
+        mobileBtn.classList.add('active');
+      } else {
+        mobileBtn.classList.remove('active');
+      }
+    }
+
     if (panel) {
       panel.style.display = t === tab ? 'block' : 'none';
     }
@@ -420,6 +431,7 @@ async function loadChildHeroDashboard() {
     setText('hero-dash-user-name', user.name || 'Jovem Herói');
     setText('hero-dash-rank-badge', heroProgress.rankBadge);
     setText('hero-dash-rank-title', heroProgress.rankTitle);
+    setText('child-mobile-rank', heroProgress.rankTitle);
     setText('hero-dash-level-number', heroProgress.level);
     setText('hero-dash-total-xp', `${heroProgress.totalXp} XP`);
     setText('hero-dash-xp-progress-text', `${heroProgress.currentLevelXp} / ${heroProgress.nextLevelXp} XP (${heroProgress.xpProgressPct}%)`);
@@ -450,8 +462,16 @@ function updateChildSidebarStats() {
   // Saldos
   const tokensEl = document.getElementById('sidebar-tokens-value');
   const energyEl = document.getElementById('sidebar-energy-value');
-  if (tokensEl) tokensEl.innerText = p.family_tokens ?? 0;
-  if (energyEl) energyEl.innerText = p.adventure_energy ?? 0;
+  const mobileTokensEl = document.getElementById('child-mobile-tokens');
+  const mobileEnergyEl = document.getElementById('child-mobile-energy');
+
+  const tokensVal = p.family_tokens ?? 0;
+  const energyVal = p.adventure_energy ?? 0;
+
+  if (tokensEl) tokensEl.innerText = tokensVal;
+  if (energyEl) energyEl.innerText = energyVal;
+  if (mobileTokensEl) mobileTokensEl.innerText = tokensVal;
+  if (mobileEnergyEl) mobileEnergyEl.innerText = energyVal;
 
   // Streak
   const streakEl = document.getElementById('sidebar-streak-value');
@@ -488,19 +508,25 @@ function updateChildSidebarStats() {
 function renderChildProfileInfo() {
   if (!state.user) return;
 
-  // Informações na Sidebar
+  // Informações na Sidebar & Header Mobile
   const nameEl = document.getElementById('child-user-name');
   const emailEl = document.getElementById('child-user-email');
+  const mobileNameEl = document.getElementById('child-mobile-name');
+
   if (nameEl) nameEl.innerText = state.user.name;
   if (emailEl) emailEl.innerText = state.user.email;
+  if (mobileNameEl) mobileNameEl.innerText = state.user.name || 'Jovem Herói';
 
   const sidebarPhotoBox = document.getElementById('child-sidebar-photo-box');
-  if (sidebarPhotoBox) {
-    if (state.user.profile_photo_url) {
-      sidebarPhotoBox.innerHTML = `<img src="${state.user.profile_photo_url}" alt="Foto" class="user-square-photo-img" onerror="this.parentElement.innerHTML='👤';">`;
-    } else {
-      sidebarPhotoBox.innerHTML = '👤';
-    }
+  const mobilePhotoBox = document.getElementById('child-mobile-photo-box');
+
+  if (state.user.profile_photo_url) {
+    const photoHtml = `<img src="${state.user.profile_photo_url}" alt="Foto" class="user-square-photo-img" onerror="this.parentElement.innerHTML='👤';">`;
+    if (sidebarPhotoBox) sidebarPhotoBox.innerHTML = photoHtml;
+    if (mobilePhotoBox) mobilePhotoBox.innerHTML = `<img src="${state.user.profile_photo_url}" alt="Foto" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;" onerror="this.parentElement.innerHTML='👤';">`;
+  } else {
+    if (sidebarPhotoBox) sidebarPhotoBox.innerHTML = '👤';
+    if (mobilePhotoBox) mobilePhotoBox.innerHTML = '👤';
   }
 
   // Ficha Informativa de Dados

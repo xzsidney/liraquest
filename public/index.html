@@ -1475,14 +1475,183 @@
       transition: all 0.3s ease;
     }
 
-    /* Footer */
-    footer {
-      text-align: center;
-      padding: 24px;
-      color: #64748b;
-      font-size: 0.85rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
-      margin-top: auto;
+    /* ===================================================== */
+    /* 📱 REGRAS DE LAYOUT MOBILE-FIRST & APP-LIKE PARA CELULAR */
+    /* ===================================================== */
+    .mobile-bottom-nav {
+      display: none;
+    }
+
+    .child-mobile-header {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      /* Ajuste Geral da Página no Celular */
+      body {
+        font-size: 14px;
+      }
+
+      .main-content {
+        padding: 8px 8px 80px 8px !important;
+      }
+
+      .navbar {
+        padding: 10px 14px;
+      }
+
+      .brand-title {
+        font-size: 1.3rem;
+      }
+
+      /* Terminal do Filho no Celular */
+      .child-layout-container {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding-bottom: 80px;
+      }
+
+      /* Oculta a sidebar desktop no mobile */
+      .child-sidebar {
+        display: none !important;
+      }
+
+      .child-content-card {
+        padding: 14px !important;
+        border-radius: 16px !important;
+      }
+
+      /* Header Mobile Compacto do Filho */
+      .child-mobile-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: linear-gradient(135deg, rgba(18, 23, 34, 0.95), rgba(30, 58, 138, 0.4));
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        border-radius: 16px;
+        padding: 12px 14px;
+        margin-bottom: 12px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      }
+
+      .child-mobile-user-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .child-mobile-photo {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        border: 2px solid var(--accent);
+        object-fit: cover;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+      }
+
+      .child-mobile-chips {
+        display: flex;
+        gap: 6px;
+      }
+
+      .mobile-chip {
+        padding: 4px 8px;
+        border-radius: 8px;
+        font-size: 0.78rem;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .mobile-chip-tokens {
+        background: rgba(245, 158, 11, 0.2);
+        color: #fde047;
+        border: 1px solid rgba(245, 158, 11, 0.4);
+      }
+
+      .mobile-chip-energy {
+        background: rgba(59, 130, 246, 0.2);
+        color: #93c5fd;
+        border: 1px solid rgba(59, 130, 246, 0.4);
+      }
+
+      /* Barra de Navegação Inferior Fixa (Estilo App) */
+      .mobile-bottom-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 64px;
+        background: rgba(11, 14, 20, 0.98);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        z-index: 1000;
+        justify-content: space-around;
+        align-items: center;
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.6);
+      }
+
+      .mobile-nav-btn {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: none;
+        color: var(--text-muted);
+        font-size: 0.7rem;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 6px 0;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        gap: 2px;
+      }
+
+      .mobile-nav-btn span.icon {
+        font-size: 1.35rem;
+        transition: transform 0.2s ease;
+      }
+
+      .mobile-nav-btn.active {
+        color: #fde047;
+        font-weight: 800;
+      }
+
+      .mobile-nav-btn.active span.icon {
+        transform: scale(1.15);
+      }
+
+      /* Grids em 1 Coluna no Celular */
+      .tasks-grid,
+      .class-selection-grid,
+      .avatar-picker-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+      }
+
+      /* Botões Maiores para Toque Fácil */
+      .btn {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* Oculta footer fixo redundante no mobile */
+      footer {
+        padding-bottom: 80px;
+      }
     }
   </style>
 </head>
@@ -2168,7 +2337,26 @@
     <section id="view-child" style="display: none;">
       <div class="child-layout-container">
         
-        <!-- BARRA LATERAL (SIDEBAR) DO FILHO COM PERFIL, SALDOS, STREAK E ABAS -->
+        <!-- HEADER MOBILE COMPACTO (EXCLUSIVO PARA CELULAR) -->
+        <div class="child-mobile-header">
+          <div class="child-mobile-user-info">
+            <div id="child-mobile-photo-box" class="child-mobile-photo">👤</div>
+            <div>
+              <div id="child-mobile-name" style="font-weight: 800; color: #ffffff; font-size: 0.95rem; line-height: 1.2;">Jovem Herói</div>
+              <div id="child-mobile-rank" style="font-size: 0.72rem; color: #fde047; font-weight: 700;">🌱 Recruta do Lar</div>
+            </div>
+          </div>
+          <div class="child-mobile-chips">
+            <div class="mobile-chip mobile-chip-tokens" title="Fichas do Lar">
+              🎟️ <span id="child-mobile-tokens">0</span>
+            </div>
+            <div class="mobile-chip mobile-chip-energy" title="Energia de Aventura">
+              ⚡ <span id="child-mobile-energy">0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- BARRA LATERAL (SIDEBAR) DO FILHO COM PERFIL, SALDOS, STREAK E ABAS (DESKTOP) -->
         <aside class="child-sidebar">
           
           <!-- Cabeçalho do Filho no Menu com Foto Quadrada -->
@@ -2582,6 +2770,36 @@
 
         </div>
 
+        <!-- ======================================================== -->
+        <!-- 📱 BARRA DE NAVEGAÇÃO INFERIOR FIXA (CELULAR - FILHO)     -->
+        <!-- ======================================================== -->
+        <nav class="mobile-bottom-nav">
+          <button id="mobile-child-nav-tasks" class="mobile-nav-btn active" onclick="switchChildTerminalTab('tasks')">
+            <span class="icon">📋</span>
+            <span>Missões</span>
+          </button>
+          <button id="mobile-child-nav-hero-dashboard" class="mobile-nav-btn" onclick="switchChildTerminalTab('hero-dashboard')">
+            <span class="icon">📊</span>
+            <span>Herói</span>
+          </button>
+          <button id="mobile-child-nav-shop" class="mobile-nav-btn" onclick="switchChildTerminalTab('shop')">
+            <span class="icon">🏪</span>
+            <span>Loja</span>
+          </button>
+          <button id="mobile-child-nav-studies" class="mobile-nav-btn" onclick="switchChildTerminalTab('studies')">
+            <span class="icon">📚</span>
+            <span>Foco</span>
+          </button>
+          <button id="mobile-child-nav-history" class="mobile-nav-btn" onclick="switchChildTerminalTab('history')">
+            <span class="icon">📜</span>
+            <span>Histórico</span>
+          </button>
+          <button id="mobile-child-nav-profile" class="mobile-nav-btn" onclick="switchChildTerminalTab('profile')">
+            <span class="icon">👤</span>
+            <span>Perfil</span>
+          </button>
+        </nav>
+
       </div>
     </section>
 
@@ -2914,10 +3132,14 @@
         <div class="form-group" style="background: rgba(15, 23, 42, 0.6); border: 1px dashed var(--border-card); border-radius: 12px; padding: 14px; text-align: center;">
           <label class="form-label" style="margin-bottom: 8px;">📷 Foto de Evidência (Opcional)</label>
           <input type="file" id="proof-file-input" accept="image/*" style="display: none;" onchange="handleProofFileSelect(event)">
+          <input type="file" id="proof-camera-input" accept="image/*" capture="environment" style="display: none;" onchange="handleProofFileSelect(event)">
           
           <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+            <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('proof-camera-input').click()">
+              📸 Tirar Foto Agora (Câmera)
+            </button>
             <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('proof-file-input').click()">
-              📁 Escolher Foto
+              📁 Escolher da Galeria
             </button>
           </div>
 
