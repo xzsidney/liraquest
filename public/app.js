@@ -1873,14 +1873,18 @@ function renderHeroHUD(char) {
 // ========================================================
 // 5. CRIAÇÃO DE HERÓI (WIZARD)
 // ========================================================
-function openHeroCreationWizard() {
+async function openHeroCreationWizard() {
   const modal = document.getElementById('hero-creation-modal');
   modal.style.display = 'flex';
+
+  if (!state.classesCatalog || state.classesCatalog.length === 0) {
+    await loadPublicCatalogs();
+  }
 
   const avatarGrid = document.getElementById('wizard-avatar-grid');
   avatarGrid.innerHTML = AVATAR_OPTIONS.map(
     (av) => `
-      <div class="avatar-option ${state.selectedWizardAvatar === av.key ? 'selected' : ''}" onclick="selectWizardAvatar('${av.key}')">
+      <div class="avatar-option ${state.selectedWizardAvatar === av.key ? 'selected' : ''}" onclick="selectWizardAvatar('${av.key}', event)">
         <span class="avatar-option-icon">${av.icon}</span>
         <span class="avatar-option-label">${av.label}</span>
       </div>
@@ -1895,7 +1899,7 @@ function openHeroCreationWizard() {
   classesGrid.innerHTML = state.classesCatalog
     .map(
       (cls) => `
-        <div class="class-choice-card ${state.selectedWizardClassId === cls.id ? 'selected' : ''}" onclick="selectWizardClass('${cls.id}')">
+        <div class="class-choice-card ${state.selectedWizardClassId === cls.id ? 'selected' : ''}" onclick="selectWizardClass('${cls.id}', event)">
           <div class="class-choice-header">
             <span class="class-choice-icon">${getClassIcon(cls.code)}</span>
             <div>
@@ -1918,18 +1922,22 @@ function closeHeroCreationWizard() {
   document.getElementById('hero-creation-modal').style.display = 'none';
 }
 
-function selectWizardAvatar(avatarKey) {
+function selectWizardAvatar(avatarKey, ev) {
   state.selectedWizardAvatar = avatarKey;
   const avatarGrid = document.getElementById('wizard-avatar-grid');
   avatarGrid.querySelectorAll('.avatar-option').forEach((el) => el.classList.remove('selected'));
-  event.currentTarget.classList.add('selected');
+  if (ev && ev.currentTarget) {
+    ev.currentTarget.classList.add('selected');
+  }
 }
 
-function selectWizardClass(classId) {
+function selectWizardClass(classId, ev) {
   state.selectedWizardClassId = classId;
   const classesGrid = document.getElementById('wizard-classes-grid');
   classesGrid.querySelectorAll('.class-choice-card').forEach((el) => el.classList.remove('selected'));
-  event.currentTarget.classList.add('selected');
+  if (ev && ev.currentTarget) {
+    ev.currentTarget.classList.add('selected');
+  }
 }
 
 function getClassIcon(code) {
