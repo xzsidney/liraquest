@@ -153,41 +153,19 @@ function updateNavbar() {
   const navAuthLogged = document.getElementById('nav-auth-logged');
   const navAuthGuest = document.getElementById('nav-auth-guest');
   const navUserName = document.getElementById('nav-user-name');
-  const navUserBadge = document.getElementById('nav-user-badge');
-  const navBtnAvatar = document.getElementById('nav-btn-avatar');
 
   if (state.token && state.user) {
     if (navAuthGuest) navAuthGuest.style.display = 'none';
     if (navAuthLogged) navAuthLogged.style.display = 'flex';
     if (navUserName) navUserName.innerText = state.user.name;
-    if (navUserBadge) {
-      navUserBadge.innerText = formatRoleName(state.user.role);
-      navUserBadge.className = `role-badge badge-${state.user.role.toLowerCase()}`;
-    }
 
-    // Atualiza foto e menu móvel
+    // Atualiza foto do menu móvel
     const mobilePhotoBox = document.getElementById('nav-mobile-photo-box');
     if (mobilePhotoBox) {
       if (state.user.profile_photo_url) {
         mobilePhotoBox.innerHTML = `<img src="${state.user.profile_photo_url}" alt="Foto" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.parentElement.innerHTML='👤';">`;
       } else {
         mobilePhotoBox.innerHTML = '👤';
-      }
-    }
-
-    // Botão de acesso ao avatar no topo (exibido para perfil Filho)
-    if (navBtnAvatar) {
-      if (state.user.role === 'CHILD' || state.user.role === 'ADMIN') {
-        navBtnAvatar.style.display = 'inline-flex';
-        if (state.character) {
-          navBtnAvatar.innerText = `⚔️ Avatar: ${state.character.name}`;
-          navBtnAvatar.className = 'btn btn-gold btn-sm';
-        } else {
-          navBtnAvatar.innerText = '✨ Despertar Avatar';
-          navBtnAvatar.className = 'btn btn-primary btn-sm';
-        }
-      } else {
-        navBtnAvatar.style.display = 'none';
       }
     }
   } else {
