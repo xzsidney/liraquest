@@ -992,6 +992,142 @@
       font-weight: 700;
     }
 
+    .reward-pill-energy {
+      background: rgba(37, 99, 235, 0.25);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.5);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .reward-pill-tokens {
+      background: rgba(212, 175, 55, 0.25);
+      color: #facc15;
+      border: 1px solid rgba(250, 204, 21, 0.55);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    /* Badges de Categorias de Tarefas */
+    .task-cat-DOMESTIC { background: rgba(59, 130, 246, 0.25); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.5); }
+    .task-cat-STUDY { background: rgba(168, 85, 247, 0.25); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.5); }
+    .task-cat-HEALTH { background: rgba(34, 197, 94, 0.25); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.5); }
+    .task-cat-CREATIVE { background: rgba(236, 72, 153, 0.25); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.5); }
+    .task-cat-SOCIAL { background: rgba(245, 158, 11, 0.25); color: #fde047; border: 1px solid rgba(245, 158, 11, 0.5); }
+    .task-cat-GERAL { background: rgba(100, 116, 139, 0.25); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.4); }
+
+    /* Badges de Dificuldade */
+    .task-diff-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+    .task-diff-EASY { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); }
+    .task-diff-MEDIUM { background: rgba(234, 179, 8, 0.2); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.4); }
+    .task-diff-HARD { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+
+    /* Cards de Saldo e Streak na Sidebar */
+    .sidebar-balances-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .sidebar-stat-card {
+      background: rgba(15, 23, 42, 0.85);
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .sidebar-stat-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .sidebar-stat-tokens {
+      border: 1px solid rgba(212, 175, 55, 0.45);
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(15, 23, 42, 0.9));
+    }
+
+    .sidebar-stat-energy {
+      border: 1px solid rgba(37, 99, 235, 0.45);
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(15, 23, 42, 0.9));
+    }
+
+    .sidebar-streak-card {
+      background: linear-gradient(135deg, rgba(249, 115, 22, 0.15), rgba(15, 23, 42, 0.9));
+      border: 1px solid rgba(249, 115, 22, 0.45);
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-stat-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .sidebar-stat-val {
+      font-size: 1.4rem;
+      font-weight: 900;
+      font-family: 'Cinzel', monospace;
+      color: #ffffff;
+    }
+
+    .sidebar-mini-stats {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+      font-size: 0.8rem;
+    }
+
+    /* Animação de Chama Flamejante para Streak >= 3 */
+    @keyframes flamePulse {
+      0% { transform: scale(1); filter: drop-shadow(0 0 4px #f97316); }
+      50% { transform: scale(1.15) rotate(-2deg); filter: drop-shadow(0 0 12px #fbbf24); }
+      100% { transform: scale(1); filter: drop-shadow(0 0 4px #f97316); }
+    }
+
+    .flame-active {
+      display: inline-block;
+      animation: flamePulse 1.6s infinite ease-in-out;
+    }
+
+    /* Card de Acesso ao Avatar / Portal do Reino */
+    .avatar-portal-card {
+      background: linear-gradient(135deg, rgba(128, 0, 32, 0.4), rgba(30, 58, 138, 0.45), rgba(15, 23, 42, 0.95));
+      border: 1px solid rgba(212, 175, 55, 0.45);
+      border-radius: 20px;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(212, 175, 55, 0.15);
+    }
+
     /* Cards de Comprovações / Submissions para Pais */
     .submissions-grid {
       display: grid;
@@ -1710,7 +1846,7 @@
     <section id="view-child" style="display: none;">
       <div class="child-layout-container">
         
-        <!-- BARRA LATERAL (SIDEBAR) DO FILHO COM OS 3 LINKS -->
+        <!-- BARRA LATERAL (SIDEBAR) DO FILHO COM PERFIL, SALDOS, STREAK E ABAS -->
         <aside class="child-sidebar">
           
           <!-- Cabeçalho do Filho no Menu com Foto Quadrada -->
@@ -1719,20 +1855,62 @@
             <div style="overflow: hidden;">
               <h3 id="child-user-name" style="font-size: 1.05rem; color: #ffffff; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">Jovem Filho</h3>
               <span id="child-user-email" style="color: var(--text-muted); font-size: 0.78rem; display: block; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">filho@liraquest.com</span>
-              <span class="role-badge badge-child" style="font-size: 0.7rem; padding: 2px 8px; margin-top: 4px;">👤 Usuário Filho</span>
+              <span id="child-user-role-badge" class="role-badge badge-child" style="font-size: 0.7rem; padding: 2px 8px; margin-top: 4px;">⚔️ Herói Aventureiro</span>
             </div>
           </div>
 
-          <!-- MENU LATERAL COM EXATAMENTE OS 3 LINKS: TAREFAS, ESTUDOS, DADOS -->
+          <!-- SALDOS DA VIDA REAL & ENERGIA RPG -->
+          <div class="sidebar-balances-grid">
+            <div class="sidebar-stat-card sidebar-stat-tokens" title="Troque por recompensas reais na Loja da Família">
+              <span class="sidebar-stat-label">🏠 Fichas Lar</span>
+              <span id="sidebar-tokens-value" class="sidebar-stat-val" style="color: #facc15;">0</span>
+            </div>
+            <div class="sidebar-stat-card sidebar-stat-energy" title="Use esta energia para entrar nas Masmorras e Raids">
+              <span class="sidebar-stat-label">⚡ Energia</span>
+              <span id="sidebar-energy-value" class="sidebar-stat-val" style="color: #60a5fa;">0</span>
+            </div>
+          </div>
+
+          <!-- STREAK (SEQUÊNCIA DE DIAS) -->
+          <div class="sidebar-streak-card">
+            <div>
+              <span class="sidebar-stat-label" style="color: #fdba74;">
+                <span id="sidebar-streak-flame" class="flame-active">🔥</span> Sequência
+              </span>
+              <div id="sidebar-streak-record" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">
+                Recorde: 0 dias
+              </div>
+            </div>
+            <div id="sidebar-streak-value" class="sidebar-stat-val" style="color: #f97316;">
+              0d
+            </div>
+          </div>
+
+          <!-- MINI ESTATÍSTICAS DE TAREFAS -->
+          <div class="sidebar-mini-stats">
+            <div>
+              <span style="color: var(--text-muted); display: block; font-size: 0.72rem;">HOJE</span>
+              <span id="sidebar-tasks-today" style="font-weight: 800; color: #4ade80; font-size: 1rem;">0</span>
+            </div>
+            <div style="text-align: right;">
+              <span style="color: var(--text-muted); display: block; font-size: 0.72rem;">TOTAL CONCLUÍDO</span>
+              <span id="sidebar-tasks-total" style="font-weight: 800; color: #ffffff; font-size: 1rem;">0</span>
+            </div>
+          </div>
+
+          <!-- MENU LATERAL COM AS 4 ABAS -->
           <div class="sidebar-menu">
             <button id="child-nav-tasks" class="sidebar-menu-btn active" onclick="switchChildTerminalTab('tasks')">
-              <span>📋</span> Tarefas
+              <span>📋</span> Missões do Dia
             </button>
             <button id="child-nav-studies" class="sidebar-menu-btn" onclick="switchChildTerminalTab('studies')">
-              <span>📚</span> Estudos
+              <span>📚</span> Foco & Estudos
+            </button>
+            <button id="child-nav-history" class="sidebar-menu-btn" onclick="switchChildTerminalTab('history')">
+              <span>📜</span> Histórico
             </button>
             <button id="child-nav-profile" class="sidebar-menu-btn" onclick="switchChildTerminalTab('profile')">
-              <span>👤</span> Dados
+              <span>👤</span> Meu Perfil
             </button>
           </div>
         </aside>
@@ -1740,75 +1918,91 @@
         <!-- ÁREA PRINCIPAL DE CONTEÚDO DO TERMINAL DO FILHO -->
         <div class="child-content-card">
           
-          <!-- PAINEL 1: 📋 TAREFAS DA CASA E DO DIA A DIA -->
+          <!-- PAINEL 1: 📋 MISSÕES DO DIA -->
           <div id="child-panel-tasks">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
               <div>
-                <h2 style="font-size: 1.5rem; color: #ffffff; margin-bottom: 4px;">📋 Mural de Tarefas</h2>
-                <p style="color: var(--text-muted); font-size: 0.9rem;">Tarefas da casa e rotinas atribuídas pelos seus pais. Cumpra e envie a foto para aprovação!</p>
+                <h2 style="font-size: 1.5rem; color: #ffffff; margin-bottom: 4px;">📋 Mural de Missões da Vida Real</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Cumpra as tarefas do dia para ganhar Fichas do Lar, XP, Ouro e Energia de Aventura!</p>
               </div>
             </div>
 
-            <!-- Lista de Tarefas Ativas -->
+            <!-- Lista de Tarefas Ativas / Pendentes -->
             <div id="child-user-tasks-list" class="tasks-grid">
               <!-- Renderizado dinamicamente via JS -->
             </div>
 
-            <!-- Histórico de Envios de Provas -->
-            <h3 style="font-size: 1.2rem; color: #cbd5e1; margin: 32px 0 12px 0;">📜 Histórico de Tarefas Concluídas</h3>
-            <div id="child-user-submissions-history" class="users-list">
-              <!-- Renderizado dinamicamente via JS -->
+            <!-- Seção de Missões Aprovadas Hoje -->
+            <div id="child-approved-today-section" style="margin-top: 36px; display: none;">
+              <h3 style="font-size: 1.15rem; color: #4ade80; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                <span>✅</span> Missões Concluídas & Aprovadas Hoje
+              </h3>
+              <div id="child-user-approved-today-list" class="users-list">
+                <!-- Renderizado dinamicamente via JS -->
+              </div>
             </div>
           </div>
 
-          <!-- PAINEL 2: 📚 ESTUDOS (CENTRAL DE ESTUDOS & POMODORO) -->
+          <!-- PAINEL 2: 📚 ESTUDOS (FOCO DO HERÓI & POMODORO) -->
           <div id="child-panel-studies" style="display: none;">
             <div style="margin-bottom: 24px;">
-              <h2 style="font-size: 1.5rem; color: #ffffff; margin-bottom: 4px;">📚 Central de Estudos</h2>
-              <p style="color: var(--text-muted); font-size: 0.9rem;">Cronometre seu tempo de estudo focado e mantenha sua rotina escolar em dia.</p>
+              <h2 style="font-size: 1.5rem; color: #ffffff; margin-bottom: 4px;">📚 Central de Foco & Estudos</h2>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">Durante seus blocos de foco, seu Avatar treina em modo AFK para acumular bônus.</p>
             </div>
 
             <!-- Widget Pomodoro / Temporizador de Estudos -->
-            <div style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.3), rgba(15, 23, 42, 0.8)); border: 1px solid var(--border-card); border-radius: 20px; padding: 28px; text-align: center; margin-bottom: 28px;">
-              <span class="home-feature-tag" style="display: inline-block; margin-bottom: 8px;">Foco & Concentração</span>
-              <h3 style="font-size: 1.3rem; color: #ffffff; margin-bottom: 8px;">Temporizador de Estudo Focado</h3>
+            <div style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.35), rgba(15, 23, 42, 0.9)); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 20px; padding: 32px; text-align: center; margin-bottom: 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+              <span class="home-feature-tag" style="display: inline-block; margin-bottom: 10px;">⚡ Foco do Herói (Treino AFK)</span>
+              <h3 style="font-size: 1.3rem; color: #ffffff; margin-bottom: 8px;">Sessão de Concentração e Estudos</h3>
               
-              <div id="study-timer-display" style="font-family: 'Cinzel', monospace; font-size: 3.5rem; font-weight: 900; color: #fde047; margin: 16px 0; letter-spacing: 2px;">
+              <div id="study-timer-display" style="font-family: 'Cinzel', monospace; font-size: 4rem; font-weight: 900; color: #fde047; margin: 16px 0; letter-spacing: 3px; text-shadow: 0 0 20px rgba(253, 224, 71, 0.4);">
                 25:00
               </div>
 
               <div style="display: flex; justify-content: center; gap: 14px; flex-wrap: wrap;">
-                <button id="btn-study-start" class="btn btn-primary" style="padding: 10px 24px;" onclick="toggleStudyTimer()">
+                <button id="btn-study-start" class="btn btn-primary" style="padding: 12px 28px; font-size: 1rem;" onclick="toggleStudyTimer()">
                   ▶️ Iniciar Sessão (25 min)
                 </button>
-                <button class="btn btn-secondary" style="padding: 10px 20px;" onclick="resetStudyTimer()">
+                <button class="btn btn-secondary" style="padding: 12px 22px;" onclick="resetStudyTimer()">
                   🔄 Reiniciar
                 </button>
               </div>
 
-              <div id="study-timer-status" style="margin-top: 14px; font-size: 0.88rem; color: #93c5fd;">
-                Pronto para iniciar uma sessão de 25 minutos de estudo concentrado.
+              <div id="study-timer-status" style="margin-top: 16px; font-size: 0.92rem; color: #93c5fd; font-weight: 600;">
+                Pronto para iniciar 25 minutos de estudo concentrado.
               </div>
             </div>
 
             <!-- Dicas e Metas de Estudos -->
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px;">
-              <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-card); border-radius: 16px; padding: 18px;">
-                <h4 style="font-size: 1.05rem; color: #facc15; margin-bottom: 8px;">📖 Técnicas de Alta Performance</h4>
+              <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-card); border-radius: 16px; padding: 20px;">
+                <h4 style="font-size: 1.05rem; color: #facc15; margin-bottom: 8px;">📖 Técnica Pomodoro</h4>
                 <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
-                  Estude em blocos de 25 minutos com 5 minutos de descanso. Evite celular e redes sociais durante o bloco.
+                  Estude sem interrupções por 25 minutos e descanse 5 minutos. Desligue as notificações de celular durante o bloco de foco.
                 </p>
               </div>
-              <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-card); border-radius: 16px; padding: 18px;">
-                <h4 style="font-size: 1.05rem; color: #60a5fa; margin-bottom: 8px;">🎯 Metas Diárias</h4>
+              <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-card); border-radius: 16px; padding: 20px;">
+                <h4 style="font-size: 1.05rem; color: #60a5fa; margin-bottom: 8px;">🎯 Recompensas de Inteligência</h4>
                 <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
-                  Completar as tarefas escolares do dia e realizar revisões regulares antes de cada prova.
+                  Completar tarefas de leitura e lições escolares fortalece o atributo Inteligência (INT) do seu herói para desferir magias mais fortes.
                 </p>
               </div>
             </div>
           </div>
 
-          <!-- PAINEL 3: 👤 FICHA INFORMATIVA DE DADOS -->
+          <!-- PAINEL 3: 📜 HISTÓRICO COMPLETO -->
+          <div id="child-panel-history" style="display: none;">
+            <div style="margin-bottom: 24px;">
+              <h2 style="font-size: 1.5rem; color: #ffffff; margin-bottom: 4px;">📜 Histórico de Missões & Envios</h2>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">Acompanhe o status de avaliação das suas comprovações e os feedbacks deixados pelos seus pais.</p>
+            </div>
+
+            <div id="child-user-history-list" class="users-list">
+              <!-- Renderizado dinamicamente via JS -->
+            </div>
+          </div>
+
+          <!-- PAINEL 4: 👤 MEU PERFIL & ATALHO PARA O AVATAR -->
           <div id="child-panel-profile" style="display: none;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
               <div>
@@ -1837,7 +2031,7 @@
                   </div>
                   <div>
                     <h3 id="info-child-name" style="font-size: 1.3rem; color: #ffffff; margin-bottom: 4px;">Nome do Filho</h3>
-                    <span class="role-badge badge-child" style="font-size: 0.75rem;">👤 Usuário Filho</span>
+                    <span class="role-badge badge-child" style="font-size: 0.75rem;">⚔️ Herói Aventureiro</span>
                     <span id="direct-upload-status" style="display: block; font-size: 0.75rem; color: var(--gold); margin-top: 6px;"></span>
                   </div>
                 </div>
@@ -1889,12 +2083,32 @@
 
                 <div style="margin-top: 20px; padding: 14px; background: rgba(0, 0, 0, 0.3); border-radius: 12px; border: 1px solid var(--border-subtle);">
                   <span style="font-size: 0.8rem; color: var(--text-muted); display: block;">💡 Informação:</span>
-                  <p style="font-size: 0.82rem; color: #cbd5e1; margin-top: 4px;">Após ingressar no clã, as tarefas atribuídas pelos seus pais aparecerão na aba Tarefas.</p>
+                  <p style="font-size: 0.82rem; color: #cbd5e1; margin-top: 4px;">Após ingressar no clã, as tarefas atribuídas pelos seus pais aparecerão na aba Missões.</p>
                 </div>
 
               </div>
 
             </div>
+
+            <!-- CARD ESPECIAL: ATALHO PARA O TERMINAL DO AVATAR -->
+            <div class="avatar-portal-card">
+              <div style="display: flex; align-items: center; gap: 18px;">
+                <div style="font-size: 3rem; background: rgba(128, 0, 32, 0.5); width: 70px; height: 70px; border-radius: 16px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--accent); flex-shrink: 0;">
+                  ⚔️
+                </div>
+                <div>
+                  <h3 style="font-size: 1.4rem; color: #ffffff; margin-bottom: 4px;">Terminal do Avatar (Reino Virtual)</h3>
+                  <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 6px;">Acesse seu herói RPG, equipe itens da Loja e encare masmorras!</p>
+                  <span id="profile-avatar-energy-tag" style="display: inline-flex; align-items: center; gap: 6px; background: rgba(37, 99, 235, 0.25); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.45); padding: 4px 10px; border-radius: 8px; font-size: 0.82rem; font-weight: 700;">
+                    ⚡ 0 Energia de Aventura disponível
+                  </span>
+                </div>
+              </div>
+              <button id="btn-profile-access-avatar" class="btn btn-primary" style="padding: 12px 28px; font-size: 1.05rem;" onclick="handleAccessAvatar()">
+                ⚔️ Entrar no Reino
+              </button>
+            </div>
+
           </div>
 
         </div>
@@ -2113,28 +2327,43 @@
   <!-- MODAL: ENVIAR COMPROVAÇÃO DE MISSÃO (FILHOS)             -->
   <!-- ======================================================== -->
   <div id="submit-proof-modal" class="modal-overlay" style="display: none;">
-    <div class="modal-content">
+    <div class="modal-content" style="max-width: 520px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-        <h2 style="font-size: 1.5rem; color: #ffffff;">📸 Enviar Prova da Missão</h2>
+        <h2 style="font-size: 1.4rem; color: #ffffff;">📸 Enviar Prova da Missão</h2>
         <button onclick="closeSubmitProofModal()" style="background: transparent; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer;">✕</button>
       </div>
       
-      <p id="modal-task-title-target" style="color: #c084fc; font-weight: 800; font-size: 1.1rem; margin-bottom: 16px;">Título da Missão</p>
+      <p id="modal-task-title-target" style="color: #fde047; font-weight: 800; font-size: 1.1rem; margin-bottom: 16px;">Título da Missão</p>
 
       <form id="submit-proof-form">
         <input type="hidden" id="modal-task-id-target">
 
         <div class="form-group">
-          <label class="form-label" for="proof-text-input">Relato do que você fez</label>
-          <textarea id="proof-text-input" class="form-textarea" placeholder="Descreva em poucas palavras como você concluiu esta tarefa..."></textarea>
+          <label class="form-label" for="proof-text-input">Conta como foi! (Relato)</label>
+          <textarea id="proof-text-input" class="form-textarea" placeholder="Descreva o que você fez e como concluiu sua tarefa..." rows="3" required></textarea>
         </div>
 
-        <div class="form-group">
-          <label class="form-label" for="proof-photo-input">URL da Foto de Evidência (Opcional)</label>
-          <input type="url" id="proof-photo-input" class="form-input" placeholder="https://exemplo.com/foto.jpg">
+        <!-- Seção de Foto da Comprovação -->
+        <div class="form-group" style="background: rgba(15, 23, 42, 0.6); border: 1px dashed var(--border-card); border-radius: 12px; padding: 14px; text-align: center;">
+          <label class="form-label" style="margin-bottom: 8px;">📷 Foto de Evidência (Opcional)</label>
+          <input type="file" id="proof-file-input" accept="image/*" style="display: none;" onchange="handleProofFileSelect(event)">
+          
+          <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('proof-file-input').click()">
+              📁 Escolher Foto
+            </button>
+          </div>
+
+          <div id="proof-photo-preview-container" style="display: none; margin-top: 10px;">
+            <img id="proof-photo-preview" src="" alt="Preview" style="max-height: 140px; border-radius: 8px; border: 1px solid var(--accent); object-fit: contain; margin: 0 auto; display: block;">
+            <button type="button" style="background: transparent; border: none; color: #f87171; font-size: 0.8rem; cursor: pointer; margin-top: 4px;" onclick="clearProofPhotoPreview()">✕ Remover foto</button>
+          </div>
+
+          <div id="proof-upload-status" style="font-size: 0.8rem; color: var(--gold); margin-top: 6px; display: none;"></div>
+          <input type="hidden" id="proof-photo-input">
         </div>
 
-        <button type="submit" id="btn-submit-proof" class="btn btn-primary" style="width: 100%; margin-top: 8px;">
+        <button type="submit" id="btn-submit-proof" class="btn btn-primary" style="width: 100%; margin-top: 8px; padding: 12px;">
           🚀 Enviar para Avaliação dos Pais
         </button>
       </form>
