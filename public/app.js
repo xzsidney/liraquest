@@ -112,6 +112,7 @@ function updateNavbar() {
   const navAuthGuest = document.getElementById('nav-auth-guest');
   const navUserName = document.getElementById('nav-user-name');
   const navUserBadge = document.getElementById('nav-user-badge');
+  const navBtnAvatar = document.getElementById('nav-btn-avatar');
 
   if (state.token && state.user) {
     if (navAuthGuest) navAuthGuest.style.display = 'none';
@@ -120,6 +121,22 @@ function updateNavbar() {
     if (navUserBadge) {
       navUserBadge.innerText = formatRoleName(state.user.role);
       navUserBadge.className = `role-badge badge-${state.user.role.toLowerCase()}`;
+    }
+
+    // Botão de acesso ao avatar no topo (exibido para perfil Filho)
+    if (navBtnAvatar) {
+      if (state.user.role === 'CHILD' || state.user.role === 'ADMIN') {
+        navBtnAvatar.style.display = 'inline-flex';
+        if (state.character) {
+          navBtnAvatar.innerText = `⚔️ Avatar: ${state.character.name}`;
+          navBtnAvatar.className = 'btn btn-gold btn-sm';
+        } else {
+          navBtnAvatar.innerText = '✨ Despertar Avatar';
+          navBtnAvatar.className = 'btn btn-primary btn-sm';
+        }
+      } else {
+        navBtnAvatar.style.display = 'none';
+      }
     }
   } else {
     if (navAuthGuest) navAuthGuest.style.display = 'flex';
@@ -346,26 +363,19 @@ async function loadChildDashboard() {
   // Carregar dados da família
   loadChildFamilyData();
 
-  // Consultar personagem e configurar o botão de acesso ao avatar na sidebar
+  // Consultar personagem e atualizar estado do avatar
   try {
     const res = await fetch(`${API.character}/me`, {
       headers: { Authorization: `Bearer ${state.token}` },
     });
     const data = await res.json();
 
-    const accessBtn = document.getElementById('btn-sidebar-access-avatar');
-
     if (res.ok && data.success && data.hasCharacter && data.character) {
       state.character = data.character;
-      if (accessBtn) {
-        accessBtn.innerText = `⚔️ Acessar Avatar (${data.character.name})`;
-      }
     } else {
       state.character = null;
-      if (accessBtn) {
-        accessBtn.innerText = '✨ Despertar Meu Avatar';
-      }
     }
+    updateNavbar();
   } catch (err) {
     console.error('Erro ao consultar personagem no painel do usuário:', err);
   }
