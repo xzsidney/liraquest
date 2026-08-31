@@ -10,7 +10,11 @@ import {
   CharacterClass,
   DefinitionTask,
 } from '../models/index.js';
-import { creditTaskRewards, ensureFamilyHasTasks } from './userProgressController.js';
+import {
+  creditTaskRewards,
+  ensureFamilyHasTasks,
+  findOrCreateUserFamily,
+} from './userProgressController.js';
 
 
 /**
@@ -29,8 +33,8 @@ export const createTask = async (req, res) => {
     }
 
     // Buscar família do pai
-    const membership = await FamilyMember.findOne({ where: { user_id: userId } });
-    if (!membership) {
+    const membership = await findOrCreateUserFamily(userId);
+    if (!membership || !membership.family_id) {
       return res.status(400).json({
         success: false,
         message: 'Você precisa criar ou pertencer a uma família para lançar missões.',
@@ -70,10 +74,7 @@ export const createTask = async (req, res) => {
 export const listFamilyTasks = async (req, res) => {
   try {
     const userId = req.user.id;
-    const membership = await FamilyMember.findOne({
-      where: { user_id: userId },
-      include: [{ model: Family, as: 'family' }],
-    });
+    const membership = await findOrCreateUserFamily(userId);
 
     if (!membership || !membership.family_id) {
       // Usuário sem família: retorna catálogo global
@@ -167,9 +168,16 @@ export const submitTaskProof = async (req, res) => {
     if (!task) {
       const defTask = await DefinitionTask.findByPk(taskId);
       if (defTask) {
-        // Obter ou criar família temporária/usuário para persistir a instância
-        const membership = await FamilyMember.findOne({ where: { user_id: userId } });
-        const familyId = membership ? membership.family_id : userId;
+        // Garantir família com registro real no banco
+        const membership = await findOrCreateUserFamily(userId);
+        const familyId = membership ? membership.family_id : null;
+
+        if (!familyId) {
+          return res.status(400).json({
+            success: false,
+            message: 'Erro ao identificar família para submissão da missão.',
+          });
+        }
 
         task = await Task.create({
           id: randomUUID().toLowerCase(),

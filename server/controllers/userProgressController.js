@@ -35,6 +35,7 @@ function yesterdayDateString() {
  */
 export async function ensureFamilyHasTasks(familyId, creatorId) {
   try {
+    if (!familyId) return;
     const existingCount = await Task.count({ where: { family_id: familyId } });
     if (existingCount > 0) return;
 
@@ -64,6 +65,48 @@ export async function ensureFamilyHasTasks(familyId, creatorId) {
     console.log(`✅ [LiraQuest] ${newTasks.length} missões padrão geradas automaticamente para a família ${familyId}!`);
   } catch (err) {
     console.error('❌ Erro ao inicializar missões padrão da família:', err);
+  }
+}
+
+/**
+ * Garante que o usuário possua uma família válida no banco para não quebrar Foreign Keys
+ */
+export async function findOrCreateUserFamily(userId) {
+  try {
+    let membership = await FamilyMember.findOne({
+      where: { user_id: userId },
+      include: [{ model: Family, as: 'family' }],
+    });
+
+    if (membership && membership.family_id) {
+      await ensureFamilyHasTasks(membership.family_id, membership.family?.created_by || userId);
+      return membership;
+    }
+
+    const user = await FamilyUser.findByPk(userId);
+    if (!user) return null;
+
+    const inviteCode = 'LIRA-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+    const family = await Family.create({
+      id: randomUUID().toLowerCase(),
+      name: `Clã ${user.name || 'Lira'}`,
+      invite_code: inviteCode,
+      created_by: userId,
+    });
+
+    membership = await FamilyMember.create({
+      id: randomUUID().toLowerCase(),
+      family_id: family.id,
+      user_id: userId,
+      role_in_family: user.role === 'PARENT' ? 'GUARDIAN' : 'MEMBER',
+    });
+
+    membership.family = family;
+    await ensureFamilyHasTasks(family.id, userId);
+    return membership;
+  } catch (err) {
+    console.error('❌ Erro em findOrCreateUserFamily:', err);
+    return null;
   }
 }
 
@@ -97,12 +140,10 @@ export async function creditTaskRewards(userId, task) {
 
   const today = todayDateString();
   const yesterday = yesterdayDateString();
-  const lastDate = progress.last_active_date; // formato 'YYYY-MM-DD' ou null
+  const lastDate = progress.last_active_date;
 
-  // ── Calcular tasks_done_today (reseta se mudou o dia) ──
   const tasksToday = lastDate === today ? progress.tasks_done_today + 1 : 1;
 
-  // ── Calcular Streak ──
   let newStreak;
   if (!lastDate) {
     newStreak = 1;
@@ -116,7 +157,6 @@ export async function creditTaskRewards(userId, task) {
 
   const newBestStreak = Math.max(progress.best_streak_days, newStreak);
 
-  // ── Atualizar tudo de uma vez ──
   await progress.update({
     adventure_energy: progress.adventure_energy + (task.energy_reward || 0),
     family_tokens: progress.family_tokens + (task.token_reward || 0),
@@ -132,7 +172,6 @@ export async function creditTaskRewards(userId, task) {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GET /api/progress/me
-// Retorna apenas o registro de progresso do usuário autenticado
 // ─────────────────────────────────────────────────────────────────────────────
 export const getMyProgress = async (req, res) => {
   try {
@@ -154,8 +193,6 @@ export const getMyProgress = async (req, res) => {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GET /api/progress/dashboard
-// Retorna tudo de uma vez: progress + tarefas pendentes + aprovadas hoje + histórico
-// Chamada principal ao carregar o Terminal do Usuário
 // ─────────────────────────────────────────────────────────────────────────────
 export const getDashboardSummary = async (req, res) => {
   try {
@@ -168,11 +205,9 @@ export const getDashboardSummary = async (req, res) => {
     const todayStart = new Date(today + 'T00:00:00.000Z');
     const todayEnd = new Date(today + 'T23:59:59.999Z');
 
-    // 2. Buscar família do usuário
-    const membership = await FamilyMember.findOne({
-      where: { user_id: userId },
-      include: [{ model: Family, as: 'family' }],
-    });
+    // 2. Garantir ou buscar família válida do usuário
+    const membership = await findOrCreateUserFamily(userId);
+    const familyId = membership ? membership.family_id : null;
 
     let pendingTasks = [];
     let approvedToday = [];
@@ -226,13 +261,7 @@ export const getDashboardSummary = async (req, res) => {
       reviewed_at: s.reviewed_at,
     }));
 
-    if (membership && membership.family_id) {
-      const familyId = membership.family_id;
-      const creatorId = membership.family?.created_by || userId;
-
-      // Garantir que a família possui as tarefas de catálogo inicializadas
-      await ensureFamilyHasTasks(familyId, creatorId);
-
+    if (familyId) {
       // Buscar tarefas ativas da família
       const familyTasks = await Task.findAll({
         where: {
@@ -276,47 +305,18 @@ export const getDashboardSummary = async (req, res) => {
           submission_feedback: latestSub ? latestSub.feedback : null,
         };
       });
-    } else {
-      // Usuário ainda sem família: carrega catálogo global de definition_tasks
-      const defTasks = await DefinitionTask.findAll({
-        where: {
-          allowed_profile: {
-            [Op.in]:
-              req.user.role === 'PARENT' || req.user.role === 'ADMIN'
-                ? ['ALL', 'ADULT_ONLY']
-                : ['ALL', 'CHILD_ONLY'],
-          },
-        },
-        order: [['difficulty', 'ASC'], ['created_at', 'ASC']],
-      });
-
-      pendingTasks = defTasks.map((d) => ({
-        id: d.id,
-        title: d.name,
-        description: d.description,
-        category: d.category,
-        difficulty: d.difficulty || 'MEDIUM',
-        xp_reward: d.reward_xp || 50,
-        gold_reward: d.reward_gold || 10,
-        energy_reward: d.reward_energy || (d.difficulty === 'EASY' ? 1 : d.difficulty === 'HARD' ? 4 : 2),
-        token_reward: d.difficulty === 'EASY' ? 5 : d.difficulty === 'HARD' ? 30 : 15,
-        estimated_time: d.estimated_time || '15-20 min',
-        requires_proof: d.requires_proof !== false,
-        submission_status: null,
-        submission_feedback: null,
-      }));
     }
 
     return res.json({
       success: true,
-      hasFamily: !!membership,
+      hasFamily: true,
+      family: membership ? membership.family : null,
       progress,
       tasks: {
         pending: pendingTasks,
         approved_today: approvedToday,
         history,
       },
-      message: membership ? null : '💡 Dica: Vincule-se a um Clã Familiar para que seus pais aprovem suas tarefas!',
     });
   } catch (error) {
     console.error('❌ Erro ao montar dashboard:', error);
