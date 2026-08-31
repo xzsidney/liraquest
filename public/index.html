@@ -1676,7 +1676,7 @@
 
         <div style="margin-top: 20px; text-align: center;">
           <span style="font-size: 0.9rem; color: var(--text-muted);">Já tem uma conta?</span>
-          <a href="#login" style="color: #c084fc; font-weight: 700; text-decoration: none; margin-left: 6px;">Fazer Login</a>
+          <a href="/login" onclick="event.preventDefault(); navigateTo('login');" style="color: #c084fc; font-weight: 700; text-decoration: none; margin-left: 6px; cursor: pointer;">Fazer Login</a>
         </div>
       </div>
     </section>
@@ -1715,7 +1715,7 @@
 
         <div style="margin-top: 20px; text-align: center;">
           <span style="font-size: 0.9rem; color: var(--text-muted);">Não tem uma conta?</span>
-          <a href="#register" style="color: #c084fc; font-weight: 700; text-decoration: none; margin-left: 6px;">Cadastre-se</a>
+          <a href="/register" onclick="event.preventDefault(); navigateTo('register');" style="color: #c084fc; font-weight: 700; text-decoration: none; margin-left: 6px; cursor: pointer;">Cadastre-se</a>
         </div>
       </div>
     </section>

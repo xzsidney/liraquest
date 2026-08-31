@@ -60,34 +60,40 @@ const ATTR_ICONS = {
 };
 
 // ========================================================
-// 1. ROTEAMENTO & NAVEGAÇÃO
+// 1. ROTEAMENTO & NAVEGAÇÃO (HTML5 History Mode Limpo)
 // ========================================================
 function navigateTo(route) {
   state.currentRoute = route;
-  if (window.location.pathname !== '/' && window.location.pathname !== '') {
-    window.history.pushState(null, '', `/#${route}`);
-  } else {
-    window.location.hash = route;
+  const targetPath = route === 'home' ? '/' : `/${route}`;
+  
+  if (window.location.pathname !== targetPath || window.location.hash) {
+    window.history.pushState({ route }, '', targetPath);
   }
   renderRoute();
 }
 
 function initRouter() {
-  const path = window.location.pathname.replace(/^\/+/, '');
-  let route = window.location.hash.replace('#', '') || path || 'home';
+  // 1. Identificar rota da URL (suporta tanto /rota limpo quanto #rota residual antigo)
+  const hashRoute = window.location.hash.replace('#', '').trim();
+  const pathRoute = window.location.pathname.replace(/^\/+|\/+$/g, '').trim();
+  
+  const route = hashRoute || pathRoute || 'home';
+  state.currentRoute = route;
 
-  // Se a URL tiver pathname residual (ex: /login ou /child), normalizar para /#rota
-  if (window.location.pathname !== '/' && window.location.pathname !== '') {
-    window.history.replaceState(null, '', `/#${route}`);
+  // Normalizar a URL removendo qualquer '#' residual
+  const targetPath = route === 'home' ? '/' : `/${route}`;
+  if (window.location.hash || window.location.pathname !== targetPath) {
+    window.history.replaceState({ route }, '', targetPath);
   }
 
-  window.addEventListener('hashchange', () => {
-    const hash = window.location.hash.replace('#', '') || 'home';
-    state.currentRoute = hash;
+  // 2. Escutar navegação de Voltar/Avançar do navegador
+  window.addEventListener('popstate', (event) => {
+    const currentPath = window.location.pathname.replace(/^\/+|\/+$/g, '').trim();
+    const r = event.state?.route || currentPath || 'home';
+    state.currentRoute = r;
     renderRoute();
   });
 
-  state.currentRoute = route;
   renderRoute();
 }
 
@@ -103,8 +109,8 @@ function renderRoute() {
   if (protectedRoutes[route]) {
     if (!state.token || !state.user) {
       showToast('Acesso restrito. Faça login para continuar.', 'warning');
-      state.currentRoute = 'login';
-      window.location.hash = 'login';
+      navigateTo('login');
+      return;
     } else {
       const allowedRoles = protectedRoutes[route];
       if (!allowedRoles.includes(state.user.role)) {
