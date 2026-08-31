@@ -240,10 +240,12 @@ export const submitTaskProof = async (req, res) => {
 export const listPendingSubmissions = async (req, res) => {
   try {
     const userId = req.user.id;
-    const membership = await FamilyMember.findOne({ where: { user_id: userId } });
+    const userRole = req.user.role;
+    const membership = await findOrCreateUserFamily(userId);
 
-    if (!membership) {
-      return res.json({ success: true, count: 0, submissions: [] });
+    let taskWhereClause = {};
+    if (userRole !== 'ADMIN' && membership && membership.family_id) {
+      taskWhereClause = { family_id: membership.family_id };
     }
 
     const submissions = await TaskSubmission.findAll({
@@ -252,7 +254,8 @@ export const listPendingSubmissions = async (req, res) => {
         {
           model: Task,
           as: 'task',
-          where: { family_id: membership.family_id },
+          where: taskWhereClause,
+          required: true,
         },
         {
           model: FamilyUser,

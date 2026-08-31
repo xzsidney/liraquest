@@ -104,26 +104,37 @@ export const joinFamily = async (req, res) => {
       });
     }
 
-    // Verificar se já é membro
-    const existingMembership = await FamilyMember.findOne({
-      where: { family_id: family.id, user_id: userId },
+    // Verificar se já possui algum vínculo familiar
+    let membership = await FamilyMember.findOne({
+      where: { user_id: userId },
     });
 
-    if (existingMembership) {
-      return res.status(400).json({
-        success: false,
-        message: 'Você já é membro desta família!',
-        family,
+    const memberRole = req.user.role === 'PARENT' ? 'GUARDIAN' : 'MEMBER';
+
+    if (membership) {
+      if (membership.family_id === family.id) {
+        return res.status(400).json({
+          success: false,
+          message: 'Você já é membro desta família!',
+          family,
+        });
+      }
+      // Atualizar para a nova família
+      await membership.update({
+        family_id: family.id,
+        role_in_family: memberRole,
+      });
+    } else {
+      membership = await FamilyMember.create({
+        id: randomUUID().toLowerCase(),
+        family_id: family.id,
+        user_id: userId,
+        role_in_family: memberRole,
       });
     }
 
-    const memberRole = req.user.role === 'PARENT' ? 'GUARDIAN' : 'MEMBER';
-    const membership = await FamilyMember.create({
-      id: randomUUID().toLowerCase(),
-      family_id: family.id,
-      user_id: userId,
-      role_in_family: memberRole,
-    });
+    // Migrar tarefas criadas pelo usuário para a nova família
+    await Task.update({ family_id: family.id }, { where: { created_by: userId } });
 
     return res.json({
       success: true,
