@@ -1757,88 +1757,237 @@
       </div>
     </section>
 
-    <!-- ==================== TELA 5: DASHBOARD PAIS ==================== -->
+    <!-- ==================== TELA 5: TERMINAL DO GUARDIÃO (PAIS - PARENT ROLE) ==================== -->
     <section id="view-parent" style="display: none;">
-      <div class="dashboard-card">
+      <div class="child-layout-container">
         
-        <!-- Header do Guardião -->
-        <div class="dashboard-header">
-          <div class="user-profile-bar">
-            <div class="avatar-circle">🛡️</div>
-            <div>
-              <h2 id="parent-user-name" style="font-size: 1.6rem; color: #ffffff;">Guardião Sidney</h2>
-              <span id="parent-user-email" style="color: var(--text-muted); font-size: 0.9rem;">pai@liraquest.com</span>
-            </div>
-          </div>
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <span class="role-badge badge-parent">🛡️ Pais / Guardião</span>
-            <button class="btn btn-danger btn-sm" onclick="handleLogout()">Sair</button>
-          </div>
-        </div>
-
-        <!-- Abas do Guardião -->
-        <div class="nav-tabs">
-          <button id="parent-tab-btn-tasks" class="nav-tab-btn active" onclick="switchParentTab('tasks')">
-            📋 Missões da Casa
-          </button>
-          <button id="parent-tab-btn-submissions" class="nav-tab-btn" onclick="switchParentTab('submissions')">
-            🔍 Provas Aguardando Aprovação <span id="parent-pending-badge" class="tab-badge-count" style="display: none;">0</span>
-          </button>
-          <button id="parent-tab-btn-clan" class="nav-tab-btn" onclick="switchParentTab('clan')">
-            🏰 Clã Familiar
-          </button>
-        </div>
-
-        <!-- ABA 1: MISSÕES DA CASA -->
-        <div id="parent-tab-tasks">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-            <h3 style="font-size: 1.25rem; color: #ffffff;">Mural de Missões do Clã</h3>
-            <button class="btn btn-primary btn-sm" onclick="openCreateTaskModal()">➕ Lançar Nova Missão</button>
-          </div>
-
-          <div id="parent-tasks-list" class="tasks-grid">
-            <!-- Renderizado dinamicamente via JS -->
-          </div>
-        </div>
-
-        <!-- ABA 2: PROVAS PENDENTES -->
-        <div id="parent-tab-submissions" style="display: none;">
-          <h3 style="font-size: 1.25rem; margin-bottom: 16px; color: #fbbf24;">Evidências Enviadas pelos Filhos</h3>
-          <div id="parent-submissions-list" class="submissions-grid">
-            <!-- Renderizado dinamicamente via JS -->
-          </div>
-        </div>
-
-        <!-- ABA 3: CLÃ FAMILIAR -->
-        <div id="parent-tab-clan" style="display: none;">
-          <div class="stats-grid">
-            <div class="stat-card">
-              <span class="stat-label">Família / Clã</span>
-              <span class="stat-number" id="parent-family-name" style="font-size: 1.3rem; color: #c084fc;">Carregando...</span>
-            </div>
-            <div class="stat-card">
-              <span class="stat-label">Código de Convite (Envie aos Filhos)</span>
-              <span class="stat-number" id="parent-family-code" style="color: #fbbf24; font-size: 1.3rem;">--</span>
-            </div>
-            <div class="stat-card">
-              <span class="stat-label">Membros Vinculados</span>
-              <span class="stat-number" id="parent-family-members-count" style="color: #4ade80;">--</span>
+        <!-- SIDEBAR DO GUARDIÃO -->
+        <aside class="child-sidebar">
+          
+          <!-- Cabeçalho do Guardião com Foto Quadrada -->
+          <div class="sidebar-user-header">
+            <div id="parent-sidebar-photo-box" class="sidebar-square-photo" style="background: rgba(128, 0, 32, 0.4); border-color: rgba(212, 175, 55, 0.5);">🛡️</div>
+            <div style="overflow: hidden;">
+              <h3 id="parent-user-name" style="font-size: 1.05rem; color: #ffffff; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">Guardião Sidney</h3>
+              <span id="parent-user-email" style="color: var(--text-muted); font-size: 0.78rem; display: block; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">pai@liraquest.com</span>
+              <span class="role-badge badge-parent" style="font-size: 0.7rem; padding: 2px 8px; margin-top: 4px;">🛡️ Guardião da Família</span>
             </div>
           </div>
 
-          <!-- Setup de Família se ainda não tiver -->
-          <div id="parent-family-setup" style="background: rgba(15, 23, 42, 0.5); padding: 24px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08); margin-top: 16px; display: none;">
-            <h3 style="font-size: 1.2rem; margin-bottom: 8px;">🏰 Criar Clã Familiar</h3>
-            <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 16px;">
-              Crie o clã da sua família para gerar o código de convite dos seus filhos.
-            </p>
-            <div style="display: flex; gap: 12px; max-width: 450px;">
-              <input type="text" id="parent-new-family-name" class="form-input" placeholder="Ex: Clã Lira">
-              <button class="btn btn-primary" style="white-space: nowrap;" onclick="handleCreateFamily()">Criar Família</button>
+          <!-- CARD DO CLÃ FAMILIAR & CÓDIGO DE CONVITE -->
+          <div class="sidebar-stat-card sidebar-stat-tokens" style="background: linear-gradient(135deg, rgba(128, 0, 32, 0.35), rgba(30, 58, 138, 0.45)); border-color: rgba(212, 175, 55, 0.45); padding: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span class="sidebar-stat-label" style="color: #fde047; font-size: 0.8rem;">🏰 Clã Familiar</span>
+              <span id="parent-sidebar-clan-name" style="font-size: 0.82rem; color: #ffffff; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px;">Carregando...</span>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.4); padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(212,175,55,0.25);">
+              <div>
+                <span style="font-size: 0.68rem; color: var(--text-muted); display: block;">Código dos Filhos:</span>
+                <strong id="parent-sidebar-invite-code" style="font-size: 1.05rem; color: #fbbf24; letter-spacing: 1px;">----</strong>
+              </div>
+              <button class="btn btn-gold btn-sm" style="padding: 4px 8px; font-size: 0.72rem;" onclick="copyClanInviteCode()" title="Copiar código para enviar aos filhos">
+                📋 Copiar
+              </button>
             </div>
           </div>
-        </div>
 
+          <!-- CARDS DE ESTATÍSTICAS DO GUARDIÃO -->
+          <div class="sidebar-balances-grid">
+            <div class="sidebar-stat-card sidebar-stat-energy" style="border-color: rgba(245, 158, 11, 0.4);" title="Provas de missões aguardando sua avaliação">
+              <span class="sidebar-stat-label" style="color: #fbbf24;">🔍 Pendentes</span>
+              <span id="parent-sidebar-pending-count" class="sidebar-stat-val" style="color: #fbbf24;">0</span>
+            </div>
+            <div class="sidebar-stat-card sidebar-stat-tokens" title="Total de missões ativas cadastradas no mural da família">
+              <span class="sidebar-stat-label">📋 Missões</span>
+              <span id="parent-sidebar-tasks-count" class="sidebar-stat-val" style="color: #60a5fa;">0</span>
+            </div>
+          </div>
+
+          <!-- MINI ESTATÍSTICA: FILHOS & MEMBROS -->
+          <div class="sidebar-mini-stats" style="grid-template-columns: 1fr;">
+            <div class="sidebar-mini-stat-card" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px;">
+              <span class="sidebar-mini-label">👥 Filhos Conectados</span>
+              <strong id="parent-sidebar-members-count" class="sidebar-mini-val" style="font-size: 1.1rem; color: #4ade80;">0</strong>
+            </div>
+          </div>
+
+          <!-- MENU DE 4 ABAS DO GUARDIÃO -->
+          <div class="sidebar-menu">
+            <button id="parent-nav-submissions" class="sidebar-menu-btn active" onclick="switchParentTerminalTab('submissions')">
+              <span style="font-size: 1.15rem;">🔍</span> Provas Pendentes
+              <span id="parent-nav-pending-badge" class="tab-badge-count" style="display: none; margin-left: auto; background: #ef4444; color: #fff;">0</span>
+            </button>
+            <button id="parent-nav-tasks" class="sidebar-menu-btn" onclick="switchParentTerminalTab('tasks')">
+              <span style="font-size: 1.15rem;">📋</span> Gestão de Missões (CRUD)
+            </button>
+            <button id="parent-nav-clan" class="sidebar-menu-btn" onclick="switchParentTerminalTab('clan')">
+              <span style="font-size: 1.15rem;">🏰</span> Filhos & Clã Familiar
+            </button>
+            <button id="parent-nav-profile" class="sidebar-menu-btn" onclick="switchParentTerminalTab('profile')">
+              <span style="font-size: 1.15rem;">👤</span> Meu Perfil Real
+            </button>
+          </div>
+
+        </aside>
+
+        <!-- ÁREA PRINCIPAL COM AS 4 ABAS DO GUARDIÃO -->
+        <main class="child-content-card">
+          
+          <!-- ==================== ABA 1: VALIDADOR DE PROVAS PENDENTES ==================== -->
+          <div id="parent-panel-submissions">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+              <div>
+                <h2 style="font-size: 1.5rem; color: #ffffff; display: flex; align-items: center; gap: 10px;">
+                  <span>🔍</span> Validador de Provas & Tarefas
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">
+                  Avalie as evidências enviadas pelos seus filhos para liberar recompensas e pontos de experiência.
+                </p>
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="loadParentSubmissions()">
+                🔄 Atualizar Provas
+              </button>
+            </div>
+
+            <!-- Lista de Provas Pendentes -->
+            <div id="parent-submissions-list" class="submissions-grid">
+              <!-- Renderizado dinamicamente via JS -->
+            </div>
+
+            <!-- Subseção: Histórico Recente de Avaliações -->
+            <div id="parent-reviewed-history-section" style="margin-top: 36px; padding-top: 24px; border-top: 1px solid rgba(212, 175, 55, 0.15);">
+              <h3 style="font-size: 1.15rem; color: #cbd5e1; margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
+                <span>📜</span> Últimas Avaliações Concluídas
+              </h3>
+              <div id="parent-reviewed-history-list">
+                <!-- Renderizado dinamicamente via JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== ABA 2: GESTÃO DE MISSÕES (CRUD) ==================== -->
+          <div id="parent-panel-tasks" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+              <div>
+                <h2 style="font-size: 1.5rem; color: #ffffff; display: flex; align-items: center; gap: 10px;">
+                  <span>📋</span> Gestão de Missões da Casa
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">
+                  Crie, edite, pause e personalize as tarefas e hábitos diários da sua família.
+                </p>
+              </div>
+              <button class="btn btn-primary" onclick="openTaskCrudModal()">
+                ➕ Lançar Nova Missão
+              </button>
+            </div>
+
+            <!-- Filtros de Missões -->
+            <div style="display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;">
+              <button class="btn btn-secondary btn-sm parent-task-filter active" onclick="filterParentTasks('ALL', this)">Todas</button>
+              <button class="btn btn-secondary btn-sm parent-task-filter" onclick="filterParentTasks('DOMESTIC', this)">🏠 Doméstica</button>
+              <button class="btn btn-secondary btn-sm parent-task-filter" onclick="filterParentTasks('STUDY', this)">📚 Estudos</button>
+              <button class="btn btn-secondary btn-sm parent-task-filter" onclick="filterParentTasks('HEALTH', this)">💪 Saúde</button>
+              <button class="btn btn-secondary btn-sm parent-task-filter" onclick="filterParentTasks('CREATIVE', this)">🎨 Criativa</button>
+              <button class="btn btn-secondary btn-sm parent-task-filter" onclick="filterParentTasks('SOCIAL', this)">🤝 Social</button>
+            </div>
+
+            <!-- Lista de Tarefas da Família -->
+            <div id="parent-tasks-list" class="tasks-grid">
+              <!-- Renderizado dinamicamente via JS -->
+            </div>
+          </div>
+
+          <!-- ==================== ABA 3: FILHOS & CLÃ FAMILIAR ==================== -->
+          <div id="parent-panel-clan" style="display: none;">
+            <div style="margin-bottom: 24px;">
+              <h2 style="font-size: 1.5rem; color: #ffffff; display: flex; align-items: center; gap: 10px;">
+                <span>🏰</span> Filhos & Membros do Clã
+              </h2>
+              <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">
+                Acompanhe o desenvolvimento real e a evolução no RPG de cada jovem herói da família.
+              </p>
+            </div>
+
+            <!-- Banner do Clã com Código de Convite Grande -->
+            <div style="background: linear-gradient(135deg, rgba(128, 0, 32, 0.4), rgba(30, 58, 138, 0.4)); border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 18px; padding: 22px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+              <div>
+                <span style="font-size: 0.8rem; color: #fbbf24; font-weight: 700; text-transform: uppercase;">Código de Acesso do Clã</span>
+                <div style="display: flex; align-items: center; gap: 12px; margin-top: 4px;">
+                  <h3 id="parent-clan-invite-code-large" style="font-size: 1.8rem; color: #ffffff; letter-spacing: 2px; font-family: monospace;">LIRA-XXXX</h3>
+                  <button class="btn btn-gold btn-sm" onclick="copyClanInviteCode()">📋 Copiar Código</button>
+                </div>
+                <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 6px;">
+                  Compartilhe este código com seus filhos para que eles ingressem na família.
+                </p>
+              </div>
+              <div style="text-align: right;">
+                <span style="font-size: 0.8rem; color: var(--text-muted);">Nome do Clã:</span>
+                <h4 id="parent-clan-title-large" style="font-size: 1.3rem; color: #fde047;">Clã Lira</h4>
+              </div>
+            </div>
+
+            <!-- Grid de Heróis / Filhos Conectados -->
+            <h3 style="font-size: 1.15rem; color: #ffffff; margin-bottom: 14px;">Heróis Conectados</h3>
+            <div id="parent-children-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
+              <!-- Renderizado dinamicamente via JS -->
+            </div>
+          </div>
+
+          <!-- ==================== ABA 4: MEU PERFIL REAL & PORTAL DO REINO ==================== -->
+          <div id="parent-panel-profile" style="display: none;">
+            <div style="margin-bottom: 24px;">
+              <h2 style="font-size: 1.5rem; color: #ffffff; display: flex; align-items: center; gap: 10px;">
+                <span>👤</span> Meu Perfil de Guardião
+              </h2>
+              <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">
+                Atualize suas informações pessoais de contato e acesse seu avatar de RPG.
+              </p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+              <!-- Formulário de Perfil Real -->
+              <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-card); border-radius: 18px; padding: 22px;">
+                <h3 style="font-size: 1.1rem; color: #ffffff; margin-bottom: 16px;">Informações do Guardião</h3>
+                <form id="parent-real-profile-form">
+                  <div class="form-group">
+                    <label class="form-label" for="parent-real-name">Nome Completo</label>
+                    <input type="text" id="parent-real-name" class="form-input" placeholder="Seu nome" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="parent-real-phone">Telefone / WhatsApp</label>
+                    <input type="text" id="parent-real-phone" class="form-input" placeholder="(00) 00000-0000">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="parent-real-work">Profissão / Empresa</label>
+                    <input type="text" id="parent-real-work" class="form-input" placeholder="Ex: Engenheiro, Autônomo">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="parent-real-photo">URL da Foto de Perfil</label>
+                    <input type="text" id="parent-real-photo" class="form-input" placeholder="https://...">
+                  </div>
+                  <button type="submit" id="btn-save-parent-profile" class="btn btn-primary" style="width: 100%;">
+                    💾 Salvar Dados do Perfil
+                  </button>
+                </form>
+              </div>
+
+              <!-- Card Portal do Avatar (RPG do Pai) -->
+              <div class="avatar-portal-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                  <span style="font-size: 2.2rem; display: block; margin-bottom: 12px;">🛡️⚔️👑</span>
+                  <h3 style="font-size: 1.3rem; color: #ffffff; margin-bottom: 8px;">Portal do Avatar no Reino</h3>
+                  <p style="color: #cbd5e1; font-size: 0.9rem; line-height: 1.5; margin-bottom: 16px;">
+                    Como Guardião, você também pode criar seu Herói, participar das Raids multiplayer e guiar seus filhos no combate arcade 2D!
+                  </p>
+                </div>
+                <button class="btn btn-gold" style="width: 100%; font-size: 1rem; padding: 12px;" onclick="handleAccessAvatar()">
+                  ⚔️ Acessar Meu Avatar de RPG
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </main>
       </div>
     </section>
 
@@ -2274,52 +2423,104 @@
   </main>
 
   <!-- ======================================================== -->
-  <!-- MODAL: CRIAR NOVA MISSÃO (PAIS)                          -->
+  <!-- MODAL: CRUD DE MISSÃO (CRIAR / EDITAR - PAIS)           -->
   <!-- ======================================================== -->
-  <div id="create-task-modal" class="modal-overlay" style="display: none;">
-    <div class="modal-content">
+  <div id="task-crud-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="max-width: 600px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h2 style="font-size: 1.5rem; color: #ffffff;">📋 Lançar Nova Missão Familiar</h2>
-        <button onclick="closeCreateTaskModal()" style="background: transparent; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer;">✕</button>
+        <h2 id="task-crud-modal-title" style="font-size: 1.5rem; color: #ffffff;">📋 Lançar Nova Missão Familiar</h2>
+        <button onclick="closeTaskCrudModal()" style="background: transparent; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer;">✕</button>
       </div>
 
-      <form id="create-task-form">
+      <form id="task-crud-form">
+        <input type="hidden" id="task-crud-id">
+
         <div class="form-group">
-          <label class="form-label" for="task-title">Título da Missão</label>
-          <input type="text" id="task-title" class="form-input" placeholder="Ex: Arrumar a Cama e Organizar Quarto" required>
+          <label class="form-label" for="task-crud-title">Título da Missão</label>
+          <input type="text" id="task-crud-title" class="form-input" placeholder="Ex: Arrumar a Cama e Organizar Quarto" required>
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="task-desc">Instruções / Detalhes</label>
-          <textarea id="task-desc" class="form-textarea" placeholder="Explique o que precisa ser feito para a missão ser considerada cumprida..."></textarea>
+          <label class="form-label" for="task-crud-desc">Instruções / Detalhes</label>
+          <textarea id="task-crud-desc" class="form-textarea" placeholder="Explique o que precisa ser feito para a missão ser considerada cumprida..." rows="3"></textarea>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
           <div class="form-group">
-            <label class="form-label" for="task-xp">Recompensa em XP</label>
-            <input type="number" id="task-xp" class="form-input" value="50" min="10" max="500" required>
+            <label class="form-label" for="task-crud-category">Categoria</label>
+            <select id="task-crud-category" class="form-select">
+              <option value="DOMESTIC">🏠 Doméstica & Limpeza</option>
+              <option value="STUDY">📚 Estudos & Lições</option>
+              <option value="HEALTH">💪 Saúde & Esportes</option>
+              <option value="CREATIVE">🎨 Criatividade & Hobbies</option>
+              <option value="SOCIAL">🤝 Convivência & Social</option>
+              <option value="GERAL">⭐ Geral</option>
+            </select>
           </div>
+
           <div class="form-group">
-            <label class="form-label" for="task-gold">Recompensa em Ouro</label>
-            <input type="number" id="task-gold" class="form-input" value="15" min="5" max="200" required>
+            <label class="form-label" for="task-crud-difficulty">Dificuldade</label>
+            <select id="task-crud-difficulty" class="form-select">
+              <option value="EASY">🟢 Fácil (Missão Rápida)</option>
+              <option value="MEDIUM" selected>🟡 Média (Padrão)</option>
+              <option value="HARD">🔴 Difícil (Grande Desafio)</option>
+            </select>
           </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label" for="task-category">Categoria</label>
-          <select id="task-category" class="form-select">
-            <option value="CASA">🏠 Organização & Limpeza da Casa</option>
-            <option value="ESTUDOS">📚 Estudos & Lição de Casa</option>
-            <option value="SAUDE">⚡ Saúde & Atividade Física</option>
-            <option value="CONVIVENCIA">✨ Cooperação & Gentileza</option>
-            <option value="GERAL">⚔️ Missão Geral</option>
-          </select>
+        <!-- Recompensas Quádruplas -->
+        <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-card); border-radius: 14px; padding: 16px; margin-bottom: 16px;">
+          <span style="font-size: 0.85rem; font-weight: 700; color: #fde047; display: block; margin-bottom: 12px;">🎁 Recompensas ao Cumprir:</span>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="task-crud-xp" style="font-size: 0.8rem;">⭐ Pontos de XP</label>
+              <input type="number" id="task-crud-xp" class="form-input" value="50" min="5" max="1000" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="task-crud-gold" style="font-size: 0.8rem;">💰 Ouro RPG</label>
+              <input type="number" id="task-crud-gold" class="form-input" value="15" min="1" max="500" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="task-crud-energy" style="font-size: 0.8rem;">⚡ Energia de Aventura</label>
+              <input type="number" id="task-crud-energy" class="form-input" value="2" min="1" max="10" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="task-crud-tokens" style="font-size: 0.8rem;">🏠 Fichas do Lar</label>
+              <input type="number" id="task-crud-tokens" class="form-input" value="15" min="0" max="100" required>
+            </div>
+          </div>
         </div>
 
-        <button type="submit" id="btn-create-task-submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
-          ✨ Publicar Missão no Mural
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" for="task-crud-time">Tempo Estimado</label>
+            <input type="text" id="task-crud-time" class="form-input" placeholder="Ex: 15-20 min" value="15-20 min">
+          </div>
+          <div class="form-group" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: center;">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: #ffffff; font-size: 0.9rem; font-weight: 600; margin-top: 16px;">
+              <input type="checkbox" id="task-crud-proof" checked style="width: 18px; height: 18px; accent-color: var(--accent);">
+              Exigir foto de comprovação
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" id="btn-save-task-crud" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 1rem;">
+          ✨ Salvar Missão no Mural
         </button>
       </form>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: LIGHTBOX DE ZOOM DE FOTO                          -->
+  <!-- ======================================================== -->
+  <div id="photo-lightbox-modal" class="modal-overlay" style="display: none;" onclick="closePhotoLightbox()">
+    <div class="modal-content" style="max-width: 800px; background: rgba(0, 0, 0, 0.9); border-color: rgba(255, 255, 255, 0.2); padding: 16px; text-align: center;" onclick="event.stopPropagation()">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <span id="lightbox-title" style="color: #ffffff; font-weight: 700;">Evidência da Missão</span>
+        <button onclick="closePhotoLightbox()" style="background: transparent; border: none; color: var(--text-muted); font-size: 1.6rem; cursor: pointer;">✕</button>
+      </div>
+      <img id="lightbox-img" src="" alt="Evidência" style="max-width: 100%; max-height: 75vh; border-radius: 12px; object-fit: contain; display: block; margin: 0 auto;">
     </div>
   </div>
 

@@ -23,7 +23,19 @@ import {
 export const createTask = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { title, description, xp_reward, gold_reward, category, assigned_to } = req.body;
+    const {
+      title,
+      description,
+      xp_reward,
+      gold_reward,
+      energy_reward,
+      token_reward,
+      category,
+      difficulty,
+      estimated_time,
+      requires_proof,
+      assigned_to,
+    } = req.body;
 
     if (!title || title.trim().length < 2) {
       return res.status(400).json({
@@ -32,7 +44,7 @@ export const createTask = async (req, res) => {
       });
     }
 
-    // Buscar família do pai
+    // Buscar ou garantir família do pai
     const membership = await findOrCreateUserFamily(userId);
     if (!membership || !membership.family_id) {
       return res.status(400).json({
@@ -50,7 +62,12 @@ export const createTask = async (req, res) => {
       description: description ? description.trim() : null,
       xp_reward: Number(xp_reward) || 50,
       gold_reward: Number(gold_reward) || 15,
-      category: category || 'GERAL',
+      energy_reward: Number(energy_reward) || 1,
+      token_reward: Number(token_reward) || 10,
+      category: category || 'DOMESTIC',
+      difficulty: difficulty || 'MEDIUM',
+      estimated_time: estimated_time || '15-20 min',
+      requires_proof: requires_proof !== false,
       is_active: true,
     });
 
@@ -69,15 +86,173 @@ export const createTask = async (req, res) => {
 };
 
 /**
- * Lista todas as missões ativas da família do usuário (ou catálogo global se sem família)
+ * Atualiza uma missão existente (exclusivo para PARENT ou ADMIN)
+ */
+export const updateTask = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { taskId } = req.params;
+    const {
+      title,
+      description,
+      xp_reward,
+      gold_reward,
+      energy_reward,
+      token_reward,
+      category,
+      difficulty,
+      estimated_time,
+      requires_proof,
+      assigned_to,
+      is_active,
+    } = req.body;
+
+    const task = await Task.findByPk(taskId);
+    if (!task) {
+      return res.status(404).json({
+        success: false,
+        message: 'Missão não encontrada.',
+      });
+    }
+
+    // Verificar se o usuário pertence à mesma família ou é ADMIN
+    const membership = await findOrCreateUserFamily(userId);
+    if (req.user.role !== 'ADMIN' && (!membership || task.family_id !== membership.family_id)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Acesso negado: Você não tem permissão para editar missões desta família.',
+      });
+    }
+
+    await task.update({
+      ...(title !== undefined ? { title: title.trim() } : {}),
+      ...(description !== undefined ? { description: description ? description.trim() : null } : {}),
+      ...(xp_reward !== undefined ? { xp_reward: Number(xp_reward) } : {}),
+      ...(gold_reward !== undefined ? { gold_reward: Number(gold_reward) } : {}),
+      ...(energy_reward !== undefined ? { energy_reward: Number(energy_reward) } : {}),
+      ...(token_reward !== undefined ? { token_reward: Number(token_reward) } : {}),
+      ...(category !== undefined ? { category } : {}),
+      ...(difficulty !== undefined ? { difficulty } : {}),
+      ...(estimated_time !== undefined ? { estimated_time } : {}),
+      ...(requires_proof !== undefined ? { requires_proof: Boolean(requires_proof) } : {}),
+      ...(assigned_to !== undefined ? { assigned_to: assigned_to || null } : {}),
+      ...(is_active !== undefined ? { is_active: Boolean(is_active) } : {}),
+    });
+
+    return res.json({
+      success: true,
+      message: `Missão "${task.title}" atualizada com sucesso!`,
+      task,
+    });
+  } catch (error) {
+    console.error('❌ Erro ao atualizar missão:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Erro interno ao atualizar missão.',
+    });
+  }
+};
+
+/**
+ * Alterna status ativo/pausado de uma missão (exclusivo para PARENT ou ADMIN)
+ */
+export const toggleTaskStatus = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { taskId } = req.params;
+
+    const task = await Task.findByPk(taskId);
+    if (!task) {
+      return res.status(404).json({
+        success: false,
+        message: 'Missão não encontrada.',
+      });
+    }
+
+    const membership = await findOrCreateUserFamily(userId);
+    if (req.user.role !== 'ADMIN' && (!membership || task.family_id !== membership.family_id)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Acesso negado para alterar esta missão.',
+      });
+    }
+
+    const newStatus = !task.is_active;
+    await task.update({ is_active: newStatus });
+
+    return res.json({
+      success: true,
+      message: `Missão "${task.title}" ${newStatus ? 'ativada' : 'pausada'} com sucesso!`,
+      task,
+    });
+  } catch (error) {
+    console.error('❌ Erro ao alternar status da missão:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Erro interno ao alternar status da missão.',
+    });
+  }
+};
+
+/**
+ * Exclui ou desativa uma missão da família (exclusivo para PARENT ou ADMIN)
+ */
+export const deleteTask = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { taskId } = req.params;
+
+    const task = await Task.findByPk(taskId);
+    if (!task) {
+      return res.status(404).json({
+        success: false,
+        message: 'Missão não encontrada.',
+      });
+    }
+
+    const membership = await findOrCreateUserFamily(userId);
+    if (req.user.role !== 'ADMIN' && (!membership || task.family_id !== membership.family_id)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Acesso negado para excluir esta missão.',
+      });
+    }
+
+    // Verificar se já possui submissões atreladas
+    const subCount = await TaskSubmission.count({ where: { task_id: taskId } });
+    if (subCount > 0) {
+      // Desativa suavemente para manter histórico e integridade
+      await task.update({ is_active: false });
+      return res.json({
+        success: true,
+        message: `Missão "${task.title}" possui histórico e foi desativada do mural.`,
+      });
+    }
+
+    await task.destroy();
+    return res.json({
+      success: true,
+      message: `Missão "${task.title}" excluída com sucesso!`,
+    });
+  } catch (error) {
+    console.error('❌ Erro ao excluir missão:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Erro interno ao excluir missão.',
+    });
+  }
+};
+
+/**
+ * Lista todas as missões da família (com suporte a filtro de ativas/todas)
  */
 export const listFamilyTasks = async (req, res) => {
   try {
     const userId = req.user.id;
+    const { include_inactive } = req.query;
     const membership = await findOrCreateUserFamily(userId);
 
     if (!membership || !membership.family_id) {
-      // Usuário sem família: retorna catálogo global
       const defTasks = await DefinitionTask.findAll({
         where: {
           allowed_profile: {
@@ -105,6 +280,7 @@ export const listFamilyTasks = async (req, res) => {
           token_reward: d.difficulty === 'EASY' ? 5 : d.difficulty === 'HARD' ? 30 : 15,
           estimated_time: d.estimated_time || '15-20 min',
           requires_proof: d.requires_proof !== false,
+          is_active: true,
           submissions: [],
         })),
         message: 'Missões do catálogo global LiraQuest.',
@@ -114,11 +290,15 @@ export const listFamilyTasks = async (req, res) => {
     const familyId = membership.family_id;
     const creatorId = membership.family?.created_by || userId;
 
-    // Garantir que a família possui as tarefas de catálogo
     await ensureFamilyHasTasks(familyId, creatorId);
 
+    const whereClause = { family_id: familyId };
+    if (!include_inactive || include_inactive !== 'true') {
+      whereClause.is_active = true;
+    }
+
     const tasks = await Task.findAll({
-      where: { family_id: familyId, is_active: true },
+      where: whereClause,
       include: [
         { model: FamilyUser, as: 'creator', attributes: ['id', 'name', 'role'] },
         { model: FamilyUser, as: 'assignee', attributes: ['id', 'name'] },
@@ -129,7 +309,7 @@ export const listFamilyTasks = async (req, res) => {
           required: false,
         },
       ],
-      order: [['created_at', 'DESC']],
+      order: [['is_active', 'DESC'], ['created_at', 'DESC']],
     });
 
     return res.json({
@@ -427,3 +607,63 @@ export const listMySubmissions = async (req, res) => {
     });
   }
 };
+
+/**
+ * Retorna as últimas comprovações avaliadas (APPROVED / REJECTED) no clã
+ */
+export const listReviewedSubmissions = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const userRole = req.user.role;
+    const membership = await findOrCreateUserFamily(userId);
+
+    let taskWhereClause = {};
+    if (userRole !== 'ADMIN' && membership && membership.family_id) {
+      taskWhereClause = { family_id: membership.family_id };
+    }
+
+    const submissions = await TaskSubmission.findAll({
+      where: {
+        status: { [Op.in]: ['APPROVED', 'REJECTED'] },
+      },
+      include: [
+        {
+          model: Task,
+          as: 'task',
+          where: taskWhereClause,
+          required: true,
+        },
+        {
+          model: FamilyUser,
+          as: 'submitter',
+          attributes: ['id', 'name', 'email', 'profile_photo_url'],
+        },
+        {
+          model: FamilyUser,
+          as: 'reviewer',
+          attributes: ['id', 'name', 'role'],
+        },
+        {
+          model: Character,
+          as: 'character',
+          attributes: ['id', 'name', 'avatar_value'],
+        },
+      ],
+      order: [['reviewed_at', 'DESC']],
+      limit: 20,
+    });
+
+    return res.json({
+      success: true,
+      count: submissions.length,
+      submissions,
+    });
+  } catch (error) {
+    console.error('❌ Erro ao listar histórico de avaliações:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Erro interno ao consultar histórico de avaliações.',
+    });
+  }
+};
+

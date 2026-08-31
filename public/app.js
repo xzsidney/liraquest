@@ -1518,106 +1518,205 @@ async function handleBuyItem(itemId) {
 }
 
 // ========================================================
-// 9. PAINEL DOS PAIS (MISSÕES & AVALIAÇÕES)
+// 9. TERMINAL DO GUARDIÃO (PAINEL DOS PAIS - PARENT ROLE)
 // ========================================================
-function switchParentTab(tab) {
+
+state.parentActiveTab = 'submissions';
+state.parentTasksList = [];
+state.parentSelectedCategoryFilter = 'ALL';
+
+function switchParentTerminalTab(tab) {
   state.parentActiveTab = tab;
-  const tabs = ['tasks', 'submissions', 'clan'];
+  const tabs = ['submissions', 'tasks', 'clan', 'profile'];
 
   tabs.forEach((t) => {
-    const btn = document.getElementById(`parent-tab-btn-${t}`);
-    const view = document.getElementById(`parent-tab-${t}`);
-    if (btn && view) {
+    const btn = document.getElementById(`parent-nav-${t}`);
+    const panel = document.getElementById(`parent-panel-${t}`);
+    if (btn && panel) {
       if (t === tab) {
         btn.classList.add('active');
-        view.style.display = 'block';
+        panel.style.display = 'block';
       } else {
         btn.classList.remove('active');
-        view.style.display = 'none';
+        panel.style.display = 'none';
       }
     }
   });
 
+  if (tab === 'submissions') {
+    loadParentSubmissions();
+    loadParentReviewedHistory();
+  }
   if (tab === 'tasks') loadParentTasks();
-  if (tab === 'submissions') loadParentSubmissions();
+  if (tab === 'clan') loadParentFamilyData();
+  if (tab === 'profile') renderParentProfileInfo();
+}
+
+// Compatibilidade legada
+function switchParentTab(tab) {
+  switchParentTerminalTab(tab);
 }
 
 async function loadParentDashboard() {
-  if (!state.user || !state.token) return;
-  document.getElementById('parent-user-name').innerText = state.user.name;
-  document.getElementById('parent-user-email').innerText = state.user.email;
+  await loadParentTerminalDashboard();
+}
 
+async function loadParentTerminalDashboard() {
+  if (!state.user || !state.token) return;
+
+  // Atualizar dados de perfil na Sidebar do Pai
+  const nameEl = document.getElementById('parent-user-name');
+  const emailEl = document.getElementById('parent-user-email');
+  const photoBox = document.getElementById('parent-sidebar-photo-box');
+
+  if (nameEl) nameEl.innerText = state.user.name;
+  if (emailEl) emailEl.innerText = state.user.email;
+  if (photoBox) {
+    if (state.user.profile_photo_url) {
+      photoBox.innerHTML = `<img src="${state.user.profile_photo_url}" alt="Guardião" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">`;
+    } else {
+      photoBox.innerHTML = '🛡️';
+    }
+  }
+
+  // Carregar dados de clã, tarefas e pendências
+  await loadParentFamilyData();
+  await loadParentSubmissions();
+  await loadParentTasks();
+  await loadParentReviewedHistory();
+  renderParentProfileInfo();
+}
+
+// ─────────────────────────────────────────────────────────
+// 🏰 GESTÃO DE CLÃ FAMILIAR & HERÓIS DOS FILHOS
+// ─────────────────────────────────────────────────────────
+async function loadParentFamilyData() {
   try {
     const res = await fetch(`${API.family}/my-family`, {
       headers: { Authorization: `Bearer ${state.token}` },
     });
     const data = await res.json();
 
-    const nameEl = document.getElementById('parent-family-name');
-    const codeEl = document.getElementById('parent-family-code');
-    const countEl = document.getElementById('parent-family-members-count');
-    const setupBox = document.getElementById('parent-family-setup');
-
     if (res.ok && data.success && data.hasFamily) {
-      nameEl.innerText = data.family.name;
-      codeEl.innerText = data.family.invite_code;
-      countEl.innerText = `${data.family.members?.length || 1} Membro(s)`;
-      if (setupBox) setupBox.style.display = 'none';
-      loadParentTasks();
-      loadParentSubmissions();
-    } else {
-      nameEl.innerText = 'Não cadastrada';
-      codeEl.innerText = '--';
-      countEl.innerText = '0';
-      if (setupBox) setupBox.style.display = 'block';
+      const fam = data.family;
+      const members = fam.members || [];
+      const code = fam.invite_code || '----';
+
+      // Atualizar Sidebar
+      const clanNameEl = document.getElementById('parent-sidebar-clan-name');
+      const inviteCodeEl = document.getElementById('parent-sidebar-invite-code');
+      const membersCountEl = document.getElementById('parent-sidebar-members-count');
+
+      if (clanNameEl) clanNameEl.innerText = fam.name;
+      if (inviteCodeEl) inviteCodeEl.innerText = code;
+      if (membersCountEl) membersCountEl.innerText = `${members.length} Membro(s)`;
+
+      // Atualizar Banner na Aba Clã
+      const codeLarge = document.getElementById('parent-clan-invite-code-large');
+      const titleLarge = document.getElementById('parent-clan-title-large');
+      if (codeLarge) codeLarge.innerText = code;
+      if (titleLarge) titleLarge.innerText = fam.name;
+
+      // Renderizar Grid de Filhos & Heróis
+      renderParentChildrenGrid(members);
     }
   } catch (err) {
-    console.error('Erro ao carregar dashboard dos pais:', err);
+    console.error('Erro ao carregar dados do clã familiar:', err);
   }
 }
 
-async function loadParentTasks() {
-  const container = document.getElementById('parent-tasks-list');
+function renderParentChildrenGrid(members) {
+  const container = document.getElementById('parent-children-grid');
   if (!container) return;
 
-  try {
-    const res = await fetch(`${API.tasks}`, {
-      headers: { Authorization: `Bearer ${state.token}` },
-    });
-    const data = await res.json();
+  const children = members.filter((m) => m.user && m.user.role === 'CHILD');
 
-    if (res.ok && data.success) {
-      if (data.tasks.length === 0) {
-        container.innerHTML = '<p style="color: var(--text-muted); grid-column: 1/-1;">Nenhuma missão criada ainda. Clique em "➕ Lançar Nova Missão" acima!</p>';
-        return;
-      }
-
-      container.innerHTML = data.tasks
-        .map(
-          (t) => `
-          <div class="task-card">
-            <div>
-              <span class="task-category-badge">${t.category || 'GERAL'}</span>
-              <h4 class="task-title">${t.title}</h4>
-              <p class="task-desc">${t.description || 'Sem descrição.'}</p>
-            </div>
-            <div class="task-rewards-row">
-              <span class="reward-pill-xp">⭐ +${t.xp_reward} XP</span>
-              <span class="reward-pill-gold">💰 +${t.gold_reward} Ouro</span>
-            </div>
-          </div>
-        `
-        )
-        .join('');
-    }
-  } catch (err) {
-    console.error('Erro ao carregar tarefas dos pais:', err);
+  if (children.length === 0) {
+    container.innerHTML = `
+      <div style="grid-column: 1/-1; background: rgba(15, 23, 42, 0.6); border: 1px dashed var(--border-card); border-radius: 16px; padding: 28px; text-align: center;">
+        <span style="font-size: 2.2rem; display: block; margin-bottom: 8px;">👥</span>
+        <h4 style="color: #ffffff; font-size: 1.1rem; margin-bottom: 6px;">Nenhum herói conectado ainda</h4>
+        <p style="color: var(--text-muted); font-size: 0.85rem; max-width: 420px; margin: 0 auto 16px auto;">
+          Envie o código do clã acima para seus filhos criarem suas contas e começarem a cumprir missões!
+        </p>
+        <button class="btn btn-gold btn-sm" onclick="copyClanInviteCode()">📋 Copiar Código de Convite</button>
+      </div>
+    `;
+    return;
   }
+
+  container.innerHTML = children
+    .map((m) => {
+      const u = m.user;
+      const hero = u.character;
+      const avatarIcon = hero ? getAvatarDisplay(hero.avatar_value) : '⚔️';
+      const className = hero?.current_class_id ? 'Herói Ativo' : 'Aventureiro';
+      const level = hero?.level || 1;
+
+      return `
+        <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid var(--border-card); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+              <div class="avatar-circle" style="width: 48px; height: 48px; font-size: 1.3rem; border: 2px solid var(--accent); background: rgba(0,0,0,0.5);">
+                ${avatarIcon}
+              </div>
+              <div style="overflow: hidden;">
+                <strong style="color: #ffffff; font-size: 1rem; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  ${u.name}
+                </strong>
+                <span style="color: #c084fc; font-size: 0.8rem;">${hero ? `Herói: ${hero.name}` : 'Sem Herói Desperto'}</span>
+              </div>
+            </div>
+
+            ${hero ? `
+              <div style="background: rgba(0,0,0,0.25); padding: 10px; border-radius: 10px; margin-bottom: 12px;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 4px;">
+                  <span style="color: #fde047; font-weight: 700;">Nível ${level}</span>
+                  <span style="color: var(--text-muted);">${className}</span>
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px;">
+                  <span class="reward-pill-gold" style="font-size: 0.75rem;">💰 ${hero.gold || 0} Ouro</span>
+                  <span class="reward-pill-energy" style="font-size: 0.75rem;">⚡ Pronto</span>
+                </div>
+              </div>
+            ` : `
+              <div style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); padding: 8px; border-radius: 8px; margin-bottom: 12px; font-size: 0.78rem; color: #fca5a5;">
+                ⚠️ Ainda não criou seu herói no reino.
+              </div>
+            `}
+          </div>
+
+          <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px; font-size: 0.78rem; color: var(--text-muted); display: flex; justify-content: space-between;">
+            <span>E-mail: ${u.email}</span>
+            <span class="role-badge" style="background: rgba(34,197,94,0.15); color: #4ade80; font-size: 0.7rem;">Membro</span>
+          </div>
+        </div>
+      `;
+    })
+    .join('');
 }
 
+function copyClanInviteCode() {
+  const code = document.getElementById('parent-sidebar-invite-code')?.innerText || 'LIRA-XXXX';
+  if (!code || code === '----') {
+    showToast('Código de convite ainda não disponível.', 'warning');
+    return;
+  }
+
+  navigator.clipboard.writeText(code).then(() => {
+    showToast(`📋 Código ${code} copiado! Envie aos seus filhos via WhatsApp.`, 'success');
+  }).catch(() => {
+    showToast(`Código do Clã: ${code}`, 'info');
+  });
+}
+
+// ─────────────────────────────────────────────────────────
+// 🔍 VALIDADOR DE PROVAS PENDENTES (AVALIAÇÃO EM TEMPO REAL)
+// ─────────────────────────────────────────────────────────
 async function loadParentSubmissions() {
   const container = document.getElementById('parent-submissions-list');
-  const badge = document.getElementById('parent-pending-badge');
+  const sidebarBadge = document.getElementById('parent-sidebar-pending-count');
+  const navBadge = document.getElementById('parent-nav-pending-badge');
   if (!container) return;
 
   try {
@@ -1627,56 +1726,102 @@ async function loadParentSubmissions() {
     const data = await res.json();
 
     if (res.ok && data.success) {
-      if (badge) {
-        badge.innerText = data.count;
-        badge.style.display = data.count > 0 ? 'inline-block' : 'none';
+      const count = data.count || 0;
+
+      // Atualizar contadores
+      if (sidebarBadge) sidebarBadge.innerText = count;
+      if (navBadge) {
+        navBadge.innerText = count;
+        navBadge.style.display = count > 0 ? 'inline-block' : 'none';
       }
 
       if (data.submissions.length === 0) {
-        container.innerHTML = '<p style="color: var(--text-muted); grid-column: 1/-1;">Nenhuma comprovação aguardando aprovação no momento. Tudo em dia! 🎉</p>';
+        container.innerHTML = `
+          <div style="grid-column: 1/-1; background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(15, 23, 42, 0.7)); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 18px; padding: 32px; text-align: center;">
+            <span style="font-size: 2.8rem; display: block; margin-bottom: 10px;">🎉</span>
+            <h3 style="font-size: 1.3rem; color: #ffffff; margin-bottom: 6px;">Tudo em dia!</h3>
+            <p style="color: var(--text-muted); font-size: 0.95rem; max-width: 450px; margin: 0 auto;">
+              Nenhuma comprovação aguardando aprovação no momento. Quando seus filhos cumprirem missões, as fotos e relatos aparecerão aqui.
+            </p>
+          </div>
+        `;
         return;
       }
 
       container.innerHTML = data.submissions
-        .map(
-          (s) => `
-          <div class="submission-card">
-            <div class="submission-header">
-              <div class="avatar-circle" style="width: 44px; height: 44px; font-size: 1.2rem;">⚔️</div>
-              <div>
-                <strong style="color: #ffffff;">${s.submitter?.name || 'Filho'}</strong>
-                <span style="display: block; font-size: 0.8rem; color: #c084fc;">Herói: ${s.character?.name || 'Sem Nome'}</span>
+        .map((s) => {
+          const catMeta = getCategoryMeta(s.task?.category || 'DOMESTIC');
+          const timeStr = s.createdAt ? new Date(s.createdAt).toLocaleString([], { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '';
+          const heroName = s.character ? s.character.name : 'Aventureiro';
+          const avatarIcon = s.character ? getAvatarDisplay(s.character.avatar_value) : '⚔️';
+
+          return `
+            <div class="submission-card" id="submission-card-${s.id}">
+              
+              <!-- Header do Filho -->
+              <div class="submission-header">
+                <div class="avatar-circle" style="width: 46px; height: 46px; font-size: 1.3rem; border: 2px solid var(--accent); background: rgba(0,0,0,0.5);">
+                  ${avatarIcon}
+                </div>
+                <div style="overflow: hidden; flex: 1;">
+                  <strong style="color: #ffffff; font-size: 1.05rem; display: block;">${s.submitter?.name || 'Filho'}</strong>
+                  <span style="font-size: 0.8rem; color: #c084fc;">Herói: ${heroName} • 📅 ${timeStr}</span>
+                </div>
+                <span class="task-category-badge ${catMeta.class}">${catMeta.label}</span>
               </div>
-            </div>
 
-            <div>
-              <span class="task-category-badge">${s.task?.category || 'MISSÃO'}</span>
-              <h4 style="font-size: 1.1rem; color: #ffffff; margin: 4px 0;">${s.task?.title}</h4>
-            </div>
+              <!-- Detalhes da Missão -->
+              <div style="margin-bottom: 12px;">
+                <h4 style="font-size: 1.15rem; color: #ffffff; margin-bottom: 4px;">${s.task?.title}</h4>
+                ${s.task?.description ? `<p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">${s.task.description}</p>` : ''}
+              </div>
 
-            ${s.proof_text ? `<div class="submission-text-box">"${s.proof_text}"</div>` : ''}
-            ${s.proof_photo_url ? `<img src="${s.proof_photo_url}" class="submission-photo" alt="Evidência da Missão">` : ''}
+              <!-- Relato do Filho -->
+              ${s.proof_text ? `
+                <div style="background: rgba(0,0,0,0.35); border-left: 3px solid var(--gold); padding: 10px 14px; border-radius: 8px; margin-bottom: 12px;">
+                  <span style="font-size: 0.75rem; color: #fbbf24; font-weight: 700; display: block; margin-bottom: 2px;">Relato do Filho:</span>
+                  <p style="font-size: 0.9rem; color: #f8fafc; font-style: italic; margin: 0;">"${s.proof_text}"</p>
+                </div>
+              ` : ''}
 
-            <div style="display: flex; gap: 8px; margin-top: 4px;">
-              <span class="reward-pill-xp">⭐ Recompensa: ${s.task?.xp_reward} XP</span>
-              <span class="reward-pill-gold">💰 ${s.task?.gold_reward} Ouro</span>
-            </div>
+              <!-- Foto de Evidência -->
+              ${s.proof_photo_url ? `
+                <div style="margin-bottom: 14px; text-align: center;">
+                  <img src="${s.proof_photo_url}" class="submission-photo" alt="Evidência da Missão" onclick="openPhotoLightbox('${s.proof_photo_url}', '${s.task?.title.replace(/'/g, "\\'")}')" title="Clique para ampliar a foto" style="cursor: zoom-in; max-height: 200px; border-radius: 12px; border: 1px solid rgba(212,175,55,0.35); object-fit: cover; width: 100%;">
+                  <span style="font-size: 0.72rem; color: #93c5fd; margin-top: 4px; display: block;">🔍 Clique na foto para ver em alta resolução</span>
+                </div>
+              ` : ''}
 
-            <div class="form-group" style="margin-top: 8px;">
-              <input type="text" id="feedback-${s.id}" class="form-input" placeholder="Mensagem de incentivo ou feedback..." style="font-size: 0.85rem;">
-            </div>
+              <!-- Recompensas que Serão Liberadas -->
+              <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-card); border-radius: 10px; padding: 10px 12px; margin-bottom: 14px;">
+                <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 6px;">Liberará para o Herói:</span>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                  <span class="reward-pill-xp">⭐ +${s.task?.xp_reward || 0} XP</span>
+                  <span class="reward-pill-gold">💰 +${s.task?.gold_reward || 0} Ouro</span>
+                  <span class="reward-pill-energy">⚡ +${s.task?.energy_reward || 1} Energia</span>
+                  <span class="reward-pill-tokens">🏠 +${s.task?.token_reward || 10} Fichas</span>
+                </div>
+              </div>
 
-            <div style="display: flex; gap: 10px;">
-              <button class="btn btn-success btn-sm" style="flex: 1;" onclick="handleReviewSubmission('${s.id}', 'APPROVED')">
-                ✅ Aprovar
-              </button>
-              <button class="btn btn-danger btn-sm" style="flex: 1;" onclick="handleReviewSubmission('${s.id}', 'REJECTED')">
-                ❌ Rejeitar
-              </button>
+              <!-- Campo de Feedback dos Pais -->
+              <div class="form-group" style="margin-bottom: 12px;">
+                <label class="form-label" style="font-size: 0.8rem;" for="feedback-${s.id}">Comentário de Incentivo / Feedback:</label>
+                <input type="text" id="feedback-${s.id}" class="form-input" placeholder="Ex: Excelente trabalho! Ficou muito bem organizado." style="font-size: 0.88rem; padding: 10px 12px;">
+              </div>
+
+              <!-- Botões de Ação do Guardião -->
+              <div style="display: flex; gap: 10px;">
+                <button class="btn btn-success" style="flex: 1; padding: 12px; font-weight: 800;" onclick="handleReviewSubmission('${s.id}', 'APPROVED')">
+                  ✅ Aprovar Missão
+                </button>
+                <button class="btn btn-danger" style="flex: 1; padding: 12px; font-weight: 800;" onclick="handleReviewSubmission('${s.id}', 'REJECTED')">
+                  ❌ Solicitar Ajuste
+                </button>
+              </div>
+
             </div>
-          </div>
-        `
-        )
+          `;
+        })
         .join('');
     }
   } catch (err) {
@@ -1684,60 +1829,15 @@ async function loadParentSubmissions() {
   }
 }
 
-function openCreateTaskModal() {
-  document.getElementById('create-task-modal').style.display = 'flex';
-}
-
-function closeCreateTaskModal() {
-  document.getElementById('create-task-modal').style.display = 'none';
-}
-
-async function handleCreateTask(e) {
-  e?.preventDefault();
-  const title = document.getElementById('task-title').value.trim();
-  const description = document.getElementById('task-desc').value.trim();
-  const xp_reward = document.getElementById('task-xp').value;
-  const gold_reward = document.getElementById('task-gold').value;
-  const category = document.getElementById('task-category').value;
-  const btn = document.getElementById('btn-create-task-submit');
-
-  if (!title) {
-    showToast('Informe o título da missão.', 'warning');
-    return;
-  }
-
-  btn.disabled = true;
-  btn.innerText = 'Publicando...';
-
-  try {
-    const res = await fetch(`${API.tasks}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${state.token}`,
-      },
-      body: JSON.stringify({ title, description, xp_reward, gold_reward, category }),
-    });
-
-    const data = await res.json();
-    if (!res.ok || !data.success) {
-      throw new Error(data.message || 'Erro ao criar missão.');
-    }
-
-    showToast(data.message, 'success');
-    closeCreateTaskModal();
-    loadParentTasks();
-  } catch (err) {
-    showToast(err.message, 'error');
-  } finally {
-    btn.disabled = false;
-    btn.innerText = '✨ Publicar Missão no Mural';
-  }
-}
-
 async function handleReviewSubmission(submissionId, status) {
   const feedbackInput = document.getElementById(`feedback-${submissionId}`);
   const feedback = feedbackInput ? feedbackInput.value.trim() : '';
+
+  if (status === 'REJECTED' && !feedback) {
+    showToast('Ao solicitar ajuste, digite um comentário explicando o motivo para seu filho.', 'warning');
+    if (feedbackInput) feedbackInput.focus();
+    return;
+  }
 
   try {
     const res = await fetch(`${API.tasks}/submissions/${submissionId}/review`, {
@@ -1754,15 +1854,422 @@ async function handleReviewSubmission(submissionId, status) {
       throw new Error(data.message || 'Erro ao avaliar comprovação.');
     }
 
-    showToast(data.message, status === 'APPROVED' ? 'success' : 'info');
-    if (data.leveledUp) {
-      showToast(`🏆 O Herói subiu para o NÍVEL ${data.newLevel}!`, 'gold');
+    if (status === 'APPROVED') {
+      showToast(data.message || '🎉 Missão Aprovada! Recompensas creditadas com sucesso!', 'success');
+      if (data.leveledUp) {
+        showToast(`🏆 O Herói subiu para o NÍVEL ${data.newLevel}!`, 'gold');
+      }
+    } else {
+      showToast('Missão devolvida com orientações para o filho ajustar.', 'info');
     }
 
-    loadParentSubmissions();
-    loadParentTasks();
+    // Recarregar listas
+    await loadParentSubmissions();
+    await loadParentReviewedHistory();
+    await loadParentFamilyData();
   } catch (err) {
     showToast(err.message, 'error');
+  }
+}
+
+async function loadParentReviewedHistory() {
+  const container = document.getElementById('parent-reviewed-history-list');
+  if (!container) return;
+
+  try {
+    const res = await fetch(`${API.tasks}/submissions/reviewed`, {
+      headers: { Authorization: `Bearer ${state.token}` },
+    });
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      if (data.submissions.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem; padding: 12px 0;">Nenhuma avaliação registrada ainda.</p>';
+        return;
+      }
+
+      container.innerHTML = data.submissions
+        .slice(0, 8)
+        .map((s) => {
+          const isApproved = s.status === 'APPROVED';
+          const badgeStatus = isApproved
+            ? '<span class="role-badge" style="background: rgba(34,197,94,0.2); color: #4ade80; border: 1px solid rgba(34,197,94,0.4);">✅ Aprovada</span>'
+            : '<span class="role-badge" style="background: rgba(239,68,68,0.2); color: #f87171; border: 1px solid rgba(239,68,68,0.4);">❌ Ajustar</span>';
+
+          const dateStr = s.reviewed_at ? new Date(s.reviewed_at).toLocaleDateString([], { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '';
+
+          return `
+            <div class="user-row" style="background: rgba(15, 23, 42, 0.6); border-color: rgba(255,255,255,0.06); padding: 10px 16px; border-radius: 10px; margin-bottom: 8px;">
+              <div>
+                <strong style="color: #ffffff; font-size: 0.92rem;">${s.task?.title || 'Missão'}</strong>
+                <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 8px;">Filho: ${s.submitter?.name || 'Filho'} • ${dateStr}</span>
+                ${s.feedback ? `<div style="font-size: 0.8rem; color: #cbd5e1; font-style: italic; margin-top: 2px;">💬 "${s.feedback}"</div>` : ''}
+              </div>
+              <div>${badgeStatus}</div>
+            </div>
+          `;
+        })
+        .join('');
+    }
+  } catch (err) {
+    console.error('Erro ao carregar histórico de avaliações:', err);
+  }
+}
+
+// ─────────────────────────────────────────────────────────
+// 📋 CRUD COMPLETO DE MISSÕES (GESTÃO DE MISSÕES DA CASA)
+// ─────────────────────────────────────────────────────────
+async function loadParentTasks() {
+  const container = document.getElementById('parent-tasks-list');
+  const sidebarCount = document.getElementById('parent-sidebar-tasks-count');
+  if (!container) return;
+
+  try {
+    const res = await fetch(`${API.tasks}?include_inactive=true`, {
+      headers: { Authorization: `Bearer ${state.token}` },
+    });
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      state.parentTasksList = data.tasks || [];
+      if (sidebarCount) sidebarCount.innerText = state.parentTasksList.filter((t) => t.is_active).length;
+
+      renderParentTasksFiltered();
+    }
+  } catch (err) {
+    console.error('Erro ao carregar tarefas dos pais:', err);
+  }
+}
+
+function filterParentTasks(category, btnElement) {
+  state.parentSelectedCategoryFilter = category;
+  document.querySelectorAll('.parent-task-filter').forEach((b) => b.classList.remove('active'));
+  if (btnElement) btnElement.classList.add('active');
+  renderParentTasksFiltered();
+}
+
+function renderParentTasksFiltered() {
+  const container = document.getElementById('parent-tasks-list');
+  if (!container) return;
+
+  let list = state.parentTasksList || [];
+  if (state.parentSelectedCategoryFilter !== 'ALL') {
+    list = list.filter((t) => t.category === state.parentSelectedCategoryFilter);
+  }
+
+  if (list.length === 0) {
+    container.innerHTML = `
+      <div style="grid-column: 1/-1; background: rgba(15, 23, 42, 0.6); border: 1px dashed var(--border-card); border-radius: 16px; padding: 32px; text-align: center;">
+        <span style="font-size: 2.5rem; display: block; margin-bottom: 8px;">📋</span>
+        <h4 style="color: #ffffff; font-size: 1.1rem; margin-bottom: 6px;">Nenhuma missão encontrada</h4>
+        <p style="color: var(--text-muted); font-size: 0.85rem; max-width: 400px; margin: 0 auto 16px auto;">
+          Clique no botão abaixo para lançar uma nova tarefa para a família!
+        </p>
+        <button class="btn btn-primary btn-sm" onclick="openTaskCrudModal()">➕ Lançar Nova Missão</button>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = list
+    .map((t) => {
+      const catMeta = getCategoryMeta(t.category);
+      const diffMeta = getDifficultyMeta(t.difficulty || 'MEDIUM');
+      const isActive = t.is_active !== false;
+
+      return `
+        <div class="task-card" style="opacity: ${isActive ? '1' : '0.65'}; border-color: ${isActive ? 'var(--border-card)' : 'rgba(239, 68, 68, 0.3)'};">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap;">
+              <span class="task-category-badge ${catMeta.class}">${catMeta.label}</span>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span class="task-diff-badge ${diffMeta.class}">${diffMeta.label}</span>
+                <span class="role-badge" style="background: ${isActive ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)'}; color: ${isActive ? '#4ade80' : '#f87171'}; font-size: 0.7rem;">
+                  ${isActive ? '🟢 Ativa' : '⏸️ Pausada'}
+                </span>
+              </div>
+            </div>
+
+            <h4 class="task-title">${t.title}</h4>
+            <p class="task-desc">${t.description || 'Sem instruções adicionais.'}</p>
+          </div>
+
+          <div>
+            <!-- Recompensas -->
+            <div class="task-rewards-row" style="flex-wrap: wrap; gap: 6px; margin: 12px 0 14px 0;">
+              <span class="reward-pill-xp">⭐ +${t.xp_reward || 0} XP</span>
+              <span class="reward-pill-gold">💰 +${t.gold_reward || 0} Ouro</span>
+              <span class="reward-pill-energy">⚡ +${t.energy_reward || 1} Energia</span>
+              <span class="reward-pill-tokens">🏠 +${t.token_reward || 10} Fichas</span>
+            </div>
+
+            <!-- Tempo & Foto -->
+            <div style="font-size: 0.75rem; color: var(--text-muted); display: flex; justify-content: space-between; margin-bottom: 12px;">
+              <span>⏱️ ${t.estimated_time || '15-20 min'}</span>
+              <span>${t.requires_proof ? '📷 Exige foto' : '📝 Apenas relato'}</span>
+            </div>
+
+            <!-- Barra de Ações do CRUD -->
+            <div style="display: flex; gap: 6px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px;">
+              <button class="btn btn-secondary btn-sm" style="flex: 1; padding: 6px 8px; font-size: 0.8rem;" onclick="openTaskCrudModal('${t.id}')">
+                ✏️ Editar
+              </button>
+              <button class="btn btn-secondary btn-sm" style="padding: 6px 10px; font-size: 0.8rem; border-color: ${isActive ? 'rgba(245,158,11,0.4)' : 'rgba(34,197,94,0.4)'};" onclick="handleToggleTaskActive('${t.id}')" title="${isActive ? 'Pausar Missão' : 'Ativar Missão'}">
+                ${isActive ? '⏸️ Pausar' : '▶️ Ativar'}
+              </button>
+              <button class="btn btn-danger btn-sm" style="padding: 6px 10px; font-size: 0.8rem;" onclick="handleDeleteTask('${t.id}')" title="Excluir Missão">
+                🗑️
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    })
+    .join('');
+}
+
+// ─────────────────────────────────────────────────────────
+// MODAL CRUD DE MISSÃO (CRIAR E EDITAR)
+// ─────────────────────────────────────────────────────────
+function openTaskCrudModal(taskId) {
+  const modal = document.getElementById('task-crud-modal');
+  const titleEl = document.getElementById('task-crud-modal-title');
+  const idInput = document.getElementById('task-crud-id');
+  const titleInput = document.getElementById('task-crud-title');
+  const descInput = document.getElementById('task-crud-desc');
+  const catInput = document.getElementById('task-crud-category');
+  const diffInput = document.getElementById('task-crud-difficulty');
+  const xpInput = document.getElementById('task-crud-xp');
+  const goldInput = document.getElementById('task-crud-gold');
+  const energyInput = document.getElementById('task-crud-energy');
+  const tokensInput = document.getElementById('task-crud-tokens');
+  const timeInput = document.getElementById('task-crud-time');
+  const proofInput = document.getElementById('task-crud-proof');
+
+  if (!modal) return;
+
+  if (taskId) {
+    const task = (state.parentTasksList || []).find((t) => t.id === taskId);
+    if (!task) return;
+
+    if (titleEl) titleEl.innerText = '✏️ Editar Missão Familiar';
+    if (idInput) idInput.value = task.id;
+    if (titleInput) titleInput.value = task.title;
+    if (descInput) descInput.value = task.description || '';
+    if (catInput) catInput.value = task.category || 'DOMESTIC';
+    if (diffInput) diffInput.value = task.difficulty || 'MEDIUM';
+    if (xpInput) xpInput.value = task.xp_reward || 50;
+    if (goldInput) goldInput.value = task.gold_reward || 15;
+    if (energyInput) energyInput.value = task.energy_reward || 2;
+    if (tokensInput) tokensInput.value = task.token_reward || 15;
+    if (timeInput) timeInput.value = task.estimated_time || '15-20 min';
+    if (proofInput) proofInput.checked = task.requires_proof !== false;
+  } else {
+    if (titleEl) titleEl.innerText = '📋 Lançar Nova Missão Familiar';
+    if (idInput) idInput.value = '';
+    if (titleInput) titleInput.value = '';
+    if (descInput) descInput.value = '';
+    if (catInput) catInput.value = 'DOMESTIC';
+    if (diffInput) diffInput.value = 'MEDIUM';
+    if (xpInput) xpInput.value = '50';
+    if (goldInput) goldInput.value = '15';
+    if (energyInput) energyInput.value = '2';
+    if (tokensInput) tokensInput.value = '15';
+    if (timeInput) timeInput.value = '15-20 min';
+    if (proofInput) proofInput.checked = true;
+  }
+
+  modal.style.display = 'flex';
+}
+
+function closeTaskCrudModal() {
+  const modal = document.getElementById('task-crud-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+async function handleSaveTaskCrud(e) {
+  e?.preventDefault();
+  const id = document.getElementById('task-crud-id')?.value;
+  const title = document.getElementById('task-crud-title')?.value.trim();
+  const description = document.getElementById('task-crud-desc')?.value.trim();
+  const category = document.getElementById('task-crud-category')?.value;
+  const difficulty = document.getElementById('task-crud-difficulty')?.value;
+  const xp_reward = Number(document.getElementById('task-crud-xp')?.value) || 50;
+  const gold_reward = Number(document.getElementById('task-crud-gold')?.value) || 15;
+  const energy_reward = Number(document.getElementById('task-crud-energy')?.value) || 2;
+  const token_reward = Number(document.getElementById('task-crud-tokens')?.value) || 15;
+  const estimated_time = document.getElementById('task-crud-time')?.value.trim() || '15-20 min';
+  const requires_proof = document.getElementById('task-crud-proof')?.checked;
+  const btn = document.getElementById('btn-save-task-crud');
+
+  if (!title) {
+    showToast('Informe o título da missão.', 'warning');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerText = 'Salvando...';
+
+  try {
+    const isEdit = Boolean(id);
+    const url = isEdit ? `${API.tasks}/${id}` : `${API.tasks}`;
+    const method = isEdit ? 'PUT' : 'POST';
+
+    const res = await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${state.token}`,
+      },
+      body: JSON.stringify({
+        title,
+        description,
+        category,
+        difficulty,
+        xp_reward,
+        gold_reward,
+        energy_reward,
+        token_reward,
+        estimated_time,
+        requires_proof,
+      }),
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || 'Erro ao salvar missão.');
+    }
+
+    showToast(data.message || '✨ Missão salva com sucesso!', 'success');
+    closeTaskCrudModal();
+    await loadParentTasks();
+  } catch (err) {
+    showToast(err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerText = '✨ Salvar Missão no Mural';
+  }
+}
+
+async function handleToggleTaskActive(taskId) {
+  try {
+    const res = await fetch(`${API.tasks}/${taskId}/toggle`, {
+      method: 'PATCH',
+      headers: { Authorization: `Bearer ${state.token}` },
+    });
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || 'Erro ao alterar status da missão.');
+    }
+
+    showToast(data.message, 'success');
+    await loadParentTasks();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+async function handleDeleteTask(taskId) {
+  const task = (state.parentTasksList || []).find((t) => t.id === taskId);
+  const taskTitle = task ? task.title : 'esta missão';
+
+  if (!confirm(`Tem certeza que deseja excluir a missão "${taskTitle}" do mural da família?`)) {
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API.tasks}/${taskId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${state.token}` },
+    });
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || 'Erro ao excluir missão.');
+    }
+
+    showToast(data.message, 'success');
+    await loadParentTasks();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+// ─────────────────────────────────────────────────────────
+// 📷 LIGHTBOX DE ZOOM DE FOTO
+// ─────────────────────────────────────────────────────────
+function openPhotoLightbox(url, title) {
+  const modal = document.getElementById('photo-lightbox-modal');
+  const img = document.getElementById('lightbox-img');
+  const titleEl = document.getElementById('lightbox-title');
+
+  if (img) img.src = url;
+  if (titleEl && title) titleEl.innerText = `Evidência: ${title}`;
+  if (modal) modal.style.display = 'flex';
+}
+
+function closePhotoLightbox() {
+  const modal = document.getElementById('photo-lightbox-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+// ─────────────────────────────────────────────────────────
+// 👤 PERFIL REAL DO GUARDIÃO
+// ─────────────────────────────────────────────────────────
+function renderParentProfileInfo() {
+  if (!state.user) return;
+  const nameInput = document.getElementById('parent-real-name');
+  const phoneInput = document.getElementById('parent-real-phone');
+  const workInput = document.getElementById('parent-real-work');
+  const photoInput = document.getElementById('parent-real-photo');
+
+  if (nameInput) nameInput.value = state.user.name || '';
+  if (phoneInput) phoneInput.value = state.user.phone || '';
+  if (workInput) workInput.value = state.user.school_or_work || '';
+  if (photoInput) photoInput.value = state.user.profile_photo_url || '';
+}
+
+async function handleSaveParentRealProfile(e) {
+  e?.preventDefault();
+  const name = document.getElementById('parent-real-name')?.value.trim();
+  const phone = document.getElementById('parent-real-phone')?.value.trim();
+  const school_or_work = document.getElementById('parent-real-work')?.value.trim();
+  const profile_photo_url = document.getElementById('parent-real-photo')?.value.trim();
+  const btn = document.getElementById('btn-save-parent-profile');
+
+  if (btn) {
+    btn.disabled = true;
+    btn.innerText = 'Salvando...';
+  }
+
+  try {
+    const res = await fetch(`${API.character}/update-profile`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${state.token}`,
+      },
+      body: JSON.stringify({ name, phone, school_or_work, profile_photo_url }),
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || 'Erro ao atualizar perfil do Guardião.');
+    }
+
+    state.user = data.user;
+    localStorage.setItem('liraquest_user', JSON.stringify(data.user));
+    await loadParentTerminalDashboard();
+    updateNavbar();
+    showToast('Perfil do Guardião atualizado com sucesso!', 'success');
+  } catch (err) {
+    showToast(err.message, 'error');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerText = '💾 Salvar Dados do Perfil';
+    }
   }
 }
 
@@ -1967,9 +2474,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const profileForm = document.getElementById('child-profile-form');
   if (profileForm) profileForm.addEventListener('submit', handleUpdateRealProfile);
 
+  const parentProfileForm = document.getElementById('parent-real-profile-form');
+  if (parentProfileForm) parentProfileForm.addEventListener('submit', handleSaveParentRealProfile);
+
+  const taskCrudForm = document.getElementById('task-crud-form');
+  if (taskCrudForm) taskCrudForm.addEventListener('submit', handleSaveTaskCrud);
+
   const createTaskForm = document.getElementById('create-task-form');
   if (createTaskForm) createTaskForm.addEventListener('submit', handleCreateTask);
 
   const submitProofForm = document.getElementById('submit-proof-form');
   if (submitProofForm) submitProofForm.addEventListener('submit', handleSubmitProof);
 });
+
