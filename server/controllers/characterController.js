@@ -400,57 +400,63 @@ export const completeChameleonGame = async (req, res) => {
       });
     }
 
-    let progress = await UserProgress.findOne({ where: { user_id: userId } });
-    if (!progress) {
-      progress = await UserProgress.create({
-        id: randomUUID().toLowerCase(),
-        user_id: userId,
-      });
-    }
+    let goldEarned = 0;
+    let xpEarned = 0;
 
     if (!isVictory) {
       // Recompensa de consolação proporcional ao tempo
-      const consolationGold = Math.min(10, Math.floor(survivedSeconds / 5)) + (crystalsCollected * 2);
-      const consolationXp = Math.min(15, Math.floor(survivedSeconds / 3));
-
-      await character.increment({ gold: consolationGold, xp: consolationXp });
-      await progress.increment({ total_gold_earned: consolationGold, total_xp_earned: consolationXp });
-      await character.reload();
-
-      return res.json({
-        success: true,
-        isVictory: false,
-        reward: {
-          goldEarned: consolationGold,
-          xpEarned: consolationXp,
-          currentGold: character.gold,
-          currentXp: character.xp,
-        },
-        message: `Você foi capturado! Mas sua coragem garantiu 💰 +${consolationGold} Ouro e ⭐ +${consolationXp} XP de consolação!`,
-      });
+      goldEarned = Math.min(10, Math.floor(survivedSeconds / 5)) + (crystalsCollected * 2);
+      xpEarned = Math.min(15, Math.floor(survivedSeconds / 3));
+    } else {
+      // Recompensa de Vitória
+      const baseGold = 30;
+      const crystalBonusGold = Math.min(25, crystalsCollected * 5);
+      goldEarned = baseGold + crystalBonusGold;
+      xpEarned = 50;
     }
 
-    // Recompensa de Vitória
-    const baseGold = 30;
-    const crystalBonusGold = Math.min(25, crystalsCollected * 5);
-    const totalGoldEarned = baseGold + crystalBonusGold;
-    const totalXpEarned = 50;
+    // 1. Atualizar Ouro do Herói
+    await character.update({ gold: (character.gold || 0) + goldEarned });
 
-    await character.increment({ gold: totalGoldEarned, xp: totalXpEarned });
-    await progress.increment({ total_gold_earned: totalGoldEarned, total_xp_earned: totalXpEarned });
-    await character.reload();
+    // 2. Atualizar XP e Level da Classe Ativa
+    let newLevel = 1;
+    let leveledUp = false;
+
+    if (character.current_class_id) {
+      let classProgress = await CharacterClass.findOne({
+        where: { character_id: character.id, class_id: character.current_class_id },
+      });
+
+      if (classProgress) {
+        let currentXP = (classProgress.xp || 0) + xpEarned;
+        let currentLevel = classProgress.level || 1;
+        let reqXP = currentLevel * 100;
+
+        while (currentXP >= reqXP) {
+          currentXP -= reqXP;
+          currentLevel += 1;
+          leveledUp = true;
+          reqXP = currentLevel * 100;
+        }
+
+        await classProgress.update({ xp: currentXP, level: currentLevel });
+        newLevel = currentLevel;
+      }
+    }
 
     return res.json({
       success: true,
-      isVictory: true,
+      isVictory,
       reward: {
-        goldEarned: totalGoldEarned,
-        crystalBonusGold,
-        xpEarned: totalXpEarned,
+        goldEarned,
+        xpEarned,
         currentGold: character.gold,
-        currentXp: character.xp,
+        newLevel,
+        leveledUp,
       },
-      message: `🎉 VITÓRIA ÉPICA! Você sobreviveu à patrulha da lanterna e faturou 💰 +${totalGoldEarned} Ouro e ⭐ +${totalXpEarned} XP!`,
+      message: isVictory
+        ? `🎉 VITÓRIA ÉPICA! Você sobreviveu à patrulha da lanterna e faturou 💰 +${goldEarned} Ouro e ⭐ +${xpEarned} XP!`
+        : `Você foi capturado! Mas sua coragem garantiu 💰 +${goldEarned} Ouro e ⭐ +${xpEarned} XP de consolação!`,
     });
   } catch (error) {
     console.error('❌ Erro ao concluir partida de Esconde-Esconde:', error);
