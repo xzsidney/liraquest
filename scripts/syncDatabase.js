@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import bcrypt from 'bcryptjs';
 import {
   sequelize,
@@ -22,16 +23,15 @@ import {
 
 async function syncAndSeed() {
   try {
-    console.log('🔄 [LiraQuest] Conectando ao MySQL da Hostinger e sincronizando esquema UUID de forma aditiva...');
+    console.log('🔄 [LiraQuest] Conectando ao MySQL da Hostinger e sincronizando esquema UUIDv4 de forma aditiva...');
 
-    // Sincronização aditiva de todas as tabelas (sem force, preservando dados existentes)
+    // Sincronização aditiva de proteção (sem force, preservando dados)
     await sequelize.sync({ alter: true });
-    console.log('✅ Todas as tabelas sincronizadas com sucesso no banco da Hostinger!');
+    console.log('✅ Esquema verificado e sincronizado com sucesso!');
 
     // ========================================================
-    // 1. SEED: 6 ATRIBUTOS DO RPG (UUID + Code)
+    // 1. SEED: 6 ATRIBUTOS DO RPG (UUIDv4)
     // ========================================================
-    console.log('🌱 Semeando catálogo de Atributos com UUID...');
     const defaultAttributes = [
       {
         code: 'str',
@@ -81,18 +81,20 @@ async function syncAndSeed() {
     for (const attr of defaultAttributes) {
       let existing = await DefinitionAttribute.findOne({ where: { code: attr.code } });
       if (!existing) {
-        existing = await DefinitionAttribute.create(attr);
+        existing = await DefinitionAttribute.create({
+          id: randomUUID().toLowerCase(),
+          ...attr,
+        });
       } else {
         await existing.update(attr);
       }
       attributeMap[attr.code] = existing.id;
     }
-    console.log('✅ Catálogo de Atributos pronto!');
+    console.log('✅ Catálogo de Atributos verificado.');
 
     // ========================================================
-    // 2. SEED: 6 CLASSES DE HERÓIS (UUID + Code + FKs UUID)
+    // 2. SEED: 6 CLASSES DE HERÓIS (UUIDv4)
     // ========================================================
-    console.log('🌱 Semeando catálogo de Classes com UUID...');
     const defaultClasses = [
       {
         code: 'guardiao_do_lar',
@@ -171,20 +173,21 @@ async function syncAndSeed() {
 
       let existing = await DefinitionClass.findOne({ where: { code: cls.code } });
       if (!existing) {
-        existing = await DefinitionClass.create(payload);
+        existing = await DefinitionClass.create({
+          id: randomUUID().toLowerCase(),
+          ...payload,
+        });
       } else {
         await existing.update(payload);
       }
       classMap[cls.code] = existing.id;
     }
-    console.log('✅ Catálogo de Classes pronto!');
+    console.log('✅ Catálogo de Classes verificado.');
 
     // ========================================================
-    // 3. SEED: HABILIDADES INICIAIS (UUID + Code + FKs UUID)
+    // 3. SEED: HABILIDADES INICIAIS (UUIDv4)
     // ========================================================
-    console.log('🌱 Semeando catálogo de Habilidades com UUID...');
     const defaultSkills = [
-      // Guardião do Lar
       {
         code: 'skill_muralha_domestica',
         classCode: 'guardiao_do_lar',
@@ -213,7 +216,6 @@ async function syncAndSeed() {
         xp_cost_to_unlock: 100,
         icon: 'firm_stance',
       },
-      // Sábio Estrategista
       {
         code: 'skill_raio_conhecimento',
         classCode: 'sabio_estrategista',
@@ -242,7 +244,6 @@ async function syncAndSeed() {
         xp_cost_to_unlock: 100,
         icon: 'tactical_eye',
       },
-      // Guardião da Harmonia
       {
         code: 'skill_abraco_revitalizante',
         classCode: 'guardiao_da_harmonia',
@@ -257,7 +258,6 @@ async function syncAndSeed() {
         xp_cost_to_unlock: 100,
         icon: 'healing_heart',
       },
-      // Rastreador Veloz
       {
         code: 'skill_ataque_relampago',
         classCode: 'rastreador_veloz',
@@ -272,7 +272,6 @@ async function syncAndSeed() {
         xp_cost_to_unlock: 100,
         icon: 'lightning_strike',
       },
-      // Artífice Criativo
       {
         code: 'skill_torre_sucata',
         classCode: 'artifice_criativo',
@@ -287,7 +286,6 @@ async function syncAndSeed() {
         xp_cost_to_unlock: 100,
         icon: 'turret',
       },
-      // Aventureiro Oportunista
       {
         code: 'skill_disparo_certeiro',
         classCode: 'aventureiro_oportunista',
@@ -322,17 +320,19 @@ async function syncAndSeed() {
 
       let existing = await DefinitionSkill.findOne({ where: { code: skl.code } });
       if (!existing) {
-        await DefinitionSkill.create(payload);
+        await DefinitionSkill.create({
+          id: randomUUID().toLowerCase(),
+          ...payload,
+        });
       } else {
         await existing.update(payload);
       }
     }
-    console.log('✅ Catálogo de Habilidades pronto!');
+    console.log('✅ Catálogo de Habilidades verificado.');
 
     // ========================================================
-    // 4. SEED: ITENS INICIAIS DA LOJA (UUID + Code)
+    // 4. SEED: ITENS DA LOJA (UUIDv4)
     // ========================================================
-    console.log('🌱 Semeando catálogo de Itens com UUID...');
     const defaultItems = [
       {
         code: 'item_espada_madeira',
@@ -384,17 +384,19 @@ async function syncAndSeed() {
     for (const itm of defaultItems) {
       let existing = await DefinitionItem.findOne({ where: { code: itm.code } });
       if (!existing) {
-        await DefinitionItem.create(itm);
+        await DefinitionItem.create({
+          id: randomUUID().toLowerCase(),
+          ...itm,
+        });
       } else {
         await existing.update(itm);
       }
     }
-    console.log('✅ Catálogo de Itens pronto!');
+    console.log('✅ Catálogo de Itens verificado.');
 
     // ========================================================
-    // 5. SEED: MONSTROS E CHEFES INICIAIS (UUID + Code)
+    // 5. SEED: MONSTROS E CHEFES (UUIDv4)
     // ========================================================
-    console.log('🌱 Semeando catálogo de Monstros com UUID...');
     const defaultMonsters = [
       {
         code: 'mob_desorganizacao',
@@ -427,68 +429,17 @@ async function syncAndSeed() {
     for (const mob of defaultMonsters) {
       let existing = await DefinitionMonster.findOne({ where: { code: mob.code } });
       if (!existing) {
-        await DefinitionMonster.create(mob);
+        await DefinitionMonster.create({
+          id: randomUUID().toLowerCase(),
+          ...mob,
+        });
       } else {
         await existing.update(mob);
       }
     }
-    console.log('✅ Catálogo de Monstros pronto!');
+    console.log('✅ Catálogo de Monstros verificado.');
 
-    // ========================================================
-    // 6. SEED: USUÁRIOS DE TESTE
-    // ========================================================
-    console.log('🌱 Verificando usuários padrão...');
-    const defaultUsers = [
-      {
-        name: 'Mestre Administrador (Sidney)',
-        email: 'admin@liraquest.com',
-        password: 'admin123',
-        role: 'ADMIN',
-        school_or_work: 'Desenvolvimento LiraQuest',
-        phone: '(11) 99999-0001',
-      },
-      {
-        name: 'Guardião Sidney (Pai)',
-        email: 'pai@liraquest.com',
-        password: 'pai123',
-        role: 'PARENT',
-        school_or_work: 'Trabalho / Família',
-        phone: '(11) 99999-0002',
-      },
-      {
-        name: 'Jovem Herói Davi (Filho)',
-        email: 'filho@liraquest.com',
-        password: 'filho123',
-        role: 'CHILD',
-        school_or_work: 'Escola Reino do Saber - 8º Ano',
-        phone: '(11) 99999-0003',
-      },
-    ];
-
-    for (const u of defaultUsers) {
-      const existing = await FamilyUser.findOne({ where: { email: u.email } });
-      if (!existing) {
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(u.password, salt);
-        await FamilyUser.create({
-          name: u.name,
-          email: u.email,
-          password: hashedPassword,
-          role: u.role,
-          school_or_work: u.school_or_work,
-          phone: u.phone,
-        });
-        console.log(`👤 Usuário criado: ${u.email} (${u.role})`);
-      } else {
-        await existing.update({
-          school_or_work: existing.school_or_work || u.school_or_work,
-          phone: existing.phone || u.phone,
-        });
-        console.log(`ℹ️ Usuário ${u.email} verificado/atualizado.`);
-      }
-    }
-
-    console.log('🎉 Sincronização UUID completa e catálogo semeado com sucesso no MySQL da Hostinger!');
+    console.log('🎉 Sincronização aditiva segura UUIDv4 finalizada!');
     process.exit(0);
   } catch (error) {
     console.error('❌ Erro durante a sincronização:', error);
