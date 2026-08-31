@@ -526,7 +526,7 @@
       box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
     }
 
-    /* Tabs de Navegação no Dashboard */
+    /* Tabs de Navegação no Dashboard dos Pais */
     .nav-tabs {
       display: flex;
       gap: 10px;
@@ -569,6 +569,86 @@
       padding: 2px 7px;
       border-radius: 9999px;
       font-weight: 800;
+    }
+
+    /* Layout com Menu Lateral (Sidebar) para o Filho */
+    .child-layout-container {
+      display: grid;
+      grid-template-columns: 270px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    @media (max-width: 920px) {
+      .child-layout-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .child-sidebar {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 22px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.8), 0 0 25px rgba(212, 175, 55, 0.08);
+      position: sticky;
+      top: 90px;
+    }
+
+    .sidebar-user-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    .sidebar-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .sidebar-menu-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: left;
+      width: 100%;
+    }
+
+    .sidebar-menu-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar-menu-btn.active {
+      color: #fde047;
+      background: linear-gradient(135deg, rgba(128, 0, 32, 0.45), rgba(30, 58, 138, 0.45));
+      border-color: var(--accent);
+      box-shadow: 0 4px 14px -2px rgba(128, 0, 32, 0.5);
+    }
+
+    .child-content-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 22px;
+      padding: 28px;
+      box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.8), 0 0 25px rgba(212, 175, 55, 0.08);
+      min-height: 580px;
     }
 
     /* Grid de Estatísticas dos Dashboards */
@@ -1557,185 +1637,221 @@
       </div>
     </section>
 
-    <!-- ==================== TELA 6: DASHBOARD FILHOS ==================== -->
+    <!-- ==================== TELA 6: DASHBOARD FILHOS (COM MENU LATERAL) ==================== -->
     <section id="view-child" style="display: none;">
-      <div class="dashboard-card">
+      <div class="child-layout-container">
         
-        <!-- Header do Usuário -->
-        <div class="dashboard-header">
-          <div class="user-profile-bar">
-            <div id="child-header-avatar" class="avatar-circle">⚔️</div>
-            <div>
-              <h2 id="child-user-name" style="font-size: 1.6rem; color: #ffffff;">Jovem Herói</h2>
-              <span id="child-user-email" style="color: var(--text-muted); font-size: 0.9rem;">filho@liraquest.com</span>
+        <!-- BARRA LATERAL (SIDEBAR) DO FILHO -->
+        <aside class="child-sidebar">
+          
+          <!-- Cabeçalho do Filho no Menu -->
+          <div class="sidebar-user-header">
+            <div id="child-header-avatar" class="avatar-circle">👤</div>
+            <div style="overflow: hidden;">
+              <h3 id="child-user-name" style="font-size: 1.1rem; color: #ffffff; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">Jovem Filho</h3>
+              <span id="child-user-email" style="color: var(--text-muted); font-size: 0.78rem; display: block; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">filho@liraquest.com</span>
+              <span class="role-badge badge-child" style="font-size: 0.7rem; padding: 2px 8px; margin-top: 4px;">⚔️ Filho / Herói</span>
             </div>
           </div>
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <span class="role-badge badge-child">⚔️ Filho / Herói</span>
-            <button class="btn btn-danger btn-sm" onclick="handleLogout()">Sair</button>
-          </div>
-        </div>
 
-        <!-- Abas de Navegação -->
-        <div class="nav-tabs">
-          <button id="child-tab-btn-game" class="nav-tab-btn active" onclick="switchChildTab('game')">
-            ⚔️ Meu Herói RPG
-          </button>
-          <button id="child-tab-btn-tasks" class="nav-tab-btn" onclick="switchChildTab('tasks')">
-            📋 Mural de Missões
-          </button>
-          <button id="child-tab-btn-shop" class="nav-tab-btn" onclick="switchChildTab('shop')">
-            🛒 Loja do Reino
-          </button>
-          <button id="child-tab-btn-real" class="nav-tab-btn" onclick="switchChildTab('real')">
-            👤 Perfil & Família
-          </button>
-        </div>
-
-        <!-- ABA 1: MUNDO DO JOGO (RPG) -->
-        <div id="child-tab-game">
-          
-          <!-- Estado A: Filho ainda NÃO criou herói -->
-          <div id="child-no-hero-view" style="display: none; text-align: center; padding: 30px 10px;">
-            <div style="font-size: 4rem; margin-bottom: 12px;">🛡️⚔️✨</div>
-            <h2 style="font-size: 2rem; color: #ffffff; margin-bottom: 12px;">Você ainda não possui um Herói!</h2>
-            <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto 28px auto; line-height: 1.6;">
-              Toda grande jornada começa com a escolha da sua identidade. Escolha sua classe inicial, selecione seu avatar de batalha e desperte seus primeiros atributos!
-            </p>
-            <button class="btn btn-primary" style="width: auto; font-size: 1.1rem; padding: 14px 36px;" onclick="openHeroCreationWizard()">
-              ⚔️ Criar Meu Herói Agora
+          <!-- Menu de Navegação Lateral -->
+          <div class="sidebar-menu">
+            <button id="child-nav-user" class="sidebar-menu-btn active" onclick="switchChildTab('user')">
+              <span>👤</span> Meu Perfil Real
+            </button>
+            <button id="child-nav-game" class="sidebar-menu-btn" onclick="switchChildTab('game')">
+              <span>⚔️</span> Meu Herói RPG
+            </button>
+            <button id="child-nav-tasks" class="sidebar-menu-btn" onclick="switchChildTab('tasks')">
+              <span>📋</span> Mural de Missões
+            </button>
+            <button id="child-nav-shop" class="sidebar-menu-btn" onclick="switchChildTab('shop')">
+              <span>🛒</span> Loja do Reino
             </button>
           </div>
 
-          <!-- Estado B: Filho JÁ possui herói ativo -->
-          <div id="child-has-hero-view" style="display: none;">
-            
-            <!-- HUD Principal do Herói -->
-            <div class="hero-hud-card">
-              <div id="hero-hud-avatar" class="hero-avatar-box">🧙‍♂️</div>
-              <div class="hero-info-box">
-                <div class="hero-name-row">
-                  <span id="hero-hud-name" class="hero-name">Herói Sem Nome</span>
-                  <span id="hero-hud-class" class="class-badge">Guardião do Lar</span>
-                  <span id="hero-hud-level" class="class-badge" style="background: rgba(34, 197, 94, 0.2); border-color: #4ade80; color: #86efac;">Nível 1</span>
-                </div>
-                
-                <div class="xp-bar-container">
-                  <div class="xp-bar-labels">
-                    <span>Pontos de Experiência (XP)</span>
-                    <span id="hero-hud-xp-text">0 / 100 XP</span>
-                  </div>
-                  <div class="xp-progress-track">
-                    <div id="hero-hud-xp-fill" class="xp-progress-fill" style="width: 10%;"></div>
-                  </div>
-                </div>
-              </div>
-
-              <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
-                <div id="hero-hud-gold" class="hero-gold-badge">💰 50 Ouro</div>
-                <button class="btn btn-secondary btn-sm" onclick="openClassSwitchModal()">🔄 Trocar Classe</button>
-              </div>
-            </div>
-
-            <!-- Grid dos 6 Atributos -->
-            <h3 style="font-size: 1.2rem; margin-bottom: 12px; color: #e2e8f0;">📊 Seus 6 Atributos de Combate</h3>
-            <div id="hero-attributes-grid" class="attributes-grid"></div>
-
-            <!-- Deck de Habilidades Ativas -->
-            <h3 style="font-size: 1.2rem; margin: 24px 0 12px 0; color: #e2e8f0;">🔮 Habilidades Desbloqueadas (Deck de Batalha)</h3>
-            <div id="hero-skills-grid" class="skills-grid"></div>
-
+          <!-- Mini Card de Saldo no Rodapé da Sidebar -->
+          <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 14px; padding: 14px; text-align: center; margin-top: auto;">
+            <span style="font-size: 0.78rem; color: var(--text-muted); display: block; margin-bottom: 2px;">Saldo de Ouro</span>
+            <span id="sidebar-child-gold" style="font-size: 1.2rem; font-weight: 900; color: #fde047;">💰 -- Ouro</span>
           </div>
 
-        </div>
+          <button class="btn btn-danger btn-sm" style="width: 100%;" onclick="handleLogout()">
+            🚪 Sair da Conta
+          </button>
+        </aside>
 
-        <!-- ABA 2: MURAL DE MISSÕES DO FILHO -->
-        <div id="child-tab-tasks" style="display: none;">
-          <h3 style="font-size: 1.25rem; color: #ffffff; margin-bottom: 8px;">Missões da Vida Real Disponíveis</h3>
-          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">
-            Cumpra as tarefas de casa e estudos para ganhar XP e Ouro após aprovação dos seus pais!
-          </p>
-
-          <div id="child-tasks-list" class="tasks-grid"></div>
-
-          <!-- Histórico de Envios -->
-          <h3 style="font-size: 1.2rem; color: #cbd5e1; margin: 32px 0 12px 0;">📜 Histórico de Provas Enviadas</h3>
-          <div id="child-submissions-history" class="users-list"></div>
-        </div>
-
-        <!-- ABA 3: LOJA DO REINO -->
-        <div id="child-tab-shop" style="display: none;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-            <div>
-              <h3 style="font-size: 1.25rem; color: #facc15;">🛒 Loja & Recompensas do Reino</h3>
-              <p style="color: var(--text-muted); font-size: 0.85rem;">Gaste seu Ouro em equipamentos ou recompensas reais!</p>
-            </div>
-            <div id="shop-current-gold" class="hero-gold-badge">💰 -- Ouro</div>
-          </div>
-
-          <div id="shop-items-grid" class="shop-grid"></div>
-        </div>
-
-        <!-- ABA 4: PERFIL REAL & FAMÍLIA -->
-        <div id="child-tab-real" style="display: none;">
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+        <!-- ÁREA PRINCIPAL DE CONTEÚDO DO FILHO -->
+        <div class="child-content-card">
+          
+          <!-- PAINEL 1: DASHBOARD DO USUÁRIO (MUNDO REAL - PADRÃO AO ENTRAR) -->
+          <div id="child-tab-user">
             
-            <!-- Dados Reais -->
-            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 18px; padding: 24px;">
-              <h3 style="font-size: 1.2rem; margin-bottom: 16px; color: #c084fc;">👤 Seus Dados do Mundo Real</h3>
-              <form id="child-profile-form">
-                <div class="form-group">
-                  <label class="form-label" for="child-real-name">Nome Completo</label>
-                  <input type="text" id="child-real-name" class="form-input" placeholder="Seu nome real">
-                </div>
-                <div class="form-group">
-                  <label class="form-label" for="child-real-phone">Telefone / WhatsApp</label>
-                  <input type="text" id="child-real-phone" class="form-input" placeholder="(11) 99999-9999">
-                </div>
-                <div class="form-group">
-                  <label class="form-label" for="child-real-school">Escola / Faculdade / Trabalho</label>
-                  <input type="text" id="child-real-school" class="form-input" placeholder="Ex: Colégio Anglo - 8º Ano">
-                </div>
-                <div class="form-group">
-                  <label class="form-label" for="child-real-photo">URL da Foto de Perfil (Opcional)</label>
-                  <input type="url" id="child-real-photo" class="form-input" placeholder="https://...">
-                </div>
-                <button type="submit" class="btn btn-primary btn-sm" style="width: 100%; margin-top: 8px;">
-                  💾 Salvar Dados do Perfil
-                </button>
-              </form>
+            <!-- Boas-vindas do Filho -->
+            <div style="background: linear-gradient(135deg, rgba(128, 0, 32, 0.35), rgba(30, 58, 138, 0.35)); border: 1px solid rgba(212, 175, 55, 0.25); border-radius: 18px; padding: 22px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: gap; gap: 16px;">
+              <div>
+                <span class="home-feature-tag">Portal do Filho</span>
+                <h2 style="font-size: 1.6rem; color: #ffffff; margin-bottom: 4px;">Bem-vindo ao seu Painel de Usuário!</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Gerencie seus dados do mundo real, conecte-se ao seu clã e acesse seu herói de RPG.</p>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="switchChildTab('game')">
+                ⚔️ Entrar no Modo Jogo RPG
+              </button>
             </div>
 
-            <!-- Clã Familiar -->
-            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 18px; padding: 24px;">
-              <h3 style="font-size: 1.2rem; margin-bottom: 16px; color: #38bdf8;">🏰 Seu Clã Familiar</h3>
+            <!-- Grid de Informações do Usuário como Filho -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
               
-              <div id="child-family-info" style="display: none;">
-                <p style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 8px;">Você pertence à família:</p>
-                <h4 id="child-family-name-display" style="font-size: 1.4rem; color: #ffffff; margin-bottom: 12px;">Clã Lira</h4>
-                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
-                  <span style="font-size: 0.85rem; color: var(--text-muted);">Código do Clã:</span>
-                  <span id="child-family-code-display" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; padding: 4px 10px; border-radius: 6px; font-weight: 800;">LIRA-0000</span>
-                </div>
-                <p style="font-size: 0.85rem; color: #4ade80;">✅ Conexão ativa com seus guardiões e missões da casa.</p>
+              <!-- Card 1: Dados Reais do Filho -->
+              <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(212, 175, 55, 0.18); border-radius: 18px; padding: 24px;">
+                <h3 style="font-size: 1.2rem; margin-bottom: 16px; color: #fde047;">👤 Seus Dados do Mundo Real</h3>
+                <form id="child-profile-form">
+                  <div class="form-group">
+                    <label class="form-label" for="child-real-name">Nome Completo</label>
+                    <input type="text" id="child-real-name" class="form-input" placeholder="Seu nome real">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="child-real-phone">Telefone / WhatsApp</label>
+                    <input type="text" id="child-real-phone" class="form-input" placeholder="(11) 99999-9999">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="child-real-school">Escola / Faculdade / Trabalho</label>
+                    <input type="text" id="child-real-school" class="form-input" placeholder="Ex: Colégio Anglo - 8º Ano">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="child-real-photo">URL da Foto de Perfil (Opcional)</label>
+                    <input type="url" id="child-real-photo" class="form-input" placeholder="https://...">
+                  </div>
+                  <button type="submit" class="btn btn-primary btn-sm" style="width: 100%; margin-top: 8px;">
+                    💾 Salvar Dados do Perfil
+                  </button>
+                </form>
               </div>
 
-              <div id="child-family-join-form">
-                <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;">
-                  Digite o código de convite fornecido pelo seu Pai/Mãe para vincular-se à família e receber missões diárias.
-                </p>
-                <div class="form-group">
-                  <label class="form-label" for="child-invite-code-input">Código de Convite da Família</label>
-                  <input type="text" id="child-invite-code-input" class="form-input" placeholder="Ex: LIRA-XXXX" style="text-transform: uppercase;">
+              <!-- Card 2: Clã Familiar & Vínculo com os Pais -->
+              <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(212, 175, 55, 0.18); border-radius: 18px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                  <h3 style="font-size: 1.2rem; margin-bottom: 16px; color: #93c5fd;">🏰 Seu Clã Familiar</h3>
+                  
+                  <div id="child-family-info" style="display: none;">
+                    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 6px;">Você pertence à família:</p>
+                    <h4 id="child-family-name-display" style="font-size: 1.5rem; color: #ffffff; margin-bottom: 12px;">Clã Lira</h4>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+                      <span style="font-size: 0.85rem; color: var(--text-muted);">Código do Clã:</span>
+                      <span id="child-family-code-display" style="background: rgba(30, 58, 138, 0.4); color: #93c5fd; padding: 4px 10px; border-radius: 6px; font-weight: 800; border: 1px solid rgba(59, 130, 246, 0.4);">LIRA-0000</span>
+                    </div>
+                    <p style="font-size: 0.85rem; color: #4ade80;">✅ Vínculo ativo: você pode receber tarefas dos guardiões e ganhar ouro!</p>
+                  </div>
+
+                  <div id="child-family-join-form">
+                    <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;">
+                      Digite o código de convite fornecido pelo seu Pai/Mãe para vincular-se ao clã e receber missões.
+                    </p>
+                    <div class="form-group">
+                      <label class="form-label" for="child-invite-code-input">Código de Convite da Família</label>
+                      <input type="text" id="child-invite-code-input" class="form-input" placeholder="Ex: LIRA-XXXX" style="text-transform: uppercase;">
+                    </div>
+                    <button class="btn btn-secondary btn-sm" style="width: 100%;" onclick="handleJoinFamily()">
+                      🛡️ Ingressar na Família
+                    </button>
+                  </div>
                 </div>
-                <button class="btn btn-secondary btn-sm" style="width: 100%;" onclick="handleJoinFamily()">
-                  🛡️ Ingressar na Família
-                </button>
+
+                <!-- Card de Status do Herói no Mundo RPG -->
+                <div id="child-user-hero-preview" style="margin-top: 20px; padding-top: 18px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                  <!-- Preenchido dinamicamente via JS (se tem herói ou se precisa criar) -->
+                </div>
+
               </div>
 
             </div>
 
           </div>
+
+          <!-- PAINEL 2: MUNDO DO JOGO (RPG) -->
+          <div id="child-tab-game" style="display: none;">
+            
+            <!-- Estado A: Filho ainda NÃO criou herói -->
+            <div id="child-no-hero-view" style="display: none; text-align: center; padding: 40px 10px;">
+              <div style="font-size: 4rem; margin-bottom: 12px;">🛡️⚔️✨</div>
+              <h2 style="font-size: 2rem; color: #ffffff; margin-bottom: 12px;">Você ainda não despertou seu Herói!</h2>
+              <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto 28px auto; line-height: 1.6;">
+                Toda grande jornada começa com a escolha da sua identidade. Escolha sua classe inicial, selecione seu avatar de batalha e desperte seus primeiros atributos!
+              </p>
+              <button class="btn btn-primary" style="width: auto; font-size: 1.1rem; padding: 14px 36px;" onclick="openHeroCreationWizard()">
+                ⚔️ Despertar Meu Herói Agora
+              </button>
+            </div>
+
+            <!-- Estado B: Filho JÁ possui herói ativo -->
+            <div id="child-has-hero-view" style="display: none;">
+              
+              <!-- HUD Principal do Herói -->
+              <div class="hero-hud-card">
+                <div id="hero-hud-avatar" class="hero-avatar-box">🧙‍♂️</div>
+                <div class="hero-info-box">
+                  <div class="hero-name-row">
+                    <span id="hero-hud-name" class="hero-name">Herói Sem Nome</span>
+                    <span id="hero-hud-class" class="class-badge">Guardião do Lar</span>
+                    <span id="hero-hud-level" class="class-badge" style="background: rgba(128, 0, 32, 0.35); border-color: var(--accent); color: #fde047;">Nível 1</span>
+                  </div>
+                  
+                  <div class="xp-bar-container">
+                    <div class="xp-bar-labels">
+                      <span>Pontos de Experiência (XP)</span>
+                      <span id="hero-hud-xp-text">0 / 100 XP</span>
+                    </div>
+                    <div class="xp-progress-track">
+                      <div id="hero-hud-xp-fill" class="xp-progress-fill" style="width: 10%;"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
+                  <div id="hero-hud-gold" class="hero-gold-badge">💰 50 Ouro</div>
+                  <button class="btn btn-secondary btn-sm" onclick="openClassSwitchModal()">🔄 Trocar Classe</button>
+                </div>
+              </div>
+
+              <!-- Grid dos 6 Atributos -->
+              <h3 style="font-size: 1.2rem; margin-bottom: 12px; color: #e2e8f0;">📊 Seus 6 Atributos de Combate</h3>
+              <div id="hero-attributes-grid" class="attributes-grid"></div>
+
+              <!-- Deck de Habilidades Ativas -->
+              <h3 style="font-size: 1.2rem; margin: 24px 0 12px 0; color: #e2e8f0;">🔮 Habilidades Desbloqueadas (Deck de Batalha)</h3>
+              <div id="hero-skills-grid" class="skills-grid"></div>
+
+            </div>
+
+          </div>
+
+          <!-- PAINEL 3: MURAL DE MISSÕES DO FILHO -->
+          <div id="child-tab-tasks" style="display: none;">
+            <h3 style="font-size: 1.25rem; color: #ffffff; margin-bottom: 8px;">Missões da Vida Real Disponíveis</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">
+              Cumpra as tarefas de casa e estudos para ganhar XP e Ouro após aprovação dos seus pais!
+            </p>
+
+            <div id="child-tasks-list" class="tasks-grid"></div>
+
+            <!-- Histórico de Envios -->
+            <h3 style="font-size: 1.2rem; color: #cbd5e1; margin: 32px 0 12px 0;">📜 Histórico de Provas Enviadas</h3>
+            <div id="child-submissions-history" class="users-list"></div>
+          </div>
+
+          <!-- PAINEL 4: LOJA DO REINO -->
+          <div id="child-tab-shop" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <div>
+                <h3 style="font-size: 1.25rem; color: #facc15;">🛒 Loja & Recompensas do Reino</h3>
+                <p style="color: var(--text-muted); font-size: 0.85rem;">Gaste seu Ouro em equipamentos ou recompensas reais!</p>
+              </div>
+              <div id="shop-current-gold" class="hero-gold-badge">💰 -- Ouro</div>
+            </div>
+
+            <div id="shop-items-grid" class="shop-grid"></div>
+          </div>
+
         </div>
 
       </div>

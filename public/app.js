@@ -297,23 +297,24 @@ async function fetchCatalogs() {
 }
 
 // ========================================================
-// 4. DASHBOARD DO FILHO (PAINEL DO HERÓI)
+// 4. DASHBOARD DO FILHO (USUÁRIO REAL & MENU LATERAL)
 // ========================================================
 function switchChildTab(tab) {
   state.childActiveTab = tab;
-  const tabs = ['game', 'tasks', 'shop', 'real'];
+  const tabs = ['user', 'game', 'tasks', 'shop'];
   
   tabs.forEach((t) => {
-    const btn = document.getElementById(`child-tab-btn-${t}`);
+    const navBtn = document.getElementById(`child-nav-${t}`);
     const view = document.getElementById(`child-tab-${t}`);
-    if (btn && view) {
+    if (navBtn) {
       if (t === tab) {
-        btn.classList.add('active');
-        view.style.display = 'block';
+        navBtn.classList.add('active');
       } else {
-        btn.classList.remove('active');
-        view.style.display = 'none';
+        navBtn.classList.remove('active');
       }
+    }
+    if (view) {
+      view.style.display = t === tab ? 'block' : 'none';
     }
   });
 
@@ -329,6 +330,7 @@ function switchChildTab(tab) {
 async function loadChildDashboard() {
   if (!state.user || !state.token) return;
 
+  // Informações do Usuário no Cabeçalho da Sidebar
   document.getElementById('child-user-name').innerText = state.user.name;
   document.getElementById('child-user-email').innerText = state.user.email;
 
@@ -342,8 +344,14 @@ async function loadChildDashboard() {
   document.getElementById('child-real-school').value = state.user.school_or_work || '';
   document.getElementById('child-real-photo').value = state.user.profile_photo_url || '';
 
+  // Carregar clã familiar
   loadChildFamilyData();
+
+  // Carregar dados do Personagem
   await loadCharacterData();
+
+  // Padrão: Abrir o Painel do Usuário (Mundo Real)
+  switchChildTab(state.childActiveTab || 'user');
 }
 
 async function loadCharacterData() {
@@ -353,16 +361,57 @@ async function loadCharacterData() {
     });
     const data = await res.json();
 
+    const heroPreviewContainer = document.getElementById('child-user-hero-preview');
+    const sidebarGoldEl = document.getElementById('sidebar-child-gold');
+
     if (res.ok && data.success) {
       if (data.hasCharacter && data.character) {
         state.character = data.character;
         renderHeroHUD(data.character);
         document.getElementById('child-no-hero-view').style.display = 'none';
         document.getElementById('child-has-hero-view').style.display = 'block';
+
+        if (sidebarGoldEl) sidebarGoldEl.innerText = `💰 ${data.character.gold} Ouro`;
+
+        // Card de Atalho do Herói no Painel do Usuário
+        if (heroPreviewContainer) {
+          const currentClass = data.character.current_class?.name || 'Aventureiro';
+          const progress = data.character.classes_progress?.find((cp) => cp.class_id === data.character.current_class_id);
+          const lvl = progress ? progress.level : 1;
+          const avatarObj = AVATAR_OPTIONS.find((a) => a.key === data.character.avatar_value);
+          const icon = avatarObj ? avatarObj.icon : '⚔️';
+
+          heroPreviewContainer.innerHTML = `
+            <div style="background: rgba(128, 0, 32, 0.25); border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 14px; padding: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 2rem;">${icon}</span>
+                <div>
+                  <strong style="color: #ffffff; font-size: 0.95rem;">${data.character.name}</strong>
+                  <span style="display: block; font-size: 0.8rem; color: #fde047;">${currentClass} • Nível ${lvl}</span>
+                </div>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="switchChildTab('game')">
+                ⚔️ Abrir RPG
+              </button>
+            </div>
+          `;
+        }
       } else {
         state.character = null;
         document.getElementById('child-no-hero-view').style.display = 'block';
         document.getElementById('child-has-hero-view').style.display = 'none';
+        if (sidebarGoldEl) sidebarGoldEl.innerText = `💰 0 Ouro`;
+
+        if (heroPreviewContainer) {
+          heroPreviewContainer.innerHTML = `
+            <div style="background: rgba(30, 58, 138, 0.25); border: 1px solid rgba(59, 130, 246, 0.4); border-radius: 14px; padding: 14px; text-align: center;">
+              <p style="font-size: 0.85rem; color: #93c5fd; margin-bottom: 8px;">✨ Você ainda não despertou seu Herói de RPG!</p>
+              <button class="btn btn-gold btn-sm" onclick="openHeroCreationWizard()">
+                ⚔️ Despertar Meu Herói
+              </button>
+            </div>
+          `;
+        }
       }
     }
   } catch (err) {
@@ -392,6 +441,8 @@ function renderHeroHUD(char) {
   document.getElementById('hero-hud-gold').innerText = `💰 ${char.gold} Ouro`;
   const shopGoldEl = document.getElementById('shop-current-gold');
   if (shopGoldEl) shopGoldEl.innerText = `💰 ${char.gold} Ouro`;
+  const sidebarGoldEl = document.getElementById('sidebar-child-gold');
+  if (sidebarGoldEl) sidebarGoldEl.innerText = `💰 ${char.gold} Ouro`;
 
   // Atributos
   const attrsContainer = document.getElementById('hero-attributes-grid');
