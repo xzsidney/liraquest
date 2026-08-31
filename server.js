@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { testDbConnection, sequelize } from './server/config/database.js';
+import './server/models/index.js';
 import authRoutes from './server/routes/authRoutes.js';
 
 dotenv.config();

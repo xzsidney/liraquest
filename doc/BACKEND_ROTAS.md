@@ -1,147 +1,115 @@
-# LiraQuest - Mapeamento de Rotas do Backend & WebSockets
+# 🛣️ LiraQuest — Mapa de Rotas do Backend & Realtime
 
-O backend do LiraQuest roda no servidor **Express** integrado com **Socket.IO** em tempo real.
-- **Arquivo de entrada:** `server.ts` (modo dev) / `server.js` (modo produção Hostinger)
-- **Porta:** `3000`
-- **Prefixo da API REST:** `/api`
-- **Arquivos de rotas:** `server/routes/authRoutes.ts` e `server/routes/familyRoutes.ts`
-- **Controller:** `server/controllers/familyController.ts` e `server/controllers/authController.ts`
-- **WebSockets:** `server/sockets/familySocketService.ts`
+Este documento cataloga todos os endpoints REST e eventos de WebSocket (Socket.IO) do **LiraQuest**, detalhando parâmetros, autenticação necessária e ações executadas.
 
 ---
 
-## 🔐 1. Rotas de Autenticação (`/api/auth/...`)
-
-| Método | Rota | Auth | Ação |
-|:---|:---|:---|:---|
-| `POST` | `/api/auth/register` | Pública | Cria novo usuário (`FamilyUser`) com nome, e-mail, senha (bcrypt) e role (`ADMIN`, `PARENT`, `CHILD`) |
-| `POST` | `/api/auth/login` | Pública | Autentica usuário, valida hash bcrypt e retorna JWT |
-| `GET` | `/api/auth/me` | 🔒 JWT | Retorna dados do usuário autenticado |
-| `GET` | `/api/auth/users` | 🔒 JWT (ADMIN) | Retorna a listagem de todos os usuários cadastrados (exclusivo para Administrador) |
-
-**Middlewares:**
-- `authenticateToken`: valida JWT no header `Authorization: Bearer <token>`.
-- `authorizeRoles(...roles)`: validação RBAC baseada nos perfis permitidos.
+## 🔒 Autenticação & Autorização (RBAC)
+- **Header:** `Authorization: Bearer <TOKEN_JWT>`
+- **Perfis (Roles):**
+  - `ADMIN`: Administrador Geral da plataforma (Sidney).
+  - `PARENT`: Guardião / Pais (gestão de família, criação e aprovação de tarefas).
+  - `CHILD`: Herói / Filhos (cumprimento de tarefas, evolução de personagem, combate).
 
 ---
 
-## 🛡️ 2. Rotas de Personagens (`/api/family/...`)
+## 1. Módulo de Autenticação (`/api/auth`)
 
-### Personagens & Ficha do Herói
-| Método | Rota | Auth | Ação |
+| Método | Rota | Autenticação | Descrição |
 |:---|:---|:---|:---|
-| `GET` | `/api/family/members` | Pública | Lista todos os heróis com status, nível, HP, MP e Ouro |
-| `GET` | `/api/family/my-characters` | 🔒 JWT | Lista os personagens pertencentes ao usuário logado |
-| `GET` | `/api/family/character/me` | 🔒 JWT | Retorna o herói principal do usuário logado |
-| `GET` | `/api/family/character/:id` | Pública | Retorna dados de um herói específico |
-| `POST` | `/api/family/claim-character` | 🔒 JWT | Vincula um personagem pré-existente ao usuário |
-| `POST` | `/api/family/create-character` | 🔒 JWT | Cria um novo herói para o usuário |
-| `POST` | `/api/family/character/update-stats` | 🔒 JWT | Aprimora um atributo (`strength`, `wisdom`, `vitality`, `agility`, `heartBond`) |
-| `POST` | `/api/family/character/update-avatar` | 🔒 JWT | Atualiza avatar ou sprite MUGEN (`sprite:capamerica`, etc.) |
-| `POST` | `/api/family/character/change-class` | 🔒 JWT | Altera a classe do herói (`GUERREIRO`, `MAGO`, etc.) |
-| `POST` | `/api/family/character/recover-infirmary` | 🔒 JWT | Libera alta médica imediata da Enfermaria (restrito a Líderes) |
+| `POST` | `/api/auth/register` | Pública | Cadastra um novo usuário (sempre `CHILD` por padrão) |
+| `POST` | `/api/auth/login` | Pública | Autentica e retorna token JWT com dados do usuário |
+| `GET` | `/api/auth/me` | JWT | Retorna os dados do usuário autenticado atual |
+| `GET` | `/api/auth/users` | JWT (`ADMIN`) | Lista todos os usuários cadastrados no sistema |
 
-### Árvore de Habilidades & Builds
-| Método | Rota | Auth | Ação |
-|:---|:---|:---|:---|
-| `GET` | `/api/family/skills/tree` | 🔒 JWT | Retorna a árvore de talentos da classe do personagem logado |
-| `POST` | `/api/family/skills/buy` | 🔒 JWT | Desbloqueia uma habilidade consumindo XP |
-| `POST` | `/api/family/skills/equip` | 🔒 JWT | Equipa/desequipa uma habilidade no slot de combate |
+### Detalhes dos Endpoints de Autenticação
 
-### Tarefas & Mural de Missões
-| Método | Rota | Auth | Ação |
-|:---|:---|:---|:---|
-| `GET` | `/api/family/tasks` | Pública | Retorna tarefas ativas e pendentes de aprovação |
-| `POST` | `/api/family/tasks/complete` | Pública | Filho solicita aprovação de uma tarefa concluída |
+#### `POST /api/auth/register`
+- **Body:**
+  ```json
+  {
+    "name": "Nome Completo",
+    "email": "usuario@liraquest.com",
+    "password": "senhaSegura123"
+  }
+  ```
+- **Resposta Sucesso (201):**
+  ```json
+  {
+    "success": true,
+    "message": "Conta criada com sucesso!",
+    "token": "eyJhbGciOi...",
+    "user": {
+      "id": "uuid...",
+      "name": "Nome Completo",
+      "email": "usuario@liraquest.com",
+      "role": "CHILD",
+      "phone": null,
+      "school_or_work": null,
+      "profile_photo_url": null,
+      "created_at": "..."
+    }
+  }
+  ```
 
-### Batalhas & Masmorras
-| Método | Rota | Auth | Ação |
-|:---|:---|:---|:---|
-| `GET` | `/api/family/battle/active` | Pública | Retorna a batalha atualmente em andamento (`IN_PROGRESS`) |
-
-### Loja do Reino
-| Método | Rota | Auth | Ação |
-|:---|:---|:---|:---|
-| `GET` | `/api/family/shop` | Pública | Lista itens disponíveis para resgate |
-| `POST` | `/api/family/shop/buy` | Pública | Resgata um item debitando Ouro do herói |
-
-### Radar da Casa & Localidades
-| Método | Rota | Auth | Ação |
-|:---|:---|:---|:---|
-| `GET` | `/api/family/locations` | Pública | Retorna as localidades do Radar do Reino |
-
-### Centro de Foco AFK / Missão Ativa (Pomodoro)
-| Método | Rota | Auth | Ação |
-|:---|:---|:---|:---|
-| `POST` | `/api/family/missions/start` | 🔒 JWT | Inicia um timer de foco, criando um registro em `family_active_missions` |
-| `GET` | `/api/family/missions/current` | 🔒 JWT | Retorna a missão ativa atual do personagem |
-| `POST` | `/api/family/missions/complete` | 🔒 JWT | Conclui a missão, concede XP + Ouro e sobe nível se necessário |
-
-### Contos & Livro-Jogo Solo
-| Método | Rota | Auth | Ação |
-|:---|:---|:---|:---|
-| `GET` | `/api/family/stories` | Pública | Lista as aventuras disponíveis |
-| `GET` | `/api/family/stories/:adventureId/node/:nodeId` | Pública | Retorna um nó narrativo com suas escolhas |
-| `POST` | `/api/family/stories/choice` | 🔒 JWT | Executa uma escolha, aplica testes de atributo e retorna o próximo nó |
-
-### Mural do Clã & Feed
-| Método | Rota | Auth | Ação |
-|:---|:---|:---|:---|
-| `GET` | `/api/family/feed` | Pública | Retorna o feed de atividades recentes da família (logs aprovados) |
-
-### Painel do Mestre / Pai (Admin)
-| Método | Rota | Auth | Ação |
-|:---|:---|:---|:---|
-| `GET` | `/api/family/master/pending-tasks` | Pública | Lista tarefas aguardando aprovação dos pais |
-| `POST` | `/api/family/master/tasks/approve` | Pública | Aprova tarefa, credita XP + Ouro no herói e dispara evento WebSocket |
-| `POST` | `/api/family/master/tasks/reject` | Pública | Rejeita tarefa com observação |
-| `POST` | `/api/family/master/tasks/create` | Pública | Cria nova tarefa no mural |
+#### `POST /api/auth/login`
+- **Body:**
+  ```json
+  {
+    "email": "usuario@liraquest.com",
+    "password": "senhaSegura123"
+  }
+  ```
+- **Resposta Sucesso (200):**
+  ```json
+  {
+    "success": true,
+    "message": "Bem-vindo de volta, Nome!",
+    "token": "eyJhbGciOi...",
+    "user": { ... }
+  }
+  ```
 
 ---
 
-## ⚡ 3. Eventos de WebSockets (Socket.IO)
+## 2. Módulos Mapeados para as Próximas Fases
 
-Todos os eventos ocorrem dentro da sala `"family_lira_room"`.
-**Arquivo:** `server/sockets/familySocketService.ts`
+### 👨‍👩‍👧‍👦 Família & Clã (`/api/family`) — *Fase 2*
+- `POST /api/family/create`: Cria um novo clã familiar e gera código de convite (Restrito a `PARENT` / `ADMIN`).
+- `POST /api/family/join`: Entra em uma família existente utilizando o código de convite.
+- `GET /api/family/my-family`: Retorna os dados da família do usuário e lista todos os membros e heróis vinculados.
 
-### Conexão e Presença
-| Evento (Client → Server) | Payload | Ação |
-|:---|:---|:---|
-| `family:join_room` | `{ characterId?, name? }` | Registra presença do herói na sala global; emite `family:presence_update` e `family:party_lobby_updated` |
-| `family:send_reaction` | `{ characterId, characterName, emoji, text? }` | Broadcast de emoji flutuante na sala |
+### ⚔️ Personagem do Herói (`/api/character`) — *Fase 2*
+- `GET /api/character/me`: Retorna o personagem do usuário autenticado (ou status indicando que ainda não foi criado).
+- `POST /api/character/create`: Cria o personagem do herói (Nome, Sexo, Avatar Foto/Sprite).
+- `PUT /api/character/update-profile`: Atualiza dados reais do perfil (Telefone, Escola/Trabalho, Foto).
+- `POST /api/character/change-class`: Troca a classe ativa preservando o progresso da classe anterior.
+- `POST /api/character/learn-skill`: Desbloqueia habilidade na Árvore de Talentos consumindo XP.
 
-| Evento (Server → Client) | Payload | Quando |
-|:---|:---|:---|
-| `family:presence_update` | `OnlineMember[]` | Toda vez que alguém entra ou sai |
-| `family:reaction_received` | `{ characterId, emoji, text, timestamp }` | Ao receber uma reação |
+### 📚 Catálogo Global (`/api/catalog`) — *Fase 2*
+- `GET /api/catalog/attributes`: Lista os 6 atributos (`STR`, `AGI`, `CON`, `INT`, `CHA`, `LUK`).
+- `GET /api/catalog/classes`: Lista as 6 classes de heróis e seus atributos primários/secundários.
+- `GET /api/catalog/skills/:classId`: Retorna a Árvore de Talentos completa de uma classe.
+- `GET /api/catalog/items`: Lista os itens e recompensas disponíveis na Loja do Reino.
 
-### Convocação de Raid & Grupo
-| Evento (Client → Server) | Payload | Ação |
-|:---|:---|:---|
-| `family:create_party_lobby` | `{ leaderCharacter }` | Cria o grupo com o Líder e notifica todos |
-| `family:send_party_invite` | `{ leaderName, leaderId, monsterName }` | Envia convite de Raid (banner dourado nas telas de todos) |
-| `family:accept_party_invite` | `{ character }` | Aceita convite e entra no grupo |
-| `family:leave_party_lobby` | `{ characterId }` | Sai da sala de espera do grupo |
-| `family:start_party_battle` | `{ partyMembers[], isSolo? }` | Inicia combate; cria/reinicia `FamilyBattle` no banco; distribui heróis no grid |
+### 📋 Tarefas & Missões (`/api/tasks`) — *Fase 3*
+- `GET /api/tasks`: Lista as missões disponíveis para a família do usuário.
+- `POST /api/tasks`: Cria uma nova missão (Pais).
+- `POST /api/tasks/:taskId/submit`: Filho envia prova da missão realizada (foto + texto).
+- `POST /api/tasks/submissions/:submissionId/review`: Pai aprova ou rejeita a prova enviada (creditando XP e Ouro automaticamente se aprovada).
 
-| Evento (Server → Client) | Payload | Quando |
-|:---|:---|:---|
-| `family:party_lobby_updated` | `PartyMember[]` | Ao criar grupo ou aceitar convite |
-| `family:party_invite_received` | `{ leaderName, leaderId, monsterName, timestamp }` | Ao enviar convite |
-| `family:battle_party_started` | `{ battle, party, characters }` | Após iniciar o combate; redireciona todos para a tela de batalha |
+---
 
-### Combate no Grid Tático (10 Posições)
-| Evento (Client → Server) | Payload | Ação |
-|:---|:---|:---|
-| `family:execute_battle_action` | `{ battleId, characterId, actionType, targetPosition?, skillId? }` | Executa `MOVE`, `ATTACK`, `SKILL` ou `DEFEND`; calcula dano; avança turno; IA do Monstro age automaticamente |
+## 3. WebSockets em Tempo Real (Socket.IO) — *Fase 4*
 
-| Evento (Server → Client) | Payload | Quando |
-|:---|:---|:---|
-| `family:battle_updated` | `{ battle, lastAction, characters }` | Após cada ação de combate |
-| `family:hero_knocked_out` | `{ characterId, characterName, inInfirmaryUntil }` | Quando HP de um herói chega a 0 |
-| `family:battle_victory` | `{ rewardXp, rewardGold, message }` | Quando o HP do monstro chega a 0 |
+### Eventos de Sala Familiar
+- `join_family_room`: O cliente se conecta à sala de eventos do seu clã familiar (`family_{id}`).
+- `task_submitted`: Notificação instantânea para os pais quando um filho submete uma prova.
+- `task_approved`: Notificação instantânea com efeito sonoro e visual para o herói quando sua missão é aprovada.
 
-### Notificações em Tempo Real
-| Evento (Server → Client) | Payload | Quando |
-|:---|:---|:---|
-| `family:task_approved_event` | `{ characterName, taskTitle, rewardXp, rewardGold, characterId, timestamp }` | Ao pai aprovar uma tarefa via Painel do Mestre |
+### Eventos de Raid & Combate Cooperativo
+- `raid_lobby_join`: Heróis entram no saguão de preparação da Raid contra o Chefe.
+- `raid_start`: Início sincronizado do combate Phaser 2D em tempo real.
+- `raid_hero_action`: Envio da ação do turno do herói (ataque, habilidade, cura, poção).
+- `raid_turn_update`: Broadcast para todos os participantes do estado do campo, fila de iniciativa e dano causado.
+- `raid_victory` / `raid_defeat`: Fim da batalha com distribuição sincronizada de recompensas.

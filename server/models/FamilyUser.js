@@ -54,6 +54,18 @@ FamilyUser.init(
         },
       },
     },
+    phone: {
+      type: DataTypes.STRING(30),
+      allowNull: true,
+    },
+    school_or_work: {
+      type: DataTypes.STRING(150),
+      allowNull: true,
+    },
+    profile_photo_url: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
   },
   {
     sequelize,
