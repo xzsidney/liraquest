@@ -10,6 +10,7 @@ import {
   DefinitionSkill,
   DefinitionItem,
   FamilyUser,
+  UserProgress,
 } from '../models/index.js';
 
 /**
