@@ -14,11 +14,14 @@ O backend do LiraQuest roda no servidor **Express** integrado com **Socket.IO** 
 
 | Método | Rota | Auth | Ação |
 |:---|:---|:---|:---|
-| `POST` | `/api/auth/register` | Pública | Cria novo usuário (`User`) com e-mail e senha (bcrypt) |
-| `POST` | `/api/auth/login` | Pública | Autentica usuário, retorna JWT |
-| `GET` | `/api/auth/me` | 🔒 JWT | Retorna dados do usuário logado |
+| `POST` | `/api/auth/register` | Pública | Cria novo usuário (`FamilyUser`) com nome, e-mail, senha (bcrypt) e role (`ADMIN`, `PARENT`, `CHILD`) |
+| `POST` | `/api/auth/login` | Pública | Autentica usuário, valida hash bcrypt e retorna JWT |
+| `GET` | `/api/auth/me` | 🔒 JWT | Retorna dados do usuário autenticado |
+| `GET` | `/api/auth/users` | 🔒 JWT (ADMIN) | Retorna a listagem de todos os usuários cadastrados (exclusivo para Administrador) |
 
-**Middleware:** `authMiddleware` — valida JWT no header `Authorization: Bearer <token>`.
+**Middlewares:**
+- `authenticateToken`: valida JWT no header `Authorization: Bearer <token>`.
+- `authorizeRoles(...roles)`: validação RBAC baseada nos perfis permitidos.
 
 ---
 

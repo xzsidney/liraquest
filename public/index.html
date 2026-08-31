@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiraQuest - Plataforma de Gamificação Familiar & RPG</title>
+  
+  <!-- Fontes Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #0b0c10;
+      --bg-card: rgba(22, 24, 34, 0.85);
+      --border-card: rgba(168, 85, 247, 0.25);
+      --primary: #9333ea;
+      --primary-hover: #a855f7;
+      --accent: #f59e0b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(147, 51, 234, 0.18) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(15, 23, 42, 0.8) 0px, transparent 100%);
+      background-attachment: fixed;
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Navbar */
+    .navbar {
+      background: rgba(11, 12, 16, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 16px 24px;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+      cursor: pointer;
+    }
+
+    .brand-icon {
+      font-size: 1.8rem;
+    }
+
+    .brand-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.6rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #ffffff 40%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 1px;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .nav-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: color 0.2s;
+      cursor: pointer;
+    }
+
+    .nav-link:hover {
+      color: #ffffff;
+    }
+
+    /* Main Container */
+    .main-content {
+      flex: 1;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 40px 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* Cards & Containers */
+    .auth-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-card);
+      border-radius: 24px;
+      padding: 40px;
+      max-width: 480px;
+      width: 100%;
+      margin: 0 auto;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 30px rgba(168, 85, 247, 0.1);
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    .dashboard-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-card);
+      border-radius: 24px;
+      padding: 36px;
+      width: 100%;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Typography */
+    h1, h2, h3 {
+      font-family: 'Cinzel', serif;
+      letter-spacing: 0.5px;
+    }
+
+    .section-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #ffffff 40%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .section-subtitle {
+      color: var(--text-muted);
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    /* Formulários */
+    .form-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-bottom: 8px;
+    }
+
+    .form-input, .form-select {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 13px 16px;
+      font-size: 1rem;
+      color: #ffffff;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .form-input:focus, .form-select:focus {
+      border-color: var(--primary-hover);
+      box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.25);
+    }
+
+    .form-select option {
+      background: #0f172a;
+      color: #ffffff;
+    }
+
+    /* Botões */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 1rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #7c3aed);
+      color: #ffffff;
+      box-shadow: 0 10px 20px -5px rgba(147, 51, 234, 0.5);
+      width: 100%;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, var(--primary-hover), #8b5cf6);
+      transform: translateY(-2px);
+      box-shadow: 0 14px 24px -5px rgba(147, 51, 234, 0.7);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.25);
+    }
+
+    .btn-sm {
+      padding: 8px 16px;
+      font-size: 0.875rem;
+      border-radius: 8px;
+    }
+
+    /* Badges de Perfil */
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    .badge-admin {
+      background: rgba(234, 179, 8, 0.15);
+      color: #facc15;
+      border: 1px solid rgba(234, 179, 8, 0.4);
+    }
+
+    .badge-parent {
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.4);
+    }
+
+    .badge-child {
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+      border: 1px solid rgba(34, 197, 94, 0.4);
+    }
+
+    /* Quick Login Bar */
+    .quick-login-box {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      text-align: center;
+    }
+
+    .quick-login-box p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .quick-login-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .btn-quick {
+      padding: 8px 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #e2e8f0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-quick:hover {
+      background: rgba(168, 85, 247, 0.2);
+      border-color: var(--primary);
+    }
+
+    /* Home View Styles */
+    .hero-section {
+      text-align: center;
+      max-width: 850px;
+      margin: 0 auto;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(147, 51, 234, 0.15);
+      border: 1px solid rgba(168, 85, 247, 0.35);
+      color: #c084fc;
+      padding: 6px 18px;
+      border-radius: 9999px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+
+    .hero-title {
+      font-size: 3.5rem;
+      font-weight: 900;
+      line-height: 1.15;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #ffffff 40%, #d8b4fe 80%, #a855f7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-desc {
+      font-size: 1.25rem;
+      color: #cbd5e1;
+      line-height: 1.7;
+      margin-bottom: 36px;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 56px;
+    }
+
+    .roles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      text-align: left;
+    }
+
+    .role-card {
+      background: rgba(30, 41, 59, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      padding: 24px;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .role-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(168, 85, 247, 0.4);
+    }
+
+    .role-card-icon {
+      font-size: 2rem;
+      margin-bottom: 12px;
+    }
+
+    .role-card h4 {
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+      color: #ffffff;
+    }
+
+    .role-card p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Dashboard Header */
+    .dashboard-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 24px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .user-profile-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .avatar-circle {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), #3b82f6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
+    }
+
+    /* Grid de Estatísticas dos Dashboards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .stat-number {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    /* Lista de Usuários no Admin */
+    .users-list {
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 16px;
+      max-height: 350px;
+      overflow-y: auto;
+    }
+
+    .user-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 0.95rem;
+    }
+
+    .user-row:last-child {
+      border-bottom: none;
+    }
+
+    .user-email {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .user-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-date {
+      font-size: 0.75rem;
+      color: #64748b;
+    }
+
+    /* Toast Container */
+    #toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .toast {
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    .toast-success { border-color: #22c55e; color: #4ade80; }
+    .toast-error { border-color: #ef4444; color: #f87171; }
+    .toast-warning { border-color: #f59e0b; color: #fbbf24; }
+    .toast-info { border-color: #3b82f6; color: #60a5fa; }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .toast-fadeout {
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s ease;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 24px;
+      color: #64748b;
+      font-size: 0.85rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Barra de Navegação Superior -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="brand" onclick="navigateTo('home')">
+        <span class="brand-icon">🏰</span>
+        <span class="brand-title">LiraQuest</span>
+      </div>
+
+      <!-- Ações da Navbar quando deslogado -->
+      <div id="nav-auth-guest" class="nav-actions">
+        <span class="nav-link" onclick="navigateTo('home')">Início</span>
+        <span class="nav-link" onclick="navigateTo('login')">Entrar</span>
+        <button class="btn btn-secondary btn-sm" onclick="navigateTo('register')">Criar Conta</button>
+      </div>
+
+      <!-- Ações da Navbar quando logado -->
+      <div id="nav-auth-logged" class="nav-actions" style="display: none;">
+        <span id="nav-user-badge" class="role-badge">Perfil</span>
+        <span id="nav-user-name" style="font-weight: 700;">Usuário</span>
+        <button class="btn btn-secondary btn-sm" onclick="redirectToUserHome()">Meu Painel</button>
+        <button class="btn btn-danger btn-sm" onclick="handleLogout()">Sair</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Conteúdo Principal Dinâmico (6 Telas) -->
+  <main class="main-content">
+
+    <!-- ==================== TELA 1: HOME PÚBLICA ==================== -->
+    <section id="view-home" class="hero-section">
+      <div class="hero-badge">
+        <span>✨</span> Nova Era da Gamificação Familiar
+      </div>
+      <h1 class="hero-title">Transforme Rotinas em uma Aventura Épica</h1>
+      <p class="hero-desc">
+        O <strong>LiraQuest</strong> une pais e filhos em um universo de RPG real. Cumpra tarefas diárias, ganhe pontos de experiência, evolua heróis e participe de batalhas cooperativas!
+      </p>
+
+      <div class="hero-actions">
+        <button class="btn btn-primary" style="width: auto;" onclick="navigateTo('register')">
+          ⚔️ Começar Aventura (Cadastro)
+        </button>
+        <button class="btn btn-secondary" onclick="navigateTo('login')">
+          🔑 Já sou Membro (Login)
+        </button>
+      </div>
+
+      <div class="roles-grid">
+        <div class="role-card">
+          <div class="role-card-icon">👑</div>
+          <h4>Administrador</h4>
+          <p>Acesso total ao sistema, estatísticas gerais e controle mestre da plataforma.</p>
+        </div>
+        <div class="role-card">
+          <div class="role-card-icon">🛡️</div>
+          <h4>Pais & Guardiões</h4>
+          <p>Criação de missões, aprovação de tarefas, recompensas e acompanhamento dos heróis.</p>
+        </div>
+        <div class="role-card">
+          <div class="role-card-icon">⚔️</div>
+          <h4>Filhos & Heróis</h4>
+          <p>Visão simplificada e gamificada com missões diárias, avatares e baú de recompensas.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TELA 2: CADASTRO ==================== -->
+    <section id="view-register" style="display: none;">
+      <div class="auth-card">
+        <h2 class="section-title">Criar Conta</h2>
+        <p class="section-subtitle">Junte-se ao LiraQuest e crie seu acesso familiar.</p>
+
+        <form id="register-form">
+          <div class="form-group">
+            <label class="form-label" for="reg-name">Nome Completo</label>
+            <input type="text" id="reg-name" class="form-input" placeholder="Ex: Sidney Lira" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg-email">E-mail</label>
+            <input type="email" id="reg-email" class="form-input" placeholder="seu@email.com" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg-password">Senha</label>
+            <input type="password" id="reg-password" class="form-input" placeholder="Mínimo 6 caracteres" minlength="6" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg-role">Perfil de Acesso</label>
+            <select id="reg-role" class="form-select">
+              <option value="PARENT">🛡️ Pais / Guardião (Gestão da Família)</option>
+              <option value="CHILD" selected>⚔️ Filho(a) / Herói (Missões)</option>
+              <option value="ADMIN">👑 Administrador (Acesso Total)</option>
+            </select>
+          </div>
+
+          <button type="submit" id="btn-register-submit" class="btn btn-primary">
+            Criar Minha Conta
+          </button>
+        </form>
+
+        <div style="margin-top: 20px; text-align: center;">
+          <span style="font-size: 0.9rem; color: var(--text-muted);">Já tem uma conta?</span>
+          <a href="#login" style="color: #c084fc; font-weight: 700; text-decoration: none; margin-left: 6px;">Fazer Login</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TELA 3: LOGIN ==================== -->
+    <section id="view-login" style="display: none;">
+      <div class="auth-card">
+        <h2 class="section-title">Acessar Conta</h2>
+        <p class="section-subtitle">Entre com suas credenciais para entrar no LiraQuest.</p>
+
+        <form id="login-form">
+          <div class="form-group">
+            <label class="form-label" for="login-email">E-mail</label>
+            <input type="email" id="login-email" class="form-input" placeholder="seu@email.com" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="login-password">Senha</label>
+            <input type="password" id="login-password" class="form-input" placeholder="••••••••" required>
+          </div>
+
+          <button type="submit" id="btn-login-submit" class="btn btn-primary">
+            Entrar no Jogo
+          </button>
+        </form>
+
+        <!-- Teste Rápido com 1 Clique -->
+        <div class="quick-login-box">
+          <p>⚡ Login Rápido de Teste (1 Clique):</p>
+          <div class="quick-login-buttons">
+            <button class="btn-quick" onclick="quickLogin('admin')">👑 Admin</button>
+            <button class="btn-quick" onclick="quickLogin('parent')">🛡️ Pai</button>
+            <button class="btn-quick" onclick="quickLogin('child')">⚔️ Filho</button>
+          </div>
+        </div>
+
+        <div style="margin-top: 20px; text-align: center;">
+          <span style="font-size: 0.9rem; color: var(--text-muted);">Não tem uma conta?</span>
+          <a href="#register" style="color: #c084fc; font-weight: 700; text-decoration: none; margin-left: 6px;">Cadastre-se</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TELA 4: DASHBOARD ADMIN ==================== -->
+    <section id="view-admin" style="display: none;">
+      <div class="dashboard-card">
+        <div class="dashboard-header">
+          <div class="user-profile-bar">
+            <div class="avatar-circle">👑</div>
+            <div>
+              <h2 id="admin-user-name" style="font-size: 1.6rem; color: #ffffff;">Mestre Administrador</h2>
+              <span id="admin-user-email" style="color: var(--text-muted); font-size: 0.9rem;">admin@liraquest.com</span>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span class="role-badge badge-admin">👑 Perfil: Administrador (Acesso Total)</span>
+            <button class="btn btn-danger btn-sm" onclick="handleLogout()">Sair</button>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-label">Total de Usuários Cadastrados</span>
+            <span class="stat-number" id="admin-total-users">--</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Banco de Dados</span>
+            <span class="stat-number" style="font-size: 1.2rem; color: #4ade80;">MySQL Hostinger Online</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Nível de Permissão</span>
+            <span class="stat-number" style="font-size: 1.2rem; color: #facc15;">Controle Mestre (FULL)</span>
+          </div>
+        </div>
+
+        <h3 style="margin-bottom: 16px; font-size: 1.3rem;">👥 Usuários Cadastrados no Sistema</h3>
+        <div class="users-list" id="admin-users-list">
+          <!-- Preenchido dinamicamente via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TELA 5: DASHBOARD PAIS ==================== -->
+    <section id="view-parent" style="display: none;">
+      <div class="dashboard-card">
+        <div class="dashboard-header">
+          <div class="user-profile-bar">
+            <div class="avatar-circle">🛡️</div>
+            <div>
+              <h2 id="parent-user-name" style="font-size: 1.6rem; color: #ffffff;">Guardião Sidney</h2>
+              <span id="parent-user-email" style="color: var(--text-muted); font-size: 0.9rem;">pai@liraquest.com</span>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span class="role-badge badge-parent">🛡️ Perfil: Pais / Guardião (Gestão Familiar)</span>
+            <button class="btn btn-danger btn-sm" onclick="handleLogout()">Sair</button>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-label">Missões Criadas para os Filhos</span>
+            <span class="stat-number">4 Ativas</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Tarefas Aguardando Aprovação</span>
+            <span class="stat-number" style="color: #fbbf24;">1 Pendente</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Recompensas Liberadas</span>
+            <span class="stat-number" style="color: #4ade80;">3 Concedidas</span>
+          </div>
+        </div>
+
+        <div style="background: rgba(15, 23, 42, 0.5); padding: 24px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08);">
+          <h3 style="font-size: 1.2rem; margin-bottom: 8px;">📋 Painel do Guardião Familiar</h3>
+          <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">
+            Bem-vindo à central dos Pais. Aqui você poderá cadastrar rotinas de estudos, deveres de casa e tarefas diárias, definindo recompensas em XP e Moedas de Ouro para os heróis da sua casa.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TELA 6: DASHBOARD FILHOS ==================== -->
+    <section id="view-child" style="display: none;">
+      <div class="dashboard-card">
+        <div class="dashboard-header">
+          <div class="user-profile-bar">
+            <div class="avatar-circle">⚔️</div>
+            <div>
+              <h2 id="child-user-name" style="font-size: 1.6rem; color: #ffffff;">Jovem Herói Davi</h2>
+              <span id="child-user-email" style="color: var(--text-muted); font-size: 0.9rem;">filho@liraquest.com</span>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span class="role-badge badge-child">⚔️ Perfil: Filho / Jovem Herói</span>
+            <button class="btn btn-danger btn-sm" onclick="handleLogout()">Sair</button>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-label">Nível do Herói</span>
+            <span class="stat-number" style="color: #c084fc;">Nível 1 (Guerreiro)</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Moedas de Ouro</span>
+            <span class="stat-number" style="color: #facc15;">💰 150</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Missões Disponíveis Hoje</span>
+            <span class="stat-number" style="color: #4ade80;">3 Prontas</span>
+          </div>
+        </div>
+
+        <div style="background: rgba(15, 23, 42, 0.5); padding: 24px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.08);">
+          <h3 style="font-size: 1.2rem; margin-bottom: 8px;">🎮 Mural de Aventuras do Herói</h3>
+          <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;">
+            Bem-vindo à sua jornada, jovem herói! Complete suas missões diárias com atenção para subir de nível, desbloquear novas magias e preparar seus poderes para as grandes Raids cooperativas com a família!
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Container de Mensagens Toast -->
+  <div id="toast-container"></div>
+
+  <footer>
+    &copy; 2026 LiraQuest - Plataforma de RPG e Gamificação Familiar. Conectado ao MySQL Hostinger.
+  </footer>
+
+  <!-- Script da Aplicação -->
+  <script src="/app.js"></script>
+</body>
+</html>

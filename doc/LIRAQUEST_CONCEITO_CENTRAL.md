@@ -12,6 +12,20 @@ A aplicação une:
 * **Raid Cooperativa Multiplayer (2 a 4 Jogadores)**: Pais e filhos jogam juntos em tempo real via WebSockets (Socket.IO) com sistema de iniciativa por turnos contra Chefes Colossais.
 * **Motor de Livro-Jogo Solo**: Sistema de aventuras narrativas em nós com múltiplas escolhas e testes de atributos.
 * **Radar do Reino**: Mapa de localidades (Casa, Vizinhança, Especial) que contextualiza as missões no mundo do jogo.
+* **Controle de Acesso RBAC (3 Perfis)**:
+  * 👑 **Administrador (`ADMIN`)**: Controle mestre e visão geral de todos os dados da plataforma.
+  * 🛡️ **Pais / Guardiões (`PARENT`)**: Gestão familiar completa, criação e aprovação de tarefas e recompensas.
+  * ⚔️ **Filhos / Heróis (`CHILD`)**: Interface gamificada para visualização de missões, evolução do herói e batalhas.
+
+---
+
+## 👥 1.1 Hierarquia de Perfis & Acesso
+1. **Home Pública (`/`)**: Apresentação e boas-vindas à plataforma.
+2. **Cadastro (`/register`)**: Criação de contas familiares com seleção de perfil.
+3. **Login (`/login`)**: Autenticação segura com JWT e redirecionamento inteligente.
+4. **Dashboard Admin (`/admin`)**: Restrito a administradores.
+5. **Dashboard Pais (`/parent`)**: Restrito a pais/guardiões (e administradores).
+6. **Dashboard Filhos (`/child`)**: Restrito a filhos/heróis.
 
 ---
 

@@ -13,11 +13,11 @@ O banco de dados do LiraQuest utiliza o padrão **MySQL / Sequelize** com tabela
 | `name` | `STRING(100)` | Nome do usuário / Patriarca |
 | `email` | `STRING(150)` | E-mail de login |
 | `password` | `STRING(255)` | Hash da senha (bcrypt) |
-| `role` | `ENUM` | `LIRA`, `MESTRE`, `JOGADOR`, `ADMIN` |
+| `role` | `ENUM` | `ADMIN` (Acesso Total), `PARENT` (Gestão Familiar), `CHILD` (Herói/Missões) |
 | `created_at` / `updated_at` | `DATE` | Auditoria |
 
 **Relacionamentos:**
-- `User` → `hasMany` → `FamilyCharacter` (via `userId`)
+- `FamilyUser` → `hasMany` → `FamilyCharacter` (via `userId`)
 
 ---
 
