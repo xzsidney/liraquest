@@ -1018,7 +1018,14 @@ function openChameleonMultiplayerLobby() {
     chameleonSocket.on('game_over_seeker_win', ({ seekerId }) => {
       if (chameleonGameInstance) {
         const iWon = amISeeker;
-        chameleonGameInstance.endGame(iWon, true);
+        chameleonGameInstance.endGame(iWon, true, iWon ? 'SEEKER_WIN' : 'ALL_CAUGHT');
+      }
+    });
+
+    chameleonSocket.on('game_over_chameleons_win', () => {
+      if (chameleonGameInstance) {
+        const iWon = !amISeeker && !chameleonGameInstance.player.isCaught;
+        chameleonGameInstance.endGame(iWon, true, amISeeker ? 'TIME_EXPIRED_SEEKER' : 'CHAMELEON_SURVIVED');
       }
     });
   } else {
@@ -1703,7 +1710,7 @@ class ChameleonGameEngine {
     this.draw();
   }
 
-  async endGame(isVictory, isMultiplayerMatch = false) {
+  async endGame(isVictory, isMultiplayerMatch = false, reason = '') {
     this.stop();
 
     const endScreen = document.getElementById('chameleon-end-screen');
@@ -1729,20 +1736,39 @@ class ChameleonGameEngine {
 
       const data = await res.json();
       if (res.ok && data.success) {
-        if (isVictory) {
-          if (iconEl) iconEl.innerText = '🎉';
-          if (titleEl) {
-            titleEl.innerText = isMultiplayerMatch ? 'RODADA CONCLUÍDA!' : 'VITÓRIA ÉPICA!';
-            titleEl.style.color = '#fde047';
+        if (isMultiplayerMatch) {
+          if (reason === 'SEEKER_WIN') {
+            if (iconEl) iconEl.innerText = '🏆';
+            if (titleEl) { titleEl.innerText = 'VITÓRIA DO CAÇADOR!'; titleEl.style.color = '#fde047'; }
+            if (descEl) descEl.innerText = 'Você encontrou e capturou todos os camaleões da família antes do tempo acabar!';
+          } else if (reason === 'ALL_CAUGHT') {
+            if (iconEl) iconEl.innerText = '🚨';
+            if (titleEl) { titleEl.innerText = 'O CAÇADOR VENCEU!'; titleEl.style.color = '#ef4444'; }
+            if (descEl) descEl.innerText = 'Todos os heróis camaleões foram capturados pela lanterna!';
+          } else if (reason === 'CHAMELEON_SURVIVED') {
+            if (iconEl) iconEl.innerText = '🎉';
+            if (titleEl) { titleEl.innerText = 'VITÓRIA DOS CAMALEÕES!'; titleEl.style.color = '#4ade80'; }
+            if (descEl) descEl.innerText = 'Você sobreviveu à caçada da família por 45 segundos e escapou da lanterna!';
+          } else if (reason === 'TIME_EXPIRED_SEEKER') {
+            if (iconEl) iconEl.innerText = '⏳';
+            if (titleEl) { titleEl.innerText = 'O TEMPO ACABOU!'; titleEl.style.color = '#94a3b8'; }
+            if (descEl) descEl.innerText = 'Os camaleões conseguiram se esconder e escaparam da sua lanterna!';
+          } else {
+            if (iconEl) iconEl.innerText = isVictory ? '🎉' : '🚨';
+            if (titleEl) { titleEl.innerText = isVictory ? 'RODADA CONCLUÍDA!' : 'FIM DA RODADA!'; titleEl.style.color = isVictory ? '#fde047' : '#ef4444'; }
+            if (descEl) descEl.innerText = `Partida finalizada!`;
           }
-          if (descEl) descEl.innerText = `Você sobreviveu à patrulha por 45 segundos e coletou ${this.crystalsCollected} cristais!`;
         } else {
-          if (iconEl) iconEl.innerText = '🚨';
-          if (titleEl) {
-            titleEl.innerText = 'VOCÊ FOI CAPTURADO!';
-            titleEl.style.color = '#ef4444';
+          // Modo Solo
+          if (isVictory) {
+            if (iconEl) iconEl.innerText = '🎉';
+            if (titleEl) { titleEl.innerText = 'VITÓRIA ÉPICA!'; titleEl.style.color = '#fde047'; }
+            if (descEl) descEl.innerText = `Você sobreviveu à patrulha por 45 segundos e coletou ${this.crystalsCollected} cristais!`;
+          } else {
+            if (iconEl) iconEl.innerText = '🚨';
+            if (titleEl) { titleEl.innerText = 'VOCÊ FOI CAPTURADO!'; titleEl.style.color = '#ef4444'; }
+            if (descEl) descEl.innerText = `A lanterna encontrou você aos ${this.timeLimitSeconds - this.timeRemaining}s de fuga.`;
           }
-          if (descEl) descEl.innerText = `A lanterna encontrou você aos ${this.timeLimitSeconds - this.timeRemaining}s de fuga.`;
         }
 
         if (goldEl) goldEl.innerText = `💰 +${data.reward.goldEarned} Ouro`;
@@ -1750,7 +1776,6 @@ class ChameleonGameEngine {
 
         if (endScreen) endScreen.style.display = 'flex';
 
-        // Atualizar perfil do Avatar no HUD
         await loadCharacterData();
       }
     } catch (err) {

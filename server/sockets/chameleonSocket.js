@@ -105,6 +105,24 @@ export function initChameleonSocket(io) {
           timeLimit: 45,
           players: Array.from(room.players.values()),
         });
+
+        // Timer oficial do servidor
+        if (room.timer) clearInterval(room.timer);
+        room.timer = setInterval(() => {
+          if (!gameRooms.has(currentRoomId)) {
+            clearInterval(room.timer);
+            return;
+          }
+          room.timeRemaining--;
+          if (room.timeRemaining <= 0) {
+            clearInterval(room.timer);
+            room.state = 'ENDED';
+            // Se o tempo acabou e sobrou camaleão vivo, os camaleões vencem!
+            chameleonNamespace.to(currentRoomId).emit('game_over_chameleons_win', {
+              seekerId: room.seekerId,
+            });
+          }
+        }, 1000);
       }, 10000);
     });
 
@@ -146,6 +164,7 @@ export function initChameleonSocket(io) {
           .every((p) => p.isCaught);
 
         if (allCaught) {
+          if (room.timer) clearInterval(room.timer);
           room.state = 'ENDED';
           chameleonNamespace.to(currentRoomId).emit('game_over_seeker_win', {
             seekerId: room.seekerId,
