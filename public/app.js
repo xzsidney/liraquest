@@ -1466,7 +1466,35 @@ class ChameleonGameEngine {
       }
     }
 
-    // 4. Modo Solo vs IA
+    // 4. Modo Multiplayer: Checagem de Captura
+    if (this.isMultiplayer && this.socket && this.socket.connected) {
+      if (this.player.isSeeker) {
+        // Se eu sou o Caçador, verifico se colidi com algum camaleão
+        for (const [id, rp] of this.remotePlayers.entries()) {
+          if (!rp.isSeeker && !rp.isCaught) {
+            const dist = Math.hypot(this.player.x - rp.x, this.player.y - rp.y);
+            if (dist <= 32) {
+              this.markPlayerCaught(id);
+              this.socket.emit('tag_chameleon', { targetSocketId: id });
+              showToast(`🎯 Você capturou ${rp.name}!`, 'success');
+            }
+          }
+        }
+      } else {
+        // Se eu sou Camaleão, verifico se o Caçador encostou em mim
+        for (const [id, rp] of this.remotePlayers.entries()) {
+          if (rp.isSeeker && !this.player.isCaught) {
+            const dist = Math.hypot(this.player.x - rp.x, this.player.y - rp.y);
+            if (dist <= 32) {
+              this.markPlayerCaught(this.socket.id);
+              this.socket.emit('tag_chameleon', { targetSocketId: this.socket.id });
+            }
+          }
+        }
+      }
+    }
+
+    // 5. Modo Solo vs IA
     if (!this.isMultiplayer) {
       const distToPlayer = Math.hypot(this.player.x - this.seeker.x, this.player.y - this.seeker.y);
       const angleToPlayer = Math.atan2(this.player.y - this.seeker.y, this.player.x - this.seeker.x);
