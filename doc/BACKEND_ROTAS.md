@@ -133,12 +133,16 @@ Este documento cataloga todos os endpoints REST e eventos de WebSocket (Socket.I
 - `task_submitted`: Notificação instantânea para os pais quando um filho submete uma prova remota.
 - `task_approved`: Notificação em tempo real com efeitos e fanfarra para o herói quando a missão é aprovada.
 
-### Eventos de Raid & Combate Cooperativo (Phaser 2D)
-- `raid_lobby_join`: Heróis entram no saguão de preparação da Raid contra o Chefe.
-- `raid_start`: Início sincronizado do combate por turnos no grid tático.
-- `raid_hero_action`: Envio da ação do turno do herói (ataque, habilidade, cura, poção).
-- `raid_turn_update`: Broadcast para todos os participantes do estado do campo e dano causado.
-- `raid_victory` / `raid_defeat`: Fim da batalha com distribuição sincronizada de recompensas.
+### Eventos do Esconde-Esconde Camaleão Multiplayer (`/chameleon`)
+- `join_lobby`: Jogador entra no Saguão do Clã com sua foto, nome e cor de bolinha.
+- `lobby_updated`: Notifica todos os membros da sala com a lista atualizada de jogadores conectados.
+- `select_color`: Altera a cor da bolinha em tempo real para todos no lobby.
+- `start_spin_lottery`: O anfitrião da sala aciona o sorteio aleatório da Roleta da Sorte 🎰.
+- `seeker_chosen`: Dispara o resultado do sorteio, elegendo aleatoriamente o Caçador e iniciando a contagem de 10s.
+- `match_started`: Início da caçada em tempo real a 60 FPS com sincronização de coordenadas.
+- `player_move` / `player_moved`: Broadcast contínuo de posição $(x,y)$, ângulo da lanterna e camuflagem.
+- `tag_chameleon` / `chameleon_caught`: Notificação instantânea quando a lanterna colide com um camaleão.
+- `game_over_seeker_win`: Finalização da partida com entrega de recompensas.
 
 ---
 

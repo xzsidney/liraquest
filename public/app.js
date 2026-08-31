@@ -888,6 +888,11 @@ function switchAvatarTab(tab) {
 
 let chameleonGameInstance = null;
 let currentChameleonColor = '#ef4444';
+let chameleonSocket = null;
+let isMultiplayerActive = false;
+let currentRoomId = null;
+let currentLobbyPlayers = [];
+let amISeeker = false;
 
 function loadArcadeHub() {
   const energyBalanceEl = document.getElementById('arcade-energy-balance');
@@ -900,6 +905,7 @@ function openChameleonGameArena() {
   document.getElementById('arcade-hub-view').style.display = 'none';
   document.getElementById('chameleon-game-view').style.display = 'block';
   document.getElementById('chameleon-start-screen').style.display = 'flex';
+  document.getElementById('chameleon-multiplayer-screen').style.display = 'none';
   document.getElementById('chameleon-end-screen').style.display = 'none';
 
   const energyDisplay = document.getElementById('chameleon-energy-display');
@@ -918,9 +924,22 @@ function closeChameleonGameArena() {
   if (chameleonGameInstance) {
     chameleonGameInstance.stop();
   }
+  if (chameleonSocket) {
+    chameleonSocket.disconnect();
+    chameleonSocket = null;
+  }
   document.getElementById('chameleon-game-view').style.display = 'none';
   document.getElementById('arcade-hub-view').style.display = 'block';
   loadArcadeHub();
+}
+
+function backToStartScreen() {
+  document.getElementById('chameleon-multiplayer-screen').style.display = 'none';
+  document.getElementById('chameleon-start-screen').style.display = 'flex';
+  if (chameleonSocket) {
+    chameleonSocket.disconnect();
+    chameleonSocket = null;
+  }
 }
 
 function selectChameleonColor(color, btn) {
@@ -934,9 +953,155 @@ function selectChameleonColor(color, btn) {
       chameleonGameInstance.drawIdlePreview(color);
     }
   }
+
+  if (chameleonSocket && chameleonSocket.connected) {
+    chameleonSocket.emit('select_color', { color });
+  }
 }
 
-async function startChameleonGameSession() {
+// ─── LOBBY MULTIPLAYER FAMILIAR & SOCKET.IO ──────────────
+function openChameleonMultiplayerLobby() {
+  document.getElementById('chameleon-start-screen').style.display = 'none';
+  document.getElementById('chameleon-multiplayer-screen').style.display = 'flex';
+  document.getElementById('chameleon-roulette-box').style.display = 'none';
+
+  // Identifica a sala da família
+  const familyId = state.user?.family_id || 'familia_liraquest';
+  currentRoomId = `room_${familyId}`;
+
+  // Conectar ao Socket.IO namespace
+  if (typeof io !== 'undefined') {
+    if (chameleonSocket) chameleonSocket.disconnect();
+
+    chameleonSocket = io('/chameleon');
+
+    chameleonSocket.on('connect', () => {
+      chameleonSocket.emit('join_lobby', {
+        roomId: currentRoomId,
+        user: state.user,
+        color: currentChameleonColor,
+      });
+    });
+
+    chameleonSocket.on('lobby_updated', ({ players, hostId }) => {
+      currentLobbyPlayers = players;
+      renderChameleonLobbyPlayers(players, hostId);
+    });
+
+    chameleonSocket.on('seeker_chosen', ({ seekerId, seekerName, players }) => {
+      amISeeker = chameleonSocket.id === seekerId;
+      animateSeekerRoulette(players, seekerName, seekerId);
+    });
+
+    chameleonSocket.on('match_started', ({ timeLimit, players }) => {
+      document.getElementById('chameleon-multiplayer-screen').style.display = 'none';
+      if (!chameleonGameInstance) {
+        chameleonGameInstance = new ChameleonGameEngine('chameleon-canvas');
+      }
+      isMultiplayerActive = true;
+      chameleonGameInstance.startMultiplayer(players, amISeeker, chameleonSocket);
+    });
+
+    chameleonSocket.on('player_moved', (data) => {
+      if (chameleonGameInstance && chameleonGameInstance.isRunning) {
+        chameleonGameInstance.updateRemotePlayer(data);
+      }
+    });
+
+    chameleonSocket.on('chameleon_caught', ({ targetId, targetName }) => {
+      if (chameleonGameInstance) {
+        chameleonGameInstance.markPlayerCaught(targetId);
+      }
+      showToast(`🚨 ${targetName} foi capturado pela lanterna!`, 'warning');
+    });
+
+    chameleonSocket.on('game_over_seeker_win', ({ seekerId }) => {
+      if (chameleonGameInstance) {
+        const iWon = amISeeker;
+        chameleonGameInstance.endGame(iWon, true);
+      }
+    });
+  } else {
+    showToast('Recarregue a página para ativar o multiplayer.', 'info');
+  }
+}
+
+function renderChameleonLobbyPlayers(players, hostId) {
+  const container = document.getElementById('chameleon-lobby-players');
+  if (!container) return;
+
+  container.innerHTML = players
+    .map((p) => {
+      const isHost = p.id === hostId;
+      const isMe = chameleonSocket && p.id === chameleonSocket.id;
+      return `
+        <div style="background: rgba(30, 41, 59, 0.85); border: 2px solid ${p.color}; border-radius: 14px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; min-width: 140px;">
+          <div style="width: 18px; height: 18px; border-radius: 50%; background: ${p.color}; box-shadow: 0 0 8px ${p.color};"></div>
+          <div>
+            <div style="font-weight: 800; color: #ffffff; font-size: 0.9rem;">
+              ${p.name} ${isMe ? '<span style="color: #60a5fa; font-size: 0.75rem;">(Você)</span>' : ''}
+            </div>
+            <div style="font-size: 0.75rem; color: #94a3b8;">
+              ${isHost ? '👑 Líder da Sala' : 'Pronto'}
+            </div>
+          </div>
+        </div>
+      `;
+    })
+    .join('');
+
+  const spinBtn = document.getElementById('btn-spin-chameleon');
+  if (spinBtn && chameleonSocket) {
+    spinBtn.disabled = chameleonSocket.id !== hostId && players.length > 1;
+    if (chameleonSocket.id !== hostId && players.length > 1) {
+      spinBtn.innerText = '⏳ Aguardando o Líder Sortear...';
+      spinBtn.style.opacity = '0.7';
+    } else {
+      spinBtn.innerText = '🎰 Sortear Caçador & Iniciar!';
+      spinBtn.style.opacity = '1';
+    }
+  }
+}
+
+function triggerSeekerLottery() {
+  if (chameleonSocket && chameleonSocket.connected) {
+    chameleonSocket.emit('start_spin_lottery');
+  }
+}
+
+function animateSeekerRoulette(players, finalSeekerName, finalSeekerId) {
+  const rouletteBox = document.getElementById('chameleon-roulette-box');
+  const rouletteName = document.getElementById('chameleon-roulette-name');
+  const spinBtn = document.getElementById('btn-spin-chameleon');
+
+  if (rouletteBox) rouletteBox.style.display = 'block';
+  if (spinBtn) spinBtn.style.display = 'none';
+
+  let count = 0;
+  const names = players.map((p) => p.name);
+  const interval = setInterval(() => {
+    count++;
+    if (rouletteName) {
+      rouletteName.innerText = names[count % names.length];
+      rouletteName.style.color = '#93c5fd';
+    }
+    if (count > 20) {
+      clearInterval(interval);
+      if (rouletteName) {
+        rouletteName.innerText = `🔦 ${finalSeekerName.toUpperCase()}!`;
+        rouletteName.style.color = '#fde047';
+      }
+      showToast(`🎰 O Caçador da rodada é: ${finalSeekerName}! 10s para se esconder!`, 'info');
+    }
+  }, 120);
+}
+
+async function startChameleonGameSession(mode = 'SOLO') {
+  if (mode === 'MULTIPLAYER') {
+    openChameleonMultiplayerLobby();
+    return;
+  }
+
   try {
     const res = await fetch(`${API.character}/minigames/chameleon/start`, {
       method: 'POST',
@@ -966,11 +1131,13 @@ async function startChameleonGameSession() {
 
     // Esconde overlays e inicia o jogo
     document.getElementById('chameleon-start-screen').style.display = 'none';
+    document.getElementById('chameleon-multiplayer-screen').style.display = 'none';
     document.getElementById('chameleon-end-screen').style.display = 'none';
 
     if (!chameleonGameInstance) {
       chameleonGameInstance = new ChameleonGameEngine('chameleon-canvas');
     }
+    isMultiplayerActive = false;
     chameleonGameInstance.start(currentChameleonColor);
   } catch (err) {
     showToast('Erro ao iniciar partida.', 'error');
@@ -991,6 +1158,8 @@ class ChameleonGameEngine {
     this.width = this.canvas.width;
     this.height = this.canvas.height;
     this.isRunning = false;
+    this.isMultiplayer = false;
+    this.socket = null;
     this.animationFrameId = null;
 
     // Teclas pressionadas
@@ -1013,6 +1182,9 @@ class ChameleonGameEngine {
       color: '#ef4444',
       speed: 4.5,
       isCamouflaged: false,
+      isSeeker: false,
+      angle: 0,
+      isCaught: false,
     };
 
     // Buscador com Lanterna (IA)
@@ -1036,6 +1208,7 @@ class ChameleonGameEngine {
       currentWaypointIdx: 0,
     };
 
+    this.remotePlayers = new Map(); // socketId -> player
     // Cristais de Bônus 💎
     this.crystals = [];
     this.crystalsCollected = 0;
@@ -1063,6 +1236,18 @@ class ChameleonGameEngine {
       if (['ArrowLeft', 'KeyA'].includes(e.code)) this.keys.left = false;
       if (['ArrowRight', 'KeyD'].includes(e.code)) this.keys.right = false;
     });
+
+    // Rotação da lanterna pelo mouse no computador
+    this.canvas.addEventListener('mousemove', (e) => {
+      if (!this.isRunning) return;
+      const rect = this.canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      if (this.player.isSeeker) {
+        this.player.angle = Math.atan2(mouseY - this.player.y, mouseX - this.player.x);
+      }
+    });
   }
 
   setDpadKey(dir, isPressed) {
@@ -1079,6 +1264,9 @@ class ChameleonGameEngine {
   start(color) {
     this.stop();
     this.isRunning = true;
+    this.isMultiplayer = false;
+    this.player.isSeeker = false;
+    this.player.isCaught = false;
     this.player.color = color || currentChameleonColor;
     this.player.x = 400;
     this.player.y = 250;
@@ -1116,6 +1304,70 @@ class ChameleonGameEngine {
     this.loop();
   }
 
+  startMultiplayer(playersList, isSeeker, socket) {
+    this.stop();
+    this.isRunning = true;
+    this.isMultiplayer = true;
+    this.socket = socket;
+    this.player.isSeeker = isSeeker;
+    this.player.isCaught = false;
+    this.player.color = currentChameleonColor;
+    this.player.x = isSeeker ? 100 : 400;
+    this.player.y = isSeeker ? 100 : 250;
+    this.remotePlayers.clear();
+
+    playersList.forEach((p) => {
+      if (socket && p.id !== socket.id) {
+        this.remotePlayers.set(p.id, {
+          id: p.id,
+          name: p.name,
+          color: p.color,
+          x: p.x,
+          y: p.y,
+          angle: p.angle || 0,
+          isSeeker: p.isSeeker,
+          isCaught: p.isCaught || false,
+          isCamouflaged: false,
+        });
+      }
+    });
+
+    this.crystals = [];
+    this.crystalsCollected = 0;
+    this.timeRemaining = this.timeLimitSeconds;
+    this.updateHUD();
+
+    this.timerInterval = setInterval(() => {
+      if (!this.isRunning) return;
+      this.timeRemaining--;
+      this.updateHUD();
+
+      if (this.timeRemaining <= 0) {
+        this.endGame(!this.player.isSeeker, true);
+      }
+    }, 1000);
+
+    this.loop();
+  }
+
+  updateRemotePlayer(data) {
+    const p = this.remotePlayers.get(data.id);
+    if (p) {
+      p.x = data.x;
+      p.y = data.y;
+      p.angle = data.angle;
+      p.isCamouflaged = data.isCamouflaged;
+    }
+  }
+
+  markPlayerCaught(socketId) {
+    if (this.socket && this.socket.id === socketId) {
+      this.player.isCaught = true;
+    }
+    const p = this.remotePlayers.get(socketId);
+    if (p) p.isCaught = true;
+  }
+
   stop() {
     this.isRunning = false;
     if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
@@ -1145,13 +1397,17 @@ class ChameleonGameEngine {
   }
 
   update() {
-    // 1. Movimento do Jogador
+    if (this.player.isCaught) return;
+
+    // 1. Movimento do Jogador Local
     let dx = 0;
     let dy = 0;
-    if (this.keys.up) dy -= this.player.speed;
-    if (this.keys.down) dy += this.player.speed;
-    if (this.keys.left) dx -= this.player.speed;
-    if (this.keys.right) dx += this.player.speed;
+    const speed = this.player.isSeeker ? 3.5 : this.player.speed;
+
+    if (this.keys.up) dy -= speed;
+    if (this.keys.down) dy += speed;
+    if (this.keys.left) dx -= speed;
+    if (this.keys.right) dx += speed;
 
     // Normaliza velocidade diagonal
     if (dx !== 0 && dy !== 0) {
@@ -1162,87 +1418,98 @@ class ChameleonGameEngine {
     this.player.x = Math.max(this.player.radius + 10, Math.min(this.width - this.player.radius - 10, this.player.x + dx));
     this.player.y = Math.max(this.player.radius + 10, Math.min(this.height - this.player.radius - 10, this.player.y + dy));
 
+    // Se estiver se movendo e for caçador sem mouse, atualiza o ângulo
+    if (this.player.isSeeker && (dx !== 0 || dy !== 0)) {
+      this.player.angle = Math.atan2(dy, dx);
+    }
+
     // 2. Verificar Camuflagem
     this.player.isCamouflaged = false;
-    for (const p of this.platforms) {
-      if (
-        this.player.x >= p.x &&
-        this.player.x <= p.x + p.w &&
-        this.player.y >= p.y &&
-        this.player.y <= p.y + p.h
-      ) {
-        if (p.color.toLowerCase() === this.player.color.toLowerCase()) {
-          this.player.isCamouflaged = true;
-          break;
+    if (!this.player.isSeeker) {
+      for (const p of this.platforms) {
+        if (
+          this.player.x >= p.x &&
+          this.player.x <= p.x + p.w &&
+          this.player.y >= p.y &&
+          this.player.y <= p.y + p.h
+        ) {
+          if (p.color.toLowerCase() === this.player.color.toLowerCase()) {
+            this.player.isCamouflaged = true;
+            break;
+          }
         }
       }
     }
 
-    // 3. Coleta de Cristais 💎
-    for (let i = this.crystals.length - 1; i >= 0; i--) {
-      const c = this.crystals[i];
-      c.pulse += 0.05;
-      const dist = Math.hypot(this.player.x - c.x, this.player.y - c.y);
-      if (dist < this.player.radius + c.radius) {
-        this.crystals.splice(i, 1);
-        this.crystalsCollected++;
-        this.updateHUD();
-        showToast('💎 Cristal Coletado! (+5 Ouro de bônus)', 'info');
+    // Emitir posição no multiplayer
+    if (this.isMultiplayer && this.socket && this.socket.connected) {
+      this.socket.emit('player_move', {
+        x: this.player.x,
+        y: this.player.y,
+        angle: this.player.angle,
+        isCamouflaged: this.player.isCamouflaged,
+      });
+    }
+
+    // 3. Coleta de Cristais (apenas camaleão)
+    if (!this.player.isSeeker) {
+      for (let i = this.crystals.length - 1; i >= 0; i--) {
+        const c = this.crystals[i];
+        c.pulse += 0.05;
+        const dist = Math.hypot(this.player.x - c.x, this.player.y - c.y);
+        if (dist < this.player.radius + c.radius) {
+          this.crystals.splice(i, 1);
+          this.crystalsCollected++;
+          this.updateHUD();
+          showToast('💎 Cristal Coletado! (+5 Ouro de bônus)', 'info');
+        }
       }
     }
 
-    // 4. IA do Buscador com Lanterna
-    const distToPlayer = Math.hypot(this.player.x - this.seeker.x, this.player.y - this.seeker.y);
-    const angleToPlayer = Math.atan2(this.player.y - this.seeker.y, this.player.x - this.seeker.x);
+    // 4. Modo Solo vs IA
+    if (!this.isMultiplayer) {
+      const distToPlayer = Math.hypot(this.player.x - this.seeker.x, this.player.y - this.seeker.y);
+      const angleToPlayer = Math.atan2(this.player.y - this.seeker.y, this.player.x - this.seeker.x);
 
-    // Diferença angular
-    let angleDiff = Math.abs(this.seeker.angle - angleToPlayer);
-    while (angleDiff > Math.PI) angleDiff = Math.abs(angleDiff - 2 * Math.PI);
+      let angleDiff = Math.abs(this.seeker.angle - angleToPlayer);
+      while (angleDiff > Math.PI) angleDiff = Math.abs(angleDiff - 2 * Math.PI);
 
-    // Detecção da Lanterna
-    const isPlayerInLightCone =
-      distToPlayer <= this.seeker.flashlightRadius &&
-      angleDiff <= this.seeker.flashlightAngleSpread / 2;
+      const isPlayerInLightCone =
+        distToPlayer <= this.seeker.flashlightRadius &&
+        angleDiff <= this.seeker.flashlightAngleSpread / 2;
 
-    if (isPlayerInLightCone) {
-      // Jogador foi atingido pelo cone de luz (mesmo se camuflado, a luz revela!)
-      this.seeker.isAlert = true;
-      this.seeker.angle = angleToPlayer;
-    } else if (distToPlayer < 45 && !this.player.isCamouflaged) {
-      // Perto demais sem estar camuflado
-      this.seeker.isAlert = true;
-      this.seeker.angle = angleToPlayer;
-    } else {
-      this.seeker.isAlert = false;
-    }
-
-    // Movimentação do Buscador
-    const currentSpeed = this.seeker.isAlert ? this.seeker.alertSpeed : this.seeker.speed;
-
-    if (this.seeker.isAlert) {
-      // Persegue o jogador
-      this.seeker.x += Math.cos(this.seeker.angle) * currentSpeed;
-      this.seeker.y += Math.sin(this.seeker.angle) * currentSpeed;
-    } else {
-      // Segue os Waypoints da Patrulha
-      const targetWp = this.seeker.waypoints[this.seeker.currentWaypointIdx];
-      const distWp = Math.hypot(targetWp.x - this.seeker.x, targetWp.y - this.seeker.y);
-      const targetAngle = Math.atan2(targetWp.y - this.seeker.y, targetWp.x - this.seeker.x);
-
-      // Suaviza a rotação da lanterna
-      this.seeker.angle += (targetAngle - this.seeker.angle) * 0.08;
-
-      this.seeker.x += Math.cos(targetAngle) * currentSpeed;
-      this.seeker.y += Math.sin(targetAngle) * currentSpeed;
-
-      if (distWp < 20) {
-        this.seeker.currentWaypointIdx = (this.seeker.currentWaypointIdx + 1) % this.seeker.waypoints.length;
+      if (isPlayerInLightCone) {
+        this.seeker.isAlert = true;
+        this.seeker.angle = angleToPlayer;
+      } else if (distToPlayer < 45 && !this.player.isCamouflaged) {
+        this.seeker.isAlert = true;
+        this.seeker.angle = angleToPlayer;
+      } else {
+        this.seeker.isAlert = false;
       }
-    }
 
-    // 5. Colisão e Captura
-    if (distToPlayer <= this.player.radius + this.seeker.radius) {
-      this.endGame(false);
+      const currentSpeed = this.seeker.isAlert ? this.seeker.alertSpeed : this.seeker.speed;
+
+      if (this.seeker.isAlert) {
+        this.seeker.x += Math.cos(this.seeker.angle) * currentSpeed;
+        this.seeker.y += Math.sin(this.seeker.angle) * currentSpeed;
+      } else {
+        const targetWp = this.seeker.waypoints[this.seeker.currentWaypointIdx];
+        const distWp = Math.hypot(targetWp.x - this.seeker.x, targetWp.y - this.seeker.y);
+        const targetAngle = Math.atan2(targetWp.y - this.seeker.y, targetWp.x - this.seeker.x);
+
+        this.seeker.angle += (targetAngle - this.seeker.angle) * 0.08;
+        this.seeker.x += Math.cos(targetAngle) * currentSpeed;
+        this.seeker.y += Math.sin(targetAngle) * currentSpeed;
+
+        if (distWp < 20) {
+          this.seeker.currentWaypointIdx = (this.seeker.currentWaypointIdx + 1) % this.seeker.waypoints.length;
+        }
+      }
+
+      if (distToPlayer <= this.player.radius + this.seeker.radius) {
+        this.endGame(false);
+      }
     }
   }
 
@@ -1261,12 +1528,10 @@ class ChameleonGameEngine {
       this.ctx.roundRect(p.x, p.y, p.w, p.h, 16);
       this.ctx.fill();
 
-      // Borda sutil
       this.ctx.lineWidth = 3;
       this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
       this.ctx.stroke();
 
-      // Rótulo da cor
       this.ctx.globalAlpha = 0.5;
       this.ctx.fillStyle = '#ffffff';
       this.ctx.font = 'bold 13px Inter, sans-serif';
@@ -1287,25 +1552,51 @@ class ChameleonGameEngine {
       this.ctx.restore();
     }
 
-    // 4. Cone de Luz da Lanterna do Buscador (Luz Dinâmica)
+    // 4. Renderizar Caçador (Local ou IA)
+    if (!this.isMultiplayer) {
+      this.drawFlashlight(this.seeker.x, this.seeker.y, this.seeker.angle, this.seeker.isAlert);
+      this.drawSeekerBody(this.seeker.x, this.seeker.y, this.seeker.angle, this.seeker.isAlert, 'Patrulha IA');
+    } else if (this.player.isSeeker) {
+      this.drawFlashlight(this.player.x, this.player.y, this.player.angle, true);
+      this.drawSeekerBody(this.player.x, this.player.y, this.player.angle, true, 'Você (Caçador)');
+    }
+
+    // 5. Renderizar Jogadores Remotos no Multiplayer
+    if (this.isMultiplayer) {
+      for (const [id, rp] of this.remotePlayers.entries()) {
+        if (rp.isSeeker) {
+          this.drawFlashlight(rp.x, rp.y, rp.angle, true);
+          this.drawSeekerBody(rp.x, rp.y, rp.angle, true, rp.name);
+        } else {
+          this.drawChameleonBody(rp.x, rp.y, rp.color, rp.isCamouflaged, rp.isCaught, rp.name);
+        }
+      }
+    }
+
+    // 6. Renderizar Jogador Local (Camaleão)
+    if (!this.player.isSeeker) {
+      this.drawChameleonBody(
+        this.player.x,
+        this.player.y,
+        this.player.color,
+        this.player.isCamouflaged,
+        this.player.isCaught,
+        'Você'
+      );
+    }
+  }
+
+  drawFlashlight(x, y, angle, isAlert) {
     this.ctx.save();
     this.ctx.beginPath();
-    this.ctx.moveTo(this.seeker.x, this.seeker.y);
-    const startAngle = this.seeker.angle - this.seeker.flashlightAngleSpread / 2;
-    const endAngle = this.seeker.angle + this.seeker.flashlightAngleSpread / 2;
-    this.ctx.arc(this.seeker.x, this.seeker.y, this.seeker.flashlightRadius, startAngle, endAngle);
+    this.ctx.moveTo(x, y);
+    const startAngle = angle - this.seeker.flashlightAngleSpread / 2;
+    const endAngle = angle + this.seeker.flashlightAngleSpread / 2;
+    this.ctx.arc(x, y, this.seeker.flashlightRadius, startAngle, endAngle);
     this.ctx.closePath();
 
-    // Gradiente da Lanterna
-    const grad = this.ctx.createRadialGradient(
-      this.seeker.x,
-      this.seeker.y,
-      10,
-      this.seeker.x,
-      this.seeker.y,
-      this.seeker.flashlightRadius
-    );
-    if (this.seeker.isAlert) {
+    const grad = this.ctx.createRadialGradient(x, y, 10, x, y, this.seeker.flashlightRadius);
+    if (isAlert) {
       grad.addColorStop(0, 'rgba(239, 68, 68, 0.85)');
       grad.addColorStop(0.7, 'rgba(239, 68, 68, 0.35)');
       grad.addColorStop(1, 'rgba(239, 68, 68, 0)');
@@ -1317,54 +1608,64 @@ class ChameleonGameEngine {
     this.ctx.fillStyle = grad;
     this.ctx.fill();
     this.ctx.restore();
+  }
 
-    // 5. Buscador (Patrulheiro das Sombras)
+  drawSeekerBody(x, y, angle, isAlert, label) {
     this.ctx.save();
     this.ctx.beginPath();
-    this.ctx.arc(this.seeker.x, this.seeker.y, this.seeker.radius, 0, Math.PI * 2);
-    this.ctx.fillStyle = this.seeker.isAlert ? '#dc2626' : '#475569';
+    this.ctx.arc(x, y, 16, 0, Math.PI * 2);
+    this.ctx.fillStyle = isAlert ? '#dc2626' : '#475569';
     this.ctx.fill();
     this.ctx.lineWidth = 3;
     this.ctx.strokeStyle = '#ffffff';
     this.ctx.stroke();
 
-    // Lanterna na mão do buscador
     this.ctx.fillStyle = '#fde047';
     this.ctx.beginPath();
-    this.ctx.arc(
-      this.seeker.x + Math.cos(this.seeker.angle) * 14,
-      this.seeker.y + Math.sin(this.seeker.angle) * 14,
-      6,
-      0,
-      Math.PI * 2
-    );
+    this.ctx.arc(x + Math.cos(angle) * 14, y + Math.sin(angle) * 14, 6, 0, Math.PI * 2);
     this.ctx.fill();
-    this.ctx.restore();
 
-    // 6. Jogador (Camaleão)
+    this.ctx.font = 'bold 11px Inter, sans-serif';
+    this.ctx.fillStyle = '#ffffff';
+    this.ctx.textAlign = 'center';
+    this.ctx.fillText(label, x, y - 22);
+    this.ctx.restore();
+  }
+
+  drawChameleonBody(x, y, color, isCamouflaged, isCaught, label) {
     this.ctx.save();
-    if (this.player.isCamouflaged) {
-      // Camuflado: 100% invisível para a IA, com aura pontilhada visível para o jogador
+    if (isCaught) {
+      this.ctx.font = '22px serif';
+      this.ctx.textAlign = 'center';
+      this.ctx.fillText('👻', x, y + 6);
+      this.ctx.font = '11px Inter, sans-serif';
+      this.ctx.fillStyle = '#94a3b8';
+      this.ctx.fillText(`${label} (Pego)`, x, y - 18);
+    } else if (isCamouflaged) {
       this.ctx.setLineDash([4, 4]);
       this.ctx.lineWidth = 2.5;
       this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
       this.ctx.beginPath();
-      this.ctx.arc(this.player.x, this.player.y, this.player.radius, 0, Math.PI * 2);
+      this.ctx.arc(x, y, 14, 0, Math.PI * 2);
       this.ctx.stroke();
 
-      this.ctx.font = '12px Inter, sans-serif';
+      this.ctx.font = '11px Inter, sans-serif';
       this.ctx.fillStyle = '#ffffff';
       this.ctx.textAlign = 'center';
-      this.ctx.fillText('👻 Camuflado', this.player.x, this.player.y - 20);
+      this.ctx.fillText(`${label} (Camuflado)`, x, y - 18);
     } else {
-      // Visível
       this.ctx.beginPath();
-      this.ctx.arc(this.player.x, this.player.y, this.player.radius, 0, Math.PI * 2);
-      this.ctx.fillStyle = this.player.color;
+      this.ctx.arc(x, y, 14, 0, Math.PI * 2);
+      this.ctx.fillStyle = color;
       this.ctx.fill();
       this.ctx.lineWidth = 3;
       this.ctx.strokeStyle = '#ffffff';
       this.ctx.stroke();
+
+      this.ctx.font = '11px Inter, sans-serif';
+      this.ctx.fillStyle = '#ffffff';
+      this.ctx.textAlign = 'center';
+      this.ctx.fillText(label, x, y - 18);
     }
     this.ctx.restore();
   }
@@ -1374,7 +1675,7 @@ class ChameleonGameEngine {
     this.draw();
   }
 
-  async endGame(isVictory) {
+  async endGame(isVictory, isMultiplayerMatch = false) {
     this.stop();
 
     const endScreen = document.getElementById('chameleon-end-screen');
@@ -1403,7 +1704,7 @@ class ChameleonGameEngine {
         if (isVictory) {
           if (iconEl) iconEl.innerText = '🎉';
           if (titleEl) {
-            titleEl.innerText = 'VITÓRIA ÉPICA!';
+            titleEl.innerText = isMultiplayerMatch ? 'RODADA CONCLUÍDA!' : 'VITÓRIA ÉPICA!';
             titleEl.style.color = '#fde047';
           }
           if (descEl) descEl.innerText = `Você sobreviveu à patrulha por 45 segundos e coletou ${this.crystalsCollected} cristais!`;

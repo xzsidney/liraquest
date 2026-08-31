@@ -129,7 +129,9 @@ Os monstros e vilões do jogo são **metáforas diretas da desordem e dos maus h
 
 ### 7.1 Arcade do Reino Virtual & Mini-Jogos (Consumo de Energia de Aventura)
 O Arcade do Reino é o hub de lazer onde o Avatar gasta a **⚡ Energia de Aventura** ganha nas tarefas do mundo real para se divertir e faturar **💰 Ouro Virtual** e **⭐ XP**:
-1. 🔦 **Esconde-Esconde Camaleão (Lanterna Dinâmica):** O jogador comanda uma bolinha colorida em uma arena com 4 quadrantes de cores nobres (Rubi, Safira, Esmeralda, Ouro). Ao parar sobre a cor correspondente, fica 100% camuflado! O patrulheiro com lanterna cônica dinâmica varre a arena; se a luz tocar o camaleão, ele é revelado e perseguido. Sobreviver por 45 segundos garante vitória e coleta de cristais bônus de ouro.
+1. 🔦 **Esconde-Esconde Camaleão (Lanterna Dinâmica & Modo Família):** O jogador comanda uma bolinha colorida em uma arena com 4 quadrantes de cores nobres (Rubi, Safira, Esmeralda, Ouro). Ao parar sobre a cor correspondente, fica 100% camuflado! Possui dois modos de jogo:
+   - 🤖 **Modo Solo:** O jogador enfrenta a Patrulha da IA e precisa sobreviver por 45 segundos coletando cristais 💎 de ouro.
+   - 👨‍👩‍👧‍👦 **Modo Família em Tempo Real (WebSockets / Socket.IO):** Pais e filhos entram no Saguão do Clã. A **Roleta da Sorte 🎰** gira e elege aleatoriamente um membro como o **🔦 Caçador da Lanterna** da rodada. Os outros viram os **👻 Camaleões**, que têm 10 segundos de escuridão para se esconder antes da caçada começar!
 2. 📚 **Oráculo do Saber (Quiz Educativo):** Perguntas contra o relógio de matemática rápida, ciências e língua portuguesa para evoluir a Inteligência do herói.
 3. 📜 **Aventuras em Quest (Livro-Jogo 3 Escolhas):** Histórias ilustradas com caminhos ramificados baseadas nos atributos da ficha.
 4. ⚔️ **Arena de Batalha 2D:** Combates contra os Monstros da Casa.

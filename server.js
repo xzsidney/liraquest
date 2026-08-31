@@ -1,4 +1,6 @@
 import express from 'express';
+import http from 'http';
+import { Server } from 'socket.io';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
@@ -14,7 +16,7 @@ import shopRoutes from './server/routes/shopRoutes.js';
 import uploadRoutes from './server/routes/uploadRoutes.js';
 import progressRoutes from './server/routes/progressRoutes.js';
 import rewardRoutes from './server/routes/rewardRoutes.js';
-
+import { initChameleonSocket } from './server/sockets/chameleonSocket.js';
 
 dotenv.config();
 
@@ -22,6 +24,17 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+const httpServer = http.createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST'],
+  },
+});
+
+// Inicializar WebSockets do Esconde-Esconde
+initChameleonSocket(io);
+
 const PORT = process.env.PORT || 3000;
 
 // Middlewares Globais
@@ -112,9 +125,9 @@ app.get('*', (req, res) => {
 async function startServer() {
   try {
     // 1. Iniciar servidor HTTP imediatamente para a Hostinger responder 200 OK
-    const server = app.listen(PORT, () => {
+    const server = httpServer.listen(PORT, () => {
       console.log('====================================================');
-      console.log(`🏰 [LiraQuest] Servidor Fullstack Online na porta ${PORT}!`);
+      console.log(`🏰 [LiraQuest] Servidor Fullstack com WebSockets Online na porta ${PORT}!`);
       console.log(`🌐 Porta ativa: ${PORT}`);
       console.log('====================================================');
     });
