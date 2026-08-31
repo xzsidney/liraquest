@@ -49,6 +49,12 @@ const AVATAR_OPTIONS = [
   { key: 'hero_beastmaster', icon: '🐺', label: 'Fera' },
 ];
 
+function getAvatarDisplay(avatarKey) {
+  if (!avatarKey) return '⚔️';
+  const found = AVATAR_OPTIONS.find((a) => a.key === avatarKey);
+  return found ? found.icon : '⚔️';
+}
+
 // Ícones visuais dos 6 Atributos
 const ATTR_ICONS = {
   str: '💪',

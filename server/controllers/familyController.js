@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { Op } from 'sequelize';
 import {
   Family,
   FamilyMember,
@@ -281,7 +282,7 @@ export const getFamilyAnalytics = async (req, res) => {
         const submittedTodayCount = await TaskSubmission.count({
           where: {
             user_id: u.id,
-            created_at: { [sequelize.Sequelize.Op.gte]: todayStart },
+            createdAt: { [Op.gte]: todayStart },
           },
         });
 
