@@ -11,7 +11,13 @@ dotenv.config();
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 function createSequelizeInstance() {
-  const rawUrl = process.env.DATABASE_URL;
+  let rawUrl = process.env.DATABASE_URL;
+
+  // Limpar aspas duplas ou simples que a Hostinger ou o painel às vezes colocam ao redor do valor
+  if (rawUrl && typeof rawUrl === 'string') {
+    rawUrl = rawUrl.trim().replace(/^["']|["']$/g, '');
+  }
+
   let dbHost = process.env.DB_HOST || process.env.MYSQLHOST;
   let dbUser = process.env.DB_USER || process.env.MYSQLUSER;
   let dbPass = process.env.DB_PASSWORD || process.env.DB_PASS || process.env.MYSQLPASSWORD || '';
@@ -19,10 +25,11 @@ function createSequelizeInstance() {
   let dbPort = process.env.DB_PORT || process.env.MYSQLPORT || 3306;
 
   // Se DATABASE_URL for fornecida, fazemos o parse via classe URL nativa do Node (elimina bugs de regex interna do Sequelize)
-  if (rawUrl && typeof rawUrl === 'string' && rawUrl.trim() !== '' && rawUrl !== 'null') {
+  if (rawUrl && rawUrl.trim() !== '' && rawUrl !== 'null') {
     try {
       const cleanUrlStr = rawUrl.split('?')[0].trim();
       const parsedUrl = new URL(cleanUrlStr);
+
 
       if (parsedUrl.hostname) dbHost = parsedUrl.hostname;
       if (parsedUrl.port) dbPort = Number(parsedUrl.port);
