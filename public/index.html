@@ -1771,34 +1771,57 @@
     .mobile-dpad-container {
       display: none;
       margin-top: 14px;
-      grid-template-columns: repeat(3, 56px);
-      grid-template-rows: repeat(3, 56px);
-      gap: 6px;
+      grid-template-columns: repeat(3, 58px);
+      grid-template-rows: repeat(3, 58px);
+      gap: 8px;
       justify-content: center;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     .dpad-btn {
-      background: rgba(30, 58, 138, 0.6);
-      border: 1px solid rgba(212, 175, 55, 0.4);
-      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(30, 58, 138, 0.85), rgba(15, 23, 42, 0.95));
+      border: 1.5px solid rgba(212, 175, 55, 0.55);
+      border-radius: 14px;
       color: #ffffff;
-      font-size: 1.4rem;
+      font-size: 1.5rem;
       display: flex;
       align-items: center;
       justify-content: center;
       user-select: none;
       -webkit-user-select: none;
-      touch-action: manipulation;
+      touch-action: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      transition: transform 0.1s, background 0.1s;
     }
 
     .dpad-btn:active {
-      background: var(--accent);
+      background: linear-gradient(135deg, var(--accent), #4a0e17);
+      border-color: #fde047;
       transform: scale(0.92);
     }
 
     @media (max-width: 768px) {
       .mobile-dpad-container {
         display: grid;
+      }
+      .game-arena-wrapper {
+        border-radius: 14px;
+        margin-top: 10px;
+        touch-action: none;
+      }
+      #chameleon-canvas {
+        touch-action: none;
+      }
+      .game-overlay-screen {
+        padding: 16px 12px;
+      }
+      .game-overlay-screen h2 {
+        font-size: 1.4rem !important;
+      }
+      .game-overlay-screen p {
+        font-size: 0.85rem !important;
       }
     }
 
@@ -3630,11 +3653,35 @@
             <!-- D-Pad de Controles de Toque (Celular) -->
             <div id="chameleon-mobile-dpad" class="mobile-dpad-container">
               <div></div>
-              <button class="dpad-btn" onpointerdown="handleDpadInput('UP', true)" onpointerup="handleDpadInput('UP', false)">⬆️</button>
+              <button type="button" class="dpad-btn" 
+                onpointerdown="handleDpadInput('UP', true, event)" 
+                onpointerup="handleDpadInput('UP', false, event)"
+                onpointercancel="handleDpadInput('UP', false, event)"
+                onpointerleave="handleDpadInput('UP', false, event)"
+                ontouchstart="handleDpadInput('UP', true, event)"
+                ontouchend="handleDpadInput('UP', false, event)">⬆️</button>
               <div></div>
-              <button class="dpad-btn" onpointerdown="handleDpadInput('LEFT', true)" onpointerup="handleDpadInput('LEFT', false)">⬅️</button>
-              <button class="dpad-btn" onpointerdown="handleDpadInput('DOWN', true)" onpointerup="handleDpadInput('DOWN', false)">⬇️</button>
-              <button class="dpad-btn" onpointerdown="handleDpadInput('RIGHT', true)" onpointerup="handleDpadInput('RIGHT', false)">➡️</button>
+              <button type="button" class="dpad-btn" 
+                onpointerdown="handleDpadInput('LEFT', true, event)" 
+                onpointerup="handleDpadInput('LEFT', false, event)"
+                onpointercancel="handleDpadInput('LEFT', false, event)"
+                onpointerleave="handleDpadInput('LEFT', false, event)"
+                ontouchstart="handleDpadInput('LEFT', true, event)"
+                ontouchend="handleDpadInput('LEFT', false, event)">⬅️</button>
+              <button type="button" class="dpad-btn" 
+                onpointerdown="handleDpadInput('DOWN', true, event)" 
+                onpointerup="handleDpadInput('DOWN', false, event)"
+                onpointercancel="handleDpadInput('DOWN', false, event)"
+                onpointerleave="handleDpadInput('DOWN', false, event)"
+                ontouchstart="handleDpadInput('DOWN', true, event)"
+                ontouchend="handleDpadInput('DOWN', false, event)">⬇️</button>
+              <button type="button" class="dpad-btn" 
+                onpointerdown="handleDpadInput('RIGHT', true, event)" 
+                onpointerup="handleDpadInput('RIGHT', false, event)"
+                onpointercancel="handleDpadInput('RIGHT', false, event)"
+                onpointerleave="handleDpadInput('RIGHT', false, event)"
+                ontouchstart="handleDpadInput('RIGHT', true, event)"
+                ontouchend="handleDpadInput('RIGHT', false, event)">➡️</button>
             </div>
 
           </div>

@@ -1166,7 +1166,10 @@ async function startChameleonGameSession(mode = 'SOLO') {
   }
 }
 
-function handleDpadInput(dir, isPressed) {
+function handleDpadInput(dir, isPressed, e) {
+  if (e) {
+    if (typeof e.preventDefault === 'function') e.preventDefault();
+  }
   if (chameleonGameInstance) {
     chameleonGameInstance.setDpadKey(dir, isPressed);
   }
@@ -1259,17 +1262,53 @@ class ChameleonGameEngine {
       if (['ArrowRight', 'KeyD'].includes(e.code)) this.keys.right = false;
     });
 
+    // Função auxiliar para mapear coordenadas da tela para o canvas 800x500 com escala responsiva
+    const getCanvasPos = (clientX, clientY) => {
+      const rect = this.canvas.getBoundingClientRect();
+      const scaleX = this.width / rect.width;
+      const scaleY = this.height / rect.height;
+      return {
+        x: (clientX - rect.left) * scaleX,
+        y: (clientY - rect.top) * scaleY,
+      };
+    };
+
     // Rotação da lanterna pelo mouse no computador
     this.canvas.addEventListener('mousemove', (e) => {
       if (!this.isRunning) return;
-      const rect = this.canvas.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
-
+      const pos = getCanvasPos(e.clientX, e.clientY);
       if (this.player.isSeeker) {
-        this.player.angle = Math.atan2(mouseY - this.player.y, mouseX - this.player.x);
+        this.player.angle = Math.atan2(pos.y - this.player.y, pos.x - this.player.x);
       }
     });
+
+    // Suporte a Toque Direto no Celular (Touch / Drag)
+    const handleTouch = (e) => {
+      if (!this.isRunning || !e.touches || e.touches.length === 0) return;
+      e.preventDefault();
+      const touch = e.touches[0];
+      const pos = getCanvasPos(touch.clientX, touch.clientY);
+
+      if (this.player.isSeeker) {
+        // Se for o Caçador: orienta a lanterna na direção do toque
+        this.player.angle = Math.atan2(pos.y - this.player.y, pos.x - this.player.x);
+      } else {
+        // Se for o Camaleão: move o herói suavemente em direção ao toque
+        const dx = pos.x - this.player.x;
+        const dy = pos.y - this.player.y;
+        const dist = Math.hypot(dx, dy);
+        if (dist > 8) {
+          const speed = this.player.speed;
+          this.player.x += (dx / dist) * Math.min(speed, dist);
+          this.player.y += (dy / dist) * Math.min(speed, dist);
+          this.player.x = Math.max(this.player.radius + 10, Math.min(this.width - this.player.radius - 10, this.player.x));
+          this.player.y = Math.max(this.player.radius + 10, Math.min(this.height - this.player.radius - 10, this.player.y));
+        }
+      }
+    };
+
+    this.canvas.addEventListener('touchstart', handleTouch, { passive: false });
+    this.canvas.addEventListener('touchmove', handleTouch, { passive: false });
   }
 
   setDpadKey(dir, isPressed) {
