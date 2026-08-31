@@ -57,16 +57,33 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Inicialização do Servidor e Conexão com o Banco
+// Inicialização Robusta do Servidor (Proteção contra Erro 503 na Hostinger)
 async function startServer() {
-  await testDbConnection();
+  try {
+    // 1. Iniciar servidor HTTP imediatamente para a Hostinger responder 200 OK
+    const server = app.listen(PORT, () => {
+      console.log('====================================================');
+      console.log(`🏰 [LiraQuest] Servidor Fullstack Online na porta ${PORT}!`);
+      console.log(`🌐 Porta ativa: ${PORT}`);
+      console.log('====================================================');
+    });
 
-  app.listen(PORT, () => {
-    console.log('====================================================');
-    console.log(`🏰 [LiraQuest] Servidor Fullstack Online na porta ${PORT}!`);
-    console.log(`🌐 Acesse no navegador: http://localhost:${PORT}`);
-    console.log('====================================================');
-  });
+    server.on('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        console.error(`⚠️ Porta ${PORT} já está em uso. O servidor pode já estar rodando.`);
+      } else {
+        console.error('❌ Erro no servidor HTTP:', err);
+      }
+    });
+
+    // 2. Testar conexão com banco MySQL em segundo plano (não bloqueia inicialização)
+    testDbConnection().catch((err) => {
+      console.error('⚠️ Aviso de banco de dados na Hostinger:', err.message);
+    });
+  } catch (err) {
+    console.error('❌ Erro ao iniciar a aplicação:', err);
+  }
 }
 
 startServer();
+

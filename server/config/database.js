@@ -6,11 +6,11 @@ dotenv.config();
 const databaseUrl = process.env.DATABASE_URL;
 
 if (!databaseUrl) {
-  console.error('❌ ERRO CRÍTICO: DATABASE_URL não foi definida no arquivo .env!');
+  console.error('⚠️ ALERTA: DATABASE_URL não foi encontrada nas variáveis de ambiente (.env)!');
 }
 
-// Remover query params legados (?connect_timeout=...&pool_timeout=...) para evitar warnings do driver mysql2
-const cleanDbUrl = databaseUrl ? databaseUrl.split('?')[0] : '';
+// Remover query params legados para evitar warnings do mysql2
+const cleanDbUrl = databaseUrl ? databaseUrl.split('?')[0] : 'mysql://localhost:3306/liraquest_placeholder';
 
 export const sequelize = new Sequelize(cleanDbUrl, {
   dialect: 'mysql',
@@ -25,6 +25,7 @@ export const sequelize = new Sequelize(cleanDbUrl, {
     idle: 10000,
   },
 });
+
 
 export const testDbConnection = async () => {
   try {
