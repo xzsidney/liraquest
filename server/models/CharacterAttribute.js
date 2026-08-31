@@ -15,7 +15,7 @@ CharacterAttribute.init(
       allowNull: false,
     },
     attribute_id: {
-      type: DataTypes.STRING(10),
+      type: DataTypes.UUID,
       allowNull: false,
     },
     base_value: {

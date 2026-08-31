@@ -15,7 +15,7 @@ CharacterInventory.init(
       allowNull: false,
     },
     item_id: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.UUID,
       allowNull: false,
     },
     quantity: {

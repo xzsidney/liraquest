@@ -37,10 +37,15 @@ Esta regra garante que a visão estratégica do jogo e a arquitetura técnica do
 ## Regra de Nomenclatura e Boas Práticas para Banco de Dados e Modelos
 Para garantir compatibilidade universal entre ambientes (Windows local vs Linux/Hostinger produção) e seguir as melhores práticas da indústria:
 
-1. **No Banco de Dados (Tabelas SQL):**
+1. **Padrão de Identificadores (UUID / GUID Obrigatório):**
+   - **TODAS as tabelas** do banco de dados devem utilizar obrigatoriamente identificadores únicos do tipo **UUID** (Universally Unique Identifier / GUID) como chave primária (`id`) gerados por `DataTypes.UUIDV4`.
+   - Todas as chaves estrangeiras (`*_id`) devem apontar para campos do tipo `UUID`.
+   - Tabelas de catálogo (`definition_*`) devem possuir seu `id` como `UUID` e uma coluna `code` ou `slug` (ex: `code: 'str'`, `code: 'guardiao_do_lar'`) única para facilitar buscas e referências legíveis por código.
+
+2. **No Banco de Dados (Tabelas SQL):**
    - Todos os novos nomes de tabelas no banco de dados devem ser **OBRIGATORIAMENTE em `snake_case` minúsculo** com o prefixo `family_` (ex: `family_characters`, `family_tasks`, `family_rewards`, `family_battles`, `family_skills`).
 
-2. **No Backend (Modelos TypeScript / Sequelize):**
+3. **No Backend (Modelos TypeScript / Sequelize):**
    - As classes e arquivos dos modelos permanecem em **`PascalCase`** (ex: `FamilyCharacter.ts`, `FamilyTask.ts`, `FamilyBattle.ts`).
    - Na inicialização do modelo no Sequelize (`init`), deve-se sempre definir explicitamente a propriedade `tableName` com o nome em `snake_case` correspondente:
      ```typescript

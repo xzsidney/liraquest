@@ -6,8 +6,17 @@ export class DefinitionClass extends Model {}
 DefinitionClass.init(
   {
     id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+    },
+    code: {
       type: DataTypes.STRING(50),
-      primaryKey: true, // 'guardiao_do_lar', 'sabio_estrategista', etc.
+      allowNull: false,
+      unique: {
+        name: 'unique_class_code',
+        msg: 'Código de classe já existente.',
+      },
     },
     name: {
       type: DataTypes.STRING(100),
@@ -18,11 +27,11 @@ DefinitionClass.init(
       allowNull: true,
     },
     primary_attribute_id: {
-      type: DataTypes.STRING(10),
+      type: DataTypes.UUID,
       allowNull: false,
     },
     secondary_attribute_id: {
-      type: DataTypes.STRING(10),
+      type: DataTypes.UUID,
       allowNull: false,
     },
     combat_role: {

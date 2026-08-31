@@ -6,8 +6,17 @@ export class DefinitionItem extends Model {}
 DefinitionItem.init(
   {
     id: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
+    },
+    code: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+      unique: {
+        name: 'unique_item_code',
+        msg: 'Código de item já existente.',
+      },
     },
     name: {
       type: DataTypes.STRING(100),

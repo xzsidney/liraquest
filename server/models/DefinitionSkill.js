@@ -6,11 +6,20 @@ export class DefinitionSkill extends Model {}
 DefinitionSkill.init(
   {
     id: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
-    class_id: {
+    code: {
       type: DataTypes.STRING(50),
+      allowNull: false,
+      unique: {
+        name: 'unique_skill_code',
+        msg: 'Código de habilidade já existente.',
+      },
+    },
+    class_id: {
+      type: DataTypes.UUID,
       allowNull: false,
     },
     tier: {
@@ -39,7 +48,7 @@ DefinitionSkill.init(
       defaultValue: 0,
     },
     required_skill_id: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.UUID,
       allowNull: true,
     },
     xp_cost_to_unlock: {

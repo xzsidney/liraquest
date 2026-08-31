@@ -15,7 +15,7 @@ CharacterSkill.init(
       allowNull: false,
     },
     skill_id: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.UUID,
       allowNull: false,
     },
     is_equipped: {

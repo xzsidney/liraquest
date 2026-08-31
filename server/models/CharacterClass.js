@@ -15,7 +15,7 @@ CharacterClass.init(
       allowNull: false,
     },
     class_id: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.UUID,
       allowNull: false,
     },
     level: {

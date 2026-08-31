@@ -6,8 +6,17 @@ export class DefinitionMonster extends Model {}
 DefinitionMonster.init(
   {
     id: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
+    },
+    code: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+      unique: {
+        name: 'unique_monster_code',
+        msg: 'Código de monstro já existente.',
+      },
     },
     name: {
       type: DataTypes.STRING(100),

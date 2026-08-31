@@ -42,7 +42,7 @@ Character.init(
       defaultValue: 'default_hero',
     },
     current_class_id: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.UUID,
       allowNull: true,
     },
     gold: {

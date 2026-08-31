@@ -15,7 +15,7 @@ Battle.init(
       allowNull: false,
     },
     monster_id: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.UUID,
       allowNull: false,
     },
     status: {

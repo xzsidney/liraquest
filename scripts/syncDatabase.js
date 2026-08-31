@@ -22,54 +22,54 @@ import {
 
 async function syncAndSeed() {
   try {
-    console.log('🔄 [LiraQuest] Conectando ao MySQL da Hostinger e sincronizando esquema de forma aditiva...');
+    console.log('🔄 [LiraQuest] Conectando ao MySQL da Hostinger e sincronizando esquema UUID de forma aditiva...');
 
     // Sincronização aditiva de todas as tabelas (sem force, preservando dados existentes)
     await sequelize.sync({ alter: true });
     console.log('✅ Todas as tabelas sincronizadas com sucesso no banco da Hostinger!');
 
     // ========================================================
-    // 1. SEED: 6 ATRIBUTOS DO RPG
+    // 1. SEED: 6 ATRIBUTOS DO RPG (UUID + Code)
     // ========================================================
-    console.log('🌱 Verificando catálogo de Atributos...');
+    console.log('🌱 Semeando catálogo de Atributos com UUID...');
     const defaultAttributes = [
       {
-        id: 'str',
+        code: 'str',
         name: 'Força',
         description: 'Poder físico, capacidade de carga e impacto corpo a corpo.',
         combat_role: 'Dano físico corpo a corpo, quebra de escudos e empurrão no grid.',
         real_life_role: 'Desafios de esforço físico, carregar peso e tarefas pesadas de casa.',
       },
       {
-        id: 'agi',
+        code: 'agi',
         name: 'Agilidade',
         description: 'Velocidade, reflexos e destreza manual.',
         combat_role: 'Iniciativa na ordem de turnos, esquiva/evasão e dano à distância.',
         real_life_role: 'Reflexos rápidos, atividades esportivas e tarefas com tempo limite.',
       },
       {
-        id: 'con',
+        code: 'con',
         name: 'Constituição',
         description: 'Vigor, resistência física e perseverança.',
         combat_role: 'Pontos de vida máximos (HP) e resistência a efeitos negativos.',
         real_life_role: 'Vigor, saúde, hábitos consistentes e foco prolongado (Timer AFK).',
       },
       {
-        id: 'int',
+        code: 'int',
         name: 'Inteligência',
         description: 'Capacidade analítica, raciocínio lógico e conhecimento.',
         combat_role: 'Dano mágico arcano, reserva máxima de MP e eficiência de táticas.',
         real_life_role: 'Estudos, leitura, lições de casa e resolução de problemas.',
       },
       {
-        id: 'cha',
+        code: 'cha',
         name: 'Carisma',
         description: 'Empatia, liderança e capacidade de inspiração.',
         combat_role: 'Eficiência de auras, cura, buffs em aliados e descontos no reino.',
         real_life_role: 'Empatia, cooperação familiar, gentileza e comunicação.',
       },
       {
-        id: 'luk',
+        code: 'luk',
         name: 'Sorte',
         description: 'Fortuna, intuição e acontecimentos improváveis.',
         combat_role: 'Chance de acerto crítico e sobrevivência milagrosa a golpes fatais.',
@@ -77,92 +77,117 @@ async function syncAndSeed() {
       },
     ];
 
+    const attributeMap = {};
     for (const attr of defaultAttributes) {
-      await DefinitionAttribute.upsert(attr);
+      let existing = await DefinitionAttribute.findOne({ where: { code: attr.code } });
+      if (!existing) {
+        existing = await DefinitionAttribute.create(attr);
+      } else {
+        await existing.update(attr);
+      }
+      attributeMap[attr.code] = existing.id;
     }
     console.log('✅ Catálogo de Atributos pronto!');
 
     // ========================================================
-    // 2. SEED: 6 CLASSES DE HERÓIS
+    // 2. SEED: 6 CLASSES DE HERÓIS (UUID + Code + FKs UUID)
     // ========================================================
-    console.log('🌱 Verificando catálogo de Classes...');
+    console.log('🌱 Semeando catálogo de Classes com UUID...');
     const defaultClasses = [
       {
-        id: 'guardiao_do_lar',
+        code: 'guardiao_do_lar',
         name: 'Guardião do Lar',
         description: 'O protetor incansável da casa que absorve impacto e protege os irmãos.',
-        primary_attribute_id: 'con',
-        secondary_attribute_id: 'str',
+        primaryCode: 'con',
+        secondaryCode: 'str',
         combat_role: 'Tanque / Protetor',
         real_life_focus: 'Arrumação pesada, limpeza do quarto e cuidado do espaço comum.',
         icon: 'shield',
       },
       {
-        id: 'sabio_estrategista',
+        code: 'sabio_estrategista',
         name: 'Sábio Estrategista',
         description: 'O mestre dos estudos e feitiços que decifra fraquezas dos monstros.',
-        primary_attribute_id: 'int',
-        secondary_attribute_id: 'con',
+        primaryCode: 'int',
+        secondaryCode: 'con',
         combat_role: 'Mago / Dano Mágico',
         real_life_focus: 'Estudos, leitura, lições de casa e notas altas.',
         icon: 'book',
       },
       {
-        id: 'guardiao_da_harmonia',
+        code: 'guardiao_da_harmonia',
         name: 'Guardião da Harmonia',
         description: 'A alma carismática que cura feridas, traz paz e inspira a família.',
-        primary_attribute_id: 'cha',
-        secondary_attribute_id: 'int',
+        primaryCode: 'cha',
+        secondaryCode: 'int',
         combat_role: 'Curandeiro / Suporte',
         real_life_focus: 'Autocuidado, cooperação com os pais e gentileza no dia a dia.',
         icon: 'heart',
       },
       {
-        id: 'rastreador_veloz',
+        code: 'rastreador_veloz',
         name: 'Rastreador Veloz',
         description: 'O atleta ágil que ataca com extrema velocidade e esquiva de perigos.',
-        primary_attribute_id: 'agi',
-        secondary_attribute_id: 'luk',
+        primaryCode: 'agi',
+        secondaryCode: 'luk',
         combat_role: 'Dano Físico / Esquiva',
         real_life_focus: 'Esportes, recados rápidos e brincadeiras ativas.',
         icon: 'zap',
       },
       {
-        id: 'artifice_criativo',
+        code: 'artifice_criativo',
         name: 'Artífice Criativo',
         description: 'O inventor habilidoso que constrói geringonças e controla o campo.',
-        primary_attribute_id: 'str',
-        secondary_attribute_id: 'int',
+        primaryCode: 'str',
+        secondaryCode: 'int',
         combat_role: 'Invocador / Controle',
         real_life_focus: 'Artes, desenhos, montagens e consertos caseiros.',
         icon: 'tool',
       },
       {
-        id: 'aventureiro_oportunista',
+        code: 'aventureiro_oportunista',
         name: 'Aventureiro Oportunista',
         description: 'O atirador sortudo que arrisca tudo por golpes críticos devastadores.',
-        primary_attribute_id: 'luk',
-        secondary_attribute_id: 'agi',
+        primaryCode: 'luk',
+        secondaryCode: 'agi',
         combat_role: 'Crítico / Longo Alcance',
         real_life_focus: 'Jogos de tabuleiro, novos desafios e missões surpresa.',
         icon: 'dice',
       },
     ];
 
+    const classMap = {};
     for (const cls of defaultClasses) {
-      await DefinitionClass.upsert(cls);
+      const payload = {
+        code: cls.code,
+        name: cls.name,
+        description: cls.description,
+        primary_attribute_id: attributeMap[cls.primaryCode],
+        secondary_attribute_id: attributeMap[cls.secondaryCode],
+        combat_role: cls.combat_role,
+        real_life_focus: cls.real_life_focus,
+        icon: cls.icon,
+      };
+
+      let existing = await DefinitionClass.findOne({ where: { code: cls.code } });
+      if (!existing) {
+        existing = await DefinitionClass.create(payload);
+      } else {
+        await existing.update(payload);
+      }
+      classMap[cls.code] = existing.id;
     }
     console.log('✅ Catálogo de Classes pronto!');
 
     // ========================================================
-    // 3. SEED: HABILIDADES INICIAIS (TIER 1)
+    // 3. SEED: HABILIDADES INICIAIS (UUID + Code + FKs UUID)
     // ========================================================
-    console.log('🌱 Verificando catálogo de Habilidades...');
+    console.log('🌱 Semeando catálogo de Habilidades com UUID...');
     const defaultSkills = [
       // Guardião do Lar
       {
-        id: 'skill_muralha_domestica',
-        class_id: 'guardiao_do_lar',
+        code: 'skill_muralha_domestica',
+        classCode: 'guardiao_do_lar',
         tier: 1,
         name: 'Muralha Doméstica',
         description: 'Cria uma barreira protetora que absorve dano direcionado aos aliados.',
@@ -175,8 +200,8 @@ async function syncAndSeed() {
         icon: 'shield_barrier',
       },
       {
-        id: 'skill_postura_firme',
-        class_id: 'guardiao_do_lar',
+        code: 'skill_postura_firme',
+        classCode: 'guardiao_do_lar',
         tier: 1,
         name: 'Postura Firme',
         description: 'Reduz o dano sofrido no próximo turno e atrai a atenção dos inimigos.',
@@ -190,8 +215,8 @@ async function syncAndSeed() {
       },
       // Sábio Estrategista
       {
-        id: 'skill_raio_conhecimento',
-        class_id: 'sabio_estrategista',
+        code: 'skill_raio_conhecimento',
+        classCode: 'sabio_estrategista',
         tier: 1,
         name: 'Raio de Conhecimento',
         description: 'Disparo mágico elemental concentrado de longo alcance.',
@@ -204,8 +229,8 @@ async function syncAndSeed() {
         icon: 'arcane_bolt',
       },
       {
-        id: 'skill_analise_tatica',
-        class_id: 'sabio_estrategista',
+        code: 'skill_analise_tatica',
+        classCode: 'sabio_estrategista',
         tier: 1,
         name: 'Análise Tática',
         description: 'Analisa fraquezas do chefe, concedendo dano extra a todos no próximo turno.',
@@ -219,8 +244,8 @@ async function syncAndSeed() {
       },
       // Guardião da Harmonia
       {
-        id: 'skill_abraco_revitalizante',
-        class_id: 'guardiao_da_harmonia',
+        code: 'skill_abraco_revitalizante',
+        classCode: 'guardiao_da_harmonia',
         tier: 1,
         name: 'Abraço Revitalizante',
         description: 'Restaura a saúde de um aliado ferido com energia acolhedora.',
@@ -234,8 +259,8 @@ async function syncAndSeed() {
       },
       // Rastreador Veloz
       {
-        id: 'skill_ataque_relampago',
-        class_id: 'rastreador_veloz',
+        code: 'skill_ataque_relampago',
+        classCode: 'rastreador_veloz',
         tier: 1,
         name: 'Ataque Relâmpago',
         description: 'Golpe ultrarrápido com chance de acertar duas vezes seguidas.',
@@ -249,8 +274,8 @@ async function syncAndSeed() {
       },
       // Artífice Criativo
       {
-        id: 'skill_torre_sucata',
-        class_id: 'artifice_criativo',
+        code: 'skill_torre_sucata',
+        classCode: 'artifice_criativo',
         tier: 1,
         name: 'Torre de Sucata',
         description: 'Monta uma torreta mecânica que dispara contra o inimigo automaticamente.',
@@ -264,8 +289,8 @@ async function syncAndSeed() {
       },
       // Aventureiro Oportunista
       {
-        id: 'skill_disparo_certeiro',
-        class_id: 'aventureiro_oportunista',
+        code: 'skill_disparo_certeiro',
+        classCode: 'aventureiro_oportunista',
         tier: 1,
         name: 'Disparo Certeiro',
         description: 'Tiro de precisão à distância com chance dobrada de acerto crítico.',
@@ -280,17 +305,37 @@ async function syncAndSeed() {
     ];
 
     for (const skl of defaultSkills) {
-      await DefinitionSkill.upsert(skl);
+      const payload = {
+        code: skl.code,
+        class_id: classMap[skl.classCode],
+        tier: skl.tier,
+        name: skl.name,
+        description: skl.description,
+        mana_cost: skl.mana_cost,
+        cooldown_turns: skl.cooldown_turns,
+        damage_multiplier: skl.damage_multiplier,
+        heal_amount: skl.heal_amount,
+        effect_type: skl.effect_type,
+        xp_cost_to_unlock: skl.xp_cost_to_unlock,
+        icon: skl.icon,
+      };
+
+      let existing = await DefinitionSkill.findOne({ where: { code: skl.code } });
+      if (!existing) {
+        await DefinitionSkill.create(payload);
+      } else {
+        await existing.update(payload);
+      }
     }
     console.log('✅ Catálogo de Habilidades pronto!');
 
     // ========================================================
-    // 4. SEED: ITENS INICIAIS DA LOJA
+    // 4. SEED: ITENS INICIAIS DA LOJA (UUID + Code)
     // ========================================================
-    console.log('🌱 Verificando catálogo de Itens...');
+    console.log('🌱 Semeando catálogo de Itens com UUID...');
     const defaultItems = [
       {
-        id: 'item_espada_madeira',
+        code: 'item_espada_madeira',
         name: 'Espada de Treino',
         description: 'Uma espada leve entalhada em carvalho. Aumenta a Força.',
         type: 'WEAPON',
@@ -299,7 +344,7 @@ async function syncAndSeed() {
         icon: 'wooden_sword',
       },
       {
-        id: 'item_escudo_bronze',
+        code: 'item_escudo_bronze',
         name: 'Escudo de Bronze',
         description: 'Escudo resistente que eleva a Constituição e sobrevivência.',
         type: 'ARMOR',
@@ -308,7 +353,7 @@ async function syncAndSeed() {
         icon: 'bronze_shield',
       },
       {
-        id: 'item_livro_antigo',
+        code: 'item_livro_antigo',
         name: 'Tomo do Estudioso',
         description: 'Páginas repletas de anotações úteis que expandem a Inteligência.',
         type: 'ACCESSORY',
@@ -317,7 +362,7 @@ async function syncAndSeed() {
         icon: 'scholar_book',
       },
       {
-        id: 'item_pocao_vida',
+        code: 'item_pocao_vida',
         name: 'Poção de Vigor',
         description: 'Restaura 40 pontos de vida instantaneamente em batalha.',
         type: 'POTION',
@@ -326,7 +371,7 @@ async function syncAndSeed() {
         icon: 'health_potion',
       },
       {
-        id: 'item_recompensa_cinema',
+        code: 'item_recompensa_cinema',
         name: 'Vale Cinema com Pipoca',
         description: 'Recompensa do Mundo Real: Uma ida ao cinema com a família!',
         type: 'REAL_WORLD',
@@ -337,17 +382,22 @@ async function syncAndSeed() {
     ];
 
     for (const itm of defaultItems) {
-      await DefinitionItem.upsert(itm);
+      let existing = await DefinitionItem.findOne({ where: { code: itm.code } });
+      if (!existing) {
+        await DefinitionItem.create(itm);
+      } else {
+        await existing.update(itm);
+      }
     }
     console.log('✅ Catálogo de Itens pronto!');
 
     // ========================================================
-    // 5. SEED: MONSTROS E CHEFES INICIAIS
+    // 5. SEED: MONSTROS E CHEFES INICIAIS (UUID + Code)
     // ========================================================
-    console.log('🌱 Verificando catálogo de Monstros...');
+    console.log('🌱 Semeando catálogo de Monstros com UUID...');
     const defaultMonsters = [
       {
-        id: 'mob_desorganizacao',
+        code: 'mob_desorganizacao',
         name: 'Gosma da Desorganização',
         description: 'Uma criatura viscosa nascida de roupas espalhadas pelo chão.',
         is_boss: false,
@@ -360,7 +410,7 @@ async function syncAndSeed() {
         sprite_key: 'slime_mess',
       },
       {
-        id: 'boss_procrastinacao',
+        code: 'boss_procrastinacao',
         name: 'Gólem da Procrastinação',
         description: 'Chefe Colossal que tenta fazer os heróis deixarem tudo para amanhã!',
         is_boss: true,
@@ -375,7 +425,12 @@ async function syncAndSeed() {
     ];
 
     for (const mob of defaultMonsters) {
-      await DefinitionMonster.upsert(mob);
+      let existing = await DefinitionMonster.findOne({ where: { code: mob.code } });
+      if (!existing) {
+        await DefinitionMonster.create(mob);
+      } else {
+        await existing.update(mob);
+      }
     }
     console.log('✅ Catálogo de Monstros pronto!');
 
@@ -425,7 +480,6 @@ async function syncAndSeed() {
         });
         console.log(`👤 Usuário criado: ${u.email} (${u.role})`);
       } else {
-        // Atualizar campos adicionais se ainda não preenchidos
         await existing.update({
           school_or_work: existing.school_or_work || u.school_or_work,
           phone: existing.phone || u.phone,
@@ -434,7 +488,7 @@ async function syncAndSeed() {
       }
     }
 
-    console.log('🎉 Sincronização completa e catálogo semeado com sucesso no MySQL da Hostinger!');
+    console.log('🎉 Sincronização UUID completa e catálogo semeado com sucesso no MySQL da Hostinger!');
     process.exit(0);
   } catch (error) {
     console.error('❌ Erro durante a sincronização:', error);
