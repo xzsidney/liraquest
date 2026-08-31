@@ -232,6 +232,22 @@ function closeMobileDrawer(e) {
   }
 }
 
+function forceAppRefresh() {
+  showToast('Limpando cache e atualizando o Reino...', 'info');
+  if ('caches' in window) {
+    caches.keys().then((names) => {
+      names.forEach((name) => caches.delete(name));
+    });
+  }
+  if (window.localStorage) {
+    // Mantem apenas a sessao se houver, mas limpa estados defasados
+  }
+  setTimeout(() => {
+    const cleanUrl = window.location.origin + window.location.pathname + '?nocache=' + Date.now() + window.location.hash;
+    window.location.replace(cleanUrl);
+  }, 400);
+}
+
 function redirectToUserHome() {
   if (!state.user) {
     navigateTo('home');

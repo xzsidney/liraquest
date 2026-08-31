@@ -2,7 +2,10 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>LiraQuest - Plataforma de Gamificação Familiar & RPG</title>
   
   <!-- Fontes Google -->
@@ -2062,6 +2065,9 @@
           <span class="icon">👤</span> Meus Dados Cadastrais
         </button>
 
+        <button class="drawer-item" style="color: #60a5fa; border: 1px dashed rgba(96, 165, 250, 0.4); margin-top: 10px;" onclick="forceAppRefresh()">
+          <span class="icon">🔄</span> Atualizar App & Limpar Cache
+        </button>
         <button class="drawer-item logout" onclick="handleLogout(); closeMobileDrawer();">
           <span class="icon">🚪</span> Sair da Conta
         </button>
@@ -3999,8 +4005,8 @@
     &copy; 2026 LiraQuest - Plataforma de RPG e Gamificação Familiar. Conectado ao MySQL Hostinger com UUIDv4.
   </footer>
 
-  <!-- Script Socket.IO e da Aplicação -->
+  <!-- Script Socket.IO e da Aplicação (com Cache-Busting Ativo) -->
   <script src="/socket.io/socket.io.js"></script>
-  <script src="/app.js"></script>
+  <script src="/app.js?v=20260831_2052"></script>
 </body>
 </html>
