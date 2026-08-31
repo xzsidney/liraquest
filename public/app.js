@@ -1668,15 +1668,27 @@ function switchParentTerminalTab(tab) {
 
   tabs.forEach((t) => {
     const btn = document.getElementById(`parent-nav-${t}`);
+    const mobileBtn = document.getElementById(`mobile-parent-nav-${t}`);
     const panel = document.getElementById(`parent-panel-${t}`);
-    if (btn && panel) {
+
+    if (btn) {
       if (t === tab) {
         btn.classList.add('active');
-        panel.style.display = 'block';
       } else {
         btn.classList.remove('active');
-        panel.style.display = 'none';
       }
+    }
+
+    if (mobileBtn) {
+      if (t === tab) {
+        mobileBtn.classList.add('active');
+      } else {
+        mobileBtn.classList.remove('active');
+      }
+    }
+
+    if (panel) {
+      panel.style.display = t === tab ? 'block' : 'none';
     }
   });
 
@@ -2086,6 +2098,11 @@ async function loadParentSubmissions() {
       if (navBadge) {
         navBadge.innerText = count;
         navBadge.style.display = count > 0 ? 'inline-block' : 'none';
+      }
+      const mobileBadge = document.getElementById('mobile-parent-pending-badge');
+      if (mobileBadge) {
+        mobileBadge.innerText = count;
+        mobileBadge.style.display = count > 0 ? 'inline-block' : 'none';
       }
 
       if (data.submissions.length === 0) {
@@ -2541,6 +2558,11 @@ async function loadParentRedemptions() {
       if (navBadge) {
         navBadge.innerText = pendingCount;
         navBadge.style.display = pendingCount > 0 ? 'inline-block' : 'none';
+      }
+      const mobileShopBadge = document.getElementById('mobile-parent-shop-badge');
+      if (mobileShopBadge) {
+        mobileShopBadge.innerText = pendingCount;
+        mobileShopBadge.style.display = pendingCount > 0 ? 'inline-block' : 'none';
       }
 
       if (list.length === 0) {
