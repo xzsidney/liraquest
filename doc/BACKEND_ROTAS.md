@@ -44,22 +44,6 @@ Este documento cataloga todos os endpoints REST e eventos de WebSocket (Socket.I
 | `POST` | `/api/family/join` | JWT | Ingressa em uma família através do código de convite |
 | `GET` | `/api/family/my-family` | JWT | Retorna dados da família do usuário, membros e heróis vinculados |
 
-### Exemplo: `POST /api/family/join`
-- **Body:**
-  ```json
-  {
-    "invite_code": "LIRA-7842"
-  }
-  ```
-- **Resposta Sucesso (200):**
-  ```json
-  {
-    "success": true,
-    "message": "Você ingressou na família \"Clã Lira\" com sucesso!",
-    "family": { "id": "uuid...", "name": "Clã Lira", "invite_code": "LIRA-7842" }
-  }
-  ```
-
 ---
 
 ## 4. Módulo de Personagem & Herói (`/api/character`)
@@ -71,44 +55,40 @@ Este documento cataloga todos os endpoints REST e eventos de WebSocket (Socket.I
 | `PUT` | `/api/character/update-profile` | JWT | Salva dados reais do usuário (Telefone, Escola/Trabalho, Foto) |
 | `POST` | `/api/character/change-class` | JWT | Alterna classe ativa preservando o progresso (Multi-Classe) |
 
-### Exemplo: `POST /api/character/create`
-- **Body:**
-  ```json
-  {
-    "name": "Davi Valente",
-    "gender": "MALE",
-    "avatar_type": "SPRITE",
-    "avatar_value": "hero_warrior",
-    "initial_class_id": "6cacfc3a-d5fa-4860-bc50-c2c2bcf91359"
-  }
-  ```
-- **Resposta Sucesso (201):**
-  ```json
-  {
-    "success": true,
-    "message": "⚔️ O Herói \"Davi Valente\" (Guardião do Lar) nasceu no reino de LiraQuest!",
-    "character": {
-      "id": "uuid...",
-      "name": "Davi Valente",
-      "gold": 50,
-      "current_class": { "name": "Guardião do Lar" },
-      "attributes": [ ... ],
-      "skills": [ ... ]
-    }
-  }
-  ```
+---
+
+## 5. Módulo de Missões & Gamificação (`/api/tasks`)
+
+| Método | Rota | Autenticação | Descrição |
+|:---|:---|:---|:---|
+| `POST` | `/api/tasks` | JWT (`PARENT` / `ADMIN`) | Cria uma nova missão da vida real (título, descrição, XP, ouro, categoria) |
+| `GET` | `/api/tasks` | JWT | Lista as missões ativas da família com status de submissão do filho |
+| `POST` | `/api/tasks/:taskId/submit` | JWT | Filho submete comprovação remota (foto + texto) |
+| `GET` | `/api/tasks/submissions/pending` | JWT (`PARENT` / `ADMIN`) | Pais listam evidências pendentes de avaliação |
+| `POST` | `/api/tasks/submissions/:submissionId/review` | JWT (`PARENT` / `ADMIN`) | Pais aprovam (creditando XP, Ouro e calculando Level Up) ou rejeitam com feedback |
+| `GET` | `/api/tasks/submissions/my` | JWT | Histórico de comprovações e feedbacks recebidos pelo filho |
 
 ---
 
-## 5. Módulos Futuros (Fases 3 & 4)
+## 6. Módulo da Loja do Reino (`/api/shop`)
 
-### 📋 Tarefas & Missões (`/api/tasks`) — *Fase 3*
-- `GET /api/tasks`: Lista as missões disponíveis para a família do usuário.
-- `POST /api/tasks`: Cria uma nova missão (Pais).
-- `POST /api/tasks/:taskId/submit`: Filho envia prova da missão realizada (foto + texto).
-- `POST /api/tasks/submissions/:submissionId/review`: Pai aprova ou rejeita a prova enviada.
+| Método | Rota | Autenticação | Descrição |
+|:---|:---|:---|:---|
+| `GET` | `/api/shop/items` | JWT | Lista itens virtuais e recompensas do mundo real |
+| `POST` | `/api/shop/buy` | JWT | Herói compra item consumindo saldo em ouro acumulado |
 
-### 🎮 WebSockets em Tempo Real (Socket.IO) — *Fase 4*
-- `join_family_room`: Conexão com o clã familiar em tempo real.
-- `task_submitted` & `task_approved`: Notificações instantâneas familiares.
-- `raid_lobby_join`, `raid_start`, `raid_hero_action`, `raid_turn_update`: Batalhas Phaser 2D em tempo real.
+---
+
+## 7. WebSockets em Tempo Real (Socket.IO) — *Fase 4*
+
+### Eventos de Sala Familiar
+- `join_family_room`: Conexão do usuário à sala exclusiva do seu clã familiar (`family_{id}`).
+- `task_submitted`: Notificação instantânea para os pais quando um filho submete uma prova remota.
+- `task_approved`: Notificação em tempo real com efeitos e fanfarra para o herói quando a missão é aprovada.
+
+### Eventos de Raid & Combate Cooperativo (Phaser 2D)
+- `raid_lobby_join`: Heróis entram no saguão de preparação da Raid contra o Chefe.
+- `raid_start`: Início sincronizado do combate por turnos no grid tático.
+- `raid_hero_action`: Envio da ação do turno do herói (ataque, habilidade, cura, poção).
+- `raid_turn_update`: Broadcast para todos os participantes do estado do campo e dano causado.
+- `raid_victory` / `raid_defeat`: Fim da batalha com distribuição sincronizada de recompensas.

@@ -1,10 +1,12 @@
-// LiraQuest - Client-Side App & RPG State Management (Fase 2)
+// LiraQuest - Client-Side App & RPG State Management (Fases 1, 2 e 3)
 
 const API = {
   auth: '/api/auth',
   catalog: '/api/catalog',
   family: '/api/family',
   character: '/api/character',
+  tasks: '/api/tasks',
+  shop: '/api/shop',
 };
 
 const state = {
@@ -19,6 +21,7 @@ const state = {
   selectedWizardClassId: null,
   selectedSwitchClassId: null,
   childActiveTab: 'game',
+  parentActiveTab: 'tasks',
 };
 
 // Lista de Avatares MUGEN / Sprites com ícones e rótulos
@@ -298,21 +301,28 @@ async function fetchCatalogs() {
 // ========================================================
 function switchChildTab(tab) {
   state.childActiveTab = tab;
-  const btnGame = document.getElementById('tab-btn-game');
-  const btnReal = document.getElementById('tab-btn-real');
-  const tabGame = document.getElementById('child-tab-game');
-  const tabReal = document.getElementById('child-tab-real');
+  const tabs = ['game', 'tasks', 'shop', 'real'];
+  
+  tabs.forEach((t) => {
+    const btn = document.getElementById(`child-tab-btn-${t}`);
+    const view = document.getElementById(`child-tab-${t}`);
+    if (btn && view) {
+      if (t === tab) {
+        btn.classList.add('active');
+        view.style.display = 'block';
+      } else {
+        btn.classList.remove('active');
+        view.style.display = 'none';
+      }
+    }
+  });
 
-  if (tab === 'game') {
-    btnGame.classList.add('active');
-    btnReal.classList.remove('active');
-    tabGame.style.display = 'block';
-    tabReal.style.display = 'none';
-  } else {
-    btnReal.classList.add('active');
-    btnGame.classList.remove('active');
-    tabReal.style.display = 'block';
-    tabGame.style.display = 'none';
+  if (tab === 'tasks') {
+    loadChildTasks();
+    loadChildSubmissionsHistory();
+  }
+  if (tab === 'shop') {
+    loadShopItems();
   }
 }
 
@@ -322,7 +332,6 @@ async function loadChildDashboard() {
   document.getElementById('child-user-name').innerText = state.user.name;
   document.getElementById('child-user-email').innerText = state.user.email;
 
-  // Carregar Catálogo se ainda não carregou
   if (state.classesCatalog.length === 0) {
     await fetchCatalogs();
   }
@@ -333,10 +342,7 @@ async function loadChildDashboard() {
   document.getElementById('child-real-school').value = state.user.school_or_work || '';
   document.getElementById('child-real-photo').value = state.user.profile_photo_url || '';
 
-  // Carregar dados de família do filho
   loadChildFamilyData();
-
-  // Carregar dados do Personagem
   await loadCharacterData();
 }
 
@@ -361,21 +367,17 @@ async function loadCharacterData() {
     }
   } catch (err) {
     console.error('Erro ao consultar personagem:', err);
-    showToast('Erro ao carregar dados do herói.', 'error');
   }
 }
 
 function renderHeroHUD(char) {
-  // Avatar
   const avatarBox = document.getElementById('hero-hud-avatar');
   const avatarObj = AVATAR_OPTIONS.find((a) => a.key === char.avatar_value);
   avatarBox.innerText = avatarObj ? avatarObj.icon : '⚔️';
 
-  // Nome e Classe
   document.getElementById('hero-hud-name').innerText = char.name;
   document.getElementById('hero-hud-class').innerText = char.current_class ? char.current_class.name : 'Aventureiro';
   
-  // Nível da classe ativa
   const currentClassProgress = char.classes_progress?.find((cp) => cp.class_id === char.current_class_id);
   const currentLevel = currentClassProgress ? currentClassProgress.level : 1;
   const currentXP = currentClassProgress ? currentClassProgress.xp : 0;
@@ -387,10 +389,11 @@ function renderHeroHUD(char) {
   const xpPercent = Math.min(100, Math.round((currentXP / requiredXP) * 100));
   document.getElementById('hero-hud-xp-fill').style.width = `${Math.max(5, xpPercent)}%`;
 
-  // Ouro
   document.getElementById('hero-hud-gold').innerText = `💰 ${char.gold} Ouro`;
+  const shopGoldEl = document.getElementById('shop-current-gold');
+  if (shopGoldEl) shopGoldEl.innerText = `💰 ${char.gold} Ouro`;
 
-  // 6 Atributos
+  // Atributos
   const attrsContainer = document.getElementById('hero-attributes-grid');
   if (attrsContainer && char.attributes) {
     attrsContainer.innerHTML = char.attributes
@@ -450,7 +453,6 @@ function openHeroCreationWizard() {
   const modal = document.getElementById('hero-creation-modal');
   modal.style.display = 'flex';
 
-  // Renderizar opções de avatares
   const avatarGrid = document.getElementById('wizard-avatar-grid');
   avatarGrid.innerHTML = AVATAR_OPTIONS.map(
     (av) => `
@@ -461,7 +463,6 @@ function openHeroCreationWizard() {
     `
   ).join('');
 
-  // Renderizar opções de classes
   const classesGrid = document.getElementById('wizard-classes-grid');
   if (state.classesCatalog.length > 0 && !state.selectedWizardClassId) {
     state.selectedWizardClassId = state.classesCatalog[0].id;
@@ -496,18 +497,14 @@ function closeHeroCreationWizard() {
 function selectWizardAvatar(avatarKey) {
   state.selectedWizardAvatar = avatarKey;
   const avatarGrid = document.getElementById('wizard-avatar-grid');
-  avatarGrid.querySelectorAll('.avatar-option').forEach((el) => {
-    el.classList.remove('selected');
-  });
+  avatarGrid.querySelectorAll('.avatar-option').forEach((el) => el.classList.remove('selected'));
   event.currentTarget.classList.add('selected');
 }
 
 function selectWizardClass(classId) {
   state.selectedWizardClassId = classId;
   const classesGrid = document.getElementById('wizard-classes-grid');
-  classesGrid.querySelectorAll('.class-choice-card').forEach((el) => {
-    el.classList.remove('selected');
-  });
+  classesGrid.querySelectorAll('.class-choice-card').forEach((el) => el.classList.remove('selected'));
   event.currentTarget.classList.add('selected');
 }
 
@@ -525,22 +522,14 @@ function getClassIcon(code) {
 
 async function handleCreateCharacter(e) {
   e?.preventDefault();
-  const nameInput = document.getElementById('wizard-hero-name');
-  const genderSelect = document.getElementById('wizard-hero-gender');
-  const btnSubmit = document.getElementById('btn-create-hero-submit');
-
-  const name = nameInput.value.trim();
-  const gender = genderSelect.value;
+  const name = document.getElementById('wizard-hero-name').value.trim();
+  const gender = document.getElementById('wizard-hero-gender').value;
   const avatar_value = state.selectedWizardAvatar;
   const initial_class_id = state.selectedWizardClassId;
+  const btnSubmit = document.getElementById('btn-create-hero-submit');
 
-  if (!name) {
-    showToast('Informe o nome do seu herói.', 'warning');
-    return;
-  }
-
-  if (!initial_class_id) {
-    showToast('Selecione uma classe inicial.', 'warning');
+  if (!name || !initial_class_id) {
+    showToast('Preencha os campos obrigatórios.', 'warning');
     return;
   }
 
@@ -554,13 +543,7 @@ async function handleCreateCharacter(e) {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${state.token}`,
       },
-      body: JSON.stringify({
-        name,
-        gender,
-        avatar_type: 'SPRITE',
-        avatar_value,
-        initial_class_id,
-      }),
+      body: JSON.stringify({ name, gender, avatar_type: 'SPRITE', avatar_value, initial_class_id }),
     });
 
     const data = await res.json();
@@ -656,7 +639,480 @@ async function handleConfirmClassSwitch() {
 }
 
 // ========================================================
-// 7. GESTÃO DE PERFIL REAL & FAMÍLIA
+// 7. MISSÕES & PROVAS (FASE 3)
+// ========================================================
+
+// FILHO: Carregar Mural de Missões
+async function loadChildTasks() {
+  const container = document.getElementById('child-tasks-list');
+  if (!container) return;
+
+  try {
+    const res = await fetch(`${API.tasks}`, {
+      headers: { Authorization: `Bearer ${state.token}` },
+    });
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      if (data.tasks.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-muted); grid-column: 1/-1;">Nenhuma missão ativa no mural da família no momento.</p>';
+        return;
+      }
+
+      container.innerHTML = data.tasks
+        .map((t) => {
+          const hasPending = t.submissions?.some((s) => s.status === 'PENDING');
+          const hasApproved = t.submissions?.some((s) => s.status === 'APPROVED');
+          
+          let actionButton = `<button class="btn btn-primary btn-sm" onclick="openSubmitProofModal('${t.id}', '${t.title.replace(/'/g, "\\'")}')">📸 Concluir & Enviar Prova</button>`;
+          if (hasPending) {
+            actionButton = `<span style="color: #fbbf24; font-size: 0.85rem; font-weight: 700;">⏳ Prova em Análise pelos Pais</span>`;
+          } else if (hasApproved) {
+            actionButton = `<span style="color: #4ade80; font-size: 0.85rem; font-weight: 700;">✅ Missão Cumprida & Aprovada!</span>`;
+          }
+
+          return `
+            <div class="task-card">
+              <div>
+                <span class="task-category-badge">${t.category || 'GERAL'}</span>
+                <h4 class="task-title">${t.title}</h4>
+                <p class="task-desc">${t.description || 'Sem descrição adicional.'}</p>
+              </div>
+              <div>
+                <div class="task-rewards-row">
+                  <span class="reward-pill-xp">⭐ +${t.xp_reward} XP</span>
+                  <span class="reward-pill-gold">💰 +${t.gold_reward} Ouro</span>
+                </div>
+                <div style="margin-top: 14px;">
+                  ${actionButton}
+                </div>
+              </div>
+            </div>
+          `;
+        })
+        .join('');
+    }
+  } catch (err) {
+    console.error('Erro ao carregar tarefas do filho:', err);
+  }
+}
+
+function openSubmitProofModal(taskId, taskTitle) {
+  document.getElementById('modal-task-id-target').value = taskId;
+  document.getElementById('modal-task-title-target').innerText = `Missão: ${taskTitle}`;
+  document.getElementById('proof-text-input').value = '';
+  document.getElementById('proof-photo-input').value = '';
+  document.getElementById('submit-proof-modal').style.display = 'flex';
+}
+
+function closeSubmitProofModal() {
+  document.getElementById('submit-proof-modal').style.display = 'none';
+}
+
+async function handleSubmitProof(e) {
+  e?.preventDefault();
+  const taskId = document.getElementById('modal-task-id-target').value;
+  const proof_text = document.getElementById('proof-text-input').value.trim();
+  const proof_photo_url = document.getElementById('proof-photo-input').value.trim();
+  const btn = document.getElementById('btn-submit-proof');
+
+  if (!proof_text && !proof_photo_url) {
+    showToast('Informe o relato ou uma foto da comprovação.', 'warning');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerText = 'Enviando...';
+
+  try {
+    const res = await fetch(`${API.tasks}/${taskId}/submit`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${state.token}`,
+      },
+      body: JSON.stringify({ proof_text, proof_photo_url }),
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || 'Erro ao enviar comprovação.');
+    }
+
+    showToast(data.message, 'success');
+    closeSubmitProofModal();
+    loadChildTasks();
+    loadChildSubmissionsHistory();
+  } catch (err) {
+    showToast(err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerText = '🚀 Enviar para Avaliação dos Pais';
+  }
+}
+
+async function loadChildSubmissionsHistory() {
+  const container = document.getElementById('child-submissions-history');
+  if (!container) return;
+
+  try {
+    const res = await fetch(`${API.tasks}/submissions/my`, {
+      headers: { Authorization: `Bearer ${state.token}` },
+    });
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      if (data.submissions.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-muted);">Você ainda não enviou comprovações de missões.</p>';
+        return;
+      }
+
+      container.innerHTML = data.submissions
+        .map((s) => {
+          let statusBadge = `<span class="role-badge" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24;">⏳ Pendente</span>`;
+          if (s.status === 'APPROVED') {
+            statusBadge = `<span class="role-badge" style="background: rgba(34, 197, 94, 0.2); color: #4ade80;">✅ Aprovada (+${s.task?.xp_reward} XP / +${s.task?.gold_reward} Ouro)</span>`;
+          } else if (s.status === 'REJECTED') {
+            statusBadge = `<span class="role-badge" style="background: rgba(239, 68, 68, 0.2); color: #f87171;">❌ Ajustar</span>`;
+          }
+
+          return `
+            <div class="user-row" style="flex-direction: column; align-items: flex-start; gap: 8px;">
+              <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                <strong>${s.task?.title || 'Missão'}</strong>
+                ${statusBadge}
+              </div>
+              ${s.proof_text ? `<p style="font-size: 0.85rem; color: #cbd5e1; font-style: italic;">"${s.proof_text}"</p>` : ''}
+              ${s.feedback ? `<p style="font-size: 0.85rem; color: #60a5fa; background: rgba(59, 130, 246, 0.1); padding: 6px 10px; border-radius: 6px; width: 100%;">💬 Feedback dos Pais: "${s.feedback}"</p>` : ''}
+            </div>
+          `;
+        })
+        .join('');
+    }
+  } catch (err) {
+    console.error('Erro ao carregar histórico de envios:', err);
+  }
+}
+
+// ========================================================
+// 8. LOJA DO REINO (FASE 3)
+// ========================================================
+async function loadShopItems() {
+  const container = document.getElementById('shop-items-grid');
+  if (!container) return;
+
+  try {
+    const res = await fetch(`${API.shop}/items`, {
+      headers: { Authorization: `Bearer ${state.token}` },
+    });
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      container.innerHTML = data.items
+        .map((item) => {
+          let icon = '🗡️';
+          if (item.type === 'ARMOR') icon = '🛡️';
+          if (item.type === 'ACCESSORY') icon = '📖';
+          if (item.type === 'POTION') icon = '🧪';
+          if (item.type === 'REAL_WORLD') icon = '🎟️';
+
+          return `
+            <div class="shop-item-card">
+              <div>
+                <div class="shop-item-icon">${icon}</div>
+                <h4 class="shop-item-title">${item.name}</h4>
+                <p class="shop-item-desc">${item.description || ''}</p>
+              </div>
+              <div>
+                <div class="shop-item-price">💰 ${item.price_gold} Ouro</div>
+                <button class="btn btn-gold btn-sm" style="width: 100%; margin-top: 10px;" onclick="handleBuyItem('${item.id}')">
+                  Comprar Item
+                </button>
+              </div>
+            </div>
+          `;
+        })
+        .join('');
+    }
+  } catch (err) {
+    console.error('Erro ao carregar loja:', err);
+  }
+}
+
+async function handleBuyItem(itemId) {
+  try {
+    const res = await fetch(`${API.shop}/buy`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${state.token}`,
+      },
+      body: JSON.stringify({ item_id: itemId }),
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || 'Erro ao comprar item.');
+    }
+
+    showToast(data.message, 'success');
+    await loadCharacterData();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+// ========================================================
+// 9. PAINEL DOS PAIS (MISSÕES & AVALIAÇÕES)
+// ========================================================
+function switchParentTab(tab) {
+  state.parentActiveTab = tab;
+  const tabs = ['tasks', 'submissions', 'clan'];
+
+  tabs.forEach((t) => {
+    const btn = document.getElementById(`parent-tab-btn-${t}`);
+    const view = document.getElementById(`parent-tab-${t}`);
+    if (btn && view) {
+      if (t === tab) {
+        btn.classList.add('active');
+        view.style.display = 'block';
+      } else {
+        btn.classList.remove('active');
+        view.style.display = 'none';
+      }
+    }
+  });
+
+  if (tab === 'tasks') loadParentTasks();
+  if (tab === 'submissions') loadParentSubmissions();
+}
+
+async function loadParentDashboard() {
+  if (!state.user || !state.token) return;
+  document.getElementById('parent-user-name').innerText = state.user.name;
+  document.getElementById('parent-user-email').innerText = state.user.email;
+
+  try {
+    const res = await fetch(`${API.family}/my-family`, {
+      headers: { Authorization: `Bearer ${state.token}` },
+    });
+    const data = await res.json();
+
+    const nameEl = document.getElementById('parent-family-name');
+    const codeEl = document.getElementById('parent-family-code');
+    const countEl = document.getElementById('parent-family-members-count');
+    const setupBox = document.getElementById('parent-family-setup');
+
+    if (res.ok && data.success && data.hasFamily) {
+      nameEl.innerText = data.family.name;
+      codeEl.innerText = data.family.invite_code;
+      countEl.innerText = `${data.family.members?.length || 1} Membro(s)`;
+      if (setupBox) setupBox.style.display = 'none';
+      loadParentTasks();
+      loadParentSubmissions();
+    } else {
+      nameEl.innerText = 'Não cadastrada';
+      codeEl.innerText = '--';
+      countEl.innerText = '0';
+      if (setupBox) setupBox.style.display = 'block';
+    }
+  } catch (err) {
+    console.error('Erro ao carregar dashboard dos pais:', err);
+  }
+}
+
+async function loadParentTasks() {
+  const container = document.getElementById('parent-tasks-list');
+  if (!container) return;
+
+  try {
+    const res = await fetch(`${API.tasks}`, {
+      headers: { Authorization: `Bearer ${state.token}` },
+    });
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      if (data.tasks.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-muted); grid-column: 1/-1;">Nenhuma missão criada ainda. Clique em "➕ Lançar Nova Missão" acima!</p>';
+        return;
+      }
+
+      container.innerHTML = data.tasks
+        .map(
+          (t) => `
+          <div class="task-card">
+            <div>
+              <span class="task-category-badge">${t.category || 'GERAL'}</span>
+              <h4 class="task-title">${t.title}</h4>
+              <p class="task-desc">${t.description || 'Sem descrição.'}</p>
+            </div>
+            <div class="task-rewards-row">
+              <span class="reward-pill-xp">⭐ +${t.xp_reward} XP</span>
+              <span class="reward-pill-gold">💰 +${t.gold_reward} Ouro</span>
+            </div>
+          </div>
+        `
+        )
+        .join('');
+    }
+  } catch (err) {
+    console.error('Erro ao carregar tarefas dos pais:', err);
+  }
+}
+
+async function loadParentSubmissions() {
+  const container = document.getElementById('parent-submissions-list');
+  const badge = document.getElementById('parent-pending-badge');
+  if (!container) return;
+
+  try {
+    const res = await fetch(`${API.tasks}/submissions/pending`, {
+      headers: { Authorization: `Bearer ${state.token}` },
+    });
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      if (badge) {
+        badge.innerText = data.count;
+        badge.style.display = data.count > 0 ? 'inline-block' : 'none';
+      }
+
+      if (data.submissions.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-muted); grid-column: 1/-1;">Nenhuma comprovação aguardando aprovação no momento. Tudo em dia! 🎉</p>';
+        return;
+      }
+
+      container.innerHTML = data.submissions
+        .map(
+          (s) => `
+          <div class="submission-card">
+            <div class="submission-header">
+              <div class="avatar-circle" style="width: 44px; height: 44px; font-size: 1.2rem;">⚔️</div>
+              <div>
+                <strong style="color: #ffffff;">${s.submitter?.name || 'Filho'}</strong>
+                <span style="display: block; font-size: 0.8rem; color: #c084fc;">Herói: ${s.character?.name || 'Sem Nome'}</span>
+              </div>
+            </div>
+
+            <div>
+              <span class="task-category-badge">${s.task?.category || 'MISSÃO'}</span>
+              <h4 style="font-size: 1.1rem; color: #ffffff; margin: 4px 0;">${s.task?.title}</h4>
+            </div>
+
+            ${s.proof_text ? `<div class="submission-text-box">"${s.proof_text}"</div>` : ''}
+            ${s.proof_photo_url ? `<img src="${s.proof_photo_url}" class="submission-photo" alt="Evidência da Missão">` : ''}
+
+            <div style="display: flex; gap: 8px; margin-top: 4px;">
+              <span class="reward-pill-xp">⭐ Recompensa: ${s.task?.xp_reward} XP</span>
+              <span class="reward-pill-gold">💰 ${s.task?.gold_reward} Ouro</span>
+            </div>
+
+            <div class="form-group" style="margin-top: 8px;">
+              <input type="text" id="feedback-${s.id}" class="form-input" placeholder="Mensagem de incentivo ou feedback..." style="font-size: 0.85rem;">
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+              <button class="btn btn-success btn-sm" style="flex: 1;" onclick="handleReviewSubmission('${s.id}', 'APPROVED')">
+                ✅ Aprovar
+              </button>
+              <button class="btn btn-danger btn-sm" style="flex: 1;" onclick="handleReviewSubmission('${s.id}', 'REJECTED')">
+                ❌ Rejeitar
+              </button>
+            </div>
+          </div>
+        `
+        )
+        .join('');
+    }
+  } catch (err) {
+    console.error('Erro ao carregar comprovações pendentes:', err);
+  }
+}
+
+function openCreateTaskModal() {
+  document.getElementById('create-task-modal').style.display = 'flex';
+}
+
+function closeCreateTaskModal() {
+  document.getElementById('create-task-modal').style.display = 'none';
+}
+
+async function handleCreateTask(e) {
+  e?.preventDefault();
+  const title = document.getElementById('task-title').value.trim();
+  const description = document.getElementById('task-desc').value.trim();
+  const xp_reward = document.getElementById('task-xp').value;
+  const gold_reward = document.getElementById('task-gold').value;
+  const category = document.getElementById('task-category').value;
+  const btn = document.getElementById('btn-create-task-submit');
+
+  if (!title) {
+    showToast('Informe o título da missão.', 'warning');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerText = 'Publicando...';
+
+  try {
+    const res = await fetch(`${API.tasks}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${state.token}`,
+      },
+      body: JSON.stringify({ title, description, xp_reward, gold_reward, category }),
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || 'Erro ao criar missão.');
+    }
+
+    showToast(data.message, 'success');
+    closeCreateTaskModal();
+    loadParentTasks();
+  } catch (err) {
+    showToast(err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerText = '✨ Publicar Missão no Mural';
+  }
+}
+
+async function handleReviewSubmission(submissionId, status) {
+  const feedbackInput = document.getElementById(`feedback-${submissionId}`);
+  const feedback = feedbackInput ? feedbackInput.value.trim() : '';
+
+  try {
+    const res = await fetch(`${API.tasks}/submissions/${submissionId}/review`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${state.token}`,
+      },
+      body: JSON.stringify({ status, feedback }),
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || 'Erro ao avaliar comprovação.');
+    }
+
+    showToast(data.message, status === 'APPROVED' ? 'success' : 'info');
+    if (data.leveledUp) {
+      showToast(`🏆 O Herói subiu para o NÍVEL ${data.newLevel}!`, 'gold');
+    }
+
+    loadParentSubmissions();
+    loadParentTasks();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+// ========================================================
+// 10. GESTÃO DE PERFIL REAL & FAMÍLIA
 // ========================================================
 async function handleUpdateRealProfile(e) {
   e?.preventDefault();
@@ -745,41 +1201,6 @@ async function handleJoinFamily() {
   }
 }
 
-// ========================================================
-// 8. DASHBOARD DOS PAIS & ADMIN
-// ========================================================
-async function loadParentDashboard() {
-  if (!state.user || !state.token) return;
-  document.getElementById('parent-user-name').innerText = state.user.name;
-  document.getElementById('parent-user-email').innerText = state.user.email;
-
-  try {
-    const res = await fetch(`${API.family}/my-family`, {
-      headers: { Authorization: `Bearer ${state.token}` },
-    });
-    const data = await res.json();
-
-    const nameEl = document.getElementById('parent-family-name');
-    const codeEl = document.getElementById('parent-family-code');
-    const countEl = document.getElementById('parent-family-members-count');
-    const setupBox = document.getElementById('parent-family-setup');
-
-    if (res.ok && data.success && data.hasFamily) {
-      nameEl.innerText = data.family.name;
-      codeEl.innerText = data.family.invite_code;
-      countEl.innerText = `${data.family.members?.length || 1} Membro(s)`;
-      if (setupBox) setupBox.style.display = 'none';
-    } else {
-      nameEl.innerText = 'Não cadastrada';
-      codeEl.innerText = '--';
-      countEl.innerText = '0';
-      if (setupBox) setupBox.style.display = 'block';
-    }
-  } catch (err) {
-    console.error('Erro ao consultar família do pai:', err);
-  }
-}
-
 async function handleCreateFamily() {
   const nameInput = document.getElementById('parent-new-family-name');
   const name = nameInput.value.trim();
@@ -853,7 +1274,7 @@ async function loadAdminDashboard() {
 }
 
 // ========================================================
-// 9. TOASTS / NOTIFICAÇÕES
+// 11. TOASTS / NOTIFICAÇÕES
 // ========================================================
 function showToast(message, type = 'info') {
   const container = document.getElementById('toast-container');
@@ -872,7 +1293,7 @@ function showToast(message, type = 'info') {
 }
 
 // ========================================================
-// 10. INICIALIZAÇÃO DA APLICAÇÃO
+// 12. INICIALIZAÇÃO DA APLICAÇÃO
 // ========================================================
 document.addEventListener('DOMContentLoaded', () => {
   initRouter();
@@ -888,4 +1309,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const profileForm = document.getElementById('child-profile-form');
   if (profileForm) profileForm.addEventListener('submit', handleUpdateRealProfile);
+
+  const createTaskForm = document.getElementById('create-task-form');
+  if (createTaskForm) createTaskForm.addEventListener('submit', handleCreateTask);
+
+  const submitProofForm = document.getElementById('submit-proof-form');
+  if (submitProofForm) submitProofForm.addEventListener('submit', handleSubmitProof);
 });

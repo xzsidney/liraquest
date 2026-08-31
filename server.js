@@ -9,6 +9,8 @@ import authRoutes from './server/routes/authRoutes.js';
 import catalogRoutes from './server/routes/catalogRoutes.js';
 import familyRoutes from './server/routes/familyRoutes.js';
 import characterRoutes from './server/routes/characterRoutes.js';
+import taskRoutes from './server/routes/taskRoutes.js';
+import shopRoutes from './server/routes/shopRoutes.js';
 
 dotenv.config();
 
@@ -31,6 +33,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/catalog', catalogRoutes);
 app.use('/api/family', familyRoutes);
 app.use('/api/character', characterRoutes);
+app.use('/api/tasks', taskRoutes);
+app.use('/api/shop', shopRoutes);
 
 // Health check & status
 app.get('/api/status', (req, res) => {
