@@ -73,6 +73,7 @@ function renderRoute() {
     admin: ['ADMIN'],
     parent: ['ADMIN', 'PARENT'],
     child: ['ADMIN', 'PARENT', 'CHILD'],
+    avatar: ['ADMIN', 'PARENT', 'CHILD'],
   };
 
   if (protectedRoutes[route]) {
@@ -90,7 +91,7 @@ function renderRoute() {
     }
   }
 
-  const views = ['home', 'register', 'login', 'admin', 'parent', 'child'];
+  const views = ['home', 'register', 'login', 'admin', 'parent', 'child', 'avatar'];
   views.forEach((viewId) => {
     const el = document.getElementById(`view-${viewId}`);
     if (el) {
@@ -103,6 +104,7 @@ function renderRoute() {
   if (state.currentRoute === 'admin') loadAdminDashboard();
   if (state.currentRoute === 'parent') loadParentDashboard();
   if (state.currentRoute === 'child') loadChildDashboard();
+  if (state.currentRoute === 'avatar') loadAvatarTerminal();
 }
 
 function updateNavbar() {
@@ -297,20 +299,93 @@ async function fetchCatalogs() {
 }
 
 // ========================================================
-// 4. DASHBOARD DO FILHO (USUÁRIO REAL & MENU LATERAL)
+// 4. TERMINAL 1: DASHBOARD DO USUÁRIO (FILHO - MUNDO REAL)
 // ========================================================
-function switchChildTab(tab) {
-  state.childActiveTab = tab;
-  const tabs = ['user', 'game', 'tasks', 'shop'];
+async function loadChildDashboard() {
+  if (!state.user || !state.token) return;
+
+  // Informações do Usuário no Cabeçalho
+  document.getElementById('child-user-name').innerText = state.user.name;
+  document.getElementById('child-user-email').innerText = state.user.email;
+
+  if (state.classesCatalog.length === 0) {
+    await fetchCatalogs();
+  }
+
+  // Preencher formulário de perfil do mundo real
+  document.getElementById('child-real-name').value = state.user.name || '';
+  document.getElementById('child-real-phone').value = state.user.phone || '';
+  document.getElementById('child-real-school').value = state.user.school_or_work || '';
+  document.getElementById('child-real-photo').value = state.user.profile_photo_url || '';
+
+  // Carregar dados da família
+  loadChildFamilyData();
+
+  // Consultar personagem e configurar o BOTÃO ÚNICO de acesso ao avatar
+  try {
+    const res = await fetch(`${API.character}/me`, {
+      headers: { Authorization: `Bearer ${state.token}` },
+    });
+    const data = await res.json();
+
+    const portalIcon = document.getElementById('child-portal-avatar-icon');
+    const portalTitle = document.getElementById('child-portal-avatar-title');
+    const portalSubtitle = document.getElementById('child-portal-avatar-subtitle');
+    const accessBtn = document.getElementById('btn-child-access-avatar');
+
+    if (res.ok && data.success && data.hasCharacter && data.character) {
+      state.character = data.character;
+      const avatarObj = AVATAR_OPTIONS.find((a) => a.key === data.character.avatar_value);
+      const icon = avatarObj ? avatarObj.icon : '⚔️';
+      const currentClass = data.character.current_class?.name || 'Aventureiro';
+      const progress = data.character.classes_progress?.find((cp) => cp.class_id === data.character.current_class_id);
+      const lvl = progress ? progress.level : 1;
+
+      if (portalIcon) portalIcon.innerText = icon;
+      if (portalTitle) portalTitle.innerText = `Avatar: ${data.character.name}`;
+      if (portalSubtitle) portalSubtitle.innerText = `${currentClass} • Nível ${lvl} • Saldo: 💰 ${data.character.gold} Ouro`;
+      if (accessBtn) {
+        accessBtn.innerText = `⚔️ Acessar Avatar (${data.character.name})`;
+        accessBtn.className = 'btn btn-primary';
+      }
+    } else {
+      state.character = null;
+      if (portalIcon) portalIcon.innerText = '✨';
+      if (portalTitle) portalTitle.innerText = 'Nenhum Avatar Desperto';
+      if (portalSubtitle) portalSubtitle.innerText = 'Crie sua identidade de RPG para iniciar as missões e ganhar ouro!';
+      if (accessBtn) {
+        accessBtn.innerText = '✨ Despertar Meu Avatar';
+        accessBtn.className = 'btn btn-gold';
+      }
+    }
+  } catch (err) {
+    console.error('Erro ao consultar personagem no painel do usuário:', err);
+  }
+}
+
+function handleAccessAvatar() {
+  if (state.character) {
+    navigateTo('avatar');
+  } else {
+    openHeroCreationWizard();
+  }
+}
+
+// ========================================================
+// 5. TERMINAL 2: TERMINAL DO AVATAR / HERÓI (MUNDO RPG)
+// ========================================================
+function switchAvatarTab(tab) {
+  state.avatarActiveTab = tab;
+  const tabs = ['sheet', 'tasks', 'shop'];
   
   tabs.forEach((t) => {
-    const navBtn = document.getElementById(`child-nav-${t}`);
-    const view = document.getElementById(`child-tab-${t}`);
-    if (navBtn) {
+    const tabBtn = document.getElementById(`avatar-tab-btn-${t}`);
+    const view = document.getElementById(`avatar-tab-${t}`);
+    if (tabBtn) {
       if (t === tab) {
-        navBtn.classList.add('active');
+        tabBtn.classList.add('active');
       } else {
-        navBtn.classList.remove('active');
+        tabBtn.classList.remove('active');
       }
     }
     if (view) {
@@ -327,95 +402,48 @@ function switchChildTab(tab) {
   }
 }
 
-async function loadChildDashboard() {
-  if (!state.user || !state.token) return;
-
-  // Informações do Usuário no Cabeçalho da Sidebar
-  document.getElementById('child-user-name').innerText = state.user.name;
-  document.getElementById('child-user-email').innerText = state.user.email;
-
-  if (state.classesCatalog.length === 0) {
-    await fetchCatalogs();
+async function loadAvatarTerminal() {
+  if (!state.user || !state.token) {
+    navigateTo('login');
+    return;
   }
 
-  // Preencher formulário de perfil do mundo real
-  document.getElementById('child-real-name').value = state.user.name || '';
-  document.getElementById('child-real-phone').value = state.user.phone || '';
-  document.getElementById('child-real-school').value = state.user.school_or_work || '';
-  document.getElementById('child-real-photo').value = state.user.profile_photo_url || '';
-
-  // Carregar clã familiar
-  loadChildFamilyData();
-
-  // Carregar dados do Personagem
-  await loadCharacterData();
-
-  // Padrão: Abrir o Painel do Usuário (Mundo Real)
-  switchChildTab(state.childActiveTab || 'user');
-}
-
-async function loadCharacterData() {
   try {
     const res = await fetch(`${API.character}/me`, {
       headers: { Authorization: `Bearer ${state.token}` },
     });
     const data = await res.json();
 
-    const heroPreviewContainer = document.getElementById('child-user-hero-preview');
-    const sidebarGoldEl = document.getElementById('sidebar-child-gold');
-
-    if (res.ok && data.success) {
-      if (data.hasCharacter && data.character) {
-        state.character = data.character;
-        renderHeroHUD(data.character);
-        document.getElementById('child-no-hero-view').style.display = 'none';
-        document.getElementById('child-has-hero-view').style.display = 'block';
-
-        if (sidebarGoldEl) sidebarGoldEl.innerText = `💰 ${data.character.gold} Ouro`;
-
-        // Card de Atalho do Herói no Painel do Usuário
-        if (heroPreviewContainer) {
-          const currentClass = data.character.current_class?.name || 'Aventureiro';
-          const progress = data.character.classes_progress?.find((cp) => cp.class_id === data.character.current_class_id);
-          const lvl = progress ? progress.level : 1;
-          const avatarObj = AVATAR_OPTIONS.find((a) => a.key === data.character.avatar_value);
-          const icon = avatarObj ? avatarObj.icon : '⚔️';
-
-          heroPreviewContainer.innerHTML = `
-            <div style="background: rgba(128, 0, 32, 0.25); border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 14px; padding: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-              <div style="display: flex; align-items: center; gap: 10px;">
-                <span style="font-size: 2rem;">${icon}</span>
-                <div>
-                  <strong style="color: #ffffff; font-size: 0.95rem;">${data.character.name}</strong>
-                  <span style="display: block; font-size: 0.8rem; color: #fde047;">${currentClass} • Nível ${lvl}</span>
-                </div>
-              </div>
-              <button class="btn btn-primary btn-sm" onclick="switchChildTab('game')">
-                ⚔️ Abrir RPG
-              </button>
-            </div>
-          `;
-        }
-      } else {
-        state.character = null;
-        document.getElementById('child-no-hero-view').style.display = 'block';
-        document.getElementById('child-has-hero-view').style.display = 'none';
-        if (sidebarGoldEl) sidebarGoldEl.innerText = `💰 0 Ouro`;
-
-        if (heroPreviewContainer) {
-          heroPreviewContainer.innerHTML = `
-            <div style="background: rgba(30, 58, 138, 0.25); border: 1px solid rgba(59, 130, 246, 0.4); border-radius: 14px; padding: 14px; text-align: center;">
-              <p style="font-size: 0.85rem; color: #93c5fd; margin-bottom: 8px;">✨ Você ainda não despertou seu Herói de RPG!</p>
-              <button class="btn btn-gold btn-sm" onclick="openHeroCreationWizard()">
-                ⚔️ Despertar Meu Herói
-              </button>
-            </div>
-          `;
-        }
-      }
+    if (!res.ok || !data.success || !data.hasCharacter || !data.character) {
+      showToast('Você precisa criar um Avatar antes de acessar o Terminal RPG!', 'info');
+      navigateTo('child');
+      openHeroCreationWizard();
+      return;
     }
+
+    state.character = data.character;
+    const char = data.character;
+
+    // Header do Avatar
+    const avatarObj = AVATAR_OPTIONS.find((a) => a.key === char.avatar_value);
+    const icon = avatarObj ? avatarObj.icon : '⚔️';
+    const currentClass = char.current_class?.name || 'Aventureiro';
+    const progress = char.classes_progress?.find((cp) => cp.class_id === char.current_class_id);
+    const lvl = progress ? progress.level : 1;
+
+    document.getElementById('avatar-header-icon').innerText = icon;
+    document.getElementById('avatar-header-name').innerText = char.name;
+    document.getElementById('avatar-header-meta').innerText = `${currentClass} • Nível ${lvl}`;
+    document.getElementById('avatar-header-gold').innerText = `💰 ${char.gold} Ouro`;
+
+    // Renderizar Ficha Completa do Herói
+    renderHeroHUD(char);
+
+    // Abrir aba padrão da ficha
+    switchAvatarTab(state.avatarActiveTab || 'sheet');
   } catch (err) {
-    console.error('Erro ao consultar personagem:', err);
+    console.error('Erro ao carregar terminal do avatar:', err);
+    showToast('Erro ao abrir terminal do avatar.', 'error');
   }
 }
 
