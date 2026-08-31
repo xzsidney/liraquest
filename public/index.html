@@ -407,42 +407,92 @@
       margin-bottom: 56px;
     }
 
-    .roles-grid {
+    /* Vitrine dos 4 Pilares da Home */
+    .home-features-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 24px;
       text-align: left;
+      margin-bottom: 48px;
     }
 
-    .role-card {
-      background: rgba(18, 20, 32, 0.7);
-      border: 1px solid rgba(212, 175, 55, 0.15);
-      border-radius: 18px;
+    .home-feature-card {
+      background: linear-gradient(135deg, rgba(18, 20, 32, 0.9), rgba(10, 11, 18, 0.95));
+      border: 1px solid rgba(212, 175, 55, 0.22);
+      border-radius: 20px;
       padding: 24px;
-      transition: transform 0.2s, border-color 0.2s;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      transition: all 0.25s ease;
     }
 
-    .role-card:hover {
+    .home-feature-card:hover {
       transform: translateY(-4px);
       border-color: var(--accent);
-      box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 12px 28px -6px rgba(128, 0, 32, 0.3), 0 0 20px rgba(212, 175, 55, 0.15);
     }
 
-    .role-card-icon {
-      font-size: 2rem;
-      margin-bottom: 12px;
+    .home-feature-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
     }
 
-    .role-card h4 {
-      font-size: 1.2rem;
-      margin-bottom: 8px;
+    .home-feature-icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(128, 0, 32, 0.4), rgba(30, 58, 138, 0.4));
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      flex-shrink: 0;
+    }
+
+    .home-feature-tag {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--gold);
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .home-feature-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.15rem;
+      font-weight: 800;
       color: #ffffff;
     }
 
-    .role-card p {
-      font-size: 0.9rem;
+    .home-feature-text {
+      font-size: 0.88rem;
       color: var(--text-muted);
       line-height: 1.5;
+    }
+
+    .home-preview-box {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-top: 4px;
+    }
+
+    /* Banner CTA da Home */
+    .home-cta-banner {
+      background: linear-gradient(135deg, rgba(74, 14, 23, 0.7), rgba(30, 58, 138, 0.7));
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      border-radius: 24px;
+      padding: 36px 24px;
+      text-align: center;
+      margin-top: 20px;
+      box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.7), 0 0 30px rgba(212, 175, 55, 0.12);
     }
 
     /* Dashboard Header */
@@ -1187,39 +1237,129 @@
     <!-- ==================== TELA 1: HOME PÚBLICA ==================== -->
     <section id="view-home" class="hero-section">
       <div class="hero-badge">
-        <span>✨</span> Nova Era da Gamificação Familiar
+        <span>👑</span> Reino de LiraQuest • Gamificação Familiar & RPG
       </div>
-      <h1 class="hero-title">Transforme Rotinas em uma Aventura Épica</h1>
+      <h1 class="hero-title">Transforme a Rotina da Casa em uma Aventura Épica</h1>
       <p class="hero-desc">
-        O <strong>LiraQuest</strong> une pais e filhos em um universo de RPG real. Cumpra tarefas diárias, ganhe pontos de experiência, evolua heróis e participe de batalhas cooperativas!
+        O <strong>LiraQuest</strong> transforma lições de casa, organização e bons hábitos em pontos de experiência, ouro real e batalhas cooperativas inesquecíveis entre pais e filhos.
       </p>
 
       <div class="hero-actions">
-        <button class="btn btn-primary" style="width: auto;" onclick="navigateTo('register')">
-          ⚔️ Começar Aventura (Cadastro)
+        <button class="btn btn-primary" style="font-size: 1.05rem; padding: 14px 28px;" onclick="navigateTo('register')">
+          ⚔️ Começar Aventura (Criar Conta)
         </button>
-        <button class="btn btn-secondary" onclick="navigateTo('login')">
-          🔑 Já sou Membro (Login)
+        <button class="btn btn-secondary" style="font-size: 1.05rem; padding: 14px 28px;" onclick="navigateTo('login')">
+          🔑 Entrar no Reino (Login)
         </button>
       </div>
 
-      <div class="roles-grid">
-        <div class="role-card">
-          <div class="role-card-icon">👑</div>
-          <h4>Administrador</h4>
-          <p>Acesso total ao sistema, estatísticas gerais e controle mestre da plataforma.</p>
+      <!-- Vitrine dos 4 Pilares da Aventura Familiar -->
+      <div class="home-features-grid">
+        
+        <!-- Pilar 1: Missões -->
+        <div class="home-feature-card">
+          <div class="home-feature-header">
+            <div class="home-feature-icon-box">📋</div>
+            <div>
+              <span class="home-feature-tag">Mundo Real</span>
+              <h3 class="home-feature-title">Missões & Hábitos Reais</h3>
+            </div>
+          </div>
+          <p class="home-feature-text">
+            Os pais lançam tarefas da casa e de estudos. Os filhos cumprem, enviam fotos comprobatórias e recebem recompensas após aprovação dos guardiões.
+          </p>
+          <div class="home-preview-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span style="font-size: 0.85rem; font-weight: 700; color: #ffffff;">🧹 Arrumar o Quarto & Lição</span>
+              <span class="reward-pill-xp" style="font-size: 0.75rem;">⭐ +50 XP</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 0.75rem; color: #4ade80;">📸 Prova com Foto Enviada</span>
+              <span class="reward-pill-gold" style="font-size: 0.75rem;">💰 +15 Ouro</span>
+            </div>
+          </div>
         </div>
-        <div class="role-card">
-          <div class="role-card-icon">🛡️</div>
-          <h4>Pais & Guardiões</h4>
-          <p>Criação de missões, aprovação de tarefas, recompensas e acompanhamento dos heróis.</p>
+
+        <!-- Pilar 2: Heróis & RPG -->
+        <div class="home-feature-card">
+          <div class="home-feature-header">
+            <div class="home-feature-icon-box">🧙‍♂️</div>
+            <div>
+              <span class="home-feature-tag">Progressão</span>
+              <h3 class="home-feature-title">Heróis & Multi-Classe</h3>
+            </div>
+          </div>
+          <p class="home-feature-text">
+            Cada filho desperta seu próprio herói com 6 atributos fundamentais, árvore de talentos e alternância livre entre classes de batalha sem perder progresso.
+          </p>
+          <div class="home-preview-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span style="font-size: 0.85rem; font-weight: 700; color: #fde047;">⚔️ Guardião do Lar • Nível 3</span>
+              <span style="font-size: 0.75rem; color: #93c5fd;">Mana: 100/100</span>
+            </div>
+            <div class="xp-progress-track" style="height: 6px;">
+              <div class="xp-progress-fill" style="width: 70%;"></div>
+            </div>
+          </div>
         </div>
-        <div class="role-card">
-          <div class="role-card-icon">⚔️</div>
-          <h4>Filhos & Heróis</h4>
-          <p>Visão simplificada e gamificada com missões diárias, criação de herói e baú de recompensas.</p>
+
+        <!-- Pilar 3: Loja de Recompensas -->
+        <div class="home-feature-card">
+          <div class="home-feature-header">
+            <div class="home-feature-icon-box">🛒</div>
+            <div>
+              <span class="home-feature-tag">Mérito & Conquistas</span>
+              <h3 class="home-feature-title">Loja & Baú de Prêmios</h3>
+            </div>
+          </div>
+          <p class="home-feature-text">
+            O ouro conquistado com esforço pode ser usado na Loja do Reino para adquirir itens do jogo ou resgatar prêmios do mundo real combinados com a família.
+          </p>
+          <div class="home-preview-box">
+            <div style="display: flex; gap: 8px; justify-content: space-between;">
+              <span style="font-size: 0.8rem; background: rgba(212, 175, 55, 0.15); color: #fde047; padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(212, 175, 55, 0.3);">🎟️ Vale Cinema</span>
+              <span style="font-size: 0.8rem; background: rgba(30, 58, 138, 0.3); color: #93c5fd; padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(59, 130, 246, 0.4);">🎮 +1h Videogame</span>
+            </div>
+          </div>
         </div>
+
+        <!-- Pilar 4: Raids Cooperativas -->
+        <div class="home-feature-card">
+          <div class="home-feature-header">
+            <div class="home-feature-icon-box">🐉</div>
+            <div>
+              <span class="home-feature-tag">Tempo Real</span>
+              <h3 class="home-feature-title">Raids & Combate 2D</h3>
+            </div>
+          </div>
+          <p class="home-feature-text">
+            Junte a família em combates multiplayer cooperativos contra Chefes Colossais como o Gólem da Procrastinação e a Gosma da Desorganização!
+          </p>
+          <div class="home-preview-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span style="font-size: 0.85rem; font-weight: 700; color: #f87171;">👾 Gólem da Procrastinação</span>
+              <span style="font-size: 0.75rem; color: #ef4444;">850 / 1000 HP</span>
+            </div>
+            <div class="xp-progress-track" style="height: 6px; background: rgba(239, 68, 68, 0.2);">
+              <div style="height: 100%; width: 85%; background: linear-gradient(90deg, #ef4444, #f59e0b); border-radius: 9999px;"></div>
+            </div>
+          </div>
+        </div>
+
       </div>
+
+      <!-- Banner de Chamada Inferior -->
+      <div class="home-cta-banner">
+        <div style="font-size: 2.5rem; margin-bottom: 8px;">🏰⚔️👑</div>
+        <h2 style="font-size: 1.8rem; color: #ffffff; margin-bottom: 8px;">Pronto para convocar seu Clã Familiar?</h2>
+        <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto 20px auto; font-size: 0.95rem;">
+          Cadastre sua família gratuitamente e dê o primeiro passo rumo a uma rotina de conquistas e diversão.
+        </p>
+        <button class="btn btn-gold" style="font-size: 1.05rem; padding: 12px 32px;" onclick="navigateTo('register')">
+          👑 Criar Meu Clã Agora
+        </button>
+      </div>
+
     </section>
 
     <!-- ==================== TELA 2: CADASTRO ==================== -->
