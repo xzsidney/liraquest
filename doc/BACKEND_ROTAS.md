@@ -61,12 +61,13 @@ Este documento cataloga todos os endpoints REST e eventos de WebSocket (Socket.I
 
 | Método | Rota | Autenticação | Descrição |
 |:---|:---|:---|:---|
-| `POST` | `/api/tasks` | JWT (`PARENT` / `ADMIN`) | Cria uma nova missão da vida real (título, descrição, XP, ouro, categoria) |
+| `POST` | `/api/tasks` | JWT (`PARENT` / `ADMIN`) | Cria uma nova missão da vida real (`title`, `description`, `xp_reward`, `gold_reward`, `energy_reward`, `token_reward`, `category`, `difficulty`, `allowed_profile`, `requires_proof`, `estimated_time`, `assigned_to`) |
 | `GET` | `/api/tasks` | JWT | Lista as missões ativas da família com status de submissão do filho |
 | `POST` | `/api/tasks/:taskId/submit` | JWT | Filho submete comprovação remota (foto + texto) |
-| `GET` | `/api/tasks/submissions/pending` | JWT (`PARENT` / `ADMIN`) | Pais listam evidências pendentes de avaliação |
-| `POST` | `/api/tasks/submissions/:submissionId/review` | JWT (`PARENT` / `ADMIN`) | Pais aprovam (creditando XP, Ouro e calculando Level Up) ou rejeitam com feedback |
+| `GET` | `/api/tasks/submissions/pending` | JWT (`PARENT` / `ADMIN`) | Pais listam evidências pendentes de avaliação no clã |
+| `POST` | `/api/tasks/submissions/:submissionId/review` | JWT (`PARENT` / `ADMIN`) | Pais aprovam (creditando XP, Ouro, Level Up no herói + Energia de Aventura, Fichas do Lar, Streak e Contadores no `UserProgress`) ou rejeitam com feedback |
 | `GET` | `/api/tasks/submissions/my` | JWT | Histórico de comprovações e feedbacks recebidos pelo filho |
+
 
 ---
 
