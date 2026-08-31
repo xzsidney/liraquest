@@ -226,6 +226,26 @@ Após qualquer mudança de funcionalidade, atualizar obrigatoriamente:
 
 ---
 
+## 9. FUNCIONALIDADES CONFIRMADAS DO PERFIL FILHO (CHILD)
+
+Estas são as funções **definidas e confirmadas** que o usuário do tipo Filho deve ter:
+
+| # | Funcionalidade | Status | Descrição |
+|:---|:---|:---|:---|
+| 1 | **Criar Personagem** | ✅ Definido | Nome do herói + Sexo + Avatar (foto upload ou sprite MUGEN) |
+| 2 | **Fazer Tarefas** | ✅ Definido | Ver mural de missões → Concluir → Enviar prova (foto/texto) → Aguardar aprovação |
+| 3 | **Atualizar Dados** | ✅ Definido | Editar: nome, telefone, escola/trabalho, foto de perfil |
+| 4 | **Alerta via WhatsApp** | 💡 Em análise | Ideia em estudo — forma de integrar (avisar Pai, receber aprovação, etc.) |
+
+### 💡 Ideias em Análise (NÃO implementar ainda)
+- **WhatsApp:** Sidney está pensando na melhor forma de uso. Possibilidades:
+  - Filho avisa Pai via WhatsApp quando envia uma prova de tarefa
+  - Filho recebe notificação no WhatsApp quando uma tarefa é aprovada
+  - Link `wa.me` pré-formatado (sem custo, sem API)
+  - **Aguardar decisão do Sidney antes de implementar.**
+
+
+
 ## 9. ESTRUTURA DE ARQUIVOS ATUAL
 
 ```
