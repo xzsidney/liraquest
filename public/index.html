@@ -1822,16 +1822,23 @@
 
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
               
-              <!-- Card 1: Ficha Pessoal com Foto Quadrada -->
+              <!-- Card 1: Ficha Pessoal com Foto Quadrada e Upload -->
               <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 18px; padding: 24px;">
                 <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border-subtle);">
-                  <div class="user-square-photo-frame" id="profile-photo-display-frame">
-                    <span id="profile-photo-placeholder" style="font-size: 3.2rem;">👤</span>
-                    <img id="profile-photo-img" src="" alt="Foto Real" class="user-square-photo-img" style="display: none;" onerror="this.style.display='none'; document.getElementById('profile-photo-placeholder').style.display='block';">
+                  <div style="position: relative; display: flex; flex-direction: column; align-items: center;">
+                    <div class="user-square-photo-frame" id="profile-photo-display-frame" style="cursor: pointer;" onclick="document.getElementById('child-direct-file-input').click()" title="Clique para enviar nova foto">
+                      <span id="profile-photo-placeholder" style="font-size: 3.2rem;">👤</span>
+                      <img id="profile-photo-img" src="" alt="Foto Real" class="user-square-photo-img" style="display: none;" onerror="this.style.display='none'; document.getElementById('profile-photo-placeholder').style.display='block';">
+                    </div>
+                    <button type="button" class="btn btn-secondary btn-sm" style="margin-top: 8px; padding: 4px 10px; font-size: 0.75rem;" onclick="document.getElementById('child-direct-file-input').click()">
+                      📷 Trocar Foto
+                    </button>
+                    <input type="file" id="child-direct-file-input" accept="image/*" style="display: none;" onchange="handleDirectPhotoUpload(event)">
                   </div>
                   <div>
                     <h3 id="info-child-name" style="font-size: 1.3rem; color: #ffffff; margin-bottom: 4px;">Nome do Filho</h3>
                     <span class="role-badge badge-child" style="font-size: 0.75rem;">👤 Usuário Filho</span>
+                    <span id="direct-upload-status" style="display: block; font-size: 0.75rem; color: var(--gold); margin-top: 6px;"></span>
                   </div>
                 </div>
 
@@ -1906,6 +1913,17 @@
         </div>
 
         <form id="child-profile-form">
+          
+          <!-- Seção de Upload de Imagem no Modal -->
+          <div class="form-group" style="background: rgba(15, 23, 42, 0.6); border: 1px dashed var(--border-card); border-radius: 12px; padding: 14px; text-align: center;">
+            <label class="form-label" style="margin-bottom: 8px;">📷 Upload de Foto do Computador / Celular</label>
+            <input type="file" id="modal-photo-file-input" accept="image/*" style="display: none;" onchange="handleModalPhotoUpload(event)">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('modal-photo-file-input').click()">
+              📁 Escolher Imagem (JPG, PNG, WEBP)
+            </button>
+            <div id="modal-upload-loading" style="font-size: 0.8rem; color: var(--gold); margin-top: 6px; display: none;">⏳ Enviando imagem...</div>
+          </div>
+
           <div class="form-group">
             <label class="form-label" for="child-real-name">Nome Completo</label>
             <input type="text" id="child-real-name" class="form-input" placeholder="Seu nome real" required>
@@ -1919,8 +1937,8 @@
             <input type="text" id="child-real-school" class="form-input" placeholder="Ex: Colégio Anglo - 8º Ano">
           </div>
           <div class="form-group">
-            <label class="form-label" for="child-real-photo">URL da Foto de Perfil (Quadrado)</label>
-            <input type="url" id="child-real-photo" class="form-input" placeholder="https://exemplo.com/foto.jpg">
+            <label class="form-label" for="child-real-photo">URL da Foto de Perfil</label>
+            <input type="text" id="child-real-photo" class="form-input" placeholder="https://... ou preenchida automaticamente pelo upload">
           </div>
           
           <div style="display: flex; gap: 10px; margin-top: 24px;">

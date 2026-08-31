@@ -79,7 +79,15 @@ Este documento cataloga todos os endpoints REST e eventos de WebSocket (Socket.I
 
 ---
 
-## 7. WebSockets em Tempo Real (Socket.IO) — *Fase 4*
+## 7. Módulo de Upload de Mídia (`/api/upload`)
+
+| Método | Rota | Autenticação | Descrição |
+|:---|:---|:---|:---|
+| `POST` | `/api/upload/profile-photo` | JWT | Upload de foto real de perfil do usuário (Multipart/form-data com Multer, armazena em `/uploads/profiles/UUID.ext` e atualiza `profile_photo_url`) |
+
+---
+
+## 8. WebSockets em Tempo Real (Socket.IO) — *Fase 4*
 
 ### Eventos de Sala Familiar
 - `join_family_room`: Conexão do usuário à sala exclusiva do seu clã familiar (`family_{id}`).

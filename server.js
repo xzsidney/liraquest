@@ -11,6 +11,7 @@ import familyRoutes from './server/routes/familyRoutes.js';
 import characterRoutes from './server/routes/characterRoutes.js';
 import taskRoutes from './server/routes/taskRoutes.js';
 import shopRoutes from './server/routes/shopRoutes.js';
+import uploadRoutes from './server/routes/uploadRoutes.js';
 
 dotenv.config();
 
@@ -35,6 +36,7 @@ app.use('/api/family', familyRoutes);
 app.use('/api/character', characterRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/shop', shopRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Health check & status
 app.get('/api/status', (req, res) => {

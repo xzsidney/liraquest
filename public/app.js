@@ -7,6 +7,7 @@ const API = {
   character: '/api/character',
   tasks: '/api/tasks',
   shop: '/api/shop',
+  upload: '/api/upload',
 };
 
 const state = {
@@ -407,6 +408,94 @@ function openEditProfileModal() {
 function closeEditProfileModal() {
   const modal = document.getElementById('child-edit-profile-modal');
   if (modal) modal.style.display = 'none';
+}
+
+async function handleDirectPhotoUpload(e) {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  if (file.size > 5 * 1024 * 1024) {
+    showToast('A imagem deve ter no máximo 5MB.', 'warning');
+    return;
+  }
+
+  const statusEl = document.getElementById('direct-upload-status');
+  if (statusEl) statusEl.innerText = '⏳ Enviando foto...';
+
+  const formData = new FormData();
+  formData.append('photo', file);
+
+  try {
+    const res = await fetch(`${API.upload}/profile-photo`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${state.token}`,
+      },
+      body: formData,
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || 'Erro ao enviar foto.');
+    }
+
+    state.user = data.user;
+    localStorage.setItem('liraquest_user', JSON.stringify(data.user));
+    renderChildProfileInfo();
+    updateNavbar();
+    showToast('Foto de perfil atualizada com sucesso!', 'success');
+  } catch (err) {
+    showToast(err.message, 'error');
+  } finally {
+    if (statusEl) statusEl.innerText = '';
+    e.target.value = '';
+  }
+}
+
+async function handleModalPhotoUpload(e) {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  if (file.size > 5 * 1024 * 1024) {
+    showToast('A imagem deve ter no máximo 5MB.', 'warning');
+    return;
+  }
+
+  const loadingEl = document.getElementById('modal-upload-loading');
+  if (loadingEl) loadingEl.style.display = 'block';
+
+  const formData = new FormData();
+  formData.append('photo', file);
+
+  try {
+    const res = await fetch(`${API.upload}/profile-photo`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${state.token}`,
+      },
+      body: formData,
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || 'Erro ao enviar foto.');
+    }
+
+    state.user = data.user;
+    localStorage.setItem('liraquest_user', JSON.stringify(data.user));
+
+    const inputPhoto = document.getElementById('child-real-photo');
+    if (inputPhoto) inputPhoto.value = data.photo_url;
+
+    renderChildProfileInfo();
+    updateNavbar();
+    showToast('Imagem carregada com sucesso!', 'success');
+  } catch (err) {
+    showToast(err.message, 'error');
+  } finally {
+    if (loadingEl) loadingEl.style.display = 'none';
+    e.target.value = '';
+  }
 }
 
 async function loadChildDashboard() {
