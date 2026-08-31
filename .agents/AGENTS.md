@@ -57,10 +57,16 @@ Para garantir compatibilidade universal entre ambientes (Windows local vs Linux/
      }
      ```
 
+## Identidade Visual & Paleta de Cores Oficial
+Toda a interface do usuário (UI/UX) do LiraQuest deve seguir estritamente a seguinte paleta de cores nobre e temática:
+- 🍷 **Cor Primária:** Bordô / Vinho Nobre (`#800020`, `#9b111e`, `#6b0f24`, `#4a0e17`) — Botões principais, elementos de destaque, bordas nobres e acentos heroicos.
+- 🌌 **Cor Secundária:** Azul Real (`#1e3a8a`, `#2563eb`, `#1d4ed8`, `#0f172a`) — Fundos profundos, superfícies de cards, barras de progresso e elementos arcanos/táticos.
+- 👑 **Cor Terciária:** Dourado Imperial (`#d4af37`, `#f59e0b`, `#fbbf24`, `#facc15`) — Ouro, moedas, títulos nobres, estrelas de XP, conquistas, insígnias reais e detalhes de prestígio.
+
 ## Arquitetura Técnica do LiraQuest (Fullstack Unificado)
-- **Frontend:** Vue 3 (Composition API / `<script setup>`), Tailwind CSS v4, Vite, Pinia, Pixi.js v8 (Motor de Animação e Batalha Arcade MUGEN 2D).
+- **Frontend:** HTML/CSS/JS nativo e responsivo com SPA hash routing, evoluindo para Vue 3 + Tailwind CSS + Phaser 3 (Motor de Animação e Batalha Arcade 2D).
 - **Backend & Realtime:** Express, Socket.IO (WebSockets em tempo real para convites e Raids cooperativas), Sequelize (MySQL).
-- **Repositório Unificado:** Frontend e backend convivem no mesmo repositório com build automatizado (`npm run build` executa o gerador de registro MUGEN e o build Vite servido por `server.ts` / `server.js`).
+- **Repositório Unificado:** Frontend e backend convivem no mesmo repositório com build automatizado (`npm run build` executa o build servido por `server.js`).
 
 ## Fluxo de Deploy Automatizado via Git (Com Pergunta Prévia)
 Todo o código será implementado e testado em ambiente local. 

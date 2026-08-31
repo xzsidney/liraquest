@@ -98,6 +98,21 @@ Aqui o filho vive a experiência de RPG. É onde o progresso acontece:
 
 * Um filho pode cumprir uma tarefa **de onde estiver** — na própria casa, na casa dos pais, em qualquer lugar.
 * O que valida a tarefa **não é a localização**, mas a **prova enviada** e a **aprovação do Pai**.
+
+---
+
+## 🎨 1.5 Identidade Visual & Paleta de Cores Oficial
+Para transmitir uma atmosfera imersiva, nobre e heroica condizente com a fantasia medieval da família, toda a interface e os elementos visuais do **LiraQuest** adotam estritamente o seguinte padrão cromático:
+
+* 🍷 **Cor Primária: Bordô / Vinho Nobre (`#800020`, `#9b111e`, `#6b0f24`, `#4a0e17`)**
+  * Aplicada em botões principais de ação heroica, headers de cartões de destaque, bordas nobres e acentos de batalha.
+* 🌌 **Cor Secundária: Azul Real (`#1e3a8a`, `#2563eb`, `#1d4ed8`, `#0f172a`)**
+  * Aplicada em superfícies de painéis, barras de progresso de mana/experiência, cartões informativos e elementos táticos/arcanos.
+* 👑 **Cor Terciária: Dourado Imperial (`#d4af37`, `#f59e0b`, `#fbbf24`, `#facc15`)**
+  * Aplicada no saldo de ouro, insígnias de prestígio, títulos nobiliárquicos, estrelas de XP, botões de recompensa e detalhes cintilantes.
+
+---
+
 * Isso torna o LiraQuest **100% funcional de forma remota e assíncrona** por natureza — não como adaptação, mas como regra central.
 
 ### Como a Família é Criada
