@@ -9,7 +9,10 @@ if (!databaseUrl) {
   console.error('❌ ERRO CRÍTICO: DATABASE_URL não foi definida no arquivo .env!');
 }
 
-export const sequelize = new Sequelize(databaseUrl, {
+// Remover query params legados (?connect_timeout=...&pool_timeout=...) para evitar warnings do driver mysql2
+const cleanDbUrl = databaseUrl ? databaseUrl.split('?')[0] : '';
+
+export const sequelize = new Sequelize(cleanDbUrl, {
   dialect: 'mysql',
   logging: process.env.NODE_ENV === 'development' ? console.log : false,
   dialectOptions: {
