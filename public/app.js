@@ -64,19 +64,30 @@ const ATTR_ICONS = {
 // ========================================================
 function navigateTo(route) {
   state.currentRoute = route;
-  window.location.hash = route;
+  if (window.location.pathname !== '/' && window.location.pathname !== '') {
+    window.history.pushState(null, '', `/#${route}`);
+  } else {
+    window.location.hash = route;
+  }
   renderRoute();
 }
 
 function initRouter() {
+  const path = window.location.pathname.replace(/^\/+/, '');
+  let route = window.location.hash.replace('#', '') || path || 'home';
+
+  // Se a URL tiver pathname residual (ex: /login ou /child), normalizar para /#rota
+  if (window.location.pathname !== '/' && window.location.pathname !== '') {
+    window.history.replaceState(null, '', `/#${route}`);
+  }
+
   window.addEventListener('hashchange', () => {
     const hash = window.location.hash.replace('#', '') || 'home';
     state.currentRoute = hash;
     renderRoute();
   });
 
-  const initialHash = window.location.hash.replace('#', '') || 'home';
-  state.currentRoute = initialHash;
+  state.currentRoute = route;
   renderRoute();
 }
 
