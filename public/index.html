@@ -1639,101 +1639,191 @@
 
     <!-- ==================== TELA 6: TERMINAL DO USUÁRIO (FILHO - MUNDO REAL) ==================== -->
     <section id="view-child" style="display: none;">
-      <div class="dashboard-card">
+      <div class="child-layout-container">
         
-        <!-- Header do Usuário -->
-        <div class="dashboard-header">
-          <div class="user-profile-bar">
-            <div class="avatar-circle">👤</div>
-            <div>
-              <h2 id="child-user-name" style="font-size: 1.6rem; color: #ffffff;">Jovem Filho</h2>
-              <span id="child-user-email" style="color: var(--text-muted); font-size: 0.9rem;">filho@liraquest.com</span>
-            </div>
-          </div>
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <span class="role-badge badge-child">👤 Usuário Filho</span>
-            <button class="btn btn-danger btn-sm" onclick="handleLogout()">Sair</button>
-          </div>
-        </div>
-
-        <!-- PORTAL DE ACESSO AO AVATAR (O ÚNICO BOTÃO DO JOGO NESTE TERMINAL) -->
-        <div id="child-user-avatar-portal" style="background: linear-gradient(135deg, rgba(128, 0, 32, 0.4), rgba(30, 58, 138, 0.4)); border: 2px solid var(--accent); border-radius: 20px; padding: 24px; margin-bottom: 28px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 25px rgba(212, 175, 55, 0.15); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
-          <div style="display: flex; align-items: center; gap: 16px;">
-            <div id="child-portal-avatar-icon" class="avatar-circle" style="width: 60px; height: 60px; font-size: 1.8rem; border-color: var(--accent);">⚔️</div>
-            <div>
-              <span class="home-feature-tag">Universo RPG • LiraQuest</span>
-              <h3 id="child-portal-avatar-title" style="font-size: 1.4rem; color: #ffffff; margin-bottom: 2px;">Meu Avatar de Batalha</h3>
-              <p id="child-portal-avatar-subtitle" style="color: var(--text-muted); font-size: 0.88rem;">Acesse a ficha do seu personagem, missões diárias, atributos e loja.</p>
-            </div>
-          </div>
-          <button id="btn-child-access-avatar" class="btn btn-primary" style="font-size: 1.1rem; padding: 14px 28px; border: 1px solid var(--accent);" onclick="handleAccessAvatar()">
-            ⚔️ Acessar Avatar
-          </button>
-        </div>
-
-        <!-- GRID DE DADOS DO USUÁRIO (MUNDO REAL) -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+        <!-- BARRA LATERAL (SIDEBAR) DO FILHO COM OS 3 LINKS -->
+        <aside class="child-sidebar">
           
-          <!-- Card 1: Dados Pessoais do Filho -->
-          <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(212, 175, 55, 0.18); border-radius: 18px; padding: 24px;">
-            <h3 style="font-size: 1.2rem; margin-bottom: 16px; color: #fde047;">👤 Seus Dados do Mundo Real</h3>
-            <form id="child-profile-form">
-              <div class="form-group">
-                <label class="form-label" for="child-real-name">Nome Completo</label>
-                <input type="text" id="child-real-name" class="form-input" placeholder="Seu nome real" required>
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="child-real-phone">Telefone / WhatsApp</label>
-                <input type="text" id="child-real-phone" class="form-input" placeholder="(11) 99999-9999">
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="child-real-school">Escola / Faculdade / Trabalho</label>
-                <input type="text" id="child-real-school" class="form-input" placeholder="Ex: Colégio Anglo - 8º Ano">
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="child-real-photo">URL da Foto de Perfil (Opcional)</label>
-                <input type="url" id="child-real-photo" class="form-input" placeholder="https://...">
-              </div>
-              <button type="submit" class="btn btn-primary btn-sm" style="width: 100%; margin-top: 8px;">
-                💾 Salvar Dados do Perfil
-              </button>
-            </form>
+          <!-- Cabeçalho do Filho no Menu -->
+          <div class="sidebar-user-header">
+            <div id="child-header-avatar" class="avatar-circle">👤</div>
+            <div style="overflow: hidden;">
+              <h3 id="child-user-name" style="font-size: 1.1rem; color: #ffffff; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">Jovem Filho</h3>
+              <span id="child-user-email" style="color: var(--text-muted); font-size: 0.78rem; display: block; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">filho@liraquest.com</span>
+              <span class="role-badge badge-child" style="font-size: 0.7rem; padding: 2px 8px; margin-top: 4px;">👤 Usuário Filho</span>
+            </div>
           </div>
 
-          <!-- Card 2: Vínculo Familiar & Clã -->
-          <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(212, 175, 55, 0.18); border-radius: 18px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between;">
-            <div>
-              <h3 style="font-size: 1.2rem; margin-bottom: 16px; color: #93c5fd;">🏰 Seu Clã Familiar</h3>
+          <!-- BOTÃO DE ACESSO AO AVATAR (PORTAL DE ENTRADA NO RPG) -->
+          <div style="background: linear-gradient(135deg, rgba(128, 0, 32, 0.45), rgba(30, 58, 138, 0.45)); border: 1px solid var(--accent); border-radius: 14px; padding: 12px; text-align: center;">
+            <span style="font-size: 0.75rem; color: var(--gold); font-weight: 800; text-transform: uppercase; display: block; margin-bottom: 6px;">Universo RPG</span>
+            <button id="btn-sidebar-access-avatar" class="btn btn-gold btn-sm" style="width: 100%; font-size: 0.88rem;" onclick="handleAccessAvatar()">
+              ⚔️ Acessar Avatar
+            </button>
+          </div>
+
+          <!-- MENU LATERAL COM EXATAMENTE OS 3 LINKS: TAREFAS, ESTUDOS, DADOS -->
+          <div class="sidebar-menu">
+            <button id="child-nav-tasks" class="sidebar-menu-btn active" onclick="switchChildTerminalTab('tasks')">
+              <span>📋</span> Tarefas
+            </button>
+            <button id="child-nav-studies" class="sidebar-menu-btn" onclick="switchChildTerminalTab('studies')">
+              <span>📚</span> Estudos
+            </button>
+            <button id="child-nav-profile" class="sidebar-menu-btn" onclick="switchChildTerminalTab('profile')">
+              <span>👤</span> Dados
+            </button>
+          </div>
+
+          <!-- Botão Sair da Conta -->
+          <button class="btn btn-danger btn-sm" style="width: 100%; margin-top: auto;" onclick="handleLogout()">
+            🚪 Sair da Conta
+          </button>
+        </aside>
+
+        <!-- ÁREA PRINCIPAL DE CONTEÚDO DO TERMINAL DO FILHO -->
+        <div class="child-content-card">
+          
+          <!-- PAINEL 1: 📋 TAREFAS DA CASA E DO DIA A DIA -->
+          <div id="child-panel-tasks">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+              <div>
+                <h2 style="font-size: 1.5rem; color: #ffffff; margin-bottom: 4px;">📋 Mural de Tarefas</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Tarefas da casa e rotinas atribuídas pelos seus pais. Cumpra e envie a foto para aprovação!</p>
+              </div>
+            </div>
+
+            <!-- Lista de Tarefas Ativas -->
+            <div id="child-user-tasks-list" class="tasks-grid">
+              <!-- Renderizado dinamicamente via JS -->
+            </div>
+
+            <!-- Histórico de Envios de Provas -->
+            <h3 style="font-size: 1.2rem; color: #cbd5e1; margin: 32px 0 12px 0;">📜 Histórico de Tarefas Concluídas</h3>
+            <div id="child-user-submissions-history" class="users-list">
+              <!-- Renderizado dinamicamente via JS -->
+            </div>
+          </div>
+
+          <!-- PAINEL 2: 📚 ESTUDOS (CENTRAL DE ESTUDOS & POMODORO) -->
+          <div id="child-panel-studies" style="display: none;">
+            <div style="margin-bottom: 24px;">
+              <h2 style="font-size: 1.5rem; color: #ffffff; margin-bottom: 4px;">📚 Central de Estudos</h2>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">Cronometre seu tempo de estudo focado e mantenha sua rotina escolar em dia.</p>
+            </div>
+
+            <!-- Widget Pomodoro / Temporizador de Estudos -->
+            <div style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.4), rgba(15, 23, 42, 0.8)); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 20px; padding: 28px; text-align: center; margin-bottom: 28px;">
+              <span class="home-feature-tag" style="display: inline-block; margin-bottom: 8px;">Foco & Concentração</span>
+              <h3 style="font-size: 1.3rem; color: #ffffff; margin-bottom: 8px;">Temporizador de Estudo Focado</h3>
               
-              <div id="child-family-info" style="display: none;">
-                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 6px;">Você pertence à família:</p>
-                <h4 id="child-family-name-display" style="font-size: 1.5rem; color: #ffffff; margin-bottom: 12px;">Clã Lira</h4>
-                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
-                  <span style="font-size: 0.85rem; color: var(--text-muted);">Código do Clã:</span>
-                  <span id="child-family-code-display" style="background: rgba(30, 58, 138, 0.4); color: #93c5fd; padding: 4px 10px; border-radius: 6px; font-weight: 800; border: 1px solid rgba(59, 130, 246, 0.4);">LIRA-0000</span>
-                </div>
-                <p style="font-size: 0.85rem; color: #4ade80;">✅ Vínculo ativo com seus pais/guardiões.</p>
+              <div id="study-timer-display" style="font-family: 'Cinzel', monospace; font-size: 3.5rem; font-weight: 900; color: #fde047; margin: 16px 0; letter-spacing: 2px;">
+                25:00
               </div>
 
-              <div id="child-family-join-form">
-                <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;">
-                  Digite o código de convite fornecido pelo seu Pai/Mãe para vincular-se ao clã e receber missões.
-                </p>
-                <div class="form-group">
-                  <label class="form-label" for="child-invite-code-input">Código de Convite da Família</label>
-                  <input type="text" id="child-invite-code-input" class="form-input" placeholder="Ex: LIRA-XXXX" style="text-transform: uppercase;">
-                </div>
-                <button class="btn btn-secondary btn-sm" style="width: 100%;" onclick="handleJoinFamily()">
-                  🛡️ Ingressar na Família
+              <div style="display: flex; justify-content: center; gap: 14px; flex-wrap: wrap;">
+                <button id="btn-study-start" class="btn btn-primary" style="padding: 10px 24px;" onclick="toggleStudyTimer()">
+                  ▶️ Iniciar Sessão (25 min)
+                </button>
+                <button class="btn btn-secondary" style="padding: 10px 20px;" onclick="resetStudyTimer()">
+                  🔄 Reiniciar
                 </button>
               </div>
+
+              <div id="study-timer-status" style="margin-top: 14px; font-size: 0.88rem; color: #93c5fd;">
+                Pronto para iniciar uma sessão de 25 minutos de estudo concentrado.
+              </div>
             </div>
 
-            <div style="margin-top: 20px; padding: 14px; background: rgba(0, 0, 0, 0.3); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.08);">
-              <span style="font-size: 0.8rem; color: var(--text-muted); display: block;">💡 Dica do Reino:</span>
-              <p style="font-size: 0.82rem; color: #cbd5e1; margin-top: 4px;">Mantenha seus dados sempre atualizados para que seus pais possam designar missões específicas para sua rotina.</p>
+            <!-- Dicas e Metas de Estudos -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px;">
+              <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 18px;">
+                <h4 style="font-size: 1.05rem; color: #facc15; margin-bottom: 8px;">📖 Técnicas de Alta Performance</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+                  Estude em blocos de 25 minutos com 5 minutos de descanso. Evite celular e redes sociais durante o bloco.
+                </p>
+              </div>
+              <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 18px;">
+                <h4 style="font-size: 1.05rem; color: #60a5fa; margin-bottom: 8px;">🎯 Metas Diárias</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+                  Completar as tarefas escolares do dia e realizar revisões regulares antes de cada prova.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- PAINEL 3: 👤 DADOS PESSOAIS E CLÃ -->
+          <div id="child-panel-profile" style="display: none;">
+            <div style="margin-bottom: 24px;">
+              <h2 style="font-size: 1.5rem; color: #ffffff; margin-bottom: 4px;">👤 Seus Dados</h2>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">Gerencie suas informações cadastrais e o vínculo com sua família.</p>
             </div>
 
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+              
+              <!-- Card 1: Dados Pessoais -->
+              <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(212, 175, 55, 0.18); border-radius: 18px; padding: 24px;">
+                <h3 style="font-size: 1.2rem; margin-bottom: 16px; color: #fde047;">👤 Dados Pessoais</h3>
+                <form id="child-profile-form">
+                  <div class="form-group">
+                    <label class="form-label" for="child-real-name">Nome Completo</label>
+                    <input type="text" id="child-real-name" class="form-input" placeholder="Seu nome real" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="child-real-phone">Telefone / WhatsApp</label>
+                    <input type="text" id="child-real-phone" class="form-input" placeholder="(11) 99999-9999">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="child-real-school">Escola / Faculdade / Trabalho</label>
+                    <input type="text" id="child-real-school" class="form-input" placeholder="Ex: Colégio Anglo - 8º Ano">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="child-real-photo">URL da Foto de Perfil (Opcional)</label>
+                    <input type="url" id="child-real-photo" class="form-input" placeholder="https://...">
+                  </div>
+                  <button type="submit" class="btn btn-primary btn-sm" style="width: 100%; margin-top: 8px;">
+                    💾 Salvar Dados
+                  </button>
+                </form>
+              </div>
+
+              <!-- Card 2: Família & Clã -->
+              <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(212, 175, 55, 0.18); border-radius: 18px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                  <h3 style="font-size: 1.2rem; margin-bottom: 16px; color: #93c5fd;">🏰 Clã Familiar</h3>
+                  
+                  <div id="child-family-info" style="display: none;">
+                    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 6px;">Você pertence à família:</p>
+                    <h4 id="child-family-name-display" style="font-size: 1.5rem; color: #ffffff; margin-bottom: 12px;">Clã Lira</h4>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+                      <span style="font-size: 0.85rem; color: var(--text-muted);">Código do Clã:</span>
+                      <span id="child-family-code-display" style="background: rgba(30, 58, 138, 0.4); color: #93c5fd; padding: 4px 10px; border-radius: 6px; font-weight: 800; border: 1px solid rgba(59, 130, 246, 0.4);">LIRA-0000</span>
+                    </div>
+                    <p style="font-size: 0.85rem; color: #4ade80;">✅ Conectado aos seus pais para recebimento de tarefas.</p>
+                  </div>
+
+                  <div id="child-family-join-form">
+                    <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;">
+                      Digite o código de convite fornecido pelo seu Pai/Mãe para vincular-se ao clã.
+                    </p>
+                    <div class="form-group">
+                      <label class="form-label" for="child-invite-code-input">Código de Convite da Família</label>
+                      <input type="text" id="child-invite-code-input" class="form-input" placeholder="Ex: LIRA-XXXX" style="text-transform: uppercase;">
+                    </div>
+                    <button class="btn btn-secondary btn-sm" style="width: 100%;" onclick="handleJoinFamily()">
+                      🛡️ Ingressar na Família
+                    </button>
+                  </div>
+                </div>
+
+                <div style="margin-top: 20px; padding: 14px; background: rgba(0, 0, 0, 0.3); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.08);">
+                  <span style="font-size: 0.8rem; color: var(--text-muted); display: block;">💡 Informação:</span>
+                  <p style="font-size: 0.82rem; color: #cbd5e1; margin-top: 4px;">Após ingressar no clã, as missões e tarefas atribuídas pelos seus pais aparecerão na aba Tarefas.</p>
+                </div>
+
+              </div>
+
+            </div>
           </div>
 
         </div>

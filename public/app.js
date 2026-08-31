@@ -301,10 +301,35 @@ async function fetchCatalogs() {
 // ========================================================
 // 4. TERMINAL 1: DASHBOARD DO USUÁRIO (FILHO - MUNDO REAL)
 // ========================================================
+function switchChildTerminalTab(tab) {
+  state.childTerminalTab = tab;
+  const tabs = ['tasks', 'studies', 'profile'];
+
+  tabs.forEach((t) => {
+    const navBtn = document.getElementById(`child-nav-${t}`);
+    const panel = document.getElementById(`child-panel-${t}`);
+    if (navBtn) {
+      if (t === tab) {
+        navBtn.classList.add('active');
+      } else {
+        navBtn.classList.remove('active');
+      }
+    }
+    if (panel) {
+      panel.style.display = t === tab ? 'block' : 'none';
+    }
+  });
+
+  if (tab === 'tasks') {
+    loadChildTasks();
+    loadChildSubmissionsHistory();
+  }
+}
+
 async function loadChildDashboard() {
   if (!state.user || !state.token) return;
 
-  // Informações do Usuário no Cabeçalho
+  // Informações do Usuário no Cabeçalho da Sidebar
   document.getElementById('child-user-name').innerText = state.user.name;
   document.getElementById('child-user-email').innerText = state.user.email;
 
@@ -321,46 +346,32 @@ async function loadChildDashboard() {
   // Carregar dados da família
   loadChildFamilyData();
 
-  // Consultar personagem e configurar o BOTÃO ÚNICO de acesso ao avatar
+  // Consultar personagem e configurar o botão de acesso ao avatar na sidebar
   try {
     const res = await fetch(`${API.character}/me`, {
       headers: { Authorization: `Bearer ${state.token}` },
     });
     const data = await res.json();
 
-    const portalIcon = document.getElementById('child-portal-avatar-icon');
-    const portalTitle = document.getElementById('child-portal-avatar-title');
-    const portalSubtitle = document.getElementById('child-portal-avatar-subtitle');
-    const accessBtn = document.getElementById('btn-child-access-avatar');
+    const accessBtn = document.getElementById('btn-sidebar-access-avatar');
 
     if (res.ok && data.success && data.hasCharacter && data.character) {
       state.character = data.character;
-      const avatarObj = AVATAR_OPTIONS.find((a) => a.key === data.character.avatar_value);
-      const icon = avatarObj ? avatarObj.icon : '⚔️';
-      const currentClass = data.character.current_class?.name || 'Aventureiro';
-      const progress = data.character.classes_progress?.find((cp) => cp.class_id === data.character.current_class_id);
-      const lvl = progress ? progress.level : 1;
-
-      if (portalIcon) portalIcon.innerText = icon;
-      if (portalTitle) portalTitle.innerText = `Avatar: ${data.character.name}`;
-      if (portalSubtitle) portalSubtitle.innerText = `${currentClass} • Nível ${lvl} • Saldo: 💰 ${data.character.gold} Ouro`;
       if (accessBtn) {
         accessBtn.innerText = `⚔️ Acessar Avatar (${data.character.name})`;
-        accessBtn.className = 'btn btn-primary';
       }
     } else {
       state.character = null;
-      if (portalIcon) portalIcon.innerText = '✨';
-      if (portalTitle) portalTitle.innerText = 'Nenhum Avatar Desperto';
-      if (portalSubtitle) portalSubtitle.innerText = 'Crie sua identidade de RPG para iniciar as missões e ganhar ouro!';
       if (accessBtn) {
         accessBtn.innerText = '✨ Despertar Meu Avatar';
-        accessBtn.className = 'btn btn-gold';
       }
     }
   } catch (err) {
     console.error('Erro ao consultar personagem no painel do usuário:', err);
   }
+
+  // Abrir a aba ativa do terminal (padrão: Tarefas)
+  switchChildTerminalTab(state.childTerminalTab || 'tasks');
 }
 
 function handleAccessAvatar() {
@@ -369,6 +380,67 @@ function handleAccessAvatar() {
   } else {
     openHeroCreationWizard();
   }
+}
+
+// --------------------------------------------------------
+// Temporizador de Estudos (Pomodoro 25 min)
+// --------------------------------------------------------
+let studyTimerState = {
+  interval: null,
+  remainingSeconds: 25 * 60,
+  isRunning: false,
+};
+
+function toggleStudyTimer() {
+  const btn = document.getElementById('btn-study-start');
+  const status = document.getElementById('study-timer-status');
+
+  if (studyTimerState.isRunning) {
+    // Pausar
+    clearInterval(studyTimerState.interval);
+    studyTimerState.isRunning = false;
+    if (btn) btn.innerText = '▶️ Continuar Sessão';
+    if (status) status.innerText = '⏸️ Temporizador pausado. Clique em Continuar quando estiver pronto.';
+  } else {
+    // Iniciar / Continuar
+    studyTimerState.isRunning = true;
+    if (btn) btn.innerText = '⏸️ Pausar Sessão';
+    if (status) status.innerText = '🔥 Foco total! Mantenha a concentração nos seus estudos.';
+
+    studyTimerState.interval = setInterval(() => {
+      if (studyTimerState.remainingSeconds > 0) {
+        studyTimerState.remainingSeconds--;
+        updateStudyTimerDisplay();
+      } else {
+        clearInterval(studyTimerState.interval);
+        studyTimerState.isRunning = false;
+        if (btn) btn.innerText = '▶️ Iniciar Nova Sessão';
+        if (status) status.innerText = '🎉 Excelente trabalho! Você completou 25 minutos de estudo focado!';
+        showToast('🎉 Parabéns! Sessão de 25 minutos de estudos concluída!', 'success');
+      }
+    }, 1000);
+  }
+}
+
+function resetStudyTimer() {
+  clearInterval(studyTimerState.interval);
+  studyTimerState.isRunning = false;
+  studyTimerState.remainingSeconds = 25 * 60;
+  updateStudyTimerDisplay();
+
+  const btn = document.getElementById('btn-study-start');
+  const status = document.getElementById('study-timer-status');
+  if (btn) btn.innerText = '▶️ Iniciar Sessão (25 min)';
+  if (status) status.innerText = 'Pronto para iniciar uma sessão de 25 minutos de estudo concentrado.';
+}
+
+function updateStudyTimerDisplay() {
+  const display = document.getElementById('study-timer-display');
+  if (!display) return;
+
+  const minutes = Math.floor(studyTimerState.remainingSeconds / 60);
+  const seconds = studyTimerState.remainingSeconds % 60;
+  display.innerText = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
 // ========================================================
@@ -723,8 +795,12 @@ async function handleConfirmClassSwitch() {
 
 // FILHO: Carregar Mural de Missões
 async function loadChildTasks() {
-  const container = document.getElementById('child-tasks-list');
-  if (!container) return;
+  const containers = [
+    document.getElementById('child-user-tasks-list'),
+    document.getElementById('child-tasks-list'),
+  ].filter(Boolean);
+
+  if (containers.length === 0) return;
 
   try {
     const res = await fetch(`${API.tasks}`, {
@@ -734,20 +810,22 @@ async function loadChildTasks() {
 
     if (res.ok && data.success) {
       if (data.tasks.length === 0) {
-        container.innerHTML = '<p style="color: var(--text-muted); grid-column: 1/-1;">Nenhuma missão ativa no mural da família no momento.</p>';
+        containers.forEach((c) => {
+          c.innerHTML = '<p style="color: var(--text-muted); grid-column: 1/-1;">Nenhuma tarefa ativa no momento.</p>';
+        });
         return;
       }
 
-      container.innerHTML = data.tasks
+      const html = data.tasks
         .map((t) => {
           const hasPending = t.submissions?.some((s) => s.status === 'PENDING');
           const hasApproved = t.submissions?.some((s) => s.status === 'APPROVED');
           
-          let actionButton = `<button class="btn btn-primary btn-sm" onclick="openSubmitProofModal('${t.id}', '${t.title.replace(/'/g, "\\'")}')">📸 Concluir & Enviar Prova</button>`;
+          let actionButton = `<button class="btn btn-primary btn-sm" onclick="openSubmitProofModal('${t.id}', '${t.title.replace(/'/g, "\\'")}')">📸 Concluir & Enviar Foto</button>`;
           if (hasPending) {
-            actionButton = `<span style="color: #fbbf24; font-size: 0.85rem; font-weight: 700;">⏳ Prova em Análise pelos Pais</span>`;
+            actionButton = `<span style="color: #fbbf24; font-size: 0.85rem; font-weight: 700;">⏳ Foto em Análise pelos Pais</span>`;
           } else if (hasApproved) {
-            actionButton = `<span style="color: #4ade80; font-size: 0.85rem; font-weight: 700;">✅ Missão Cumprida & Aprovada!</span>`;
+            actionButton = `<span style="color: #4ade80; font-size: 0.85rem; font-weight: 700;">✅ Tarefa Cumprida & Aprovada!</span>`;
           }
 
           return `
@@ -770,6 +848,10 @@ async function loadChildTasks() {
           `;
         })
         .join('');
+
+      containers.forEach((c) => {
+        c.innerHTML = html;
+      });
     }
   } catch (err) {
     console.error('Erro ao carregar tarefas do filho:', err);
@@ -778,7 +860,7 @@ async function loadChildTasks() {
 
 function openSubmitProofModal(taskId, taskTitle) {
   document.getElementById('modal-task-id-target').value = taskId;
-  document.getElementById('modal-task-title-target').innerText = `Missão: ${taskTitle}`;
+  document.getElementById('modal-task-title-target').innerText = `Tarefa: ${taskTitle}`;
   document.getElementById('proof-text-input').value = '';
   document.getElementById('proof-photo-input').value = '';
   document.getElementById('submit-proof-modal').style.display = 'flex';
@@ -831,8 +913,12 @@ async function handleSubmitProof(e) {
 }
 
 async function loadChildSubmissionsHistory() {
-  const container = document.getElementById('child-submissions-history');
-  if (!container) return;
+  const containers = [
+    document.getElementById('child-user-submissions-history'),
+    document.getElementById('child-submissions-history'),
+  ].filter(Boolean);
+
+  if (containers.length === 0) return;
 
   try {
     const res = await fetch(`${API.tasks}/submissions/my`, {
@@ -842,11 +928,13 @@ async function loadChildSubmissionsHistory() {
 
     if (res.ok && data.success) {
       if (data.submissions.length === 0) {
-        container.innerHTML = '<p style="color: var(--text-muted);">Você ainda não enviou comprovações de missões.</p>';
+        containers.forEach((c) => {
+          c.innerHTML = '<p style="color: var(--text-muted);">Você ainda não enviou comprovações de tarefas.</p>';
+        });
         return;
       }
 
-      container.innerHTML = data.submissions
+      const html = data.submissions
         .map((s) => {
           let statusBadge = `<span class="role-badge" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24;">⏳ Pendente</span>`;
           if (s.status === 'APPROVED') {
@@ -858,7 +946,7 @@ async function loadChildSubmissionsHistory() {
           return `
             <div class="user-row" style="flex-direction: column; align-items: flex-start; gap: 8px;">
               <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
-                <strong>${s.task?.title || 'Missão'}</strong>
+                <strong>${s.task?.title || 'Tarefa'}</strong>
                 ${statusBadge}
               </div>
               ${s.proof_text ? `<p style="font-size: 0.85rem; color: #cbd5e1; font-style: italic;">"${s.proof_text}"</p>` : ''}
@@ -867,6 +955,10 @@ async function loadChildSubmissionsHistory() {
           `;
         })
         .join('');
+
+      containers.forEach((c) => {
+        c.innerHTML = html;
+      });
     }
   } catch (err) {
     console.error('Erro ao carregar histórico de envios:', err);
