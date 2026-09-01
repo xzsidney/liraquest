@@ -423,19 +423,31 @@ export const listPendingSubmissions = async (req, res) => {
     const userRole = req.user.role;
     const membership = await findOrCreateUserFamily(userId);
 
-    let taskWhereClause = {};
+    let submissionWhere = { status: 'PENDING' };
+
     if (userRole !== 'ADMIN' && membership && membership.family_id) {
-      taskWhereClause = { family_id: membership.family_id };
+      const familyMembers = await FamilyMember.findAll({
+        where: { family_id: membership.family_id },
+        attributes: ['user_id'],
+      });
+      const memberUserIds = familyMembers.map((m) => m.user_id);
+
+      submissionWhere = {
+        status: 'PENDING',
+        [Op.or]: [
+          { user_id: { [Op.in]: memberUserIds } },
+          { '$task.family_id$': membership.family_id },
+        ],
+      };
     }
 
     const submissions = await TaskSubmission.findAll({
-      where: { status: 'PENDING' },
+      where: submissionWhere,
       include: [
         {
           model: Task,
           as: 'task',
-          where: taskWhereClause,
-          required: true,
+          required: false,
         },
         {
           model: FamilyUser,
@@ -617,21 +629,33 @@ export const listReviewedSubmissions = async (req, res) => {
     const userRole = req.user.role;
     const membership = await findOrCreateUserFamily(userId);
 
-    let taskWhereClause = {};
+    let submissionWhere = {
+      status: { [Op.in]: ['APPROVED', 'REJECTED'] },
+    };
+
     if (userRole !== 'ADMIN' && membership && membership.family_id) {
-      taskWhereClause = { family_id: membership.family_id };
+      const familyMembers = await FamilyMember.findAll({
+        where: { family_id: membership.family_id },
+        attributes: ['user_id'],
+      });
+      const memberUserIds = familyMembers.map((m) => m.user_id);
+
+      submissionWhere = {
+        status: { [Op.in]: ['APPROVED', 'REJECTED'] },
+        [Op.or]: [
+          { user_id: { [Op.in]: memberUserIds } },
+          { '$task.family_id$': membership.family_id },
+        ],
+      };
     }
 
     const submissions = await TaskSubmission.findAll({
-      where: {
-        status: { [Op.in]: ['APPROVED', 'REJECTED'] },
-      },
+      where: submissionWhere,
       include: [
         {
           model: Task,
           as: 'task',
-          where: taskWhereClause,
-          required: true,
+          required: false,
         },
         {
           model: FamilyUser,
