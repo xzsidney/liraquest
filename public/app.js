@@ -1255,6 +1255,9 @@ class ChameleonGameEngine {
     this.crystalsCollected = 0;
     this.maxCrystals = 5;
 
+    // Toque Contínuo Mobile (Touch 360°)
+    this.touchTarget = { x: 0, y: 0, active: false };
+
     // Tempo de Jogo
     this.timeLimitSeconds = 45;
     this.timeRemaining = 45;
@@ -1298,33 +1301,26 @@ class ChameleonGameEngine {
       }
     });
 
-    // Suporte a Toque Direto no Celular (Touch / Drag)
-    const handleTouch = (e) => {
+    // Suporte a Toque Direto no Celular (Touch / Drag 360° Contínuo)
+    const handleTouchStartMove = (e) => {
       if (!this.isRunning || !e.touches || e.touches.length === 0) return;
       e.preventDefault();
       const touch = e.touches[0];
       const pos = getCanvasPos(touch.clientX, touch.clientY);
-
+      this.touchTarget = { x: pos.x, y: pos.y, active: true };
       if (this.player.isSeeker) {
-        // Se for o Caçador: orienta a lanterna na direção do toque
         this.player.angle = Math.atan2(pos.y - this.player.y, pos.x - this.player.x);
-      } else {
-        // Se for o Camaleão: move o herói suavemente em direção ao toque
-        const dx = pos.x - this.player.x;
-        const dy = pos.y - this.player.y;
-        const dist = Math.hypot(dx, dy);
-        if (dist > 8) {
-          const speed = this.player.speed;
-          this.player.x += (dx / dist) * Math.min(speed, dist);
-          this.player.y += (dy / dist) * Math.min(speed, dist);
-          this.player.x = Math.max(this.player.radius + 10, Math.min(this.width - this.player.radius - 10, this.player.x));
-          this.player.y = Math.max(this.player.radius + 10, Math.min(this.height - this.player.radius - 10, this.player.y));
-        }
       }
     };
 
-    this.canvas.addEventListener('touchstart', handleTouch, { passive: false });
-    this.canvas.addEventListener('touchmove', handleTouch, { passive: false });
+    const handleTouchEnd = (e) => {
+      this.touchTarget.active = false;
+    };
+
+    this.canvas.addEventListener('touchstart', handleTouchStartMove, { passive: false });
+    this.canvas.addEventListener('touchmove', handleTouchStartMove, { passive: false });
+    this.canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+    this.canvas.addEventListener('touchcancel', handleTouchEnd, { passive: false });
   }
 
   setDpadKey(dir, isPressed) {
@@ -1486,17 +1482,37 @@ class ChameleonGameEngine {
     if (this.keys.left) dx -= speed;
     if (this.keys.right) dx += speed;
 
-    // Normaliza velocidade diagonal
-    if (dx !== 0 && dy !== 0) {
-      dx *= 0.7071;
-      dy *= 0.7071;
+    // Movimento por Toque no Celular (Touch / Drag 360°)
+    if (this.touchTarget && this.touchTarget.active) {
+      const tdx = this.touchTarget.x - this.player.x;
+      const tdy = this.touchTarget.y - this.player.y;
+      const tdist = Math.hypot(tdx, tdy);
+
+      if (this.player.isSeeker) {
+        this.player.angle = Math.atan2(tdy, tdx);
+        if (tdist > 14) {
+          dx = (tdx / tdist) * speed;
+          dy = (tdy / tdist) * speed;
+        }
+      } else {
+        if (tdist > 8) {
+          dx = (tdx / tdist) * Math.min(speed, tdist);
+          dy = (tdy / tdist) * Math.min(speed, tdist);
+        }
+      }
+    } else {
+      // Normaliza velocidade diagonal do teclado
+      if (dx !== 0 && dy !== 0) {
+        dx *= 0.7071;
+        dy *= 0.7071;
+      }
     }
 
     this.player.x = Math.max(this.player.radius + 10, Math.min(this.width - this.player.radius - 10, this.player.x + dx));
     this.player.y = Math.max(this.player.radius + 10, Math.min(this.height - this.player.radius - 10, this.player.y + dy));
 
-    // Se estiver se movendo e for caçador sem mouse, atualiza o ângulo
-    if (this.player.isSeeker && (dx !== 0 || dy !== 0)) {
+    // Se estiver se movendo pelo teclado e for caçador sem mouse/toque, atualiza o ângulo
+    if (this.player.isSeeker && !this.touchTarget?.active && (dx !== 0 || dy !== 0)) {
       this.player.angle = Math.atan2(dy, dx);
     }
 

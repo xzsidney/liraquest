@@ -1715,27 +1715,134 @@
       box-shadow: 0 8px 24px rgba(128, 0, 32, 0.3);
     }
 
+    /* ===================================================== */
+    /* 🎮 MODO ARENA IMERSIVA (FULL FOCUS OVERLAY)           */
+    /* ===================================================== */
+    .full-focus-arena {
+      position: fixed !important;
+      inset: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background: radial-gradient(circle at center, #0e1526 0%, #05070c 100%) !important;
+      z-index: 99999 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      align-items: center !important;
+      padding: 12px !important;
+      overflow: hidden !important;
+      touch-action: none !important;
+      user-select: none !important;
+      -webkit-user-select: none !important;
+    }
+
+    .arena-floating-hud {
+      width: 100%;
+      max-width: 960px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      padding: 0 4px;
+      flex-wrap: nowrap;
+      gap: 8px;
+      z-index: 20;
+    }
+
+    .arena-exit-btn {
+      background: rgba(128, 0, 32, 0.7);
+      border: 1px solid rgba(248, 113, 113, 0.5);
+      color: #ffffff;
+      padding: 6px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .arena-hud-center {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .arena-badge {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 5px 12px;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+
+    .arena-timer {
+      color: #fde047;
+      border-color: rgba(250, 204, 21, 0.4);
+    }
+
+    .arena-crystals {
+      color: #60a5fa;
+      border-color: rgba(96, 165, 250, 0.4);
+    }
+
+    .arena-energy {
+      color: #93c5fd;
+      background: rgba(30, 58, 138, 0.5);
+      border-color: rgba(59, 130, 246, 0.4);
+    }
+
+    .arena-color-picker {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.8);
+      padding: 4px 8px;
+      border-radius: 20px;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+    }
+
+    .color-picker-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .color-picker-btn.selected {
+      border-color: #ffffff;
+      transform: scale(1.25);
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+    }
+
     .game-arena-wrapper {
       position: relative;
       background: #090c10;
-      border: 2px solid rgba(212, 175, 55, 0.3);
-      border-radius: 20px;
+      border: 2px solid rgba(212, 175, 55, 0.4);
+      border-radius: 16px;
       overflow: hidden;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8);
-      margin-top: 16px;
+      justify-content: center;
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(212, 175, 55, 0.15);
+      width: 100%;
+      max-width: 960px;
+      height: calc(100vh - 80px);
+      max-height: calc(960px * 0.625);
+      aspect-ratio: 16 / 10;
+      touch-action: none;
     }
 
     #chameleon-canvas {
       display: block;
       width: 100%;
-      max-width: 800px;
-      height: auto;
-      aspect-ratio: 16 / 10;
+      height: 100%;
+      object-fit: fill;
       background: #0b0f19;
       cursor: crosshair;
+      touch-action: none;
     }
 
     .game-overlay-screen {
@@ -1744,87 +1851,44 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(11, 15, 25, 0.94);
+      background: rgba(11, 15, 25, 0.95);
       backdrop-filter: blur(8px);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 24px;
+      padding: 20px;
       text-align: center;
       z-index: 10;
     }
 
-    .color-picker-btn {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      border: 3px solid rgba(255, 255, 255, 0.2);
-      cursor: pointer;
-      transition: transform 0.2s, border-color 0.2s;
-    }
-
-    .color-picker-btn.selected {
-      border-color: #ffffff;
-      transform: scale(1.2);
-      box-shadow: 0 0 16px rgba(255, 255, 255, 0.6);
-    }
-
-    /* D-Pad Virtual para Celulares */
-    .mobile-dpad-container {
-      display: none;
-      margin-top: 14px;
-      grid-template-columns: repeat(3, 58px);
-      grid-template-rows: repeat(3, 58px);
-      gap: 8px;
-      justify-content: center;
-      touch-action: none;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-
-    .dpad-btn {
-      background: linear-gradient(135deg, rgba(30, 58, 138, 0.85), rgba(15, 23, 42, 0.95));
-      border: 1.5px solid rgba(212, 175, 55, 0.55);
-      border-radius: 14px;
-      color: #ffffff;
-      font-size: 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      user-select: none;
-      -webkit-user-select: none;
-      touch-action: none;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-      transition: transform 0.1s, background 0.1s;
-    }
-
-    .dpad-btn:active {
-      background: linear-gradient(135deg, var(--accent), #4a0e17);
-      border-color: #fde047;
-      transform: scale(0.92);
-    }
-
     @media (max-width: 768px) {
-      .mobile-dpad-container {
-        display: grid;
+      .arena-floating-hud {
+        gap: 4px;
+        margin-bottom: 6px;
+      }
+      .arena-badge {
+        padding: 4px 8px;
+        font-size: 0.78rem;
+      }
+      .color-picker-btn {
+        width: 24px;
+        height: 24px;
       }
       .game-arena-wrapper {
-        border-radius: 14px;
-        margin-top: 10px;
-        touch-action: none;
-      }
-      #chameleon-canvas {
-        touch-action: none;
+        border-radius: 12px;
+        height: calc(100vh - 65px);
+        max-height: 85vh;
       }
       .game-overlay-screen {
-        padding: 16px 12px;
+        padding: 14px 10px;
       }
       .game-overlay-screen h2 {
-        font-size: 1.4rem !important;
+        font-size: 1.3rem !important;
       }
       .game-overlay-screen p {
-        font-size: 0.85rem !important;
+        font-size: 0.8rem !important;
+        margin-bottom: 14px !important;
       }
     }
 
@@ -3545,89 +3609,83 @@
             </div>
           </div>
 
-          <!-- SUB-PAINEL 2: ARENA DO JOGO ESCONDE-ESCONDE CAMALEÃO -->
-          <div id="chameleon-game-view" style="display: none;">
+          <!-- SUB-PAINEL 2: ARENA DO JOGO ESCONDE-ESCONDE CAMALEÃO (MODO FULL FOCUS) -->
+          <div id="chameleon-game-view" class="full-focus-arena" style="display: none;">
             
-            <!-- Barra Superior da Arena -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
-              <button class="btn btn-secondary btn-sm" onclick="closeChameleonGameArena()">
-                ⬅️ Voltar ao Arcade
+            <!-- Barra Superior HUD Flutuante -->
+            <div class="arena-floating-hud">
+              <button type="button" class="arena-exit-btn" onclick="closeChameleonGameArena()">
+                ✕ Sair
               </button>
               
-              <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
-                <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); padding: 6px 14px; border-radius: 10px; font-weight: 800; color: #fde047; font-size: 1.05rem;">
-                  ⏱️ Tempo: <span id="chameleon-timer-display">45</span>s
+              <div class="arena-hud-center">
+                <div class="arena-badge arena-timer">
+                  ⏱️ <span id="chameleon-timer-display">45</span>s
                 </div>
-                <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); padding: 6px 14px; border-radius: 10px; font-weight: 800; color: #60a5fa; font-size: 0.95rem;">
-                  💎 Cristais: <span id="chameleon-crystals-display">0</span>
+                <div class="arena-badge arena-crystals">
+                  💎 <span id="chameleon-crystals-display">0</span>
                 </div>
-                <div style="background: rgba(30, 58, 138, 0.4); border: 1px solid rgba(59, 130, 246, 0.4); padding: 6px 14px; border-radius: 10px; font-weight: 800; color: #93c5fd; font-size: 0.95rem;">
+                <div class="arena-badge arena-energy">
                   ⚡ <span id="chameleon-energy-display">0</span>
                 </div>
               </div>
-            </div>
 
-            <!-- Seletor de Cor da Bolinha Camaleão -->
-            <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-card); border-radius: 14px; padding: 10px 16px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-              <span style="font-size: 0.88rem; color: #cbd5e1; font-weight: 600;">
-                🎨 Escolha a Cor da sua Bolinha:
-              </span>
-              <div style="display: flex; gap: 12px;">
-                <button type="button" class="color-picker-btn selected" style="background: #ef4444;" onclick="selectChameleonColor('#ef4444', this)" title="Vermelho Rubi"></button>
-                <button type="button" class="color-picker-btn" style="background: #3b82f6;" onclick="selectChameleonColor('#3b82f6', this)" title="Azul Safira"></button>
-                <button type="button" class="color-picker-btn" style="background: #22c55e;" onclick="selectChameleonColor('#22c55e', this)" title="Verde Esmeralda"></button>
-                <button type="button" class="color-picker-btn" style="background: #eab308;" onclick="selectChameleonColor('#eab308', this)" title="Amarelo Ouro"></button>
+              <!-- Seletor Rápido de Cor Flutuante -->
+              <div class="arena-color-picker">
+                <button type="button" class="color-picker-btn selected" style="background: #ef4444;" onclick="selectChameleonColor('#ef4444', this)" title="Rubi"></button>
+                <button type="button" class="color-picker-btn" style="background: #3b82f6;" onclick="selectChameleonColor('#3b82f6', this)" title="Safira"></button>
+                <button type="button" class="color-picker-btn" style="background: #22c55e;" onclick="selectChameleonColor('#22c55e', this)" title="Esmeralda"></button>
+                <button type="button" class="color-picker-btn" style="background: #eab308;" onclick="selectChameleonColor('#eab308', this)" title="Ouro"></button>
               </div>
             </div>
 
-            <!-- Canvas da Arena de Jogo -->
+            <!-- Canvas da Arena de Jogo Widescreen Expandido -->
             <div class="game-arena-wrapper">
               <canvas id="chameleon-canvas" width="800" height="500"></canvas>
 
               <!-- Overlay 1: Tela de Início (Escolha de Modo: Solo vs Multiplayer Familiar) -->
               <div id="chameleon-start-screen" class="game-overlay-screen">
-                <span style="font-size: 3.5rem; margin-bottom: 8px;">🔦</span>
-                <h2 style="font-size: 1.8rem; color: #ffffff; margin-bottom: 6px;">Esconde-Esconde Camaleão</h2>
-                <p style="color: #cbd5e1; font-size: 0.92rem; max-width: 520px; line-height: 1.5; margin-bottom: 20px;">
-                  Mova sua bolinha com as <strong>Setas / WASD</strong>.<br>
-                  Fique parado sobre o piso da <strong>mesma cor</strong> da sua bolinha para ficar <strong>100% invisível</strong>!<br>
-                  Não deixe o <strong>cone de luz da lanterna</strong> iluminar você!
+                <span style="font-size: 3.2rem; margin-bottom: 6px;">🔦</span>
+                <h2 style="font-size: 1.6rem; color: #ffffff; margin-bottom: 4px;">Esconde-Esconde Camaleão</h2>
+                <p style="color: #cbd5e1; font-size: 0.88rem; max-width: 480px; line-height: 1.4; margin-bottom: 16px;">
+                  No PC use <strong>WASD / Setas</strong>. No Celular <strong>toque e arraste o dedo</strong> na tela.<br>
+                  Fique parado sobre o piso da <strong>mesma cor</strong> da sua bolinha para ficar <strong>100% invisível</strong>!
                 </p>
 
-                <div style="display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;">
-                  <button class="btn btn-primary" style="padding: 14px 28px; font-size: 1.05rem; font-weight: 800;" onclick="startChameleonGameSession('SOLO')">
+                <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
+                  <button class="btn btn-primary" style="padding: 12px 24px; font-size: 1rem; font-weight: 800;" onclick="startChameleonGameSession('SOLO')">
                     🤖 Modo Solo (vs Patrulha IA)
                   </button>
-                  <button class="btn btn-gold" style="padding: 14px 28px; font-size: 1.05rem; font-weight: 800;" onclick="openChameleonMultiplayerLobby()">
-                    👨‍👩‍👧‍👦 Modo Família (Sorteio do Caçador 🎲)
+                  <button class="btn btn-gold" style="padding: 12px 24px; font-size: 1rem; font-weight: 800;" onclick="openChameleonMultiplayerLobby()">
+                    👨‍👩‍👧‍👦 Modo Família (Sorteio 🎲)
                   </button>
                 </div>
               </div>
 
               <!-- Overlay 1.5: Lobby Multiplayer Familiar & Sorteio 🎲 -->
               <div id="chameleon-multiplayer-screen" class="game-overlay-screen" style="display: none;">
-                <span style="font-size: 3.2rem; margin-bottom: 6px;">🎲</span>
-                <h3 style="font-size: 1.6rem; color: #fde047; margin-bottom: 4px;">Saguão do Clã Familiar</h3>
-                <p style="color: #cbd5e1; font-size: 0.88rem; margin-bottom: 16px;">
+                <span style="font-size: 3rem; margin-bottom: 4px;">🎲</span>
+                <h3 style="font-size: 1.5rem; color: #fde047; margin-bottom: 4px;">Saguão do Clã Familiar</h3>
+                <p style="color: #cbd5e1; font-size: 0.85rem; margin-bottom: 14px;">
                   Membros da família conectados nesta sala em tempo real:
                 </p>
 
                 <!-- Lista de Jogadores no Lobby -->
-                <div id="chameleon-lobby-players" style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; max-width: 500px;">
+                <div id="chameleon-lobby-players" style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 16px; max-width: 480px;">
                   <!-- Preenchido via Socket.IO -->
                 </div>
 
                 <!-- Animação da Roleta / Sorteio -->
-                <div id="chameleon-roulette-box" style="display: none; background: rgba(0,0,0,0.8); border: 2px solid var(--accent); border-radius: 16px; padding: 18px 28px; margin-bottom: 20px; text-align: center;">
-                  <div style="font-size: 1.1rem; color: #93c5fd; font-weight: 700; margin-bottom: 6px;">🎰 Sorteando o Caçador da Rodada...</div>
-                  <div id="chameleon-roulette-name" style="font-size: 1.8rem; color: #fde047; font-weight: 900; letter-spacing: 1px;">???</div>
+                <div id="chameleon-roulette-box" style="display: none; background: rgba(0,0,0,0.85); border: 2px solid var(--accent); border-radius: 14px; padding: 14px 24px; margin-bottom: 16px; text-align: center;">
+                  <div style="font-size: 1rem; color: #93c5fd; font-weight: 700; margin-bottom: 4px;">🎰 Sorteando o Caçador da Rodada...</div>
+                  <div id="chameleon-roulette-name" style="font-size: 1.6rem; color: #fde047; font-weight: 900; letter-spacing: 1px;">???</div>
                 </div>
 
-                <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
-                  <button id="btn-spin-chameleon" class="btn btn-gold" style="padding: 12px 28px; font-weight: 800; font-size: 1.05rem;" onclick="triggerSeekerLottery()">
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+                  <button id="btn-spin-chameleon" class="btn btn-gold" style="padding: 10px 24px; font-weight: 800; font-size: 1rem;" onclick="triggerSeekerLottery()">
                     🎰 Sortear Caçador & Iniciar!
                   </button>
-                  <button class="btn btn-secondary" style="padding: 12px 20px;" onclick="backToStartScreen()">
+                  <button class="btn btn-secondary" style="padding: 10px 18px;" onclick="backToStartScreen()">
                     ⬅️ Voltar
                   </button>
                 </div>
@@ -3635,59 +3693,25 @@
 
               <!-- Overlay 2: Tela de Fim de Jogo (Vitória ou Derrota) -->
               <div id="chameleon-end-screen" class="game-overlay-screen" style="display: none;">
-                <span id="chameleon-result-icon" style="font-size: 3.8rem; margin-bottom: 8px;">🎉</span>
-                <h2 id="chameleon-result-title" style="font-size: 1.9rem; color: #fde047; margin-bottom: 8px;">VITÓRIA ÉPICA!</h2>
-                <p id="chameleon-result-desc" style="color: #ffffff; font-size: 1.05rem; max-width: 480px; margin-bottom: 18px;">
+                <span id="chameleon-result-icon" style="font-size: 3.5rem; margin-bottom: 6px;">🎉</span>
+                <h2 id="chameleon-result-title" style="font-size: 1.7rem; color: #fde047; margin-bottom: 6px;">VITÓRIA ÉPICA!</h2>
+                <p id="chameleon-result-desc" style="color: #ffffff; font-size: 0.95rem; max-width: 440px; margin-bottom: 16px;">
                   Você sobreviveu à patrulha da lanterna!
                 </p>
-                <div id="chameleon-rewards-box" style="background: rgba(30, 58, 138, 0.4); border: 1px solid rgba(212, 175, 55, 0.4); border-radius: 14px; padding: 12px 24px; display: flex; gap: 16px; margin-bottom: 20px;">
-                  <span id="chameleon-reward-gold" class="reward-pill-gold" style="font-size: 0.95rem;">💰 +30 Ouro</span>
-                  <span id="chameleon-reward-xp" class="reward-pill-xp" style="font-size: 0.95rem;">⭐ +50 XP</span>
+                <div id="chameleon-rewards-box" style="background: rgba(30, 58, 138, 0.4); border: 1px solid rgba(212, 175, 55, 0.4); border-radius: 12px; padding: 10px 20px; display: flex; gap: 14px; margin-bottom: 16px;">
+                  <span id="chameleon-reward-gold" class="reward-pill-gold" style="font-size: 0.9rem;">💰 +30 Ouro</span>
+                  <span id="chameleon-reward-xp" class="reward-pill-xp" style="font-size: 0.9rem;">⭐ +50 XP</span>
                 </div>
-                <div style="display: flex; gap: 12px;">
-                  <button class="btn btn-primary" style="padding: 12px 24px;" onclick="startChameleonGameSession('SOLO')">
+                <div style="display: flex; gap: 10px;">
+                  <button class="btn btn-primary" style="padding: 10px 20px;" onclick="startChameleonGameSession('SOLO')">
                     🔄 Jogar Novamente (5 ⚡)
                   </button>
-                  <button class="btn btn-secondary" style="padding: 12px 20px;" onclick="closeChameleonGameArena()">
+                  <button class="btn btn-secondary" style="padding: 10px 18px;" onclick="closeChameleonGameArena()">
                     ⬅️ Menu de Jogos
                   </button>
                 </div>
               </div>
 
-            </div>
-
-            <!-- D-Pad de Controles de Toque (Celular) -->
-            <div id="chameleon-mobile-dpad" class="mobile-dpad-container">
-              <div></div>
-              <button type="button" class="dpad-btn" 
-                onpointerdown="handleDpadInput('UP', true, event)" 
-                onpointerup="handleDpadInput('UP', false, event)"
-                onpointercancel="handleDpadInput('UP', false, event)"
-                onpointerleave="handleDpadInput('UP', false, event)"
-                ontouchstart="handleDpadInput('UP', true, event)"
-                ontouchend="handleDpadInput('UP', false, event)">⬆️</button>
-              <div></div>
-              <button type="button" class="dpad-btn" 
-                onpointerdown="handleDpadInput('LEFT', true, event)" 
-                onpointerup="handleDpadInput('LEFT', false, event)"
-                onpointercancel="handleDpadInput('LEFT', false, event)"
-                onpointerleave="handleDpadInput('LEFT', false, event)"
-                ontouchstart="handleDpadInput('LEFT', true, event)"
-                ontouchend="handleDpadInput('LEFT', false, event)">⬅️</button>
-              <button type="button" class="dpad-btn" 
-                onpointerdown="handleDpadInput('DOWN', true, event)" 
-                onpointerup="handleDpadInput('DOWN', false, event)"
-                onpointercancel="handleDpadInput('DOWN', false, event)"
-                onpointerleave="handleDpadInput('DOWN', false, event)"
-                ontouchstart="handleDpadInput('DOWN', true, event)"
-                ontouchend="handleDpadInput('DOWN', false, event)">⬇️</button>
-              <button type="button" class="dpad-btn" 
-                onpointerdown="handleDpadInput('RIGHT', true, event)" 
-                onpointerup="handleDpadInput('RIGHT', false, event)"
-                onpointercancel="handleDpadInput('RIGHT', false, event)"
-                onpointerleave="handleDpadInput('RIGHT', false, event)"
-                ontouchstart="handleDpadInput('RIGHT', true, event)"
-                ontouchend="handleDpadInput('RIGHT', false, event)">➡️</button>
             </div>
 
           </div>
@@ -4007,6 +4031,6 @@
 
   <!-- Script Socket.IO e da Aplicação (com Cache-Busting Ativo) -->
   <script src="/socket.io/socket.io.js"></script>
-  <script src="/app.js?v=20260831_2052"></script>
+  <script src="/app.js?v=20260831_2105"></script>
 </body>
 </html>
