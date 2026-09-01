@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jogo Phaser</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #000;
+    }
+    /* Botão flutuante para voltar à Home */
+    #btn-sair {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      padding: 10px 20px;
+      background-color: #e74c3c;
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      transition: background 0.2s ease;
+    }
+    #btn-sair:hover {
+      background-color: #c0392b;
+    }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.min.js"></script>
+</head>
+<body>
+
+  <button id="btn-sair" onclick="window.location.href='index.html'">Sair do Jogo</button>
+
+  <script>
+    class CenaPrincipal extends Phaser.Scene {
+      constructor() {
+        super({ key: 'CenaPrincipal' });
+      }
+
+      create() {
+        // Texto de instrução na tela
+        this.add.text(20, 20, 'Use as SETAS do teclado para acelerar o ponto', {
+          fontSize: '18px',
+          color: '#ffffff'
+        });
+
+        // Criação de uma textura circular de 20px (o pontinho)
+        const graphics = this.make.graphics({ x: 0, y: 0, add: false });
+        graphics.fillStyle(0x00ffcc, 1);
+        graphics.fillCircle(10, 10, 10);
+        graphics.generateTexture('ponto', 20, 20);
+
+        // Adiciona o ponto com física Arcade
+        this.player = this.physics.add.image(400, 300, 'ponto');
+        
+        // Configurações de física (movimento automático inicial e colisão com as bordas da tela)
+        this.player.setVelocity(200, 200);
+        this.player.setCollideWorldBounds(true);
+        this.player.setBounce(1, 1);
+
+        // Captura das teclas direcionais
+        this.cursors = this.input.keyboard.createCursorKeys();
+      }
+
+      update() {
+        // Controle opcional via teclado
+        if (this.cursors.left.isDown) {
+          this.player.setVelocityX(-300);
+        } else if (this.cursors.right.isDown) {
+          this.player.setVelocityX(300);
+        }
+
+        if (this.cursors.up.isDown) {
+          this.player.setVelocityY(-300);
+        } else if (this.cursors.down.isDown) {
+          this.player.setVelocityY(300);
+        }
+      }
+    }
+
+    // Configuração do Phaser com suporte a tela inteira responsiva
+    const config = {
+      type: Phaser.AUTO,
+      scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+        width: 1280,
+        height: 720
+      },
+      physics: {
+        default: 'arcade',
+        arcade: {
+          gravity: { y: 0 },
+          debug: false
+        }
+      },
+      scene: [CenaPrincipal]
+    };
+
+    const game = new Phaser.Game(config);
+  </script>
+</body>
+</html>

@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>LiraQuest — Esconde-Esconde Camaleão (Arcade)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background: radial-gradient(circle at center, #0e1628 0%, #05070c 100%);
+      color: #ffffff;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 12px;
+      touch-action: none;
+    }
+
+    /* ── BARRA SUPERIOR HUD FLUTUANTE ── */
+    .arcade-hud {
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding: 0 4px;
+      gap: 8px;
+      z-index: 100;
+    }
+
+    .btn-sair {
+      background: rgba(128, 0, 32, 0.85);
+      border: 1px solid rgba(248, 113, 113, 0.5);
+      color: #ffffff;
+      padding: 8px 18px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s, transform 0.1s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+
+    .btn-sair:hover {
+      background: #9b111e;
+      transform: scale(1.02);
+    }
+
+    .btn-sair:active {
+      transform: scale(0.96);
+    }
+
+    .hud-stats {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hud-badge {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 6px 14px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 0.92rem;
+      white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .badge-timer {
+      color: #fde047;
+      border-color: rgba(250, 204, 21, 0.4);
+    }
+
+    .badge-crystals {
+      color: #60a5fa;
+      border-color: rgba(96, 165, 250, 0.4);
+    }
+
+    .badge-energy {
+      color: #93c5fd;
+      background: rgba(30, 58, 138, 0.6);
+      border-color: rgba(59, 130, 246, 0.4);
+    }
+
+    .hud-color-picker {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.9);
+      padding: 5px 12px;
+      border-radius: 24px;
+      border: 1px solid rgba(212, 175, 55, 0.4);
+    }
+
+    .color-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .color-btn.selected {
+      border-color: #ffffff;
+      transform: scale(1.25);
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+    }
+
+    /* ── ARENA DO JOGO (WIDESCREEN 16:10 CENTRALIZADA) ── */
+    .game-wrapper {
+      position: relative;
+      background: #090c10;
+      border: 2px solid rgba(212, 175, 55, 0.4);
+      border-radius: 18px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(212, 175, 55, 0.15);
+      width: 100%;
+      max-width: 1100px;
+      height: calc(100vh - 84px);
+      max-height: calc(1100px * 0.625);
+      aspect-ratio: 16 / 10;
+      touch-action: none;
+    }
+
+    #game-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: fill;
+      background: #0b0f19;
+      cursor: crosshair;
+      touch-action: none;
+    }
+
+    /* ── OVERLAYS (TELA INÍCIO / LOBBY / FIM) ── */
+    .game-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(11, 15, 25, 0.96);
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      z-index: 50;
+    }
+
+    .overlay-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.8rem;
+      color: #fde047;
+      margin-bottom: 8px;
+    }
+
+    .overlay-desc {
+      color: #cbd5e1;
+      font-size: 0.92rem;
+      max-width: 500px;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      padding: 12px 26px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 1rem;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.1s, box-shadow 0.2s;
+    }
+
+    .btn:active {
+      transform: scale(0.96);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #1e3a8a, #2563eb);
+      color: #ffffff;
+      box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, #800020, #9b111e);
+      color: #fde047;
+      border: 1px solid rgba(212, 175, 55, 0.5);
+      box-shadow: 0 4px 16px rgba(128, 0, 32, 0.4);
+    }
+
+    .btn-secondary {
+      background: rgba(30, 41, 59, 0.8);
+      color: #cbd5e1;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 6px 8px;
+      }
+      .arcade-hud {
+        gap: 4px;
+        margin-bottom: 6px;
+      }
+      .btn-sair {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+      }
+      .hud-badge {
+        padding: 4px 8px;
+        font-size: 0.78rem;
+      }
+      .color-btn {
+        width: 22px;
+        height: 22px;
+      }
+      .game-wrapper {
+        border-radius: 14px;
+        height: calc(100vh - 58px);
+        max-height: 88vh;
+      }
+      .overlay-title {
+        font-size: 1.4rem;
+      }
+      .overlay-desc {
+        font-size: 0.82rem;
+        margin-bottom: 14px;
+      }
+      .btn {
+        padding: 10px 18px;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA HUD -->
+  <header class="arcade-hud">
+    <a href="/" class="btn-sair">
+      ✕ Sair do Jogo
+    </a>
+
+    <div class="hud-stats">
+      <div class="hud-badge badge-timer">
+        ⏱️ <span id="timer-display">45</span>s
+      </div>
+      <div class="hud-badge badge-crystals">
+        💎 <span id="crystals-display">0</span>
+      </div>
+      <div class="hud-badge badge-energy">
+        ⚡ <span id="energy-display">--</span>
+      </div>
+    </div>
+
+    <!-- SELETOR DE COR -->
+    <div class="hud-color-picker">
+      <button type="button" class="color-btn selected" style="background: #ef4444;" onclick="changeColor('#ef4444', this)" title="Rubi"></button>
+      <button type="button" class="color-btn" style="background: #3b82f6;" onclick="changeColor('#3b82f6', this)" title="Safira"></button>
+      <button type="button" class="color-btn" style="background: #22c55e;" onclick="changeColor('#22c55e', this)" title="Esmeralda"></button>
+      <button type="button" class="color-btn" style="background: #eab308;" onclick="changeColor('#eab308', this)" title="Ouro"></button>
+    </div>
+  </header>
+
+  <!-- ARENA DO JOGO -->
+  <main class="game-wrapper">
+    <canvas id="game-canvas" width="800" height="500"></canvas>
+
+    <!-- OVERLAY 1: INÍCIO -->
+    <div id="screen-start" class="game-overlay">
+      <span style="font-size: 3.5rem; margin-bottom: 8px;">🔦</span>
+      <h2 class="overlay-title">Esconde-Esconde Camaleão</h2>
+      <p class="overlay-desc">
+        No PC use <strong>WASD / Setas</strong>. No Celular <strong>toque e arraste o dedo</strong> na tela.<br>
+        Fique parado sobre o piso da <strong>mesma cor</strong> da sua bolinha para ficar <strong>100% invisível</strong>!
+      </p>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
+        <button class="btn btn-primary" onclick="startGame('SOLO')">
+          🤖 Modo Solo (vs Patrulha IA)
+        </button>
+        <button class="btn btn-gold" onclick="openMultiplayerLobby()">
+          👨‍👩‍👧‍👦 Modo Família (Sorteio 🎲)
+        </button>
+      </div>
+    </div>
+
+    <!-- OVERLAY 1.5: LOBBY MULTIPLAYER -->
+    <div id="screen-multiplayer" class="game-overlay" style="display: none;">
+      <span style="font-size: 3.2rem; margin-bottom: 6px;">🎲</span>
+      <h3 class="overlay-title" style="font-size: 1.5rem;">Saguão do Clã Familiar</h3>
+      <p class="overlay-desc" style="margin-bottom: 14px;">
+        Membros da família conectados nesta sala em tempo real:
+      </p>
+      <div id="lobby-players-list" style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 16px; max-width: 480px;">
+        <!-- Preenchido via Socket.IO -->
+      </div>
+      <div id="roulette-box" style="display: none; background: rgba(0,0,0,0.85); border: 2px solid #800020; border-radius: 14px; padding: 14px 24px; margin-bottom: 16px; text-align: center;">
+        <div style="font-size: 1rem; color: #93c5fd; font-weight: 700; margin-bottom: 4px;">🎰 Sorteando o Caçador da Rodada...</div>
+        <div id="roulette-name" style="font-size: 1.6rem; color: #fde047; font-weight: 900; letter-spacing: 1px;">???</div>
+      </div>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+        <button id="btn-spin" class="btn btn-gold" onclick="triggerLottery()">
+          🎰 Sortear Caçador & Iniciar!
+        </button>
+        <button class="btn btn-secondary" onclick="backToStart()">
+          ⬅️ Voltar
+        </button>
+      </div>
+    </div>
+
+    <!-- OVERLAY 2: FIM DE JOGO -->
+    <div id="screen-end" class="game-overlay" style="display: none;">
+      <span id="end-icon" style="font-size: 3.5rem; margin-bottom: 6px;">🎉</span>
+      <h2 id="end-title" class="overlay-title">VITÓRIA ÉPICA!</h2>
+      <p id="end-desc" class="overlay-desc">Você sobreviveu à patrulha da lanterna!</p>
+      <div id="end-rewards" style="background: rgba(30, 58, 138, 0.4); border: 1px solid rgba(212, 175, 55, 0.4); border-radius: 12px; padding: 10px 20px; display: flex; gap: 14px; margin-bottom: 16px;">
+        <span class="hud-badge" style="color: #fde047; border-color: rgba(250, 204, 21, 0.4);">💰 +30 Ouro</span>
+        <span class="hud-badge" style="color: #60a5fa; border-color: rgba(96, 165, 250, 0.4);">⭐ +50 XP</span>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <button class="btn btn-primary" onclick="startGame('SOLO')">
+          🔄 Jogar Novamente
+        </button>
+        <a href="/" class="btn btn-secondary" style="text-decoration: none;">
+          ⬅️ Voltar ao Reino
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <!-- SCRIPTS -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    // ─── ESTADO E AUTENTICAÇÃO ──────────────────────────────
+    const token = localStorage.getItem('token');
+    let currentUser = null;
+    let currentHero = null;
+    let userProgress = null;
+    let selectedColor = '#ef4444';
+    let socket = null;
+    let gameEngine = null;
+
+    try {
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) currentUser = JSON.parse(storedUser);
+    } catch (e) {}
+
+    // Carregar saldos do usuário
+    async function loadUserData() {
+      if (!token) return;
+      try {
+        const res = await fetch('/api/progress/me', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.success && data.progress) {
+          userProgress = data.progress;
+          const energyEl = document.getElementById('energy-display');
+          if (energyEl) energyEl.innerText = `${userProgress.adventure_energy || 0} ⚡`;
+        }
+      } catch (e) {
+        console.error('Erro ao buscar energia:', e);
+      }
+    }
+    loadUserData();
+
+    function changeColor(color, btn) {
+      selectedColor = color;
+      document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
+      if (btn) btn.classList.add('selected');
+      if (gameEngine && gameEngine.player) {
+        gameEngine.player.color = color;
+      }
+    }
+
+    function backToStart() {
+      document.getElementById('screen-multiplayer').style.display = 'none';
+      document.getElementById('screen-start').style.display = 'flex';
+      if (socket) {
+        socket.disconnect();
+        socket = null;
+      }
+    }
+
+    // ─── ENGINE 2D DO CAMALEÃO ──────────────────────────────
+    class ChameleonEngine {
+      constructor(canvasId) {
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext('2d');
+        this.width = this.canvas.width;
+        this.height = this.canvas.height;
+        this.isRunning = false;
+        this.isMultiplayer = false;
+        this.animationFrameId = null;
+
+        this.keys = { up: false, down: false, left: false, right: false };
+        this.touchTarget = { x: 0, y: 0, active: false };
+
+        this.platforms = [
+          { id: 'red', color: '#ef4444', name: 'Rubi', x: 40, y: 40, w: 330, h: 180 },
+          { id: 'blue', color: '#3b82f6', name: 'Safira', x: 430, y: 40, w: 330, h: 180 },
+          { id: 'green', color: '#22c55e', name: 'Esmeralda', x: 40, y: 280, w: 330, h: 180 },
+          { id: 'yellow', color: '#eab308', name: 'Ouro', x: 430, y: 280, w: 330, h: 180 },
+        ];
+
+        this.player = {
+          x: 400,
+          y: 250,
+          radius: 14,
+          color: selectedColor,
+          speed: 4.5,
+          isCamouflaged: false,
+          isSeeker: false,
+          angle: 0,
+          isCaught: false,
+        };
+
+        this.seeker = {
+          x: 100,
+          y: 100,
+          radius: 16,
+          angle: 0,
+          speed: 2.3,
+          alertSpeed: 3.8,
+          isAlert: false,
+          flashlightRadius: 260,
+          flashlightAngleSpread: Math.PI / 3.4,
+          waypoints: [
+            { x: 100, y: 100 },
+            { x: 700, y: 100 },
+            { x: 700, y: 400 },
+            { x: 100, y: 400 },
+            { x: 400, y: 250 },
+          ],
+          currentWaypointIdx: 0,
+        };
+
+        this.remotePlayers = new Map();
+        this.crystals = [];
+        this.crystalsCollected = 0;
+        this.timeRemaining = 45;
+        this.timerInterval = null;
+        this.crystalSpawnInterval = null;
+
+        this.bindControls();
+      }
+
+      bindControls() {
+        window.addEventListener('keydown', (e) => {
+          if (!this.isRunning) return;
+          if (['ArrowUp', 'KeyW'].includes(e.code)) { this.keys.up = true; e.preventDefault(); }
+          if (['ArrowDown', 'KeyS'].includes(e.code)) { this.keys.down = true; e.preventDefault(); }
+          if (['ArrowLeft', 'KeyA'].includes(e.code)) { this.keys.left = true; e.preventDefault(); }
+          if (['ArrowRight', 'KeyD'].includes(e.code)) { this.keys.right = true; e.preventDefault(); }
+        });
+
+        window.addEventListener('keyup', (e) => {
+          if (['ArrowUp', 'KeyW'].includes(e.code)) this.keys.up = false;
+          if (['ArrowDown', 'KeyS'].includes(e.code)) this.keys.down = false;
+          if (['ArrowLeft', 'KeyA'].includes(e.code)) this.keys.left = false;
+          if (['ArrowRight', 'KeyD'].includes(e.code)) this.keys.right = false;
+        });
+
+        const getCanvasPos = (clientX, clientY) => {
+          const rect = this.canvas.getBoundingClientRect();
+          const scaleX = this.width / rect.width;
+          const scaleY = this.height / rect.height;
+          return {
+            x: Math.max(0, Math.min(this.width, (clientX - rect.left) * scaleX)),
+            y: Math.max(0, Math.min(this.height, (clientY - rect.top) * scaleY)),
+          };
+        };
+
+        this.canvas.addEventListener('mousemove', (e) => {
+          if (!this.isRunning) return;
+          const pos = getCanvasPos(e.clientX, e.clientY);
+          if (this.player.isSeeker) {
+            this.player.angle = Math.atan2(pos.y - this.player.y, pos.x - this.player.x);
+          }
+        });
+
+        const handleTouchStartMove = (e) => {
+          if (!this.isRunning || !e.touches || e.touches.length === 0) return;
+          e.preventDefault();
+          const touch = e.touches[0];
+          const pos = getCanvasPos(touch.clientX, touch.clientY);
+          this.touchTarget = { x: pos.x, y: pos.y, active: true };
+          if (this.player.isSeeker) {
+            this.player.angle = Math.atan2(pos.y - this.player.y, pos.x - this.player.x);
+          }
+        };
+
+        const handleTouchEnd = () => {
+          this.touchTarget.active = false;
+        };
+
+        this.canvas.addEventListener('touchstart', handleTouchStartMove, { passive: false });
+        this.canvas.addEventListener('touchmove', handleTouchStartMove, { passive: false });
+        this.canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+        this.canvas.addEventListener('touchcancel', handleTouchEnd, { passive: false });
+      }
+
+      start(color, isMulti = false) {
+        this.isRunning = true;
+        this.isMultiplayer = isMulti;
+        this.player.color = color;
+        this.player.isCaught = false;
+        this.player.x = 400;
+        this.player.y = 250;
+        this.crystalsCollected = 0;
+        this.timeRemaining = 45;
+        this.crystals = [];
+
+        this.updateHUD();
+
+        if (this.timerInterval) clearInterval(this.timerInterval);
+        if (this.crystalSpawnInterval) clearInterval(this.crystalSpawnInterval);
+
+        if (!this.isMultiplayer) {
+          this.timerInterval = setInterval(() => {
+            this.timeRemaining--;
+            this.updateHUD();
+            if (this.timeRemaining <= 0) {
+              this.endGame(true);
+            }
+          }, 1000);
+
+          this.crystalSpawnInterval = setInterval(() => {
+            if (this.crystals.length < 5) this.spawnCrystal();
+          }, 6000);
+        }
+
+        for (let i = 0; i < 3; i++) this.spawnCrystal();
+        this.loop();
+      }
+
+      stop() {
+        this.isRunning = false;
+        if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
+        if (this.timerInterval) clearInterval(this.timerInterval);
+        if (this.crystalSpawnInterval) clearInterval(this.crystalSpawnInterval);
+      }
+
+      spawnCrystal() {
+        const x = Math.floor(Math.random() * (this.width - 120)) + 60;
+        const y = Math.floor(Math.random() * (this.height - 120)) + 60;
+        this.crystals.push({ x, y, radius: 10, pulse: 0 });
+      }
+
+      updateHUD() {
+        const timerEl = document.getElementById('timer-display');
+        const crystalsEl = document.getElementById('crystals-display');
+        if (timerEl) timerEl.innerText = this.timeRemaining;
+        if (crystalsEl) crystalsEl.innerText = this.crystalsCollected;
+      }
+
+      loop() {
+        if (!this.isRunning) return;
+        this.update();
+        this.draw();
+        this.animationFrameId = requestAnimationFrame(() => this.loop());
+      }
+
+      update() {
+        if (this.player.isCaught) return;
+
+        let dx = 0;
+        let dy = 0;
+        const speed = this.player.isSeeker ? 3.5 : this.player.speed;
+
+        if (this.keys.up) dy -= speed;
+        if (this.keys.down) dy += speed;
+        if (this.keys.left) dx -= speed;
+        if (this.keys.right) dx += speed;
+
+        if (this.touchTarget.active) {
+          const tdx = this.touchTarget.x - this.player.x;
+          const tdy = this.touchTarget.y - this.player.y;
+          const tdist = Math.hypot(tdx, tdy);
+          if (this.player.isSeeker) {
+            this.player.angle = Math.atan2(tdy, tdx);
+            if (tdist > 14) {
+              dx = (tdx / tdist) * speed;
+              dy = (tdy / tdist) * speed;
+            }
+          } else {
+            if (tdist > 8) {
+              dx = (tdx / tdist) * Math.min(speed, tdist);
+              dy = (tdy / tdist) * Math.min(speed, tdist);
+            }
+          }
+        } else if (dx !== 0 && dy !== 0) {
+          dx *= 0.7071;
+          dy *= 0.7071;
+        }
+
+        this.player.x = Math.max(this.player.radius + 10, Math.min(this.width - this.player.radius - 10, this.player.x + dx));
+        this.player.y = Math.max(this.player.radius + 10, Math.min(this.height - this.player.radius - 10, this.player.y + dy));
+
+        if (this.player.isSeeker && !this.touchTarget.active && (dx !== 0 || dy !== 0)) {
+          this.player.angle = Math.atan2(dy, dx);
+        }
+
+        // Camuflagem
+        this.player.isCamouflaged = false;
+        if (!this.player.isSeeker) {
+          for (const p of this.platforms) {
+            if (
+              this.player.x >= p.x &&
+              this.player.x <= p.x + p.w &&
+              this.player.y >= p.y &&
+              this.player.y <= p.y + p.h
+            ) {
+              if (p.color.toLowerCase() === this.player.color.toLowerCase()) {
+                this.player.isCamouflaged = true;
+                break;
+              }
+            }
+          }
+
+          // Revelação por lanterna
+          if (this.player.isCamouflaged && !this.isMultiplayer) {
+            const dist = Math.hypot(this.player.x - this.seeker.x, this.player.y - this.seeker.y);
+            const angleToPlayer = Math.atan2(this.player.y - this.seeker.y, this.player.x - this.seeker.x);
+            let diff = Math.abs(this.seeker.angle - angleToPlayer);
+            while (diff > Math.PI) diff = Math.abs(diff - 2 * Math.PI);
+            if (dist <= this.seeker.flashlightRadius && diff <= this.seeker.flashlightAngleSpread / 2) {
+              this.player.isCamouflaged = false;
+            }
+          }
+        }
+
+        // Coleta de Cristais
+        for (let i = this.crystals.length - 1; i >= 0; i--) {
+          const c = this.crystals[i];
+          const dist = Math.hypot(this.player.x - c.x, this.player.y - c.y);
+          if (dist < this.player.radius + c.radius) {
+            this.crystals.splice(i, 1);
+            this.crystalsCollected++;
+            this.updateHUD();
+          }
+        }
+
+        // IA do Caçador em Modo Solo
+        if (!this.isMultiplayer) {
+          const wp = this.seeker.waypoints[this.seeker.currentWaypointIdx];
+          const distToWp = Math.hypot(wp.x - this.seeker.x, wp.y - this.seeker.y);
+
+          if (distToWp < 20) {
+            this.seeker.currentWaypointIdx = (this.seeker.currentWaypointIdx + 1) % this.seeker.waypoints.length;
+          }
+
+          const targetAngle = Math.atan2(wp.y - this.seeker.y, wp.x - this.seeker.x);
+          this.seeker.angle += (targetAngle - this.seeker.angle) * 0.05;
+          this.seeker.x += Math.cos(this.seeker.angle) * this.seeker.speed;
+          this.seeker.y += Math.sin(this.seeker.angle) * this.seeker.speed;
+
+          // Colisão com o jogador
+          const distToSeeker = Math.hypot(this.player.x - this.seeker.x, this.player.y - this.seeker.y);
+          if (distToSeeker < this.player.radius + this.seeker.radius) {
+            this.endGame(false);
+          }
+        }
+
+        // Envio de posição em Multiplayer
+        if (this.isMultiplayer && socket) {
+          socket.emit('player_move', {
+            x: this.player.x,
+            y: this.player.y,
+            angle: this.player.angle,
+            isCamouflaged: this.player.isCamouflaged,
+          });
+        }
+      }
+
+      draw() {
+        this.ctx.clearRect(0, 0, this.width, this.height);
+
+        // Grade de Fundo
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+        this.ctx.lineWidth = 1;
+        for (let x = 0; x < this.width; x += 40) {
+          this.ctx.beginPath();
+          this.ctx.moveTo(x, 0);
+          this.ctx.lineTo(x, this.height);
+          this.ctx.stroke();
+        }
+        for (let y = 0; y < this.height; y += 40) {
+          this.ctx.beginPath();
+          this.ctx.moveTo(0, y);
+          this.ctx.lineTo(this.width, y);
+          this.ctx.stroke();
+        }
+
+        // 4 Zonas de Cores
+        for (const p of this.platforms) {
+          this.ctx.fillStyle = p.color;
+          this.ctx.beginPath();
+          this.ctx.roundRect(p.x, p.y, p.w, p.h, 16);
+          this.ctx.fill();
+
+          this.ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+          this.ctx.font = 'bold 15px "Plus Jakarta Sans"';
+          this.ctx.fillText(p.name, p.x + 16, p.y + 28);
+        }
+
+        // Cristais 💎
+        for (const c of this.crystals) {
+          c.pulse += 0.06;
+          const pulseR = c.radius + Math.sin(c.pulse) * 2;
+          this.ctx.fillStyle = '#60a5fa';
+          this.ctx.shadowColor = '#3b82f6';
+          this.ctx.shadowBlur = 12;
+          this.ctx.beginPath();
+          this.ctx.arc(c.x, c.y, pulseR, 0, Math.PI * 2);
+          this.ctx.fill();
+          this.ctx.shadowBlur = 0;
+          this.ctx.fillStyle = '#ffffff';
+          this.ctx.font = '12px sans-serif';
+          this.ctx.fillText('💎', c.x - 7, c.y + 4);
+        }
+
+        // Jogador Local
+        if (this.player.isSeeker) {
+          this.drawSeeker(this.player.x, this.player.y, this.player.angle, 'Você (Caçador)');
+        } else {
+          this.drawChameleon(this.player.x, this.player.y, this.player.color, this.player.isCamouflaged, 'Você');
+        }
+
+        // Caçador Solo IA
+        if (!this.isMultiplayer) {
+          this.drawSeeker(this.seeker.x, this.seeker.y, this.seeker.angle, 'Patrulha IA');
+        }
+
+        // Jogadores Remotos
+        if (this.isMultiplayer) {
+          this.remotePlayers.forEach((rp) => {
+            if (rp.isSeeker) {
+              this.drawSeeker(rp.x, rp.y, rp.angle, rp.name || 'Caçador');
+            } else {
+              this.drawChameleon(rp.x, rp.y, rp.color, rp.isCamouflaged, rp.name || 'Membro');
+            }
+          });
+        }
+      }
+
+      drawChameleon(x, y, color, isCamo, label) {
+        if (isCamo) return; // 100% invisível quando camuflado!
+
+        this.ctx.fillStyle = color;
+        this.ctx.shadowColor = color;
+        this.ctx.shadowBlur = 14;
+        this.ctx.beginPath();
+        this.ctx.arc(x, y, 14, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.shadowBlur = 0;
+
+        this.ctx.fillStyle = '#ffffff';
+        this.ctx.font = 'bold 11px "Plus Jakarta Sans"';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText(label, x, y - 18);
+      }
+
+      drawSeeker(x, y, angle, label) {
+        // Cone de Luz da Lanterna
+        this.ctx.save();
+        this.ctx.translate(x, y);
+        this.ctx.rotate(angle);
+
+        const grad = this.ctx.createRadialGradient(0, 0, 10, 0, 0, 260);
+        grad.addColorStop(0, 'rgba(253, 224, 71, 0.45)');
+        grad.addColorStop(1, 'rgba(253, 224, 71, 0.0)');
+
+        this.ctx.fillStyle = grad;
+        this.ctx.beginPath();
+        this.ctx.moveTo(0, 0);
+        this.ctx.arc(0, 0, 260, -Math.PI / 6.8, Math.PI / 6.8);
+        this.ctx.closePath();
+        this.ctx.fill();
+        this.ctx.restore();
+
+        // Corpo do Caçador
+        this.ctx.fillStyle = '#800020';
+        this.ctx.strokeStyle = '#d4af37';
+        this.ctx.lineWidth = 2;
+        this.ctx.beginPath();
+        this.ctx.arc(x, y, 16, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.stroke();
+
+        this.ctx.fillStyle = '#ffffff';
+        this.ctx.font = 'bold 11px "Plus Jakarta Sans"';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText(label, x, y - 20);
+      }
+
+      endGame(isWin) {
+        this.stop();
+        const endScreen = document.getElementById('screen-end');
+        const endTitle = document.getElementById('end-title');
+        const endDesc = document.getElementById('end-desc');
+        const endIcon = document.getElementById('end-icon');
+
+        if (isWin) {
+          endTitle.innerText = 'VITÓRIA ÉPICA!';
+          endDesc.innerText = 'Você sobreviveu à patrulha com camuflagem perfeita!';
+          endIcon.innerText = '🎉';
+        } else {
+          endTitle.innerText = 'CAPTURADO!';
+          endDesc.innerText = 'A luz da lanterna revelou sua posição!';
+          endIcon.innerText = '🔦';
+        }
+
+        endScreen.style.display = 'flex';
+      }
+    }
+
+    // Inicialização do Jogo
+    gameEngine = new ChameleonEngine('game-canvas');
+
+    function startGame(mode) {
+      document.getElementById('screen-start').style.display = 'none';
+      document.getElementById('screen-multiplayer').style.display = 'none';
+      document.getElementById('screen-end').style.display = 'none';
+      gameEngine.start(selectedColor, mode === 'MULTIPLAYER');
+    }
+
+    function openMultiplayerLobby() {
+      document.getElementById('screen-start').style.display = 'none';
+      document.getElementById('screen-multiplayer').style.display = 'flex';
+
+      if (!socket) {
+        socket = io('/chameleon', {
+          auth: { token: token }
+        });
+
+        socket.on('lobby_update', (players) => {
+          const list = document.getElementById('lobby-players-list');
+          list.innerHTML = players.map(p => `
+            <div style="background: rgba(30, 58, 138, 0.5); border: 1px solid rgba(212, 175, 55, 0.4); padding: 8px 16px; border-radius: 12px; font-size: 0.9rem; font-weight: 700;">
+              👤 ${p.name}
+            </div>
+          `).join('');
+        });
+
+        socket.on('start_game_round', (data) => {
+          startGame('MULTIPLAYER');
+        });
+      }
+    }
+
+    function triggerLottery() {
+      if (socket) {
+        socket.emit('request_lottery');
+      } else {
+        startGame('MULTIPLAYER');
+      }
+    }
+  </script>
+</body>
+</html>

@@ -933,22 +933,7 @@ function loadArcadeHub() {
 }
 
 function openChameleonGameArena() {
-  document.getElementById('arcade-hub-view').style.display = 'none';
-  document.getElementById('chameleon-game-view').style.display = 'block';
-  document.getElementById('chameleon-start-screen').style.display = 'flex';
-  document.getElementById('chameleon-multiplayer-screen').style.display = 'none';
-  document.getElementById('chameleon-end-screen').style.display = 'none';
-
-  const energyDisplay = document.getElementById('chameleon-energy-display');
-  if (energyDisplay) {
-    energyDisplay.innerText = `${state.progress?.adventure_energy || 0} ⚡`;
-  }
-
-  // Inicializa o canvas em modo de espera
-  if (!chameleonGameInstance) {
-    chameleonGameInstance = new ChameleonGameEngine('chameleon-canvas');
-  }
-  chameleonGameInstance.drawIdlePreview(currentChameleonColor);
+  window.location.href = '/game.html';
 }
 
 function closeChameleonGameArena() {
