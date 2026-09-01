@@ -3924,25 +3924,25 @@
   <!-- ======================================================== -->
   <!-- MODAL: DETALHES DA TAREFA AVALIADA / HISTÓRICO           -->
   <!-- ======================================================== -->
-  <div id="reviewed-detail-modal" class="modal-overlay" style="display: none;">
-    <div class="modal-content" style="max-width: 560px;">
+  <div id="reviewed-detail-modal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99999; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); align-items: center; justify-content: center; padding: 20px;" onclick="if(event.target === this) closeReviewedDetailModal()">
+    <div class="modal-content" style="max-width: 560px; width: 100%; max-height: 90vh; overflow-y: auto; background: #0f172a; border: 1px solid rgba(212,175,55,0.4); border-radius: 20px; padding: 24px; box-shadow: 0 25px 60px rgba(0,0,0,0.9);">
       <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
         <div>
-          <span id="reviewed-detail-status-badge" class="role-badge">✅ Aprovada</span>
-          <h3 id="reviewed-detail-title" style="font-size: 1.35rem; color: #ffffff; margin-top: 6px;">Título da Tarefa</h3>
+          <span id="reviewed-detail-status-badge" class="role-badge" style="padding: 4px 10px; font-size: 0.82rem; font-weight: 700; border-radius: 8px;">✅ Aprovada</span>
+          <h3 id="reviewed-detail-title" style="font-size: 1.35rem; color: #ffffff; margin-top: 8px; margin-bottom: 2px;">Título da Tarefa</h3>
           <p id="reviewed-detail-subtitle" style="font-size: 0.85rem; color: var(--text-muted);">Filho: Davi • 31/08 às 21:22</p>
         </div>
-        <button type="button" class="modal-close-btn" onclick="closeReviewedDetailModal()">✕</button>
+        <button type="button" onclick="closeReviewedDetailModal()" style="background: transparent; border: none; color: #cbd5e1; font-size: 1.6rem; cursor: pointer; padding: 4px 8px; line-height: 1;">✕</button>
       </div>
 
       <!-- Evidência Fotográfica (se houver) -->
       <div id="reviewed-detail-photo-box" style="display: none; margin-bottom: 16px; text-align: center;">
-        <label class="form-label" style="text-align: left; display: block; margin-bottom: 6px;">📸 Foto da Comprovação Enviada:</label>
-        <img id="reviewed-detail-photo" src="" alt="Comprovação" style="max-height: 220px; width: 100%; object-fit: cover; border-radius: 12px; border: 1px solid rgba(212,175,55,0.4); cursor: zoom-in;" onclick="openPhotoLightbox(this.src, document.getElementById('reviewed-detail-title').innerText)">
+        <label class="form-label" style="text-align: left; display: block; margin-bottom: 6px; font-size: 0.85rem; color: #93c5fd;">📸 Foto da Comprovação Enviada:</label>
+        <img id="reviewed-detail-photo" src="" alt="Comprovação" style="max-height: 240px; width: 100%; object-fit: cover; border-radius: 12px; border: 1px solid rgba(212,175,55,0.4); cursor: zoom-in;" onclick="openPhotoLightbox(this.src, document.getElementById('reviewed-detail-title').innerText)">
       </div>
 
       <!-- Relato do Filho -->
-      <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px; margin-bottom: 16px;">
+      <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px; margin-bottom: 16px;">
         <span style="font-size: 0.8rem; color: #93c5fd; font-weight: 700; display: block; margin-bottom: 4px;">📝 Relato do Filho:</span>
         <p id="reviewed-detail-proof-text" style="font-size: 0.92rem; color: #ffffff; line-height: 1.4; margin: 0;">--</p>
       </div>
@@ -3955,13 +3955,13 @@
       </div>
 
       <!-- Parecer / Feedback do Pai -->
-      <div id="reviewed-detail-feedback-box" style="background: rgba(128, 0, 32, 0.25); border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 12px; padding: 12px; margin-bottom: 20px;">
+      <div id="reviewed-detail-feedback-box" style="background: rgba(128, 0, 32, 0.35); border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 12px; padding: 12px; margin-bottom: 20px;">
         <span style="font-size: 0.8rem; color: #fde047; font-weight: 700; display: block; margin-bottom: 2px;">💬 Parecer do Guardião:</span>
         <p id="reviewed-detail-feedback-text" style="font-size: 0.88rem; color: #cbd5e1; margin: 0; font-style: italic;">"Ótimo trabalho!"</p>
       </div>
 
       <div style="display: flex; justify-content: flex-end;">
-        <button type="button" class="btn btn-secondary" style="width: 100%;" onclick="closeReviewedDetailModal()">
+        <button type="button" class="btn btn-secondary" style="width: 100%; padding: 12px; font-weight: 700;" onclick="closeReviewedDetailModal()">
           Fechar
         </button>
       </div>
@@ -3977,6 +3977,6 @@
 
   <!-- Script Socket.IO e da Aplicação (com Cache-Busting Ativo) -->
   <script src="/socket.io/socket.io.js"></script>
-  <script src="/app.js?v=20260901_1340"></script>
+  <script src="/app.js?v=20260901_1345"></script>
 </body>
 </html>

@@ -3338,75 +3338,83 @@ async function loadParentReviewedHistory() {
 }
 
 function openReviewedDetailModal(submissionId) {
-  console.log('🔍 Inspecionando comprovação ID:', submissionId);
-  const s = (state.reviewedSubmissions || []).find((item) => String(item.id).toLowerCase() === String(submissionId).toLowerCase());
-  if (!s) {
-    showToast('Detalhes da missão não encontrados na lista.', 'warning');
-    return;
-  }
-
-  const modal = document.getElementById('reviewed-detail-modal');
-  const titleEl = document.getElementById('reviewed-detail-title');
-  const subtitleEl = document.getElementById('reviewed-detail-subtitle');
-  const badgeEl = document.getElementById('reviewed-detail-status-badge');
-  const photoBoxEl = document.getElementById('reviewed-detail-photo-box');
-  const photoEl = document.getElementById('reviewed-detail-photo');
-  const proofTextEl = document.getElementById('reviewed-detail-proof-text');
-  const xpEl = document.getElementById('reviewed-detail-xp');
-  const goldEl = document.getElementById('reviewed-detail-gold');
-  const energyEl = document.getElementById('reviewed-detail-energy');
-  const feedbackBoxEl = document.getElementById('reviewed-detail-feedback-box');
-  const feedbackTextEl = document.getElementById('reviewed-detail-feedback-text');
-
-  if (titleEl) titleEl.innerText = s.task?.title || 'Missão Concluída';
-
-  const dateStr = s.reviewed_at
-    ? new Date(s.reviewed_at).toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-    : 'Data não informada';
-  if (subtitleEl) subtitleEl.innerText = `Filho: ${s.submitter?.name || 'Filho'} • Avaliada em ${dateStr}`;
-
-  const isApproved = s.status === 'APPROVED';
-  if (badgeEl) {
-    badgeEl.innerText = isApproved ? '✅ Aprovada' : '❌ Ajustar';
-    badgeEl.style.background = isApproved ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.2)';
-    badgeEl.style.color = isApproved ? '#4ade80' : '#f87171';
-    badgeEl.style.borderColor = isApproved ? 'rgba(34,197,94,0.4)' : 'rgba(239,68,68,0.4)';
-  }
-
-  // Foto da Comprovação
-  if (s.proof_photo_url && photoBoxEl && photoEl) {
-    photoEl.src = s.proof_photo_url;
-    photoEl.onerror = () => {
-      if (photoBoxEl) photoBoxEl.style.display = 'none';
-    };
-    photoBoxEl.style.display = 'block';
-  } else if (photoBoxEl) {
-    photoBoxEl.style.display = 'none';
-  }
-
-  // Relato do Filho
-  if (proofTextEl) {
-    proofTextEl.innerText = s.proof_text || '(Nenhum relato em texto fornecido)';
-  }
-
-  // Recompensas
-  if (xpEl) xpEl.innerText = `⭐ +${s.task?.xp_reward || 50} XP`;
-  if (goldEl) goldEl.innerText = `💰 +${s.task?.gold_reward || 10} Ouro`;
-  if (energyEl) energyEl.innerText = `⚡ +${s.task?.energy_reward || 2} Energia`;
-
-  // Parecer do Pai
-  if (feedbackBoxEl && feedbackTextEl) {
-    if (s.feedback) {
-      feedbackTextEl.innerText = `"${s.feedback}"`;
-      feedbackBoxEl.style.display = 'block';
-    } else {
-      feedbackTextEl.innerText = isApproved ? 'Missão aprovada sem comentários adicionais.' : 'Ajustes solicitados sem comentários.';
-      feedbackBoxEl.style.display = 'block';
+  try {
+    console.log('🔍 Inspecionando comprovação ID:', submissionId);
+    const s = (state.reviewedSubmissions || []).find((item) => String(item.id).toLowerCase() === String(submissionId).toLowerCase());
+    if (!s) {
+      console.warn('⚠️ Submissão não encontrada:', submissionId, state.reviewedSubmissions);
+      showToast('Detalhes da missão não encontrados na lista.', 'warning');
+      return;
     }
-  }
 
-  if (modal) {
+    const modal = document.getElementById('reviewed-detail-modal');
+    if (!modal) {
+      console.error('❌ Modal #reviewed-detail-modal não encontrado no DOM!');
+      return;
+    }
+
+    const titleEl = document.getElementById('reviewed-detail-title');
+    const subtitleEl = document.getElementById('reviewed-detail-subtitle');
+    const badgeEl = document.getElementById('reviewed-detail-status-badge');
+    const photoBoxEl = document.getElementById('reviewed-detail-photo-box');
+    const photoEl = document.getElementById('reviewed-detail-photo');
+    const proofTextEl = document.getElementById('reviewed-detail-proof-text');
+    const xpEl = document.getElementById('reviewed-detail-xp');
+    const goldEl = document.getElementById('reviewed-detail-gold');
+    const energyEl = document.getElementById('reviewed-detail-energy');
+    const feedbackBoxEl = document.getElementById('reviewed-detail-feedback-box');
+    const feedbackTextEl = document.getElementById('reviewed-detail-feedback-text');
+
+    if (titleEl) titleEl.innerText = s.task?.title || 'Missão Concluída';
+
+    const dateStr = s.reviewed_at
+      ? new Date(s.reviewed_at).toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+      : 'Data não informada';
+    if (subtitleEl) subtitleEl.innerText = `Filho: ${s.submitter?.name || 'Filho'} • Avaliada em ${dateStr}`;
+
+    const isApproved = s.status === 'APPROVED';
+    if (badgeEl) {
+      badgeEl.innerText = isApproved ? '✅ Aprovada' : '❌ Ajustar';
+      badgeEl.style.background = isApproved ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.2)';
+      badgeEl.style.color = isApproved ? '#4ade80' : '#f87171';
+      badgeEl.style.borderColor = isApproved ? 'rgba(34,197,94,0.4)' : 'rgba(239,68,68,0.4)';
+    }
+
+    // Foto da Comprovação
+    if (s.proof_photo_url && photoBoxEl && photoEl) {
+      photoEl.src = s.proof_photo_url;
+      photoEl.onerror = () => {
+        if (photoBoxEl) photoBoxEl.style.display = 'none';
+      };
+      photoBoxEl.style.display = 'block';
+    } else if (photoBoxEl) {
+      photoBoxEl.style.display = 'none';
+    }
+
+    // Relato do Filho
+    if (proofTextEl) {
+      proofTextEl.innerText = s.proof_text || '(Nenhum relato em texto fornecido)';
+    }
+
+    // Recompensas
+    if (xpEl) xpEl.innerText = `⭐ +${s.task?.xp_reward || 50} XP`;
+    if (goldEl) goldEl.innerText = `💰 +${s.task?.gold_reward || 10} Ouro`;
+    if (energyEl) energyEl.innerText = `⚡ +${s.task?.energy_reward || 2} Energia`;
+
+    // Parecer do Pai
+    if (feedbackBoxEl && feedbackTextEl) {
+      if (s.feedback) {
+        feedbackTextEl.innerText = `"${s.feedback}"`;
+        feedbackBoxEl.style.display = 'block';
+      } else {
+        feedbackTextEl.innerText = isApproved ? 'Missão aprovada sem comentários adicionais.' : 'Ajustes solicitados sem comentários.';
+        feedbackBoxEl.style.display = 'block';
+      }
+    }
+
     modal.style.display = 'flex';
+  } catch (err) {
+    console.error('❌ Erro ao abrir modal de detalhes:', err);
   }
 }
 
@@ -3431,7 +3439,6 @@ function clearReviewedHistoryView(e) {
   showToast('🧹 Visualização do histórico limpa!', 'info');
 }
 
-// Exportar funções explicitamente no objeto window global
 window.openReviewedDetailModal = openReviewedDetailModal;
 window.closeReviewedDetailModal = closeReviewedDetailModal;
 window.clearReviewedHistoryView = clearReviewedHistoryView;
