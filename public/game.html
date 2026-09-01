@@ -27,46 +27,79 @@
       height: 100vh;
       overflow: hidden;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
-      padding: 12px;
+      padding: 10px;
       touch-action: none;
     }
 
-    /* ── BARRA SUPERIOR HUD FLUTUANTE ── */
-    .arcade-hud {
+    /* ── ARENA DO JOGO (WIDESCREEN AUTO-FIT TOTAL PARA QUALQUER MONITOR) ── */
+    .game-wrapper {
+      position: relative;
+      background: #090c10;
+      border: 2px solid rgba(212, 175, 55, 0.45);
+      border-radius: 18px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(212, 175, 55, 0.15);
       width: 100%;
-      max-width: 1100px;
+      height: 100%;
+      max-width: min(98vw, calc((100vh - 20px) * 1.6));
+      max-height: calc(100vh - 20px);
+      aspect-ratio: 16 / 10;
+      touch-action: none;
+    }
+
+    #game-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: fill;
+      background: #0b0f19;
+      cursor: crosshair;
+      touch-action: none;
+    }
+
+    /* ── HUD FLUTUANTE SOBREPOSTO DENTRO DO JOGO ── */
+    .hud-overlay {
+      position: absolute;
+      top: 12px;
+      left: 14px;
+      right: 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
-      padding: 0 4px;
-      gap: 8px;
-      z-index: 100;
+      z-index: 40;
+      pointer-events: none;
+    }
+
+    .hud-overlay * {
+      pointer-events: auto;
     }
 
     .btn-sair {
       background: rgba(128, 0, 32, 0.85);
       border: 1px solid rgba(248, 113, 113, 0.5);
       color: #ffffff;
-      padding: 8px 18px;
+      padding: 8px 16px;
       border-radius: 12px;
       font-weight: 700;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       cursor: pointer;
       text-decoration: none;
       display: flex;
       align-items: center;
       gap: 6px;
+      backdrop-filter: blur(8px);
       transition: background 0.2s, transform 0.1s;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.5);
     }
 
     .btn-sair:hover {
       background: #9b111e;
-      transform: scale(1.02);
+      transform: scale(1.03);
     }
 
     .btn-sair:active {
@@ -80,14 +113,15 @@
     }
 
     .hud-badge {
-      background: rgba(15, 23, 42, 0.9);
+      background: rgba(15, 23, 42, 0.85);
       border: 1px solid rgba(255, 255, 255, 0.15);
       padding: 6px 14px;
       border-radius: 12px;
       font-weight: 800;
-      font-size: 0.92rem;
+      font-size: 0.9rem;
       white-space: nowrap;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     }
 
     .badge-timer {
@@ -110,15 +144,17 @@
       display: flex;
       gap: 6px;
       align-items: center;
-      background: rgba(15, 23, 42, 0.9);
+      background: rgba(15, 23, 42, 0.85);
       padding: 5px 12px;
       border-radius: 24px;
       border: 1px solid rgba(212, 175, 55, 0.4);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     }
 
     .color-btn {
-      width: 28px;
-      height: 28px;
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
       border: 2px solid rgba(255, 255, 255, 0.3);
       cursor: pointer;
@@ -129,35 +165,6 @@
       border-color: #ffffff;
       transform: scale(1.25);
       box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
-    }
-
-    /* ── ARENA DO JOGO (WIDESCREEN 16:10 CENTRALIZADA) ── */
-    .game-wrapper {
-      position: relative;
-      background: #090c10;
-      border: 2px solid rgba(212, 175, 55, 0.4);
-      border-radius: 18px;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(212, 175, 55, 0.15);
-      width: 100%;
-      max-width: 1100px;
-      height: calc(100vh - 84px);
-      max-height: calc(1100px * 0.625);
-      aspect-ratio: 16 / 10;
-      touch-action: none;
-    }
-
-    #game-canvas {
-      display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: fill;
-      background: #0b0f19;
-      cursor: crosshair;
-      touch-action: none;
     }
 
     /* ── OVERLAYS (TELA INÍCIO / LOBBY / FIM) ── */
@@ -180,7 +187,7 @@
 
     .overlay-title {
       font-family: 'Cinzel', serif;
-      font-size: 1.8rem;
+      font-size: 1.9rem;
       color: #fde047;
       margin-bottom: 8px;
     }
@@ -190,7 +197,7 @@
       font-size: 0.92rem;
       max-width: 500px;
       line-height: 1.5;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
     .btn {
@@ -228,74 +235,77 @@
 
     @media (max-width: 768px) {
       body {
-        padding: 6px 8px;
+        padding: 4px;
       }
-      .arcade-hud {
-        gap: 4px;
-        margin-bottom: 6px;
+      .game-wrapper {
+        border-radius: 12px;
+        max-width: 98vw;
+        max-height: 96vh;
+      }
+      .hud-overlay {
+        top: 8px;
+        left: 8px;
+        right: 8px;
       }
       .btn-sair {
-        padding: 6px 12px;
-        font-size: 0.8rem;
+        padding: 6px 10px;
+        font-size: 0.78rem;
       }
       .hud-badge {
         padding: 4px 8px;
-        font-size: 0.78rem;
+        font-size: 0.75rem;
       }
       .color-btn {
-        width: 22px;
-        height: 22px;
-      }
-      .game-wrapper {
-        border-radius: 14px;
-        height: calc(100vh - 58px);
-        max-height: 88vh;
+        width: 20px;
+        height: 20px;
       }
       .overlay-title {
         font-size: 1.4rem;
       }
       .overlay-desc {
-        font-size: 0.82rem;
-        margin-bottom: 14px;
+        font-size: 0.8rem;
+        margin-bottom: 12px;
       }
       .btn {
-        padding: 10px 18px;
-        font-size: 0.9rem;
+        padding: 10px 16px;
+        font-size: 0.88rem;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- BARRA HUD -->
-  <header class="arcade-hud">
-    <a href="/" class="btn-sair">
-      ✕ Sair do Jogo
-    </a>
-
-    <div class="hud-stats">
-      <div class="hud-badge badge-timer">
-        ⏱️ <span id="timer-display">45</span>s
-      </div>
-      <div class="hud-badge badge-crystals">
-        💎 <span id="crystals-display">0</span>
-      </div>
-      <div class="hud-badge badge-energy">
-        ⚡ <span id="energy-display">--</span>
-      </div>
-    </div>
-
-    <!-- SELETOR DE COR -->
-    <div class="hud-color-picker">
-      <button type="button" class="color-btn selected" style="background: #ef4444;" onclick="changeColor('#ef4444', this)" title="Rubi"></button>
-      <button type="button" class="color-btn" style="background: #3b82f6;" onclick="changeColor('#3b82f6', this)" title="Safira"></button>
-      <button type="button" class="color-btn" style="background: #22c55e;" onclick="changeColor('#22c55e', this)" title="Esmeralda"></button>
-      <button type="button" class="color-btn" style="background: #eab308;" onclick="changeColor('#eab308', this)" title="Ouro"></button>
-    </div>
-  </header>
-
-  <!-- ARENA DO JOGO -->
+  <!-- ARENA DO JOGO COM HUD FLUTUANTE INTERNO -->
   <main class="game-wrapper">
+
+    <!-- HUD FLUTUANTE SOBREPOSTO NO TOPO DO MAPA -->
+    <div class="hud-overlay">
+      <a href="/avatar" class="btn-sair">
+        ✕ Sair do Jogo
+      </a>
+
+      <div class="hud-stats">
+        <div class="hud-badge badge-timer">
+          ⏱️ <span id="timer-display">45</span>s
+        </div>
+        <div class="hud-badge badge-crystals">
+          💎 <span id="crystals-display">0</span>
+        </div>
+        <div class="hud-badge badge-energy">
+          ⚡ <span id="energy-display">--</span>
+        </div>
+      </div>
+
+      <!-- SELETOR DE COR FLUTUANTE -->
+      <div class="hud-color-picker">
+        <button type="button" class="color-btn selected" style="background: #ef4444;" onclick="changeColor('#ef4444', this)" title="Rubi"></button>
+        <button type="button" class="color-btn" style="background: #3b82f6;" onclick="changeColor('#3b82f6', this)" title="Safira"></button>
+        <button type="button" class="color-btn" style="background: #22c55e;" onclick="changeColor('#22c55e', this)" title="Esmeralda"></button>
+        <button type="button" class="color-btn" style="background: #eab308;" onclick="changeColor('#eab308', this)" title="Ouro"></button>
+      </div>
+    </div>
+
+    <!-- CANVAS 2D -->
     <canvas id="game-canvas" width="800" height="500"></canvas>
 
     <!-- OVERLAY 1: INÍCIO -->
@@ -306,6 +316,18 @@
         No PC use <strong>WASD / Setas</strong>. No Celular <strong>toque e arraste o dedo</strong> na tela.<br>
         Fique parado sobre o piso da <strong>mesma cor</strong> da sua bolinha para ficar <strong>100% invisível</strong>!
       </p>
+
+      <!-- Seletor de Cores na Tela Inicial -->
+      <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 16px; padding: 10px 18px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center;">
+        <span style="font-size: 0.88rem; color: #cbd5e1; font-weight: 700;">Cor da sua bolinha:</span>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" class="color-btn selected start-color-btn" style="background: #ef4444;" onclick="changeColor('#ef4444', this)" title="Rubi"></button>
+          <button type="button" class="color-btn start-color-btn" style="background: #3b82f6;" onclick="changeColor('#3b82f6', this)" title="Safira"></button>
+          <button type="button" class="color-btn start-color-btn" style="background: #22c55e;" onclick="changeColor('#22c55e', this)" title="Esmeralda"></button>
+          <button type="button" class="color-btn start-color-btn" style="background: #eab308;" onclick="changeColor('#eab308', this)" title="Ouro"></button>
+        </div>
+      </div>
+
       <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
         <button class="btn btn-primary" onclick="startGame('SOLO')">
           🤖 Modo Solo (vs Patrulha IA)
@@ -353,8 +375,8 @@
         <button class="btn btn-primary" onclick="startGame('SOLO')">
           🔄 Jogar Novamente
         </button>
-        <a href="/" class="btn btn-secondary" style="text-decoration: none;">
-          ⬅️ Voltar ao Reino
+        <a href="/avatar" class="btn btn-secondary" style="text-decoration: none;">
+          ⬅️ Voltar ao Avatar
         </a>
       </div>
     </div>
@@ -364,7 +386,7 @@
   <script src="/socket.io/socket.io.js"></script>
   <script>
     // ─── ESTADO E AUTENTICAÇÃO ──────────────────────────────
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('liraquest_token') || localStorage.getItem('token');
     let currentUser = null;
     let currentHero = null;
     let userProgress = null;
@@ -373,7 +395,7 @@
     let gameEngine = null;
 
     try {
-      const storedUser = localStorage.getItem('user');
+      const storedUser = localStorage.getItem('liraquest_user') || localStorage.getItem('user');
       if (storedUser) currentUser = JSON.parse(storedUser);
     } catch (e) {}
 
@@ -398,8 +420,14 @@
 
     function changeColor(color, btn) {
       selectedColor = color;
-      document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
-      if (btn) btn.classList.add('selected');
+      document.querySelectorAll('.color-btn').forEach(b => {
+        if (b.getAttribute('title')?.toLowerCase() === btn?.getAttribute('title')?.toLowerCase() ||
+            b.style.background === color) {
+          b.classList.add('selected');
+        } else {
+          b.classList.remove('selected');
+        }
+      });
       if (gameEngine && gameEngine.player) {
         gameEngine.player.color = color;
       }
