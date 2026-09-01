@@ -3291,13 +3291,15 @@ async function loadParentReviewedHistory() {
     const data = await res.json();
 
     if (res.ok && data.success) {
-      if (data.submissions.length === 0) {
+      state.reviewedSubmissions = data.submissions || [];
+
+      if (state.reviewedSubmissions.length === 0) {
         container.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem; padding: 12px 0;">Nenhuma avaliação registrada ainda.</p>';
         return;
       }
 
-      container.innerHTML = data.submissions
-        .slice(0, 8)
+      container.innerHTML = state.reviewedSubmissions
+        .slice(0, 10)
         .map((s) => {
           const isApproved = s.status === 'APPROVED';
           const badgeStatus = isApproved
@@ -3305,15 +3307,26 @@ async function loadParentReviewedHistory() {
             : '<span class="role-badge" style="background: rgba(239,68,68,0.2); color: #f87171; border: 1px solid rgba(239,68,68,0.4);">❌ Ajustar</span>';
 
           const dateStr = s.reviewed_at ? new Date(s.reviewed_at).toLocaleDateString([], { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '';
+          const hasPhoto = Boolean(s.proof_photo_url);
 
           return `
-            <div class="user-row" style="background: rgba(15, 23, 42, 0.6); border-color: rgba(255,255,255,0.06); padding: 10px 16px; border-radius: 10px; margin-bottom: 8px;">
-              <div>
-                <strong style="color: #ffffff; font-size: 0.92rem;">${s.task?.title || 'Missão'}</strong>
-                <span style="font-size: 0.78rem; color: var(--text-muted); margin-left: 8px;">Filho: ${s.submitter?.name || 'Filho'} • ${dateStr}</span>
-                ${s.feedback ? `<div style="font-size: 0.8rem; color: #cbd5e1; font-style: italic; margin-top: 2px;">💬 "${s.feedback}"</div>` : ''}
+            <div class="user-row reviewed-history-row" onclick="openReviewedDetailModal('${s.id}')" title="Clique para ver os detalhes da comprovação" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08); padding: 12px 16px; border-radius: 12px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s ease; display: flex; justify-content: space-between; align-items: center;">
+              <div style="flex: 1; padding-right: 12px;">
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                  <strong style="color: #ffffff; font-size: 0.95rem;">${s.task?.title || 'Missão'}</strong>
+                  ${hasPhoto ? '<span style="font-size: 0.82rem; background: rgba(59,130,246,0.2); color: #93c5fd; border: 1px solid rgba(59,130,246,0.3); padding: 2px 8px; border-radius: 12px;">📸 Com Foto</span>' : ''}
+                </div>
+                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">
+                  Filho: <span style="color: #cbd5e1; font-weight: 600;">${s.submitter?.name || 'Filho'}</span> • ${dateStr}
+                </div>
+                ${s.feedback ? `<div style="font-size: 0.82rem; color: #cbd5e1; font-style: italic; margin-top: 4px;">💬 "${s.feedback}"</div>` : ''}
               </div>
-              <div>${badgeStatus}</div>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span class="btn-link" style="font-size: 0.82rem; color: #60a5fa; display: flex; align-items: center; gap: 4px;">
+                  👁️ Ver Detalhes
+                </span>
+                ${badgeStatus}
+              </div>
             </div>
           `;
         })
@@ -3322,6 +3335,86 @@ async function loadParentReviewedHistory() {
   } catch (err) {
     console.error('Erro ao carregar histórico de avaliações:', err);
   }
+}
+
+function openReviewedDetailModal(submissionId) {
+  const s = (state.reviewedSubmissions || []).find((item) => item.id === submissionId);
+  if (!s) {
+    showToast('Detalhes da missão não encontrados.', 'warning');
+    return;
+  }
+
+  const modal = document.getElementById('reviewed-detail-modal');
+  const titleEl = document.getElementById('reviewed-detail-title');
+  const subtitleEl = document.getElementById('reviewed-detail-subtitle');
+  const badgeEl = document.getElementById('reviewed-detail-status-badge');
+  const photoBoxEl = document.getElementById('reviewed-detail-photo-box');
+  const photoEl = document.getElementById('reviewed-detail-photo');
+  const proofTextEl = document.getElementById('reviewed-detail-proof-text');
+  const xpEl = document.getElementById('reviewed-detail-xp');
+  const goldEl = document.getElementById('reviewed-detail-gold');
+  const energyEl = document.getElementById('reviewed-detail-energy');
+  const feedbackBoxEl = document.getElementById('reviewed-detail-feedback-box');
+  const feedbackTextEl = document.getElementById('reviewed-detail-feedback-text');
+
+  if (titleEl) titleEl.innerText = s.task?.title || 'Missão Concluída';
+
+  const dateStr = s.reviewed_at
+    ? new Date(s.reviewed_at).toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+    : 'Data não informada';
+  if (subtitleEl) subtitleEl.innerText = `Filho: ${s.submitter?.name || 'Filho'} • Avaliada em ${dateStr}`;
+
+  const isApproved = s.status === 'APPROVED';
+  if (badgeEl) {
+    badgeEl.innerText = isApproved ? '✅ Aprovada' : '❌ Ajustar';
+    badgeEl.style.background = isApproved ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.2)';
+    badgeEl.style.color = isApproved ? '#4ade80' : '#f87171';
+    badgeEl.style.borderColor = isApproved ? 'rgba(34,197,94,0.4)' : 'rgba(239,68,68,0.4)';
+  }
+
+  // Foto da Comprovação
+  if (s.proof_photo_url && photoBoxEl && photoEl) {
+    photoEl.src = s.proof_photo_url;
+    photoBoxEl.style.display = 'block';
+  } else if (photoBoxEl) {
+    photoBoxEl.style.display = 'none';
+  }
+
+  // Relato do Filho
+  if (proofTextEl) {
+    proofTextEl.innerText = s.proof_text || '(Nenhum relato em texto fornecido)';
+  }
+
+  // Recompensas
+  if (xpEl) xpEl.innerText = `⭐ +${s.task?.xp_reward || 50} XP`;
+  if (goldEl) goldEl.innerText = `💰 +${s.task?.gold_reward || 10} Ouro`;
+  if (energyEl) energyEl.innerText = `⚡ +${s.task?.energy_reward || 2} Energia`;
+
+  // Parecer do Pai
+  if (feedbackBoxEl && feedbackTextEl) {
+    if (s.feedback) {
+      feedbackTextEl.innerText = `"${s.feedback}"`;
+      feedbackBoxEl.style.display = 'block';
+    } else {
+      feedbackTextEl.innerText = isApproved ? 'Missão aprovada sem comentários adicionais.' : 'Ajustes solicitados sem comentários.';
+      feedbackBoxEl.style.display = 'block';
+    }
+  }
+
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeReviewedDetailModal() {
+  const modal = document.getElementById('reviewed-detail-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function clearReviewedHistoryView() {
+  const container = document.getElementById('parent-reviewed-history-list');
+  if (container) {
+    container.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem; padding: 12px 0;">🧹 Histórico de avaliações limpo da visualização. Clique em "Atualizar Provas" para recarregar.</p>';
+  }
+  showToast('🧹 Visualização do histórico limpa!', 'info');
 }
 
 // ========================================================
