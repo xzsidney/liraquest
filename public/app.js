@@ -3338,9 +3338,10 @@ async function loadParentReviewedHistory() {
 }
 
 function openReviewedDetailModal(submissionId) {
-  const s = (state.reviewedSubmissions || []).find((item) => item.id === submissionId);
+  console.log('🔍 Inspecionando comprovação ID:', submissionId);
+  const s = (state.reviewedSubmissions || []).find((item) => String(item.id).toLowerCase() === String(submissionId).toLowerCase());
   if (!s) {
-    showToast('Detalhes da missão não encontrados.', 'warning');
+    showToast('Detalhes da missão não encontrados na lista.', 'warning');
     return;
   }
 
@@ -3375,6 +3376,9 @@ function openReviewedDetailModal(submissionId) {
   // Foto da Comprovação
   if (s.proof_photo_url && photoBoxEl && photoEl) {
     photoEl.src = s.proof_photo_url;
+    photoEl.onerror = () => {
+      if (photoBoxEl) photoBoxEl.style.display = 'none';
+    };
     photoBoxEl.style.display = 'block';
   } else if (photoBoxEl) {
     photoBoxEl.style.display = 'none';
@@ -3401,7 +3405,9 @@ function openReviewedDetailModal(submissionId) {
     }
   }
 
-  if (modal) modal.style.display = 'flex';
+  if (modal) {
+    modal.style.display = 'flex';
+  }
 }
 
 function closeReviewedDetailModal() {
@@ -3409,13 +3415,26 @@ function closeReviewedDetailModal() {
   if (modal) modal.style.display = 'none';
 }
 
-function clearReviewedHistoryView() {
+function clearReviewedHistoryView(e) {
+  if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
   const container = document.getElementById('parent-reviewed-history-list');
   if (container) {
-    container.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem; padding: 12px 0;">🧹 Histórico de avaliações limpo da visualização. Clique em "Atualizar Provas" para recarregar.</p>';
+    container.innerHTML = `
+      <div style="background: rgba(15,23,42,0.6); border: 1px dashed rgba(255,255,255,0.15); border-radius: 12px; padding: 20px; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
+        🧹 Histórico de avaliações ocultado da tela.
+        <div style="margin-top: 10px;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="loadParentReviewedHistory()">🔄 Reexibir Histórico</button>
+        </div>
+      </div>
+    `;
   }
   showToast('🧹 Visualização do histórico limpa!', 'info');
 }
+
+// Exportar funções explicitamente no objeto window global
+window.openReviewedDetailModal = openReviewedDetailModal;
+window.closeReviewedDetailModal = closeReviewedDetailModal;
+window.clearReviewedHistoryView = clearReviewedHistoryView;
 
 // ========================================================
 // 🏪 LOJA DO LAR & RECOMPENSAS DA FAMÍLIA (FILHOS & PAIS)
