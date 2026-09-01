@@ -3280,9 +3280,23 @@ async function handleReviewSubmission(submissionId, status) {
   }
 }
 
-async function loadParentReviewedHistory() {
+async function loadParentReviewedHistory(forceShow = false) {
   const container = document.getElementById('parent-reviewed-history-list');
   if (!container) return;
+
+  // Se o usuário optou por manter o histórico oculto (persistente)
+  const isHidden = localStorage.getItem('liraquest_hide_reviewed_history') === 'true';
+  if (isHidden && !forceShow) {
+    container.innerHTML = `
+      <div style="background: rgba(15,23,42,0.6); border: 1px dashed rgba(255,255,255,0.15); border-radius: 12px; padding: 20px; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
+        🧹 Histórico de avaliações ocultado da tela.
+        <div style="margin-top: 10px;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="restoreReviewedHistoryView()">🔄 Reexibir Histórico</button>
+        </div>
+      </div>
+    `;
+    return;
+  }
 
   try {
     const res = await fetch(`${API.tasks}/submissions/reviewed`, {
@@ -3425,23 +3439,31 @@ function closeReviewedDetailModal() {
 
 function clearReviewedHistoryView(e) {
   if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+  localStorage.setItem('liraquest_hide_reviewed_history', 'true');
   const container = document.getElementById('parent-reviewed-history-list');
   if (container) {
     container.innerHTML = `
       <div style="background: rgba(15,23,42,0.6); border: 1px dashed rgba(255,255,255,0.15); border-radius: 12px; padding: 20px; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
         🧹 Histórico de avaliações ocultado da tela.
         <div style="margin-top: 10px;">
-          <button type="button" class="btn btn-secondary btn-sm" onclick="loadParentReviewedHistory()">🔄 Reexibir Histórico</button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="restoreReviewedHistoryView()">🔄 Reexibir Histórico</button>
         </div>
       </div>
     `;
   }
-  showToast('🧹 Visualização do histórico limpa!', 'info');
+  showToast('🧹 Visualização do histórico limpa e salva!', 'info');
+}
+
+function restoreReviewedHistoryView() {
+  localStorage.removeItem('liraquest_hide_reviewed_history');
+  loadParentReviewedHistory(true);
+  showToast('📜 Histórico de avaliações reexibido!', 'success');
 }
 
 window.openReviewedDetailModal = openReviewedDetailModal;
 window.closeReviewedDetailModal = closeReviewedDetailModal;
 window.clearReviewedHistoryView = clearReviewedHistoryView;
+window.restoreReviewedHistoryView = restoreReviewedHistoryView;
 
 // ========================================================
 // 🏪 LOJA DO LAR & RECOMPENSAS DA FAMÍLIA (FILHOS & PAIS)
