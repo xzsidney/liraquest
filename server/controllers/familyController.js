@@ -339,6 +339,7 @@ export const getFamilyAnalytics = async (req, res) => {
     const totalClanGold = validMembers.reduce((acc, m) => acc + (m.hero?.gold || 0), 0);
     const totalClanTokens = validMembers.reduce((acc, m) => acc + (m.progress?.token_balance || 0), 0);
     const maxClanStreak = validMembers.reduce((acc, m) => Math.max(acc, m.progress?.current_streak || 0), 0);
+    const onlineMembersCount = validMembers.filter((m) => m.presence?.is_online).length;
 
     // 1. Buscar todas as submissões aprovadas do clã com tarefa e autor
     const approvedSubmissions = await TaskSubmission.findAll({
