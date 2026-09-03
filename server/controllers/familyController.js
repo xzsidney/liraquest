@@ -442,6 +442,105 @@ export const getFamilyAnalytics = async (req, res) => {
       };
     });
 
+    // 3.1 Comparativo Entre Filhos (Quem Fez o Quê)
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    sevenDaysAgo.setHours(0, 0, 0, 0);
+
+    const childrenComparison = children.map((ch) => {
+      const childSubmissions = approvedSubmissions.filter((s) => s.user_id === ch.id);
+      const weekSubmissions = childSubmissions.filter(
+        (s) => new Date(s.reviewed_at || s.createdAt) >= sevenDaysAgo
+      );
+      const chCats = catCountsByChild[ch.id] || {
+        DOMESTIC: 0,
+        STUDY: 0,
+        HEALTH: 0,
+        CREATIVE: 0,
+        SOCIAL: 0,
+        GERAL: 0,
+        total: 0,
+      };
+      const tasksTotal = childSubmissions.length;
+      const tasksWeek = weekSubmissions.length;
+      const contributionPercent =
+        totalClanTasks > 0 ? Math.round((tasksTotal / totalClanTasks) * 100) : 0;
+
+      // Categoria de maior destaque do filho
+      let topCategory = null;
+      let maxCatCount = 0;
+      Object.keys(categoryMeta).forEach((k) => {
+        const cCount = chCats[k] || 0;
+        if (cCount > maxCatCount) {
+          maxCatCount = cCount;
+          topCategory = {
+            key: k,
+            label: categoryMeta[k].label,
+            icon: categoryMeta[k].icon,
+            count: cCount,
+          };
+        }
+      });
+
+      // Lista das últimas missões concluídas por este filho
+      const recentTasks = childSubmissions.slice(0, 5).map((s) => ({
+        id: s.id,
+        title: s.task?.title || 'Missão',
+        category: s.task?.category || 'GERAL',
+        categoryLabel: categoryMeta[s.task?.category || 'GERAL']?.label || 'Geral',
+        categoryIcon: categoryMeta[s.task?.category || 'GERAL']?.icon || '📌',
+        xp: s.task?.xp_reward || 0,
+        gold: s.task?.gold_reward || 0,
+        completedAt: s.reviewed_at || s.createdAt,
+      }));
+
+      return {
+        id: ch.id,
+        name: ch.name,
+        role_in_family: ch.role_in_family,
+        presence: ch.presence,
+        hero: ch.hero,
+        progress: ch.progress,
+        tasksTotal,
+        tasksWeek,
+        contributionPercent,
+        topCategory,
+        categories: chCats,
+        recentTasks,
+      };
+    });
+
+    // 3.2 Matriz Comparativa de Categorias (Lado a Lado)
+    const categoryMatrix = Object.keys(categoryMeta).map((key) => {
+      const byChild = children.map((ch) => {
+        const count = (catCountsByChild[ch.id] && catCountsByChild[ch.id][key]) || 0;
+        return {
+          id: ch.id,
+          name: ch.name,
+          count,
+        };
+      });
+
+      let maxCount = 0;
+      let leaderName = null;
+      byChild.forEach((c) => {
+        if (c.count > maxCount) {
+          maxCount = c.count;
+          leaderName = c.name;
+        }
+      });
+
+      return {
+        category: key,
+        label: categoryMeta[key].label,
+        icon: categoryMeta[key].icon,
+        color: categoryMeta[key].color,
+        totalClan: catCounts[key] || 0,
+        byChild,
+        leaderName: maxCount > 0 ? leaderName : null,
+      };
+    });
+
     // 4. Extrato do Tesouro Familiar & Resgates
     let totalGoldEarned = 0;
     let totalXpEarned = 0;
@@ -653,6 +752,8 @@ export const getFamilyAnalytics = async (req, res) => {
       weeklyHabits,
       categoryDistribution,
       catCountsByChild,
+      childrenComparison,
+      categoryMatrix,
       treasuryStatement,
       clanAchievements,
       pedagogicalInsights,

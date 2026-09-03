@@ -2969,6 +2969,8 @@ function renderFilteredClanDashboard() {
     weeklyHabits,
     categoryDistribution,
     catCountsByChild,
+    childrenComparison,
+    categoryMatrix,
     treasuryStatement,
     clanAchievements,
     pedagogicalInsights,
@@ -3003,10 +3005,13 @@ function renderFilteredClanDashboard() {
   // 4. Relatório Pedagógico Dinâmico
   renderPedagogicalInsights(pedagogicalInsights);
 
-  // 5. Extrato do Tesouro Familiar & Resgates
+  // 5. Comparativo Entre Heróis (Quem Fez o Quê)
+  renderChildrenComparison(childrenComparison, categoryMatrix, clanStats.totalClanTasks);
+
+  // 6. Extrato do Tesouro Familiar & Resgates
   renderTreasuryStatement(treasuryStatement);
 
-  // 6. Conquistas & Insígnias do Clã
+  // 7. Conquistas & Insígnias do Clã
   renderClanAchievements(clanAchievements);
 
   // 7. Renderizar Card 1: Campeão da Casa (Mais Tarefas)
@@ -3436,6 +3441,271 @@ function renderClanAchievements(achievements) {
     })
     .join('');
 }
+
+// ─────────────────────────────────────────────────────────
+// ⚔️ COMPARATIVO ENTRE HERÓIS (QUEM FEZ O QUÊ)
+// ─────────────────────────────────────────────────────────
+window._clanComparisonSubTab = 'cards';
+
+function switchClanComparisonSubTab(tab) {
+  window._clanComparisonSubTab = tab;
+  const btnCards = document.getElementById('btn-comp-view-cards');
+  const btnMatrix = document.getElementById('btn-comp-view-matrix');
+  const viewCards = document.getElementById('clan-comp-cards-view');
+  const viewMatrix = document.getElementById('clan-comp-matrix-view');
+
+  if (tab === 'cards') {
+    if (btnCards) btnCards.className = 'btn btn-sm btn-gold';
+    if (btnMatrix) btnMatrix.className = 'btn btn-sm btn-secondary';
+    if (viewCards) viewCards.style.display = 'grid';
+    if (viewMatrix) viewMatrix.style.display = 'none';
+  } else {
+    if (btnCards) btnCards.className = 'btn btn-sm btn-secondary';
+    if (btnMatrix) btnMatrix.className = 'btn btn-sm btn-gold';
+    if (viewCards) viewCards.style.display = 'none';
+    if (viewMatrix) viewMatrix.style.display = 'block';
+  }
+}
+window.switchClanComparisonSubTab = switchClanComparisonSubTab;
+
+function renderChildrenComparison(childrenComparison, categoryMatrix, totalClanTasks) {
+  renderChildrenCardsComparison(childrenComparison, totalClanTasks);
+  renderCategoryMatrixComparison(categoryMatrix, childrenComparison, totalClanTasks);
+}
+
+function renderChildrenCardsComparison(childrenComparison, totalClanTasks) {
+  const container = document.getElementById('clan-comp-cards-view');
+  if (!container) return;
+
+  if (!childrenComparison || childrenComparison.length === 0) {
+    container.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: var(--text-muted);">
+        Nenhum filho cadastrado no clã até o momento.
+      </div>
+    `;
+    return;
+  }
+
+  // Ordenar filhos por total de tarefas concluídas (decrescente)
+  const sorted = [...childrenComparison].sort((a, b) => b.tasksTotal - a.tasksTotal);
+
+  container.innerHTML = sorted
+    .map((ch, idx) => {
+      const avatarIcon = ch.hero ? getAvatarDisplay(ch.hero.avatar_value) : '⚔️';
+      const rankBadge =
+        idx === 0 && ch.tasksTotal > 0
+          ? '<span style="background: rgba(245,158,11,0.25); color: #fde047; border: 1px solid rgba(245,158,11,0.5); padding: 2px 8px; border-radius: 12px; font-size: 0.72rem; font-weight: 700;">👑 1º Lugar</span>'
+          : `<span style="background: rgba(255,255,255,0.06); color: #cbd5e1; border: 1px solid rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 12px; font-size: 0.72rem;">#${idx + 1}</span>`;
+
+      const presenceBadge = ch.presence?.is_online
+        ? '<span style="color: #4ade80; font-size: 0.7rem; font-weight: 700;">🟢 Online</span>'
+        : `<span style="color: #94a3b8; font-size: 0.7rem;">⚪ ${ch.presence?.label || 'Offline'}</span>`;
+
+      const cats = ch.categories || {};
+      const recentList = ch.recentTasks || [];
+
+      return `
+        <div style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.25), rgba(15, 23, 42, 0.85)); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; justify-content: space-between;">
+          <!-- CABEÇALHO DO FILHO -->
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="avatar-circle" style="width: 48px; height: 48px; font-size: 1.4rem; background: rgba(0,0,0,0.5); border: 2px solid var(--gold);">
+                  ${avatarIcon}
+                </div>
+                <div>
+                  <div style="display: flex; align-items: center; gap: 6px;">
+                    <strong style="color: #ffffff; font-size: 1.05rem;">${ch.name}</strong>
+                  </div>
+                  <span style="color: #c084fc; font-size: 0.8rem;">
+                    ${ch.hero ? `Herói: ${ch.hero.name} (Nv. ${ch.hero.level})` : 'Aventureiro'}
+                  </span>
+                </div>
+              </div>
+              <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+                ${rankBadge}
+                ${presenceBadge}
+              </div>
+            </div>
+
+            <!-- BARRA DE CONTRIBUIÇÃO NA CASA -->
+            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 10px 12px; margin-bottom: 14px;">
+              <div style="display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 6px;">
+                <span style="color: #cbd5e1;">Produtividade no Clã:</span>
+                <strong style="color: #fbbf24;">${ch.tasksTotal} missões (${ch.contributionPercent}%)</strong>
+              </div>
+              <div style="width: 100%; height: 7px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
+                <div style="width: ${ch.contributionPercent}%; height: 100%; background: linear-gradient(90deg, #3b82f6, #fbbf24); border-radius: 4px;"></div>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted); margin-top: 6px;">
+                <span>📅 Esta semana: <strong style="color: #93c5fd;">${ch.tasksWeek}</strong></span>
+                <span>🔥 Streak: <strong style="color: #fb923c;">${ch.progress?.current_streak || 0}d</strong></span>
+                <span>💰 Ouro: <strong style="color: #fde047;">${ch.hero?.gold || 0}</strong></span>
+              </div>
+            </div>
+
+            <!-- FOCO DE ÁREAS (QUAIS COISAS FEZ) -->
+            <div style="margin-bottom: 14px;">
+              <span style="font-size: 0.75rem; color: #cbd5e1; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">
+                🎯 Áreas de Dedicação:
+              </span>
+              <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                <span style="background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); color: #93c5fd; padding: 3px 8px; border-radius: 8px; font-size: 0.74rem;">
+                  📚 Estudos: <strong>${cats.STUDY || 0}</strong>
+                </span>
+                <span style="background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); color: #6ee7b7; padding: 3px 8px; border-radius: 8px; font-size: 0.74rem;">
+                  🧹 Casa: <strong>${cats.DOMESTIC || 0}</strong>
+                </span>
+                <span style="background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); color: #fde047; padding: 3px 8px; border-radius: 8px; font-size: 0.74rem;">
+                  🏃‍♂️ Saúde: <strong>${cats.HEALTH || 0}</strong>
+                </span>
+                <span style="background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.3); color: #c4b5fd; padding: 3px 8px; border-radius: 8px; font-size: 0.74rem;">
+                  🎨 Artes: <strong>${cats.CREATIVE || 0}</strong>
+                </span>
+              </div>
+            </div>
+
+            <!-- ÚLTIMAS MISSÕES REALIZADAS (QUEM FEZ O QUÊ) -->
+            <div>
+              <span style="font-size: 0.75rem; color: #cbd5e1; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">
+                📜 Últimas Missões Concluídas:
+              </span>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                ${
+                  recentList.length > 0
+                    ? recentList
+                        .map((t) => {
+                          const dateStr = new Date(t.completedAt).toLocaleDateString('pt-BR', {
+                            day: '2-digit',
+                            month: '2-digit',
+                          });
+                          return `
+                            <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem;">
+                              <span style="color: #ffffff; display: flex; align-items: center; gap: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px;">
+                                <span>${t.categoryIcon}</span> ${t.title}
+                              </span>
+                              <span style="color: var(--text-muted); font-size: 0.7rem; white-space: nowrap;">
+                                ${dateStr}
+                              </span>
+                            </div>
+                          `;
+                        })
+                        .join('')
+                    : '<span style="font-size: 0.75rem; color: var(--text-muted); font-style: italic;">Nenhuma missão recente concluída.</span>'
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    })
+    .join('');
+}
+
+function renderCategoryMatrixComparison(categoryMatrix, childrenComparison, totalClanTasks) {
+  const container = document.getElementById('clan-comp-matrix-view');
+  if (!container) return;
+
+  if (!categoryMatrix || !childrenComparison || childrenComparison.length === 0) {
+    container.innerHTML = `<p style="font-size: 0.85rem; color: var(--text-muted);">Carregando matriz comparativa...</p>`;
+    return;
+  }
+
+  const childHeaders = childrenComparison
+    .map(
+      (ch) => `
+      <th style="padding: 10px 14px; text-align: center; color: #ffffff; font-size: 0.85rem; border-bottom: 2px solid rgba(212,175,55,0.3); white-space: nowrap;">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+          <span>⚔️ ${ch.name}</span>
+          <span style="font-size: 0.7rem; color: #fbbf24; font-weight: normal;">${ch.tasksTotal} missões (${ch.contributionPercent}%)</span>
+        </div>
+      </th>
+    `
+    )
+    .join('');
+
+  const rows = categoryMatrix
+    .map((row) => {
+      const childCells = childrenComparison
+        .map((ch) => {
+          const childCount = (ch.categories && ch.categories[row.category]) || 0;
+          const isLeader = row.leaderName && row.leaderName === ch.name && childCount > 0;
+          const bgHighlight = isLeader ? 'background: rgba(245, 158, 11, 0.12);' : '';
+          const badge = isLeader ? '<span style="color: #fbbf24; font-size: 0.75rem; margin-left: 4px;">👑</span>' : '';
+
+          return `
+            <td style="padding: 10px 14px; text-align: center; font-size: 0.88rem; color: ${childCount > 0 ? '#ffffff' : 'var(--text-muted)'}; border-bottom: 1px solid rgba(255,255,255,0.06); ${bgHighlight}">
+              <strong>${childCount}</strong>${badge}
+            </td>
+          `;
+        })
+        .join('');
+
+      return `
+        <tr style="transition: background 0.2s ease;">
+          <td style="padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.06); color: #cbd5e1; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 1.1rem;">${row.icon}</span>
+            <span>${row.label}</span>
+          </td>
+          <td style="padding: 10px 14px; text-align: center; font-size: 0.88rem; color: ${row.color}; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.06);">
+            ${row.totalClan}
+          </td>
+          ${childCells}
+          <td style="padding: 10px 14px; text-align: center; font-size: 0.8rem; color: #fbbf24; border-bottom: 1px solid rgba(255,255,255,0.06); font-weight: 600;">
+            ${row.leaderName ? `👑 ${row.leaderName}` : '<span style="color: var(--text-muted);">-</span>'}
+          </td>
+        </tr>
+      `;
+    })
+    .join('');
+
+  const totalCells = childrenComparison
+    .map(
+      (ch) => `
+      <td style="padding: 12px 14px; text-align: center; font-size: 0.95rem; color: #fde047; font-weight: 800; border-top: 2px solid rgba(212,175,55,0.3); background: rgba(0,0,0,0.3);">
+        ${ch.tasksTotal} (${ch.contributionPercent}%)
+      </td>
+    `
+    )
+    .join('');
+
+  container.innerHTML = `
+    <table style="width: 100%; border-collapse: collapse; min-width: 600px; background: rgba(0,0,0,0.2); border-radius: 12px; overflow: hidden;">
+      <thead>
+        <tr style="background: rgba(15, 23, 42, 0.9);">
+          <th style="padding: 10px 14px; text-align: left; color: var(--text-muted); font-size: 0.78rem; text-transform: uppercase; border-bottom: 2px solid rgba(212,175,55,0.3);">
+            Área / Hábito
+          </th>
+          <th style="padding: 10px 14px; text-align: center; color: var(--text-muted); font-size: 0.78rem; text-transform: uppercase; border-bottom: 2px solid rgba(212,175,55,0.3);">
+            Total Clã
+          </th>
+          ${childHeaders}
+          <th style="padding: 10px 14px; text-align: center; color: var(--text-muted); font-size: 0.78rem; text-transform: uppercase; border-bottom: 2px solid rgba(212,175,55,0.3);">
+            Destaque na Área
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows}
+      </tbody>
+      <tfoot>
+        <tr style="background: rgba(128, 0, 32, 0.25);">
+          <td style="padding: 12px 14px; font-weight: 800; color: #ffffff; font-size: 0.9rem; border-top: 2px solid rgba(212,175,55,0.3);">
+            ⭐ TOTAL DE MISSÕES
+          </td>
+          <td style="padding: 12px 14px; text-align: center; font-size: 1rem; color: #fbbf24; font-weight: 800; border-top: 2px solid rgba(212,175,55,0.3);">
+            ${totalClanTasks || 0}
+          </td>
+          ${totalCells}
+          <td style="padding: 12px 14px; text-align: center; font-size: 0.8rem; color: #4ade80; font-weight: 700; border-top: 2px solid rgba(212,175,55,0.3);">
+            ✨ Cooperação
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  `;
+}
+
 
 
 // ─────────────────────────────────────────────────────────

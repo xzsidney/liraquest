@@ -61,6 +61,7 @@ O centro de comando dos pais para coordenar e incentivar a família:
   - **🥧 Distribuição por Áreas da Vida:** Diagnóstico visual do equilíbrio entre Estudos 📚, Organização 🧹, Saúde 🏃‍♂️, Criatividade 🎨 e Social 🤝.
   - **👑 Campeão da Casa vs. 🌱 Herói em Foco:** Reconhecimento da liderança positiva e identificação empática de quem necessita de incentivo.
   - **📈 Relatório & Dicas Pedagógicas Dinâmicas:** Orientações personalizadas para os pais fortalecerem a motivação intrínseca e o reforço verbal positivo.
+  - **⚔️ Comparativo Entre Heróis (Quem Fez o Quê):** Visualização lado a lado da produtividade de cada irmão com % de contribuição no clã, áreas de dedicação, matriz comparativa por hábitos e histórico detalhado das últimas missões realizadas por cada um.
   - **💰 Extrato do Tesouro Familiar & Resgates:** Balanço lúdico de Ouro e Fichas geradas vs Vales resgatados na Loja do Lar com histórico recente.
   - **🏆 Conquistas & Insígnias Coletivas do Clã:** Metas colaborativas da casa (ex: 50 tarefas no clã, 7 dias de streak coletiva, 20 tarefas de estudos).
   - **Métricas Globais do Clã:** Total de tarefas aprovadas pela família, tesouro acumulado e recorde de streak do clã.

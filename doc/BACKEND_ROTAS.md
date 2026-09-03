@@ -47,7 +47,7 @@ Este documento cataloga todos os endpoints REST e eventos de WebSocket (Socket.I
 | `POST` | `/api/family/create` | JWT (`PARENT` / `ADMIN`) | Cria uma nova família e gera código único (ex: `LIRA-7842`) |
 | `POST` | `/api/family/join` | JWT | Ingressa em uma família através do código de convite |
 | `GET` | `/api/family/my-family` | JWT | Retorna dados da família do usuário, membros e heróis vinculados |
-| `GET` | `/api/family/analytics` | JWT (`PARENT` / `ADMIN`) | Retorna métricas enriquecidas do Painel do Clã: presença online em tempo real, Top Herói, Herói em Foco, totais consolidados, evolução de hábitos nos últimos 7 dias (`weeklyHabits`), distribuição de tarefas por categorias da vida (`categoryDistribution`), extrato financeiro lúdico com resgates da Loja do Lar (`treasuryStatement`), insígnias coletivas (`clanAchievements`) e relatório com orientações empáticas aos pais (`pedagogicalInsights`). |
+| `GET` | `/api/family/analytics` | JWT (`PARENT` / `ADMIN`) | Retorna métricas enriquecidas do Painel do Clã: presença online em tempo real, Top Herói, Herói em Foco, totais consolidados, evolução de hábitos nos últimos 7 dias (`weeklyHabits`), distribuição por categorias (`categoryDistribution`), comparativo lado a lado entre heróis (`childrenComparison`), matriz comparativa de hábitos por categoria (`categoryMatrix`), extrato financeiro lúdico com resgates da Loja do Lar (`treasuryStatement`), insígnias coletivas (`clanAchievements`) e relatório pedagógico dinâmico (`pedagogicalInsights`). |
 
 
 

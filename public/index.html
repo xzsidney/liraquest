@@ -2676,6 +2676,39 @@
               </div>
             </div>
 
+            <!-- ==================== SEÇÃO: COMPARATIVO ENTRE HERÓIS (QUEM FEZ O QUÊ) ==================== -->
+            <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 18px; padding: 22px; margin-bottom: 26px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px;">
+                <div>
+                  <h3 style="font-size: 1.25rem; color: #ffffff; margin: 0; display: flex; align-items: center; gap: 8px;">
+                    <span>⚔️</span> Comparativo Entre Heróis: Quem Fez o Quê
+                  </h3>
+                  <span style="font-size: 0.82rem; color: var(--text-muted);">
+                    Visão lado a lado da contribuição de cada filho, áreas de dedicação e histórico recente de missões cumpridas.
+                  </span>
+                </div>
+                <!-- Alternador de Visualização: Cards Lado a Lado vs Matriz por Áreas -->
+                <div style="display: flex; gap: 8px; background: rgba(0,0,0,0.35); padding: 4px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+                  <button id="btn-comp-view-cards" class="btn btn-sm btn-gold" onclick="switchClanComparisonSubTab('cards')" style="padding: 4px 12px; font-size: 0.78rem;">
+                    🗂️ Cards Lado a Lado
+                  </button>
+                  <button id="btn-comp-view-matrix" class="btn btn-sm btn-secondary" onclick="switchClanComparisonSubTab('matrix')" style="padding: 4px 12px; font-size: 0.78rem;">
+                    📊 Matriz por Áreas
+                  </button>
+                </div>
+              </div>
+
+              <!-- SUB-VIEW 1: CARDS LADO A LADO COM AS ÚLTIMAS MISSÕES DE CADA FILHO -->
+              <div id="clan-comp-cards-view" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px;">
+                <!-- Preenchido via JS -->
+              </div>
+
+              <!-- SUB-VIEW 2: TABELA / MATRIZ COMPARATIVA POR CATEGORIA -->
+              <div id="clan-comp-matrix-view" style="display: none; overflow-x: auto;">
+                <!-- Preenchido via JS -->
+              </div>
+            </div>
+
             <!-- SEÇÃO: EXTRATO DO TESOURO & RESGATES DA LOJA DO LAR -->
             <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 18px; padding: 22px; margin-bottom: 26px;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 10px;">
@@ -4101,6 +4134,6 @@
 
   <!-- Script Socket.IO e da Aplicação (com Cache-Busting Ativo) -->
   <script src="/socket.io/socket.io.js"></script>
-  <script src="/app.js?v=20260903_clan_analytics_v2"></script>
+  <script src="/app.js?v=20260903_comparative"></script>
 </body>
 </html>
