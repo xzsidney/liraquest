@@ -2554,23 +2554,32 @@
             </div>
           </div>
           
-          <!-- ==================== ABA: PAINEL DO CLÃ (DASHBOARD ANALÍTICO) ==================== -->
+          <!-- ==================== ABA: PAINEL DO CLÃ (DASHBOARD ANALÍTICO & PEDAGÓGICO) ==================== -->
           <div id="parent-panel-clan-dashboard" style="display: none;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+            <!-- CABEÇALHO DO PAINEL -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; flex-wrap: wrap; gap: 14px;">
               <div>
-                <h2 style="font-size: 1.5rem; color: #ffffff; display: flex; align-items: center; gap: 10px;">
-                  <span>📊</span> Painel de Controle do Clã
+                <h2 style="font-size: 1.55rem; color: #ffffff; display: flex; align-items: center; gap: 10px; margin: 0 0 6px 0;">
+                  <span>📊</span> Painel de Inteligência do Clã
                 </h2>
-                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">
-                  Métricas em tempo real, presença da família e acompanhamento de desempenho dos heróis.
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">
+                  Visão pedagógica em tempo real, evolução de hábitos, tesouro do lar e insígnias familiares.
                 </p>
               </div>
-              <button class="btn btn-secondary btn-sm" onclick="loadClanAnalyticsDashboard()">
-                🔄 Atualizar Dados
-              </button>
+              <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 6px; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 10px; padding: 4px 10px;">
+                  <span style="font-size: 0.82rem; color: #fbbf24;">Filtrar:</span>
+                  <select id="clan-dash-member-filter" onchange="onClanMemberFilterChange(this.value)" style="background: transparent; color: #ffffff; border: none; font-size: 0.85rem; outline: none; cursor: pointer; padding: 2px 4px;">
+                    <option value="ALL" style="background: #0f172a; color: #fff;">🏰 Todos os Heróis</option>
+                  </select>
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="loadClanAnalyticsDashboard()">
+                  🔄 Atualizar Dados
+                </button>
+              </div>
             </div>
 
-            <!-- GRID DE MÉTRICAS GLOBAIS DO CLÃ -->
+            <!-- GRID DE MÉTRICAS GLOBAIS DO CLÃ (KPIS) -->
             <div class="stats-grid" style="margin-bottom: 24px;">
               <div class="stat-card" style="border-color: rgba(34, 197, 94, 0.35);">
                 <span class="stat-label">🟢 Presença Online</span>
@@ -2594,19 +2603,132 @@
               </div>
             </div>
 
-            <!-- DESTAQUES: CAMPEÃO DA CASA vs HERÓI EM FOCO (2 CARDS) -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 28px;">
-              
-              <!-- CARD 1: CAMPEÃO DA CASA (MAIS TAREFAS) -->
-              <div id="clan-dash-top-performer-card" style="background: linear-gradient(135deg, rgba(128, 0, 32, 0.4), rgba(245, 158, 11, 0.15)); border: 1px solid rgba(212, 175, 55, 0.45); border-radius: 18px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; min-height: 200px;">
-                <!-- Preenchido via JS -->
+            <!-- SEÇÃO DE INTELIGÊNCIA: HÁBITOS SEMANAIS + DISTRIBUIÇÃO POR CATEGORIAS (2 COLUNAS) -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 26px;">
+              <!-- CARD: HÁBITOS DA SEMANA (GRÁFICO SVG NATIVO) -->
+              <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 18px; padding: 20px; display: flex; flex-direction: column;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
+                  <div>
+                    <h3 style="font-size: 1.15rem; color: #ffffff; margin: 0; display: flex; align-items: center; gap: 8px;">
+                      <span>📅</span> Hábitos & Produtividade da Semana
+                    </h3>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">Evolução diária dos últimos 7 dias</span>
+                  </div>
+                  <span style="background: rgba(59, 130, 246, 0.15); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.3); padding: 3px 8px; border-radius: 8px; font-size: 0.72rem; font-weight: 700;">
+                    Últimos 7 dias
+                  </span>
+                </div>
+                <div id="clan-dash-weekly-chart" style="flex: 1; min-height: 180px; display: flex; align-items: flex-end; justify-content: center;">
+                  <!-- Renderizado via JS -->
+                </div>
               </div>
 
-              <!-- CARD 2: HERÓI EM FOCO (MENOS TAREFAS / INCENTIVO) -->
-              <div id="clan-dash-needs-attention-card" style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.4), rgba(15, 23, 42, 0.8)); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 18px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; min-height: 200px;">
-                <!-- Preenchido via JS -->
+              <!-- CARD: DISTRIBUIÇÃO POR CATEGORIAS -->
+              <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(212, 175, 55, 0.25); border-radius: 18px; padding: 20px; display: flex; flex-direction: column;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
+                  <div>
+                    <h3 style="font-size: 1.15rem; color: #ffffff; margin: 0; display: flex; align-items: center; gap: 8px;">
+                      <span>🥧</span> Equilíbrio por Áreas da Vida
+                    </h3>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">Estudos, organização, saúde e hábitos</span>
+                  </div>
+                  <span style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); padding: 3px 8px; border-radius: 8px; font-size: 0.72rem; font-weight: 700;">
+                    Distribuição
+                  </span>
+                </div>
+                <div id="clan-dash-category-distribution" style="display: flex; flex-direction: column; gap: 10px; flex: 1; justify-content: center;">
+                  <!-- Renderizado via JS -->
+                </div>
+              </div>
+            </div>
+
+            <!-- SEÇÃO DE DESTAQUES & RELATÓRIO PEDAGÓGICO (2 COLUNAS) -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 26px;">
+              <!-- COLUNA ESQUERDA: CAMPEÃO DA CASA & HERÓI EM FOCO -->
+              <div style="display: flex; flex-direction: column; gap: 16px;">
+                <!-- CARD 1: CAMPEÃO DA CASA -->
+                <div id="clan-dash-top-performer-card" style="background: linear-gradient(135deg, rgba(128, 0, 32, 0.45), rgba(245, 158, 11, 0.15)); border: 1px solid rgba(212, 175, 55, 0.45); border-radius: 18px; padding: 20px;">
+                  <!-- Preenchido via JS -->
+                </div>
+
+                <!-- CARD 2: HERÓI EM FOCO -->
+                <div id="clan-dash-needs-attention-card" style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.45), rgba(15, 23, 42, 0.8)); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 18px; padding: 20px;">
+                  <!-- Preenchido via JS -->
+                </div>
               </div>
 
+              <!-- COLUNA DIREITA: RELATÓRIO PEDAGÓGICO INTELIGENTE -->
+              <div style="background: linear-gradient(135deg, rgba(107, 15, 36, 0.4), rgba(15, 23, 42, 0.85)); border: 1px solid rgba(212, 175, 55, 0.4); border-radius: 18px; padding: 20px; display: flex; flex-direction: column;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                  <h3 style="font-size: 1.15rem; color: #ffffff; margin: 0; display: flex; align-items: center; gap: 8px;">
+                    <span>📈</span> Relatório & Insights Pedagógicos
+                  </h3>
+                  <span style="background: rgba(212, 175, 55, 0.15); color: #fbbf24; border: 1px solid rgba(212, 175, 55, 0.35); padding: 3px 8px; border-radius: 8px; font-size: 0.72rem; font-weight: 700;">
+                    Dicas para os Pais
+                  </span>
+                </div>
+                <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 14px; line-height: 1.4;">
+                  Orientações empáticas para fortalecer a motivação intrínseca, sem atrito e com foco no esforço contínuo.
+                </p>
+                <div id="clan-dash-pedagogical-insights" style="display: flex; flex-direction: column; gap: 12px; flex: 1;">
+                  <!-- Renderizado via JS -->
+                </div>
+              </div>
+            </div>
+
+            <!-- SEÇÃO: EXTRATO DO TESOURO & RESGATES DA LOJA DO LAR -->
+            <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 18px; padding: 22px; margin-bottom: 26px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 10px;">
+                <div>
+                  <h3 style="font-size: 1.2rem; color: #ffffff; margin: 0; display: flex; align-items: center; gap: 8px;">
+                    <span>💰</span> Extrato do Tesouro Familiar & Resgates
+                  </h3>
+                  <span style="font-size: 0.82rem; color: var(--text-muted);">Economia do lar: Ouro e Fichas geradas vs Vales resgatados</span>
+                </div>
+              </div>
+
+              <!-- MINI-GRID DE FINANÇAS DO LAR -->
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 18px;">
+                <div style="background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 12px; padding: 14px;">
+                  <span style="font-size: 0.75rem; color: var(--text-muted); display: block;">🪙 Ouro Conquistado (Total)</span>
+                  <strong id="clan-dash-treasury-gold" style="font-size: 1.3rem; color: #fde047;">0</strong>
+                </div>
+                <div style="background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 12px; padding: 14px;">
+                  <span style="font-size: 0.75rem; color: var(--text-muted); display: block;">🏠 Fichas do Lar Geradas</span>
+                  <strong id="clan-dash-treasury-tokens-earned" style="font-size: 1.3rem; color: #93c5fd;">0</strong>
+                </div>
+                <div style="background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px; padding: 14px;">
+                  <span style="font-size: 0.75rem; color: var(--text-muted); display: block;">🎁 Fichas Resgatadas em Vales</span>
+                  <strong id="clan-dash-treasury-tokens-spent" style="font-size: 1.3rem; color: #f87171;">0</strong>
+                </div>
+                <div style="background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 12px; padding: 14px;">
+                  <span style="font-size: 0.75rem; color: var(--text-muted); display: block;">💎 Saldo de Fichas Disponíveis</span>
+                  <strong id="clan-dash-treasury-tokens-balance" style="font-size: 1.3rem; color: #4ade80;">0</strong>
+                </div>
+              </div>
+
+              <!-- LISTA DE RESGATES RECENTES -->
+              <h4 style="font-size: 0.95rem; color: #cbd5e1; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                <span>🎟️</span> Últimos Resgates da Loja do Lar
+              </h4>
+              <div id="clan-dash-recent-redemptions-list" style="display: flex; flex-direction: column; gap: 8px;">
+                <!-- Preenchido via JS -->
+              </div>
+            </div>
+
+            <!-- SEÇÃO: MURAL DE INSÍGNIAS & CONQUISTAS COLETIVAS DO CLÃ -->
+            <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 18px; padding: 22px; margin-bottom: 26px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+                <div>
+                  <h3 style="font-size: 1.2rem; color: #ffffff; margin: 0; display: flex; align-items: center; gap: 8px;">
+                    <span>🏆</span> Conquistas & Insígnias Coletivas do Clã
+                  </h3>
+                  <span style="font-size: 0.82rem; color: var(--text-muted);">Metas colaborativas alcançadas com o esforço de todos</span>
+                </div>
+              </div>
+              <div id="clan-dash-achievements-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;">
+                <!-- Preenchido via JS -->
+              </div>
             </div>
 
             <!-- LISTA & STATUS DE TODOS OS MEMBROS DO CLÃ -->
@@ -3979,6 +4101,6 @@
 
   <!-- Script Socket.IO e da Aplicação (com Cache-Busting Ativo) -->
   <script src="/socket.io/socket.io.js"></script>
-  <script src="/app.js?v=20260901_1355"></script>
+  <script src="/app.js?v=20260903_clan_analytics"></script>
 </body>
 </html>

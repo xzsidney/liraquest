@@ -55,11 +55,15 @@ Representa a vida prática e a rotina do membro da família:
 O centro de comando dos pais para coordenar e incentivar a família:
 * **Validador de Provas em Tempo Real:** Avaliação com 1 clique das fotos e relatos enviados pelos filhos, com aprovação e feedback pedagógico.
 * **Gestão de Missões (CRUD Completo):** Criação, edição, ativação/pausa e exclusão de tarefas personalizadas da casa.
-* **Painel do Clã (Dashboard Analítico da Família):**
+* **Painel do Clã (Dashboard de Inteligência & Analytics Familiar):**
   - **Presença em Tempo Real:** Status de conexão de cada membro (`🟢 Online agora`, `🟡 Ausente há Xm`, `⚪ Visto há Xh`).
-  - **👑 Campeão da Casa (Mais Tarefas):** Destaque ao herói mais produtivo da semana/mês.
-  - **🌱 Herói em Foco (Apoio & Menos Tarefas):** Identificação acolhedora para incentivar quem precisa de apoio com tarefas acessíveis.
-  - **Métricas Globais do Clã:** Total de tarefas concluídas pela família, tesouro acumulado e recorde de streak do clã.
+  - **📅 Hábitos & Produtividade Semanal:** Gráfico de evolução diária das missões cumpridas nos últimos 7 dias, com filtro individual por herói.
+  - **🥧 Distribuição por Áreas da Vida:** Diagnóstico visual do equilíbrio entre Estudos 📚, Organização 🧹, Saúde 🏃‍♂️, Criatividade 🎨 e Social 🤝.
+  - **👑 Campeão da Casa vs. 🌱 Herói em Foco:** Reconhecimento da liderança positiva e identificação empática de quem necessita de incentivo.
+  - **📈 Relatório & Dicas Pedagógicas Dinâmicas:** Orientações personalizadas para os pais fortalecerem a motivação intrínseca e o reforço verbal positivo.
+  - **💰 Extrato do Tesouro Familiar & Resgates:** Balanço lúdico de Ouro e Fichas geradas vs Vales resgatados na Loja do Lar com histórico recente.
+  - **🏆 Conquistas & Insígnias Coletivas do Clã:** Metas colaborativas da casa (ex: 50 tarefas no clã, 7 dias de streak coletiva, 20 tarefas de estudos).
+  - **Métricas Globais do Clã:** Total de tarefas aprovadas pela família, tesouro acumulado e recorde de streak do clã.
 * **Filhos & Clã Familiar:** Acompanhamento individual dos heróis vinculados e código de convite familiar em 1 clique.
 * **Seus Dados Cadastrais:** Gestão do perfil pessoal, telefone, profissão e foto real do guardião.
 

@@ -364,3 +364,15 @@ Histórico de vales resgatados pelos membros com suas Fichas do Lar.
 | `notes` | `TEXT` | Sim | Observações adicionais |
 | `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
 
+---
+
+## 6. Agregações e Inteligência do Painel do Clã (Analytics dos Pais)
+
+O **Painel do Clã** (`/api/family/analytics`) realiza agregações analíticas em tempo real a partir das tabelas relacionais do sistema:
+- **Hábitos Semanais (`weeklyHabits`):** Cruzamento de `task_submissions` (`status = 'APPROVED'`) nos últimos 7 dias por data e usuário.
+- **Distribuição de Categorias (`categoryDistribution`):** Agrupamento de `task_submissions` aprovadas com a coluna `category` de `tasks` (`DOMESTIC`, `STUDY`, `HEALTH`, `CREATIVE`, `SOCIAL`, `GERAL`).
+- **Extrato do Tesouro Familiar (`treasuryStatement`):** Soma de recompensas obtidas em `tasks` vs resgates consumidos em `family_reward_redemptions` (`token_cost`).
+- **Insígnias Coletivas (`clanAchievements`):** Metas dinâmicas do clã combinando total de tarefas, sequências e acúmulo de ouro.
+- **Relatório Pedagógico (`pedagogicalInsights`):** Heurística baseada no equilíbrio de hábitos, sequências ativas e incentivo individual.
+
+

@@ -2908,6 +2908,11 @@ function copyClanInviteCode() {
 // ─────────────────────────────────────────────────────────
 // 📊 PAINEL DO CLÃ (DASHBOARD ANALÍTICO & CONTROLE FAMILIAR)
 // ─────────────────────────────────────────────────────────
+// 📊 PAINEL DO CLÃ: DASHBOARD ANALÍTICO & PEDAGÓGICO
+// ─────────────────────────────────────────────────────────
+window._clanAnalyticsData = null;
+window._selectedClanMemberId = 'ALL';
+
 async function loadClanAnalyticsDashboard() {
   if (!state.token) return;
 
@@ -2922,194 +2927,514 @@ async function loadClanAnalyticsDashboard() {
       return;
     }
 
-    const { clanStats, topPerformer, needsAttention, members } = data;
+    window._clanAnalyticsData = data;
 
-    // Atualizar Contadores Globais (Pai e Filho)
-    const updateText = (id, val) => {
-      const el = document.getElementById(id);
-      if (el) el.innerText = val;
-    };
-
-    updateText('clan-dash-online-count', `${clanStats.onlineMembersCount} / ${clanStats.totalMembers}`);
-    updateText('child-clan-dash-online-count', `${clanStats.onlineMembersCount} / ${clanStats.totalMembers}`);
-
-    updateText('clan-dash-tasks-count', clanStats.totalClanTasks);
-    updateText('child-clan-dash-tasks-count', clanStats.totalClanTasks);
-
-    updateText('clan-dash-gold-count', `${clanStats.totalClanGold}`);
-    updateText('child-clan-dash-gold-count', `${clanStats.totalClanGold}`);
-
-    updateText('clan-dash-streak-count', `${clanStats.maxClanStreak}d`);
-    updateText('child-clan-dash-streak-count', `${clanStats.maxClanStreak}d`);
-
-    // Renderizar Card 1: Campeão da Casa (Mais Tarefas)
-    const renderTopCard = (containerId) => {
-      const el = document.getElementById(containerId);
-      if (!el) return;
-
-      if (!topPerformer || topPerformer.total_approved_tasks === 0) {
-        el.innerHTML = `
-          <div>
-            <span style="font-size: 0.8rem; color: #fbbf24; font-weight: 700; text-transform: uppercase;">👑 Campeão da Casa</span>
-            <h3 style="font-size: 1.25rem; color: #ffffff; margin: 6px 0;">Em Disputa Aberta!</h3>
-            <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">
-              Nenhum herói concluiu missões ainda. Quem cumprir a primeira tarefa assumirá a liderança do ranking da casa!
-            </p>
-          </div>
-          <div style="margin-top: 14px;">
-            <span class="role-badge" style="background: rgba(245,158,11,0.2); color: #fbbf24; border: 1px solid rgba(245,158,11,0.4);">
-              ⚔️ Liderança Disponível
-            </span>
-          </div>
-        `;
-        return;
-      }
-
-      const avatarIcon = topPerformer.hero ? getAvatarDisplay(topPerformer.hero.avatar_value) : '👑';
-      const streak = topPerformer.progress?.current_streak || 0;
-
-      el.innerHTML = `
-        <div>
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-            <span style="font-size: 0.8rem; color: #fbbf24; font-weight: 700; text-transform: uppercase;">👑 Campeão da Casa</span>
-            <span class="role-badge" style="background: rgba(245,158,11,0.25); color: #fde047; border: 1px solid rgba(245,158,11,0.5);">
-              🏆 Mais Produtivo
-            </span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 12px;">
-            <div class="avatar-circle" style="width: 52px; height: 52px; font-size: 1.5rem; background: rgba(0,0,0,0.5); border: 2px solid var(--gold);">
-              ${avatarIcon}
-            </div>
-            <div>
-              <h3 style="font-size: 1.25rem; color: #ffffff; margin: 0;">${topPerformer.name}</h3>
-              <span style="color: #c084fc; font-size: 0.82rem;">${topPerformer.hero ? `Herói: ${topPerformer.hero.name} • Nível ${topPerformer.hero.level}` : 'Herói do Clã'}</span>
-            </div>
-          </div>
-          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <span class="reward-pill-xp" style="font-size: 0.8rem;">⭐ ${topPerformer.total_approved_tasks} Missões Concluídas</span>
-            <span class="reward-pill-gold" style="font-size: 0.8rem;">💰 ${topPerformer.hero?.gold || 0} Ouro</span>
-            <span style="background: rgba(249,115,22,0.2); color: #fb923c; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">🔥 Streak: ${streak} dias</span>
-          </div>
-        </div>
-        <p style="font-size: 0.8rem; color: #4ade80; margin-top: 14px; margin-bottom: 0;">
-          ✨ Parabéns pelo empenho exemplar nos hábitos da casa!
-        </p>
+    // Preencher dropdown de filtro por membro se ainda não estiver preenchido
+    const filterSelect = document.getElementById('clan-dash-member-filter');
+    if (filterSelect) {
+      const currentVal = window._selectedClanMemberId || 'ALL';
+      const children = (data.members || []).filter((m) => m.role === 'CHILD');
+      filterSelect.innerHTML = `
+        <option value="ALL" style="background: #0f172a; color: #fff;">🏰 Todos os Heróis</option>
+        ${children
+          .map(
+            (c) =>
+              `<option value="${c.id}" ${c.id === currentVal ? 'selected' : ''} style="background: #0f172a; color: #fff;">⚔️ ${c.name}</option>`
+          )
+          .join('')}
       `;
-    };
+    }
 
-    renderTopCard('clan-dash-top-performer-card');
-    renderTopCard('child-clan-dash-top-performer-card');
-
-    // Renderizar Card 2: Herói em Foco (Menos Tarefas / Apoio)
-    const renderAttentionCard = (containerId) => {
-      const el = document.getElementById(containerId);
-      if (!el) return;
-
-      if (!needsAttention || needsAttention.id === topPerformer?.id) {
-        el.innerHTML = `
-          <div>
-            <span style="font-size: 0.8rem; color: #93c5fd; font-weight: 700; text-transform: uppercase;">🌱 Equilíbrio do Clã</span>
-            <h3 style="font-size: 1.25rem; color: #ffffff; margin: 6px 0;">Todos no Mesmo Ritmo!</h3>
-            <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">
-              Todos os membros da família estão avançando juntos em perfeita harmonia. Continuem com a cooperação diária!
-            </p>
-          </div>
-          <div style="margin-top: 14px;">
-            <span class="role-badge" style="background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.3);">
-              ✨ Família Unida
-            </span>
-          </div>
-        `;
-        return;
-      }
-
-      const avatarIcon = needsAttention.hero ? getAvatarDisplay(needsAttention.hero.avatar_value) : '🌱';
-
-      el.innerHTML = `
-        <div>
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-            <span style="font-size: 0.8rem; color: #93c5fd; font-weight: 700; text-transform: uppercase;">🌱 Herói em Foco</span>
-            <span class="role-badge" style="background: rgba(59,130,246,0.2); color: #93c5fd; border: 1px solid rgba(59,130,246,0.4);">
-              🤝 Precisa de Apoio
-            </span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 12px;">
-            <div class="avatar-circle" style="width: 52px; height: 52px; font-size: 1.5rem; background: rgba(0,0,0,0.5); border: 2px solid #3b82f6;">
-              ${avatarIcon}
-            </div>
-            <div>
-              <h3 style="font-size: 1.25rem; color: #ffffff; margin: 0;">${needsAttention.name}</h3>
-              <span style="color: #93c5fd; font-size: 0.82rem;">${needsAttention.hero ? `Herói: ${needsAttention.hero.name}` : 'Aventureiro'}</span>
-            </div>
-          </div>
-          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <span style="background: rgba(255,255,255,0.08); color: #cbd5e1; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem;">📋 ${needsAttention.total_approved_tasks} Missões Feitas</span>
-            <span style="background: rgba(245,158,11,0.15); color: #fde047; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem;">🎯 Pronto para novos desafios</span>
-          </div>
-        </div>
-        <p style="font-size: 0.8rem; color: #93c5fd; margin-top: 14px; margin-bottom: 0;">
-          💡 Dica: Que tal realizar uma missão rápida hoje para subir de nível e ganhar ouro?
-        </p>
-      `;
-    };
-
-    renderAttentionCard('clan-dash-needs-attention-card');
-    renderAttentionCard('child-clan-dash-needs-attention-card');
-
-    // Renderizar Lista de Membros com Presença Online
-    const renderMembersList = (containerId) => {
-      const el = document.getElementById(containerId);
-      if (!el) return;
-
-      el.innerHTML = members
-        .map((m) => {
-          const isParent = m.role === 'PARENT' || m.role === 'ADMIN';
-          const avatarIcon = m.hero ? getAvatarDisplay(m.hero.avatar_value) : isParent ? '🛡️' : '👤';
-          const roleBadge = isParent
-            ? '<span class="role-badge badge-parent" style="font-size: 0.72rem;">🛡️ Guardião</span>'
-            : '<span class="role-badge badge-child" style="font-size: 0.72rem;">⚔️ Herói Filho</span>';
-
-          const presenceBadge = m.presence.is_online
-            ? '<span style="background: rgba(34,197,94,0.2); color: #4ade80; border: 1px solid rgba(34,197,94,0.4); padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">🟢 Online agora</span>'
-            : `<span style="background: rgba(148,163,184,0.1); color: #94a3b8; border: 1px solid rgba(148,163,184,0.2); padding: 4px 10px; border-radius: 12px; font-size: 0.75rem;">${m.presence.label}</span>`;
-
-          return `
-            <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-card); border-radius: 14px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-              <div style="display: flex; align-items: center; gap: 14px;">
-                <div class="avatar-circle" style="width: 44px; height: 44px; font-size: 1.3rem; border: 2px solid rgba(212,175,55,0.4); background: rgba(0,0,0,0.5);">
-                  ${avatarIcon}
-                </div>
-                <div>
-                  <div style="display: flex; align-items: center; gap: 8px;">
-                    <strong style="color: #ffffff; font-size: 0.98rem;">${m.name}</strong>
-                    ${roleBadge}
-                  </div>
-                  <span style="font-size: 0.78rem; color: var(--text-muted);">${m.hero ? `Herói: ${m.hero.name} (Nv. ${m.hero.level})` : m.email}</span>
-                </div>
-              </div>
-
-              <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
-                ${!isParent ? `
-                  <div style="text-align: right; font-size: 0.8rem;">
-                    <span style="color: #cbd5e1; display: block;">Hoje: <strong>${m.progress?.tasks_completed_today || 0}</strong> | Total: <strong>${m.total_approved_tasks || 0}</strong> missões</span>
-                    <span style="color: #fde047;">💰 ${m.hero?.gold || 0} Ouro • 🔥 ${m.progress?.current_streak || 0}d streak</span>
-                  </div>
-                ` : ''}
-                <div>
-                  ${presenceBadge}
-                </div>
-              </div>
-            </div>
-          `;
-        })
-        .join('');
-    };
-
-    renderMembersList('clan-dash-members-list');
-    renderMembersList('child-clan-dash-members-list');
+    renderFilteredClanDashboard();
   } catch (err) {
     console.error('Erro ao carregar dashboard analítico do clã:', err);
   }
+}
+
+function onClanMemberFilterChange(memberId) {
+  window._selectedClanMemberId = memberId || 'ALL';
+  renderFilteredClanDashboard();
+}
+window.onClanMemberFilterChange = onClanMemberFilterChange;
+
+function renderFilteredClanDashboard() {
+  const data = window._clanAnalyticsData;
+  if (!data) return;
+
+  const {
+    clanStats,
+    topPerformer,
+    needsAttention,
+    members,
+    weeklyHabits,
+    categoryDistribution,
+    catCountsByChild,
+    treasuryStatement,
+    clanAchievements,
+    pedagogicalInsights,
+  } = data;
+
+  const selectedMemberId = window._selectedClanMemberId || 'ALL';
+
+  // 1. Atualizar Contadores Globais (Pai e Filho)
+  const updateText = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.innerText = val;
+  };
+
+  updateText('clan-dash-online-count', `${clanStats.onlineMembersCount} / ${clanStats.totalMembers}`);
+  updateText('child-clan-dash-online-count', `${clanStats.onlineMembersCount} / ${clanStats.totalMembers}`);
+
+  updateText('clan-dash-tasks-count', clanStats.totalClanTasks);
+  updateText('child-clan-dash-tasks-count', clanStats.totalClanTasks);
+
+  updateText('clan-dash-gold-count', `${clanStats.totalClanGold}`);
+  updateText('child-clan-dash-gold-count', `${clanStats.totalClanGold}`);
+
+  updateText('clan-dash-streak-count', `${clanStats.maxClanStreak}d`);
+  updateText('child-clan-dash-streak-count', `${clanStats.maxClanStreak}d`);
+
+  // 2. Gráfico de Hábitos Semanais
+  renderWeeklyHabitsChart(weeklyHabits, selectedMemberId);
+
+  // 3. Distribuição por Categorias
+  renderCategoryDistribution(categoryDistribution, catCountsByChild, selectedMemberId);
+
+  // 4. Relatório Pedagógico Dinâmico
+  renderPedagogicalInsights(pedagogicalInsights);
+
+  // 5. Extrato do Tesouro Familiar & Resgates
+  renderTreasuryStatement(treasuryStatement);
+
+  // 6. Conquistas & Insígnias do Clã
+  renderClanAchievements(clanAchievements);
+
+  // 7. Renderizar Card 1: Campeão da Casa (Mais Tarefas)
+  const renderTopCard = (containerId) => {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+
+    if (!topPerformer || topPerformer.total_approved_tasks === 0) {
+      el.innerHTML = `
+        <div>
+          <span style="font-size: 0.8rem; color: #fbbf24; font-weight: 700; text-transform: uppercase;">👑 Campeão da Casa</span>
+          <h3 style="font-size: 1.25rem; color: #ffffff; margin: 6px 0;">Em Disputa Aberta!</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">
+            Nenhum herói concluiu missões ainda. Quem cumprir a primeira tarefa assumirá a liderança do ranking da casa!
+          </p>
+        </div>
+        <div style="margin-top: 14px;">
+          <span class="role-badge" style="background: rgba(245,158,11,0.2); color: #fbbf24; border: 1px solid rgba(245,158,11,0.4);">
+            ⚔️ Liderança Disponível
+          </span>
+        </div>
+      `;
+      return;
+    }
+
+    const avatarIcon = topPerformer.hero ? getAvatarDisplay(topPerformer.hero.avatar_value) : '👑';
+    const streak = topPerformer.progress?.current_streak || 0;
+
+    el.innerHTML = `
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+          <span style="font-size: 0.8rem; color: #fbbf24; font-weight: 700; text-transform: uppercase;">👑 Campeão da Casa</span>
+          <span class="role-badge" style="background: rgba(245,158,11,0.25); color: #fde047; border: 1px solid rgba(245,158,11,0.5);">
+            🏆 Mais Produtivo
+          </span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 12px;">
+          <div class="avatar-circle" style="width: 52px; height: 52px; font-size: 1.5rem; background: rgba(0,0,0,0.5); border: 2px solid var(--gold);">
+            ${avatarIcon}
+          </div>
+          <div>
+            <h3 style="font-size: 1.25rem; color: #ffffff; margin: 0;">${topPerformer.name}</h3>
+            <span style="color: #c084fc; font-size: 0.82rem;">${topPerformer.hero ? `Herói: ${topPerformer.hero.name} • Nível ${topPerformer.hero.level}` : 'Herói do Clã'}</span>
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <span class="reward-pill-xp" style="font-size: 0.8rem;">⭐ ${topPerformer.total_approved_tasks} Missões Concluídas</span>
+          <span class="reward-pill-gold" style="font-size: 0.8rem;">💰 ${topPerformer.hero?.gold || 0} Ouro</span>
+          <span style="background: rgba(249,115,22,0.2); color: #fb923c; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">🔥 Streak: ${streak} dias</span>
+        </div>
+      </div>
+      <p style="font-size: 0.8rem; color: #4ade80; margin-top: 14px; margin-bottom: 0;">
+        ✨ Parabéns pelo empenho exemplar nos hábitos da casa!
+      </p>
+    `;
+  };
+
+  renderTopCard('clan-dash-top-performer-card');
+  renderTopCard('child-clan-dash-top-performer-card');
+
+  // 8. Renderizar Card 2: Herói em Foco (Menos Tarefas / Apoio)
+  const renderAttentionCard = (containerId) => {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+
+    if (!needsAttention || needsAttention.id === topPerformer?.id) {
+      el.innerHTML = `
+        <div>
+          <span style="font-size: 0.8rem; color: #93c5fd; font-weight: 700; text-transform: uppercase;">🌱 Equilíbrio do Clã</span>
+          <h3 style="font-size: 1.25rem; color: #ffffff; margin: 6px 0;">Todos no Mesmo Ritmo!</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">
+            Todos os membros da família estão avançando juntos em perfeita harmonia. Continuem com a cooperação diária!
+          </p>
+        </div>
+        <div style="margin-top: 14px;">
+          <span class="role-badge" style="background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.3);">
+            ✨ Família Unida
+          </span>
+        </div>
+      `;
+      return;
+    }
+
+    const avatarIcon = needsAttention.hero ? getAvatarDisplay(needsAttention.hero.avatar_value) : '🌱';
+
+    el.innerHTML = `
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+          <span style="font-size: 0.8rem; color: #93c5fd; font-weight: 700; text-transform: uppercase;">🌱 Herói em Foco</span>
+          <span class="role-badge" style="background: rgba(59,130,246,0.2); color: #93c5fd; border: 1px solid rgba(59,130,246,0.4);">
+            🤝 Precisa de Apoio
+          </span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 12px;">
+          <div class="avatar-circle" style="width: 52px; height: 52px; font-size: 1.5rem; background: rgba(0,0,0,0.5); border: 2px solid #3b82f6;">
+            ${avatarIcon}
+          </div>
+          <div>
+            <h3 style="font-size: 1.25rem; color: #ffffff; margin: 0;">${needsAttention.name}</h3>
+            <span style="color: #93c5fd; font-size: 0.82rem;">${needsAttention.hero ? `Herói: ${needsAttention.hero.name}` : 'Aventureiro'}</span>
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <span style="background: rgba(255,255,255,0.08); color: #cbd5e1; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem;">📋 ${needsAttention.total_approved_tasks} Missões Feitas</span>
+          <span style="background: rgba(245,158,11,0.15); color: #fde047; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem;">🎯 Pronto para novos desafios</span>
+        </div>
+      </div>
+      <p style="font-size: 0.8rem; color: #93c5fd; margin-top: 14px; margin-bottom: 0;">
+        💡 Dica: Que tal realizar uma missão rápida hoje juntos para subir de nível e ganhar ouro?
+      </p>
+    `;
+  };
+
+  renderAttentionCard('clan-dash-needs-attention-card');
+  renderAttentionCard('child-clan-dash-needs-attention-card');
+
+  // 9. Renderizar Lista de Membros com Presença Online
+  const renderMembersList = (containerId) => {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+
+    el.innerHTML = members
+      .map((m) => {
+        const isParent = m.role === 'PARENT' || m.role === 'ADMIN';
+        const avatarIcon = m.hero ? getAvatarDisplay(m.hero.avatar_value) : isParent ? '🛡️' : '👤';
+        const roleBadge = isParent
+          ? '<span class="role-badge badge-parent" style="font-size: 0.72rem;">🛡️ Guardião</span>'
+          : '<span class="role-badge badge-child" style="font-size: 0.72rem;">⚔️ Herói Filho</span>';
+
+        const presenceBadge = m.presence.is_online
+          ? '<span style="background: rgba(34,197,94,0.2); color: #4ade80; border: 1px solid rgba(34,197,94,0.4); padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">🟢 Online agora</span>'
+          : `<span style="background: rgba(148,163,184,0.1); color: #94a3b8; border: 1px solid rgba(148,163,184,0.2); padding: 4px 10px; border-radius: 12px; font-size: 0.75rem;">${m.presence.label}</span>`;
+
+        return `
+          <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-card); border-radius: 14px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <div class="avatar-circle" style="width: 44px; height: 44px; font-size: 1.3rem; border: 2px solid rgba(212,175,55,0.4); background: rgba(0,0,0,0.5);">
+                ${avatarIcon}
+              </div>
+              <div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <strong style="color: #ffffff; font-size: 0.98rem;">${m.name}</strong>
+                  ${roleBadge}
+                </div>
+                <span style="font-size: 0.78rem; color: var(--text-muted);">${m.hero ? `Herói: ${m.hero.name} (Nv. ${m.hero.level})` : m.email}</span>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+              ${!isParent ? `
+                <div style="text-align: right; font-size: 0.8rem;">
+                  <span style="color: #cbd5e1; display: block;">Hoje: <strong>${m.progress?.tasks_completed_today || 0}</strong> | Total: <strong>${m.total_approved_tasks || 0}</strong> missões</span>
+                  <span style="color: #fde047;">💰 ${m.hero?.gold || 0} Ouro • 🔥 ${m.progress?.current_streak || 0}d streak</span>
+                </div>
+              ` : ''}
+              <div>
+                ${presenceBadge}
+              </div>
+            </div>
+          </div>
+        `;
+      })
+      .join('');
+  };
+
+  renderMembersList('clan-dash-members-list');
+  renderMembersList('child-clan-dash-members-list');
+}
+
+// ─────────────────────────────────────────────────────────
+// HELPERS DE RENDERIZAÇÃO DO PAINEL DO CLÃ
+// ─────────────────────────────────────────────────────────
+
+function renderWeeklyHabitsChart(weeklyHabits, selectedMemberId) {
+  const container = document.getElementById('clan-dash-weekly-chart');
+  if (!container) return;
+
+  if (!weeklyHabits || weeklyHabits.length === 0) {
+    container.innerHTML = `<p style="font-size: 0.85rem; color: var(--text-muted); text-align: center; margin: auto;">Nenhum dado semanal disponível.</p>`;
+    return;
+  }
+
+  const dayData = weeklyHabits.map((d) => {
+    let count = 0;
+    if (!selectedMemberId || selectedMemberId === 'ALL') {
+      count = d.total || 0;
+    } else {
+      const ch = (d.children || []).find((c) => c.id === selectedMemberId);
+      count = ch ? ch.count : 0;
+    }
+    return { ...d, displayCount: count };
+  });
+
+  const maxVal = Math.max(4, ...dayData.map((d) => d.displayCount));
+
+  container.innerHTML = `
+    <div style="display: flex; align-items: flex-end; justify-content: space-between; width: 100%; height: 160px; gap: 8px; padding-top: 20px; padding-bottom: 4px;">
+      ${dayData
+        .map((d) => {
+          const heightPct = d.displayCount > 0 ? Math.max(16, Math.round((d.displayCount / maxVal) * 100)) : 6;
+          const isHighlight = d.displayCount > 0;
+          const barBg = isHighlight
+            ? 'linear-gradient(180deg, #fbbf24 0%, #d4af37 40%, #1e3a8a 100%)'
+            : 'rgba(255, 255, 255, 0.06)';
+          const borderStyle = isHighlight
+            ? '1px solid rgba(251, 191, 36, 0.6)'
+            : '1px solid rgba(255, 255, 255, 0.08)';
+          const glow = isHighlight ? 'box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);' : '';
+
+          return `
+            <div style="flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; position: relative;">
+              <span style="font-size: 0.78rem; font-weight: 700; color: ${isHighlight ? '#fde047' : 'rgba(255,255,255,0.3)'}; margin-bottom: 6px;">
+                ${d.displayCount}
+              </span>
+              <div title="${d.date}: ${d.displayCount} missões concluídas" style="width: 100%; max-width: 36px; height: ${heightPct}%; background: ${barBg}; border: ${borderStyle}; border-radius: 8px 8px 3px 3px; ${glow} transition: height 0.4s ease; cursor: pointer;"></div>
+              <span style="font-size: 0.75rem; color: ${isHighlight ? '#ffffff' : 'var(--text-muted)'}; font-weight: ${isHighlight ? '700' : '400'}; margin-top: 8px;">
+                ${d.dayLabel}
+              </span>
+            </div>
+          `;
+        })
+        .join('')}
+    </div>
+  `;
+}
+
+function renderCategoryDistribution(categoryDistribution, catCountsByChild, selectedMemberId) {
+  const container = document.getElementById('clan-dash-category-distribution');
+  if (!container) return;
+
+  if (!categoryDistribution || categoryDistribution.length === 0) {
+    container.innerHTML = `<p style="font-size: 0.85rem; color: var(--text-muted);">Nenhuma missão registrada ainda.</p>`;
+    return;
+  }
+
+  let list = categoryDistribution;
+  if (selectedMemberId && selectedMemberId !== 'ALL' && catCountsByChild && catCountsByChild[selectedMemberId]) {
+    const childStats = catCountsByChild[selectedMemberId];
+    const childTotal = childStats.total || 1;
+    list = categoryDistribution.map((cat) => {
+      const count = childStats[cat.category] || 0;
+      const pct = childStats.total > 0 ? Math.round((count / childTotal) * 100) : 0;
+      return { ...cat, count, percentage: pct };
+    });
+  }
+
+  container.innerHTML = list
+    .map(
+      (cat) => `
+      <div style="margin-bottom: 6px;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 4px;">
+          <span style="color: #cbd5e1; display: flex; align-items: center; gap: 6px;">
+            <span>${cat.icon}</span> ${cat.label}
+          </span>
+          <span style="font-weight: 700; color: ${cat.color};">${cat.count} (${cat.percentage}%)</span>
+        </div>
+        <div style="width: 100%; height: 7px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
+          <div style="width: ${cat.percentage}%; height: 100%; background: ${cat.color}; border-radius: 4px; transition: width 0.4s ease;"></div>
+        </div>
+      </div>
+    `
+    )
+    .join('');
+}
+
+function renderPedagogicalInsights(insights) {
+  const container = document.getElementById('clan-dash-pedagogical-insights');
+  if (!container) return;
+
+  if (!insights || insights.length === 0) {
+    container.innerHTML = `
+      <div style="background: rgba(0, 0, 0, 0.35); border-left: 4px solid #fbbf24; border-radius: 10px; padding: 12px 14px;">
+        <strong style="color: #ffffff; font-size: 0.88rem; display: block; margin-bottom: 4px;">✨ Rotina Familiar Ativa</strong>
+        <p style="font-size: 0.82rem; color: #cbd5e1; margin: 0; line-height: 1.4;">
+          Continue validando as tarefas dos heróis para gerar orientações personalizadas de reforço positivo!
+        </p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = insights
+    .map(
+      (item) => `
+      <div style="background: rgba(0, 0, 0, 0.4); border-left: 4px solid ${item.color || '#fbbf24'}; border-radius: 10px; padding: 12px 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px;">
+          <strong style="color: #ffffff; font-size: 0.88rem; display: flex; align-items: center; gap: 6px;">
+            <span>${item.icon}</span> ${item.title}
+          </strong>
+          <span style="font-size: 0.68rem; color: ${item.color || '#fbbf24'}; background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 6px; font-weight: 700; text-transform: uppercase;">
+            ${item.badge}
+          </span>
+        </div>
+        <p style="font-size: 0.82rem; color: #cbd5e1; margin: 0; line-height: 1.45;">
+          ${item.text}
+        </p>
+      </div>
+    `
+    )
+    .join('');
+}
+
+function renderTreasuryStatement(treasury) {
+  if (!treasury) return;
+
+  const updateText = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.innerText = val;
+  };
+
+  updateText('clan-dash-treasury-gold', `${treasury.totalGoldEarned} 🪙`);
+  updateText('clan-dash-treasury-tokens-earned', `${treasury.totalTokensEarned} 🏠`);
+  updateText('clan-dash-treasury-tokens-spent', `${treasury.totalTokensSpent} 🎁`);
+  updateText('clan-dash-treasury-tokens-balance', `${treasury.currentVaultTokens} 💎`);
+
+  const listContainer = document.getElementById('clan-dash-recent-redemptions-list');
+  if (!listContainer) return;
+
+  const redemptions = treasury.recentRedemptions || [];
+  if (redemptions.length === 0) {
+    listContainer.innerHTML = `
+      <div style="background: rgba(0, 0, 0, 0.25); border-radius: 8px; padding: 12px; text-align: center;">
+        <span style="font-size: 0.82rem; color: var(--text-muted);">
+          Nenhum vale foi resgatado ainda na Loja do Lar. Conforme os heróis trocarem Fichas do Lar, o extrato aparecerá aqui!
+        </span>
+      </div>
+    `;
+    return;
+  }
+
+  listContainer.innerHTML = redemptions
+    .map((r) => {
+      const statusLabel =
+        r.status === 'DELIVERED'
+          ? 'Entregue'
+          : r.status === 'APPROVED'
+          ? 'Aprovado'
+          : r.status === 'PENDING'
+          ? 'Aguardando Aprovação'
+          : 'Cancelado';
+
+      const statusColor =
+        r.status === 'DELIVERED'
+          ? '#4ade80'
+          : r.status === 'APPROVED'
+          ? '#60a5fa'
+          : r.status === 'PENDING'
+          ? '#fde047'
+          : '#ef4444';
+
+      const statusBg =
+        r.status === 'DELIVERED'
+          ? 'rgba(34, 197, 94, 0.15)'
+          : r.status === 'APPROVED'
+          ? 'rgba(59, 130, 246, 0.15)'
+          : r.status === 'PENDING'
+          ? 'rgba(245, 158, 11, 0.15)'
+          : 'rgba(239, 68, 68, 0.15)';
+
+      const dateFormatted = new Date(r.createdAt).toLocaleDateString('pt-BR');
+
+      return `
+        <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
+              ${r.rewardIcon}
+            </div>
+            <div>
+              <strong style="color: #ffffff; font-size: 0.88rem; display: block;">${r.rewardTitle}</strong>
+              <span style="font-size: 0.74rem; color: var(--text-muted);">${r.userName} • ${dateFormatted}</span>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="color: #fbbf24; font-weight: 700; font-size: 0.84rem;">${r.tokenCost} Fichas</span>
+            <span style="background: ${statusBg}; color: ${statusColor}; border: 1px solid ${statusColor}44; padding: 3px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 700;">
+              ${statusLabel}
+            </span>
+          </div>
+        </div>
+      `;
+    })
+    .join('');
+}
+
+function renderClanAchievements(achievements) {
+  const container = document.getElementById('clan-dash-achievements-grid');
+  if (!container) return;
+
+  if (!achievements || achievements.length === 0) {
+    container.innerHTML = `<p style="font-size: 0.85rem; color: var(--text-muted);">Carregando insígnias do clã...</p>`;
+    return;
+  }
+
+  container.innerHTML = achievements
+    .map((a) => {
+      const isUnlocked = a.unlocked;
+      const border = isUnlocked ? '1px solid rgba(212, 175, 55, 0.55)' : '1px solid rgba(255, 255, 255, 0.08)';
+      const bg = isUnlocked
+        ? 'linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(15, 23, 42, 0.85))'
+        : 'rgba(0, 0, 0, 0.35)';
+
+      return `
+        <div style="background: ${bg}; border: ${border}; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; position: relative;">
+          <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+            <div style="font-size: 1.8rem; background: rgba(0,0,0,0.5); border-radius: 12px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: 1px solid ${isUnlocked ? 'var(--gold)' : 'rgba(255,255,255,0.1)'};">
+              ${a.icon}
+            </div>
+            <div style="flex: 1;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong style="color: ${isUnlocked ? '#fde047' : '#ffffff'}; font-size: 0.92rem;">${a.title}</strong>
+                ${isUnlocked ? '<span style="color: #4ade80; font-size: 0.72rem; font-weight: 700;">✨ CONCLUÍDO</span>' : ''}
+              </div>
+              <p style="font-size: 0.76rem; color: var(--text-muted); margin: 3px 0 0 0; line-height: 1.35;">${a.description}</p>
+            </div>
+          </div>
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: #cbd5e1; margin-bottom: 4px;">
+              <span>Progresso do Clã</span>
+              <span style="font-weight: 700; color: ${isUnlocked ? '#fde047' : '#94a3b8'};">${a.current} / ${a.target}</span>
+            </div>
+            <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+              <div style="width: ${a.progressPercentage}%; height: 100%; background: ${isUnlocked ? 'linear-gradient(90deg, #d4af37, #fde047)' : '#3b82f6'}; border-radius: 3px; transition: width 0.4s ease;"></div>
+            </div>
+          </div>
+        </div>
+      `;
+    })
+    .join('');
 }
 
 
