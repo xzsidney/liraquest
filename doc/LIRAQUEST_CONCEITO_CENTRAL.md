@@ -139,8 +139,12 @@ O Arcade do Reino é o hub de lazer onde o Avatar gasta a **⚡ Energia de Avent
    - 👨‍👩‍👧‍👦 **Modo Família em Tempo Real (WebSockets / Socket.IO):** Pais e filhos entram no Saguão do Clã. A **Roleta da Sorte 🎰** gira e elege aleatoriamente um membro como o **🔦 Caçador da Lanterna** da rodada. Os outros viram os **👻 Camaleões**, que têm 10 segundos de escuridão para se esconder antes da caçada começar!
 2. 🏹 **O Arqueiro do Saber (Tiroteio de Conhecimento e Reflexo - ATIVO):** Jogo de precisão motora e agilidade mental em Canvas 2D nativo (ultra leve para a Hostinger). O herói dispara flechas de luz contra 4 alvos/balões rúnicos flutuantes correspondentes às alternativas de enigmas curriculares reais.
    - 🎒 **Calibração por Etapas de Ensino:** Permite escolher entre *Fundamental 1 (Primário)*, *Fundamental 2*, *Ensino Médio* e *Ensino Superior / Faculdade*.
-   - ⚡ **Economia e Atributos:** Consome 4 ⚡ Energia de Aventura, premia com Ouro 💰, XP ⭐ e bônus direto no atributo **Inteligência (INT)** do herói.
-   - ⚡ **Alvo Relâmpago de Reflexo:** Aparição periódica de um alvo dourado de alta velocidade para testar o tempo de reação e conceder bônus extras.
+   - 🎯 **3 Níveis de Dificuldade da Aljava:**
+     - 🟢 *Fácil (Iniciante):* Flechas ilimitadas (∞) para treinar sem pressão (1.0x recompensas).
+     - 🟡 *Médio (Aventureiro):* Aljava com 15 flechas para 10 perguntas (+25% de Ouro e XP).
+     - 🔴 *Difícil (Mestre Arqueiro):* Aljava com 12 flechas, alvos mais velozes e penalidade de -1 flecha extra por erro de resposta (+50% de Ouro e XP e bônus dobrado em INT).
+   - ⚡ **Economia e Atributos:** Consome 4 ⚡ Energia de Aventura, credita Ouro 💰 direto no Herói, XP ⭐ na classe ativa e bônus no atributo **Inteligência (INT)**.
+   - ⚡ **Alvo Relâmpago de Reflexo:** Aparição periódica de um alvo dourado de alta velocidade para testar o tempo de reação e conceder bônus extras (+250 pts).
 3. 📜 **Aventuras em Quest (Livro-Jogo 3 Escolhas):** Histórias ilustradas com caminhos ramificados baseadas nos atributos da ficha.
 4. ⚔️ **Arena de Batalha 2D:** Combates contra os Monstros da Casa.
 

@@ -161,6 +161,6 @@ Este documento cataloga todos os endpoints REST e eventos de WebSocket (Socket.I
 |:---|:---|:---|:---|
 | `GET` | `/api/quiz/questions/random` | Pública | Retorna perguntas aleatórias com suas 4 alternativas embaralhadas, filtradas por `stage` (`fundamental_1`, `fundamental_2`, `ensino_medio`, `superior`) e opcionalmente `discipline` |
 | `POST` | `/api/quiz/start` | JWT | Valida e debita 4 de Energia de Aventura (`adventure_energy`) para iniciar a sessão do Arqueiro do Saber |
-| `POST` | `/api/quiz/finish` | JWT | Registra desfecho da partida (`hits`, `misses`, `max_combo`, `score`), creditando Ouro Virtual e XP no `UserProgress` e aprimorando o atributo Inteligência (`INT`) do Personagem |
+| `POST` | `/api/quiz/finish` | JWT | Registra desfecho da partida (`hits`, `misses`, `max_combo`, `score`, `stage`, `difficulty`), creditando Ouro no Herói (`Character.gold`), XP na classe ativa (`CharacterClass.xp`), verificando Level Up e aprimorando o atributo Inteligência (`INT`) do Herói |
 
 

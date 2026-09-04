@@ -5,6 +5,7 @@ import {
   FamilyQuizOption,
   UserProgress,
   Character,
+  CharacterClass,
   CharacterAttribute,
   DefinitionAttribute,
 } from '../models/index.js';
@@ -105,7 +106,7 @@ export const startQuizSession = async (req, res) => {
       });
     }
 
-    // Se estiver sem energia em ambiente de teste/arcade, concede energia inicial para jogar
+    // Se estiver sem energia em ambiente de teste/arcade, concede bônus de boas-vindas para permitir jogar
     if ((progress.adventure_energy || 0) < ENERGY_COST) {
       await progress.increment('adventure_energy', { by: 12 });
       await progress.reload();
@@ -130,46 +131,86 @@ export const startQuizSession = async (req, res) => {
 
 /**
  * POST /api/quiz/finish
- * Finaliza a partida, credita Ouro, XP e aprimora o atributo INT do personagem
+ * Finaliza a partida, credita Ouro no Herói, XP na Classe Ativa e aprimora o atributo INT
  */
 export const finishQuizSession = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { hits = 0, misses = 0, max_combo = 0, score = 0, stage = 'fundamental_1' } = req.body;
+    const {
+      hits = 0,
+      misses = 0,
+      max_combo = 0,
+      score = 0,
+      stage = 'fundamental_1',
+      difficulty = 'facil',
+    } = req.body;
 
     const parsedHits = Math.max(0, parseInt(hits, 10) || 0);
     const parsedCombo = Math.max(0, parseInt(max_combo, 10) || 0);
 
-    // Multiplicador por nível escolar
+    // Multiplicador por etapa escolar
     const stageMultipliers = {
       fundamental_1: 1.0,
       fundamental_2: 1.2,
       ensino_medio: 1.4,
       superior: 1.6,
     };
-    const mult = stageMultipliers[stage] || 1.0;
+    const stageMult = stageMultipliers[stage] || 1.0;
+
+    // Multiplicador por dificuldade de pontaria
+    const diffMultipliers = {
+      facil: 1.0,
+      medio: 1.25,
+      dificil: 1.5,
+    };
+    const diffMult = diffMultipliers[difficulty] || 1.0;
+
+    const totalMult = stageMult * diffMult;
 
     // Cálculo das recompensas
-    const goldEarned = Math.round(Math.max(10, parsedHits * 4 + parsedCombo * 3) * mult);
-    const xpEarned = Math.round(Math.max(25, parsedHits * 7 + 20) * mult);
+    const goldEarned = Math.round(Math.max(10, parsedHits * 4 + parsedCombo * 3) * totalMult);
+    const xpEarned = Math.round(Math.max(25, parsedHits * 7 + 20) * totalMult);
 
-    let progress = await UserProgress.findOne({ where: { user_id: userId } });
-    if (!progress) {
-      progress = await UserProgress.create({
-        id: randomUUID().toLowerCase(),
-        user_id: userId,
+    // 1. Atualizar Ouro do Herói
+    let currentGold = 0;
+    const character = await Character.findOne({ where: { user_id: userId } });
+    if (character) {
+      await character.update({
+        gold: (character.gold || 0) + goldEarned,
       });
+      currentGold = character.gold;
     }
 
-    await progress.increment({
-      gold_virtual: goldEarned,
-      hero_xp: xpEarned,
-    });
-    await progress.reload();
+    // 2. Atualizar XP e Nível da Classe Ativa do Herói
+    let newLevel = 1;
+    let newXP = 0;
+    let leveledUp = false;
 
-    // Aprimoramento de Inteligência (INT) do Personagem
+    if (character && character.current_class_id) {
+      const classProgress = await CharacterClass.findOne({
+        where: { character_id: character.id, class_id: character.current_class_id },
+      });
+
+      if (classProgress) {
+        let currentXP = (classProgress.xp || 0) + xpEarned;
+        let currentLevel = classProgress.level || 1;
+        let reqXP = currentLevel * 100;
+
+        while (currentXP >= reqXP) {
+          currentXP -= reqXP;
+          currentLevel += 1;
+          leveledUp = true;
+          reqXP = currentLevel * 100;
+        }
+
+        await classProgress.update({ xp: currentXP, level: currentLevel });
+        newLevel = currentLevel;
+        newXP = currentXP;
+      }
+    }
+
+    // 3. Aprimoramento de Inteligência (INT) do Personagem
     let intBoosted = false;
-    const character = await Character.findOne({ where: { user_id: userId } });
     if (character && parsedHits >= 4) {
       const intAttrDef = await DefinitionAttribute.findOne({ where: { code: 'int' } });
       if (intAttrDef) {
@@ -184,10 +225,13 @@ export const finishQuizSession = async (req, res) => {
             bonus_value: 0,
           },
         });
-        await charAttr.increment('bonus_value', { by: 1 });
+        const bonusIncrement = difficulty === 'dificil' ? 2 : 1;
+        await charAttr.increment('bonus_value', { by: bonusIncrement });
         intBoosted = true;
       }
     }
+
+    const progress = await UserProgress.findOne({ where: { user_id: userId } });
 
     return res.json({
       success: true,
@@ -196,9 +240,11 @@ export const finishQuizSession = async (req, res) => {
         gold_earned: goldEarned,
         xp_earned: xpEarned,
         int_boosted: intBoosted,
-        current_gold: progress.gold_virtual,
-        current_xp: progress.hero_xp,
-        adventure_energy: progress.adventure_energy,
+        current_gold: currentGold,
+        current_xp: newXP,
+        current_level: newLevel,
+        leveled_up: leveledUp,
+        adventure_energy: progress ? progress.adventure_energy : 0,
       },
     });
   } catch (error) {

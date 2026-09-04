@@ -4135,7 +4135,14 @@
   </footer>
 
   <!-- Script Socket.IO e da Aplicação (com Cache-Busting Ativo) -->
+  <script>
+    function openArcherGameArena() {
+      try { localStorage.setItem('liraquest_avatar_tab', 'arcade'); } catch(e) {}
+      window.location.href = '/archer.html';
+    }
+    window.openArcherGameArena = openArcherGameArena;
+  </script>
   <script src="/socket.io/socket.io.js"></script>
-  <script src="/app.js?v=20260903_comparative"></script>
+  <script src="/app.js?v=20260903_archer_v3"></script>
 </body>
 </html>

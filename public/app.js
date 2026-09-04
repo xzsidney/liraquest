@@ -933,12 +933,17 @@ function loadArcadeHub() {
 }
 
 function openChameleonGameArena() {
+  try { localStorage.setItem('liraquest_avatar_tab', 'arcade'); } catch (e) {}
   window.location.href = '/game.html';
 }
 
 function openArcherGameArena() {
+  try { localStorage.setItem('liraquest_avatar_tab', 'arcade'); } catch (e) {}
   window.location.href = '/archer.html';
 }
+
+window.openChameleonGameArena = openChameleonGameArena;
+window.openArcherGameArena = openArcherGameArena;
 
 function closeChameleonGameArena() {
   if (chameleonGameInstance) {
@@ -1929,7 +1934,14 @@ async function loadAvatarTerminal() {
     // Renderizar Ficha Completa do Herói
     renderHeroHUD(char);
 
-    // Abrir aba padrão da ficha
+    // Restaurar aba se voltou do Arcade ou manter atual
+    const savedTab = localStorage.getItem('liraquest_avatar_tab');
+    if (savedTab) {
+      state.avatarActiveTab = savedTab;
+      localStorage.removeItem('liraquest_avatar_tab');
+    }
+
+    // Abrir aba ativa
     switchAvatarTab(state.avatarActiveTab || 'sheet');
   } catch (err) {
     console.error('Erro ao carregar terminal do avatar:', err);
