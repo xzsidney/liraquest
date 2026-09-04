@@ -620,43 +620,35 @@
       margin-bottom: 12px;
     }
 
-    /* Dado D20 Visual Animado */
+    /* Dado D20 Icosaedro Vetorial Autêntico */
     .d20-dice-wrapper {
       position: relative;
-      width: 110px;
-      height: 110px;
+      width: 130px;
+      height: 130px;
       margin: 10px 0;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .d20-canvas-icon {
-      font-size: 5rem;
-      filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.6));
+    .d20-svg {
+      width: 120px;
+      height: 120px;
+      display: block;
       transition: transform 0.1s linear;
+      filter: drop-shadow(0 0 16px rgba(212, 175, 55, 0.45));
     }
 
     .d20-rolling {
-      animation: rollD20 0.8s ease-out forwards;
+      animation: rollD20 0.85s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
     }
 
     @keyframes rollD20 {
-      0% { transform: rotate(0deg) scale(0.6); }
-      30% { transform: rotate(180deg) scale(1.2); }
-      60% { transform: rotate(360deg) scale(0.9); }
-      80% { transform: rotate(500deg) scale(1.1); }
+      0% { transform: rotate(0deg) scale(0.65); }
+      30% { transform: rotate(200deg) scale(1.2); }
+      60% { transform: rotate(400deg) scale(0.9); }
+      80% { transform: rotate(560deg) scale(1.1); }
       100% { transform: rotate(720deg) scale(1); }
-    }
-
-    .d20-number-display {
-      position: absolute;
-      font-family: 'Cinzel', serif;
-      font-size: 1.8rem;
-      font-weight: 900;
-      color: #050813;
-      text-shadow: 0 0 2px #ffffff;
-      pointer-events: none;
     }
 
     .d20-calc-row {
@@ -917,12 +909,59 @@
     <!-- MODAL DE ROLAGEM D20 -->
     <div class="d20-modal-overlay" id="d20-modal">
       <div class="d20-box">
-        <h3 class="d20-title" id="d20-action-title">🎲 Teste de Atributo</h3>
+        <h3 class="d20-title" id="d20-action-title">✨ Teste de Atributo</h3>
         
-        <!-- Dado Animado -->
+        <!-- Dado D20 Icosaedro Vetorial Autêntico -->
         <div class="d20-dice-wrapper">
-          <div class="d20-canvas-icon" id="d20-icon">🎲</div>
-          <span class="d20-number-display" id="d20-number">--</span>
+          <svg class="d20-svg" id="d20-svg" viewBox="0 0 120 120" width="120" height="120">
+            <defs>
+              <radialGradient id="d20-center-grad" cx="50%" cy="40%" r="60%">
+                <stop offset="0%" stop-color="#b91c1c" />
+                <stop offset="60%" stop-color="#800020" />
+                <stop offset="100%" stop-color="#4a0e17" />
+              </radialGradient>
+              <linearGradient id="d20-top-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#991b1b" />
+                <stop offset="100%" stop-color="#6b0f24" />
+              </linearGradient>
+              <linearGradient id="d20-dark-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#4a0e17" />
+                <stop offset="100%" stop-color="#2a060d" />
+              </linearGradient>
+              <linearGradient id="d20-med-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#7f1d1d" />
+                <stop offset="100%" stop-color="#450a0a" />
+              </linearGradient>
+            </defs>
+            
+            <g id="d20-facets">
+              <!-- 10 Facetas visíveis do Icosaedro D20 -->
+              <!-- Faceta Central (Triângulo voltado para frente onde fica o número) -->
+              <polygon id="d20-face-center" points="60,30 90,82 30,82" fill="url(#d20-center-grad)" stroke="#d4af37" stroke-width="1.8" stroke-linejoin="round" />
+              
+              <!-- Facetas Superiores -->
+              <polygon points="60,30 60,6 106,32" fill="url(#d20-top-grad)" stroke="#d4af37" stroke-width="1.4" stroke-linejoin="round" />
+              <polygon points="60,30 14,32 60,6" fill="url(#d20-med-grad)" stroke="#d4af37" stroke-width="1.4" stroke-linejoin="round" />
+              
+              <!-- Facetas Laterais Superiores -->
+              <polygon points="60,30 106,32 90,82" fill="url(#d20-top-grad)" stroke="#d4af37" stroke-width="1.4" stroke-linejoin="round" />
+              <polygon points="60,30 30,82 14,32" fill="url(#d20-dark-grad)" stroke="#d4af37" stroke-width="1.4" stroke-linejoin="round" />
+              
+              <!-- Facetas Laterais Inferiores -->
+              <polygon points="90,82 106,32 106,88" fill="url(#d20-dark-grad)" stroke="#d4af37" stroke-width="1.4" stroke-linejoin="round" />
+              <polygon points="30,82 14,88 14,32" fill="url(#d20-med-grad)" stroke="#d4af37" stroke-width="1.4" stroke-linejoin="round" />
+              
+              <!-- Facetas Inferiores -->
+              <polygon points="90,82 106,88 60,114" fill="url(#d20-dark-grad)" stroke="#d4af37" stroke-width="1.4" stroke-linejoin="round" />
+              <polygon points="30,82 60,114 14,88" fill="url(#d20-dark-grad)" stroke="#d4af37" stroke-width="1.4" stroke-linejoin="round" />
+              <polygon points="30,82 90,82 60,114" fill="url(#d20-med-grad)" stroke="#d4af37" stroke-width="1.4" stroke-linejoin="round" />
+            </g>
+
+            <!-- Número no Centro da Face Frontal do D20 -->
+            <text id="d20-number" x="60" y="67" text-anchor="middle" dominant-baseline="middle" font-family="'Cinzel', serif" font-weight="900" font-size="22" fill="#ffffff" stroke="#050813" stroke-width="0.7">
+              --
+            </text>
+          </svg>
         </div>
 
         <div class="d20-calc-row" id="d20-calc-row">
@@ -1353,24 +1392,37 @@
       const outcome = document.getElementById('d20-outcome');
       const btnContinue = document.getElementById('btn-d20-continue');
 
-      document.getElementById('d20-action-title').innerText = `🎲 ${action.title}`;
+      document.getElementById('d20-action-title').innerText = `✨ ${action.title}`;
       modal.style.display = 'flex';
       btnContinue.style.display = 'none';
 
+      const d20Svg = document.getElementById('d20-svg');
+      const d20FaceCenter = document.getElementById('d20-face-center');
+      if (d20FaceCenter) d20FaceCenter.setAttribute('fill', 'url(#d20-center-grad)');
+
       // Reset
-      numberDisp.innerText = '--';
-      calcRow.innerText = 'Rolando o dado d20...';
+      numberDisp.textContent = '--';
+      calcRow.innerText = 'Rolando o D20...';
       banner.innerText = '...';
       banner.className = 'd20-result-banner';
       outcome.innerText = 'Conjurando a sorte do herói...';
 
-      // Animação do dado
-      icon.classList.remove('d20-rolling');
-      void icon.offsetWidth; // trigger reflow
-      icon.classList.add('d20-rolling');
+      // Animação de rotação 3D do D20
+      if (d20Svg) {
+        d20Svg.classList.remove('d20-rolling');
+        void d20Svg.offsetWidth; // trigger reflow
+        d20Svg.classList.add('d20-rolling');
+      }
       playSound('dice');
 
+      // Números girando na face do D20 durante a rolagem
+      let shuffleInterval = setInterval(() => {
+        numberDisp.textContent = Math.floor(Math.random() * 20) + 1;
+      }, 70);
+
       setTimeout(() => {
+        clearInterval(shuffleInterval);
+
         // Cálculo da Rolagem
         const d20 = Math.floor(Math.random() * 20) + 1;
         const attrCode = action.attribute_code.toLowerCase();
@@ -1380,12 +1432,23 @@
         const total = d20 + mod;
         const dc = action.difficulty_dc || 12;
 
-        numberDisp.innerText = d20;
-        calcRow.innerHTML = `[Dado: <b>${d20}</b>] + [Bônus ${attrCode.toUpperCase()}: <b>${mod >= 0 ? '+' + mod : mod}</b>] = <b>${total}</b> vs CD ${dc}`;
+        numberDisp.textContent = d20;
+        calcRow.innerHTML = `[D20: <b>${d20}</b>] + [Bônus ${attrCode.toUpperCase()}: <b>${mod >= 0 ? '+' + mod : mod}</b>] = <b>${total}</b> vs CD ${dc}`;
 
         const isSuccess = (d20 === 20) || (d20 !== 1 && total >= dc);
         const isCritical = (d20 === 20);
         const isCriticalFail = (d20 === 1);
+
+        // Feedback visual de iluminação na face do D20
+        if (d20FaceCenter) {
+          if (isCritical) {
+            d20FaceCenter.setAttribute('fill', '#f59e0b');
+          } else if (isCriticalFail) {
+            d20FaceCenter.setAttribute('fill', '#ef4444');
+          } else {
+            d20FaceCenter.setAttribute('fill', 'url(#d20-center-grad)');
+          }
+        }
 
         if (isSuccess) {
           playSound('success');
