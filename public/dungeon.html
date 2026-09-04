@@ -417,14 +417,36 @@
       border-color: #4ade80;
     }
 
-    /* O Livro de Pergaminho */
+    /* O Livro de Pergaminho com Imersão Visual RPG */
     .parchment-book {
-      background: #0f1628 linear-gradient(145deg, rgba(26, 38, 66, 0.85) 0%, rgba(13, 20, 36, 0.95) 100%);
+      position: relative;
+      background-color: #0d1424;
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
       border: 2px solid var(--gold);
       border-radius: 18px;
       padding: 18px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 30px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.85), 0 0 20px rgba(212, 175, 55, 0.25), inset 0 0 35px rgba(0, 0, 0, 0.7);
+      overflow: hidden;
+      transition: background-image 0.5s ease-in-out;
+    }
+
+    /* Camada de Overlay escuro + vinheta para garantir contraste e leitura cristalina */
+    .parchment-book::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 30%, rgba(15, 23, 42, 0.82) 0%, rgba(7, 11, 20, 0.94) 100%);
+      backdrop-filter: blur(0.8px);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Garantir que todo o conteúdo interno fique nítido e acima da arte de fundo */
+    .parchment-book > * {
       position: relative;
+      z-index: 2;
     }
 
     @media (min-width: 640px) {
@@ -470,11 +492,12 @@
     }
 
     .scene-narrative-text {
-      font-size: 0.96rem;
-      color: #e2e8f0;
-      line-height: 1.65;
+      font-size: 0.98rem;
+      color: #f8fafc;
+      line-height: 1.7;
       margin-bottom: 16px;
       text-align: justify;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9), 0 0 10px rgba(0, 0, 0, 0.6);
     }
 
     /* Barra de Atributos do Herói na Masmorra */
@@ -482,8 +505,9 @@
       display: flex;
       gap: 6px;
       flex-wrap: wrap;
-      background: rgba(0, 0, 0, 0.45);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(10, 15, 30, 0.7);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(212, 175, 55, 0.3);
       border-radius: 10px;
       padding: 6px 10px;
       margin-bottom: 16px;
@@ -492,8 +516,8 @@
     }
 
     .stat-chip {
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid rgba(212, 175, 55, 0.3);
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(212, 175, 55, 0.35);
       padding: 2px 8px;
       border-radius: 6px;
       font-weight: 700;
@@ -513,8 +537,9 @@
     }
 
     .choice-card {
-      background: linear-gradient(90deg, rgba(30, 58, 138, 0.25) 0%, rgba(15, 23, 42, 0.85) 100%);
-      border: 1.5px solid rgba(59, 130, 246, 0.4);
+      background: linear-gradient(90deg, rgba(30, 58, 138, 0.45) 0%, rgba(15, 23, 42, 0.85) 100%);
+      backdrop-filter: blur(8px);
+      border: 1.5px solid rgba(59, 130, 246, 0.45);
       border-radius: 14px;
       padding: 12px 14px;
       display: flex;
@@ -523,12 +548,14 @@
       cursor: pointer;
       transition: all 0.2s ease;
       position: relative;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
     }
 
     .choice-card:hover {
-      background: linear-gradient(90deg, rgba(128, 0, 32, 0.4) 0%, rgba(30, 58, 138, 0.5) 100%);
+      background: linear-gradient(90deg, rgba(128, 0, 32, 0.55) 0%, rgba(30, 58, 138, 0.65) 100%);
       border-color: var(--gold);
       transform: translateX(4px);
+      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.3);
     }
 
     .choice-num {
@@ -1345,6 +1372,18 @@
       document.getElementById('scene-order-badge').innerText = scene.is_final_scene ? '👑 Desafio Final' : `Ato ${visitedStepsCount}`;
       document.getElementById('scene-title').innerText = scene.title;
       document.getElementById('scene-text').innerText = scene.narrative_text;
+
+      // Imagem de Fundo Temática da Masmorra
+      const bookCard = document.querySelector('.parchment-book');
+      if (bookCard && activeAdventure) {
+        const bgMap = {
+          'covil_goblin_poeira': '/assets/dungeons/covil_goblin_poeira.jpg',
+          'torre_devorador_paginas': '/assets/dungeons/torre_devorador_paginas.jpg',
+          'catacumbas_procrastinacao': '/assets/dungeons/catacumbas_procrastinacao.jpg',
+        };
+        const bgUrl = bgMap[activeAdventure.code] || '/assets/dungeons/covil_goblin_poeira.jpg';
+        bookCard.style.backgroundImage = `url('${bgUrl}')`;
+      }
 
       // 3 Escolhas
       const container = document.getElementById('choices-container');
