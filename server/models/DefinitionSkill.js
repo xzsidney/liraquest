@@ -71,6 +71,11 @@ DefinitionSkill.init(
       type: DataTypes.STRING(100),
       allowNull: true,
     },
+    animation_id: {
+      type: DataTypes.INTEGER,
+      defaultValue: 1,
+      allowNull: false,
+    },
   },
   {
     sequelize,

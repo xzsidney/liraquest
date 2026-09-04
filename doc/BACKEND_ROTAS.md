@@ -198,9 +198,9 @@ Endpoints do mini-game **Aventuras em Quest**, com carregamento de masmorras rel
 ---
 
 ## ⚔️ 13. Arena de Batalha 2D (Mini-Game Arcade RPG por Turnos)
-Rotas dedicadas ao Jogo 4 do Arcade (`/battle.html`): combate tático por turnos com sprites MUGEN clássicos (Capitão América vs Ciclope).
+Rotas dedicadas ao Jogo 4 do Arcade (`/battle.html`): combate tático por turnos com sprites MUGEN clássicos (Capitão América vs Ciclope), sincronização com a ficha de atributos do herói e baralho tático de 4 habilidades (1 Ataque Básico + 3 Habilidades Equipadas).
 
 | Método | Rota | Autenticação | Descrição |
 |:---|:---|:---|:---|
-| `POST` | `/api/battle/start` | JWT | Inicia a batalha 2D na Arena, consumindo 5 de Energia de Aventura do membro (`UserProgress.adventure_energy`), gerando a sessão e retornando os dados do lutador |
-| `POST` | `/api/battle/finish` | JWT | Registra o desfecho da batalha (`VICTORY` ou `DEFEAT`). Em caso de vitória, credita +50 de Ouro (`Character.gold`) e +80 de XP (`Character.current_xp`), processando subida de nível (`Character.level`) |
+| `POST` | `/api/battle/start` | JWT | Inicia a batalha 2D na Arena, consumindo 5 de Energia de Aventura (`UserProgress.adventure_energy`). Calcula estatísticas de combate a partir da ficha viva do Herói (CON, STR, INT, AGI, LUK, bônus de equipamentos), equipa até 3 habilidades adquiridas em `character_skills`, gera o deck tático com `animation_id` modular e calibra o adversário de acordo com o nível do herói. |
+| `POST` | `/api/battle/finish` | JWT | Registra o desfecho da batalha (`VICTORY` ou `DEFEAT`). Em caso de vitória, credita +50 de Ouro (`Character.gold`) e +80 de XP (`Character.current_xp`), processando subida de nível (`Character.level`). |

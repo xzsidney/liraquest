@@ -130,6 +130,7 @@ Habilidades e magias da Árvore de Talentos de cada classe (Tiers I, II e III).
 | `heal_amount` | `INT` | Não | Valor base de cura |
 | `effect_type` | `VARCHAR(50)` | Sim | Tipo de efeito (`SHIELD`, `MAGIC_DAMAGE`, `HEAL`, etc.) |
 | `icon` | `VARCHAR(100)` | Sim | Ícone de combate |
+| `animation_id` | `INT` | Não | ID da animação/efeito visual disparado na Arena 2D (ex: 1 = Arremesso, 2 = Feixe Laser, 3 = Gancho, 4 = Investida, 5 = Rasteira, 100 = Básico) |
 | `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
 
 ### 🗡️ `definition_items`

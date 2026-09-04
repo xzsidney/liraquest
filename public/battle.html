@@ -84,8 +84,9 @@
 
     .player-stats-bar {
       display: flex;
-      gap: 14px;
+      gap: 12px;
       align-items: center;
+      flex-wrap: wrap;
     }
 
     .stat-pill {
@@ -106,11 +107,11 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 16px 20px;
+      padding: 14px 20px;
       max-width: 1200px;
       width: 100%;
       margin: 0 auto;
-      gap: 16px;
+      gap: 14px;
     }
 
     /* ─── PAINEL DE COMBATE / HUD ──────────────────────────────────── */
@@ -254,7 +255,6 @@
       image-rendering: crisp-edges;
     }
 
-    /* OVERLAYS CINEMATOGRÁFICOS DO CANVAS */
     .hyper-flash-overlay {
       position: absolute;
       inset: 0;
@@ -295,7 +295,7 @@
       opacity: 1;
     }
 
-    /* ─── COMANDOS TÁTICOS (MENU DE TURNO) ─────────────────────────── */
+    /* ─── COMANDOS TÁTICOS (MENU DE TURNO MODULAR) ─────────────────── */
     .tactical-deck {
       width: 100%;
       background: rgba(15, 23, 42, 0.85);
@@ -312,6 +312,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
     .deck-title {
@@ -326,7 +328,7 @@
 
     .action-buttons-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
       gap: 10px;
     }
 
@@ -357,6 +359,10 @@
       opacity: 0.4;
       cursor: not-allowed;
       filter: grayscale(0.8);
+    }
+
+    .action-card-btn.basic-btn {
+      border-color: rgba(56, 189, 248, 0.5);
     }
 
     .action-card-btn.hyper-btn {
@@ -405,7 +411,7 @@
       border: 1px solid rgba(212, 175, 55, 0.2);
       border-radius: 12px;
       padding: 10px 14px;
-      max-height: 110px;
+      max-height: 105px;
       overflow-y: auto;
       font-size: 0.82rem;
       display: flex;
@@ -442,14 +448,14 @@
       background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(20, 10, 25, 0.95) 100%);
       border: 2px solid var(--accent-gold);
       border-radius: 20px;
-      padding: 28px;
-      max-width: 650px;
+      padding: 26px;
+      max-width: 680px;
       width: 100%;
       box-shadow: 0 16px 64px rgba(0, 0, 0, 0.9);
       text-align: center;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 18px;
       animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
@@ -458,6 +464,19 @@
       font-size: 1.6rem;
       color: var(--accent-gold-bright);
       font-weight: 900;
+    }
+
+    .char-sheet-summary-box {
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 12px;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
     .char-select-grid {
@@ -475,7 +494,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       transition: all 0.25s ease;
     }
 
@@ -487,15 +506,15 @@
     }
 
     .char-card-avatar {
-      width: 80px;
-      height: 80px;
+      width: 72px;
+      height: 72px;
       border-radius: 16px;
       border: 2px solid var(--accent-gold);
       background: #0b1120;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2.6rem;
+      font-size: 2.4rem;
     }
 
     .btn-main {
@@ -504,7 +523,7 @@
       border: 1.5px solid var(--accent-gold);
       padding: 14px 28px;
       border-radius: 12px;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 800;
       cursor: pointer;
       transition: all 0.2s;
@@ -527,12 +546,8 @@
       to { opacity: 1; transform: scale(1); }
     }
 
-    /* RESPONSIVIDADE */
     @media (max-width: 768px) {
-      .battle-hud {
-        grid-template-columns: 1fr;
-        gap: 10px;
-      }
+      .battle-hud { grid-template-columns: 1fr; gap: 10px; }
       .vs-center-badge { display: none; }
       .char-select-grid { grid-template-columns: 1fr; }
       .action-buttons-grid { grid-template-columns: repeat(2, 1fr); }
@@ -547,6 +562,9 @@
       <span>⬅️</span> Voltar ao Arcade
     </button>
     <div class="player-stats-bar">
+      <div class="stat-pill" style="color: #60a5fa;" id="player-sheet-badge">
+        <span>🛡️ Herói:</span> <span id="header-hero-name">Carregando...</span> (Nv. <span id="header-hero-level">1</span>)
+      </div>
       <div class="stat-pill" style="color: #fbbf24;">
         <span>⚡ Energia:</span> <span id="player-energy-display">15</span>
       </div>
@@ -577,7 +595,7 @@
         <div class="meter-container">
           <div class="meter-label">
             <span style="color: #4ade80;">HP (Vida)</span>
-            <span id="player-hp-text">350 / 350</span>
+            <span id="player-hp-text">380 / 380</span>
           </div>
           <div class="meter-track">
             <div class="meter-fill fill-hp" id="player-hp-bar" style="width: 100%;"></div>
@@ -679,11 +697,11 @@
       <div class="hyper-title-banner" id="hyper-title-banner">FINAL JUSTICE!</div>
     </div>
 
-    <!-- COMANDOS TÁTICOS (DECK DE AÇÕES) -->
+    <!-- COMANDOS TÁTICOS (DECK DINÂMICO DE 4 SLOTS + DEFESA/POÇÃO) -->
     <section class="tactical-deck">
       <div class="deck-header">
         <div class="deck-title">
-          <span>⚔️</span> Comandos Táticos de Combate por Turno
+          <span>⚔️</span> Deck de Combate (1 Ataque Básico + 3 Habilidades da Ficha)
         </div>
         <div style="font-size: 0.8rem; color: var(--accent-gold);" id="deck-status-hint">
           Selecione uma ação para executar o turno:
@@ -691,23 +709,35 @@
       </div>
 
       <div class="action-buttons-grid" id="action-buttons-grid">
-        <!-- Preenchido dinamicamente de acordo com o personagem escolhido -->
+        <!-- Preenchido dinamicamente com base nas habilidades da ficha -->
       </div>
     </section>
 
     <!-- LOG DE COMBATE -->
     <div class="battle-log-card" id="battle-log">
-      <div class="log-item">⚔️ A Arena de Batalha 2D está pronta! Escolha sua estratégia no seu turno.</div>
+      <div class="log-item">⚔️ A Arena de Batalha 2D está pronta! Habilidades carregadas da ficha do herói.</div>
     </div>
 
   </main>
 
-  <!-- MODAL DE SELEÇÃO DE PERSONAGEM -->
+  <!-- MODAL DE SELEÇÃO DE CAMPEÃO -->
   <div class="modal-backdrop" id="char-select-modal">
     <div class="modal-box">
       <div class="modal-title">ESCOLHA SEU CAMPEÃO</div>
-      <p style="font-size: 0.9rem; color: var(--text-muted);">
-        Selecione o lutador que você comandará na Arena 2D (Custo: 5 ⚡ Energia):
+      
+      <!-- RESUMO DA FICHA DO HERÓI -->
+      <div class="char-sheet-summary-box">
+        <div>
+          <span style="color: #60a5fa; font-weight: 800;">Herói:</span> <b id="modal-hero-name">Carregando...</b>
+          <span style="color: var(--accent-gold); font-weight: 700; margin-left: 6px;">(Nível <span id="modal-hero-level">1</span>)</span>
+        </div>
+        <div id="modal-hero-attrs" style="color: var(--text-muted);">
+          FOR: 10 | CON: 10 | INT: 10 | AGI: 10 | SOR: 10
+        </div>
+      </div>
+
+      <p style="font-size: 0.88rem; color: var(--text-muted);">
+        Escolha qual guerreiro representará sua ficha no combate (Custo: 5 ⚡ Energia):
       </p>
 
       <div class="char-select-grid">
@@ -715,9 +745,9 @@
         <div class="char-card selected" id="card-pick-cap" onclick="selectChampion('cap')">
           <div class="char-card-avatar">🛡️</div>
           <h3 style="color: #fff; font-size: 1.1rem;">Capitão América</h3>
-          <span style="font-size: 0.75rem; color: #38bdf8; font-weight: 700;">Tanque & Vanguarda</span>
+          <span style="font-size: 0.75rem; color: #38bdf8; font-weight: 700;">Vanguarda & Tanque</span>
           <p style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.3;">
-            Escudo de Vibranium, defesa blindada, arremesso perfurante e investidas supersônicas.
+            Escala com sua <b>FORÇA</b> e <b>CONSTITUIÇÃO</b>. Defesa com escudo, projétil que vai e volta e investidas.
           </p>
         </div>
 
@@ -727,7 +757,7 @@
           <h3 style="color: #fff; font-size: 1.1rem;">Ciclope</h3>
           <span style="font-size: 0.75rem; color: #f59e0b; font-weight: 700;">Artilharia Óptica</span>
           <p style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.3;">
-            Disparos de feixes de plasma, controle de campo à distância e o destrutivo Mega Optic Blast.
+            Escala com sua <b>INTELIGÊNCIA</b> e <b>AGILIDADE</b>. Rajadas ópticas, feixes de laser contínuos e plasma.
           </p>
         </div>
       </div>
@@ -788,7 +818,7 @@
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(140, this.ctx.currentTime);
+        osc.frequency.setValueAtTime(150, this.ctx.currentTime);
         osc.frequency.exponentialRampToValueAtTime(30, this.ctx.currentTime + 0.15);
         gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
@@ -804,14 +834,14 @@
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(800, this.ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(120, this.ctx.currentTime + 0.3);
+        osc.frequency.setValueAtTime(850, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(120, this.ctx.currentTime + 0.35);
         gain.gain.setValueAtTime(0.35, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.35);
         osc.connect(gain);
         gain.connect(this.ctx.destination);
         osc.start();
-        osc.stop(this.ctx.currentTime + 0.3);
+        osc.stop(this.ctx.currentTime + 0.35);
       }
       playShieldClang() {
         if (!this.enabled) return;
@@ -856,49 +886,22 @@
     // ─── CONFIGURAÇÕES E ESTADO DO JOGO ────────────────────────────────
     let selectedPlayerChamp = 'cap'; // 'cap' ou 'cyclops'
     let selectedOpponentChamp = 'cyclops';
+    let loadedCharacterSheet = null;
 
-    const FIGHTER_DEFINITIONS = {
+    const FIGHTER_METADATA = {
       cap: {
         name: 'Capitão América',
         role: 'Vanguarda & Tanque',
         icon: '🛡️',
         assetDir: '/assets/characters/cap/',
-        maxHp: 380,
-        maxMp: 100,
-        atkPower: 45,
-        defense: 25,
-        speed: 14,
         scale: 2.2,
-        actions: [
-          { id: 'attack', name: 'Golpe Físico', cost: 0, mpGain: 15, furyGain: 12, desc: 'Combo de socos diretos. Gera +15 MP.', power: 1.0 },
-          { id: 'shield_slash', name: 'Shield Slash', cost: 15, furyGain: 18, desc: 'Arremesso perfurante de escudo que ignora 30% da armadura.', power: 1.5, projectile: true },
-          { id: 'stars_stripes', name: 'Stars & Stripes', cost: 25, furyGain: 22, desc: 'Gancho aéreo ascendente com 45% de chance de atordoar (Stun).', power: 1.9, stunChance: 0.45 },
-          { id: 'charging_star', name: 'Charging Star', cost: 35, furyGain: 25, desc: 'Investida com escudo de energia. Causa alto dano e concede guarda.', power: 2.3, grantShield: 0.3 },
-          { id: 'hyper', name: 'FINAL JUSTICE', cost: 0, furyCost: 100, desc: 'GOLPE SUPREMO! Investida cinematográfica de energia cósmica.', power: 3.8, isHyper: true },
-          { id: 'guard', name: 'Defender', cost: 0, mpGain: 20, furyGain: 15, desc: 'Entra em guarda com o vibranium. Reduz 50% do próximo dano.', isGuard: true },
-          { id: 'item', name: 'Poção de HP', cost: 0, desc: 'Cura 70 pontos de vida da mochila familiar.', isPotion: true, uses: 2 }
-        ]
       },
       cyclops: {
         name: 'Ciclope',
         role: 'Mestre Óptico',
         icon: '🔴',
         assetDir: '/assets/characters/cyclops/',
-        maxHp: 340,
-        maxMp: 100,
-        atkPower: 52,
-        defense: 18,
-        speed: 16,
         scale: 2.2,
-        actions: [
-          { id: 'attack', name: 'Cyclone Kick', cost: 0, mpGain: 15, furyGain: 12, desc: 'Chute acrobático giratório. Gera +15 MP.', power: 1.0 },
-          { id: 'optic_blast', name: 'Optic Blast', cost: 15, furyGain: 18, desc: 'Disparo concentrado de feixe laser pelo visor em linha reta.', power: 1.55, beam: true },
-          { id: 'optic_sweep', name: 'Optic Sweep', cost: 25, furyGain: 22, desc: 'Varredura óptica rasteira que atrasa a iniciativa do adversário.', power: 1.8, delayAtb: 40 },
-          { id: 'gene_splice', name: 'Gene Splice', cost: 35, furyGain: 25, desc: 'Gancho ascendente envolto em plasma vermelho com alta chance crítica.', power: 2.4, critBonus: 0.35 },
-          { id: 'hyper', name: 'MEGA OPTIC BLAST', cost: 0, furyCost: 100, desc: 'GOLPE SUPREMO! Canhão colossal de plasma que vaporiza o campo.', power: 4.0, isHyper: true },
-          { id: 'guard', name: 'Defender', cost: 0, mpGain: 20, furyGain: 15, desc: 'Bloqueio tático com antebraços. Reduz 40% de dano e gera 20 MP.', isGuard: true },
-          { id: 'item', name: 'Poção de HP', cost: 0, desc: 'Cura 70 pontos de vida da mochila familiar.', isPotion: true, uses: 2 }
-        ]
       }
     };
 
@@ -934,38 +937,52 @@
       turnsCount: 1,
       shakeDuration: 0,
       shakeMagnitude: 0,
+      actionDeck: [],
       player: {
         champKey: 'cap',
+        homeX: 240,
+        x: 240,
+        y: 430,
         hp: 380,
         maxHp: 380,
         mp: 100,
         maxMp: 100,
+        atkPhys: 45,
+        atkMagic: 40,
+        defense: 25,
+        speed: 14,
+        critChance: 0.1,
         fury: 0,
         isGuarding: false,
         potionUses: 2,
         isStunned: false,
-        x: 240,
-        y: 430,
         currentAnim: 'idle',
         frameIndex: 0,
         lastFrameTime: 0,
-        activeProjectile: null
+        activeProjectile: null,
+        activeBeam: null
       },
       opponent: {
         champKey: 'cyclops',
-        hp: 340,
-        maxHp: 340,
+        homeX: 720,
+        x: 720,
+        y: 430,
+        hp: 350,
+        maxHp: 350,
         mp: 100,
         maxMp: 100,
+        atkPhys: 42,
+        atkMagic: 48,
+        defense: 20,
+        speed: 14,
         fury: 0,
         isGuarding: false,
         potionUses: 2,
         isStunned: false,
-        x: 720,
-        y: 430,
         currentAnim: 'idle',
         frameIndex: 0,
         lastFrameTime: 0,
+        activeProjectile: null,
         activeBeam: null
       },
       floatingNumbers: [],
@@ -984,8 +1001,9 @@
     async function confirmChampionAndStart() {
       document.getElementById('char-select-modal').style.display = 'none';
 
-      // Chamar backend para iniciar run de batalha (-5 energia)
+      let battleData = null;
       const token = localStorage.getItem('liraquest_token');
+
       if (token) {
         try {
           const res = await fetch('/api/battle/start', {
@@ -1000,78 +1018,131 @@
               energy_cost: 5
             })
           });
-          const data = await res.json();
-          if (data.success && data.energy_remaining !== undefined) {
-            document.getElementById('player-energy-display').innerText = data.energy_remaining;
+          battleData = await res.json();
+          if (battleData.success && battleData.energy_remaining !== undefined) {
+            document.getElementById('player-energy-display').innerText = battleData.energy_remaining;
           }
         } catch (err) {
           console.warn('Iniciando em modo offline / arcade autônomo:', err);
         }
       }
 
-      initBattleMatch(selectedPlayerChamp, selectedOpponentChamp);
+      initBattleMatch(selectedPlayerChamp, selectedOpponentChamp, battleData);
     }
 
-    function initBattleMatch(pChampKey, oChampKey) {
-      const pDef = FIGHTER_DEFINITIONS[pChampKey];
-      const oDef = FIGHTER_DEFINITIONS[oChampKey];
+    function initBattleMatch(pChampKey, oChampKey, backendData) {
+      const pMeta = FIGHTER_METADATA[pChampKey];
+      const oMeta = FIGHTER_METADATA[oChampKey];
+
+      // Valores calculados da ficha ou fallback
+      const pStats = backendData?.player_battle_stats || {
+        max_hp: 380,
+        max_mp: 100,
+        atk_phys: 45,
+        atk_magic: 40,
+        defense: 25,
+        speed_atb: 14,
+        crit_chance: 0.12
+      };
+
+      const oStats = backendData?.opponent_battle_stats || {
+        max_hp: 350,
+        max_mp: 100,
+        atk_phys: 42,
+        atk_magic: 46,
+        defense: 20,
+        speed_atb: 14
+      };
 
       state.player.champKey = pChampKey;
-      state.player.hp = pDef.maxHp;
-      state.player.maxHp = pDef.maxHp;
-      state.player.mp = pDef.maxMp;
-      state.player.maxMp = pDef.maxMp;
+      state.player.x = state.player.homeX = 240;
+      state.player.y = 430;
+      state.player.hp = state.player.maxHp = pStats.max_hp;
+      state.player.mp = state.player.maxMp = pStats.max_mp;
+      state.player.atkPhys = pStats.atk_phys;
+      state.player.atkMagic = pStats.atk_magic;
+      state.player.defense = pStats.defense;
+      state.player.speed = pStats.speed_atb;
+      state.player.critChance = pStats.crit_chance;
       state.player.fury = 0;
       state.player.isGuarding = false;
       state.player.isStunned = false;
       state.player.potionUses = 2;
       state.player.currentAnim = 'idle';
       state.player.frameIndex = 0;
+      state.player.activeProjectile = null;
+      state.player.activeBeam = null;
 
       state.opponent.champKey = oChampKey;
-      state.opponent.hp = oDef.maxHp;
-      state.opponent.maxHp = oDef.maxHp;
-      state.opponent.mp = oDef.maxMp;
-      state.opponent.maxMp = oDef.maxMp;
+      state.opponent.x = state.opponent.homeX = 720;
+      state.opponent.y = 430;
+      state.opponent.hp = state.opponent.maxHp = oStats.max_hp;
+      state.opponent.mp = state.opponent.maxMp = oStats.max_mp;
+      state.opponent.atkPhys = oStats.atk_phys;
+      state.opponent.atkMagic = oStats.atk_magic;
+      state.opponent.defense = oStats.defense;
+      state.opponent.speed = oStats.speed_atb;
       state.opponent.fury = 0;
       state.opponent.isGuarding = false;
       state.opponent.isStunned = false;
       state.opponent.potionUses = 2;
       state.opponent.currentAnim = 'idle';
       state.opponent.frameIndex = 0;
+      state.opponent.activeProjectile = null;
+      state.opponent.activeBeam = null;
 
       state.turn = 'player';
       state.turnsCount = 1;
       state.floatingNumbers = [];
       state.particles = [];
 
-      // Atualizar Nomes e Badges no HUD
-      document.getElementById('player-name').innerText = pDef.name;
-      document.getElementById('player-portrait').innerText = pDef.icon;
-      document.getElementById('player-role-badge').innerText = pDef.role;
+      // Deck vindo do banco ou padrão
+      if (backendData?.action_deck && backendData.action_deck.length > 0) {
+        state.actionDeck = backendData.action_deck;
+      } else {
+        // Fallback default deck
+        state.actionDeck = [
+          { id: 'basic_attack', name: pChampKey === 'cap' ? 'Soco Direto' : 'Cyclone Kick', cost: 0, mp_gain: 15, fury_gain: 12, damage_multiplier: 1.0, animation_id: 100, desc: 'Ataque básico físico. Gera +15 MP.' },
+          { id: 'skill_1', name: pChampKey === 'cap' ? 'Shield Slash' : 'Optic Blast', cost: 15, damage_multiplier: 1.5, animation_id: pChampKey === 'cap' ? 1 : 2, desc: 'Ataque de energia/projétil perfurante.' },
+          { id: 'skill_2', name: pChampKey === 'cap' ? 'Stars & Stripes' : 'Optic Sweep', cost: 25, damage_multiplier: 1.9, animation_id: pChampKey === 'cap' ? 3 : 5, desc: 'Gancho ascendente ou varredura de chão.' },
+          { id: 'skill_3', name: pChampKey === 'cap' ? 'Charging Star' : 'Gene Splice', cost: 35, damage_multiplier: 2.3, animation_id: pChampKey === 'cap' ? 4 : 3, desc: 'Golpe devastador com alta potência.' }
+        ];
+      }
 
-      document.getElementById('opponent-name').innerText = oDef.name;
-      document.getElementById('opponent-portrait').innerText = oDef.icon;
-      document.getElementById('opponent-role-badge').innerText = oDef.role;
+      // Adicionar Hyper, Defesa e Poção
+      state.actionDeck.push(
+        { id: 'hyper', name: pChampKey === 'cap' ? 'FINAL JUSTICE' : 'MEGA OPTIC BLAST', cost: 0, isHyper: true, furyCost: 100, damage_multiplier: 3.8, animation_id: 600, desc: 'GOLPE SUPREMO! Consome 100% de Fúria com cinematic de tela inteira.' },
+        { id: 'guard', name: 'Defender', cost: 0, isGuard: true, mp_gain: 20, fury_gain: 15, desc: 'Assume guarda fechada. Reduz 50% de dano e gera +20 MP.' },
+        { id: 'item', name: 'Poção de HP', cost: 0, isPotion: true, desc: 'Cura 70 pontos de vida da mochila familiar (2 usos).' }
+      );
+
+      // Nomes e Badges no HUD
+      document.getElementById('player-name').innerText = backendData?.character?.name || pMeta.name;
+      document.getElementById('player-portrait').innerText = pMeta.icon;
+      document.getElementById('player-role-badge').innerText = `${pMeta.name} • ${pMeta.role}`;
+
+      document.getElementById('opponent-name').innerText = oMeta.name;
+      document.getElementById('opponent-portrait').innerText = oMeta.icon;
+      document.getElementById('opponent-role-badge').innerText = oMeta.role;
 
       updateHudDisplay();
       renderActionDeck();
-      addLog(`⚔️ O duelo começou! ${pDef.name} vs ${oDef.name}!`, 'hyper-log');
+      addLog(`⚔️ O combate começou! ${document.getElementById('player-name').innerText} (${pMeta.name}) vs ${oMeta.name}!`, 'hyper-log');
     }
 
     function renderActionDeck() {
-      const pDef = FIGHTER_DEFINITIONS[state.player.champKey];
       const container = document.getElementById('action-buttons-grid');
       container.innerHTML = '';
 
-      pDef.actions.forEach(action => {
+      state.actionDeck.forEach(action => {
         const btn = document.createElement('button');
-        btn.className = `action-card-btn ${action.isHyper ? 'hyper-btn' : ''}`;
+        const isBasic = action.animation_id === 100;
+        btn.className = `action-card-btn ${action.isHyper ? 'hyper-btn' : ''} ${isBasic ? 'basic-btn' : ''}`;
         btn.id = `btn-action-${action.id}`;
 
         let costLabel = '';
         if (action.cost > 0) costLabel = `${action.cost} MP`;
-        else if (action.furyCost) costLabel = '100% FÚRIA';
+        else if (action.isHyper) costLabel = '100% FÚRIA';
         else if (action.isPotion) costLabel = `${state.player.potionUses}x`;
         else costLabel = '0 MP';
 
@@ -1092,9 +1163,8 @@
 
     function refreshActionButtonsAvailability() {
       const isPlayerTurn = state.turn === 'player';
-      const pDef = FIGHTER_DEFINITIONS[state.player.champKey];
 
-      pDef.actions.forEach(act => {
+      state.actionDeck.forEach(act => {
         const btn = document.getElementById(`btn-action-${act.id}`);
         if (!btn) return;
 
@@ -1157,8 +1227,8 @@
 
       // Consumo de recursos
       if (action.cost) state.player.mp -= action.cost;
-      if (action.mpGain) state.player.mp = Math.min(state.player.maxMp, state.player.mp + action.mpGain);
-      if (action.furyGain) state.player.fury = Math.min(100, state.player.fury + action.furyGain);
+      if (action.mp_gain) state.player.mp = Math.min(state.player.maxMp, state.player.mp + action.mp_gain);
+      if (action.fury_gain) state.player.fury = Math.min(100, state.player.fury + action.fury_gain);
       if (action.isHyper) state.player.fury = 0;
 
       updateHudDisplay();
@@ -1169,7 +1239,7 @@
         const heal = 70;
         state.player.hp = Math.min(state.player.maxHp, state.player.hp + heal);
         spawnFloatingNumber(state.player.x, state.player.y - 120, `+${heal} HP`, '#4ade80');
-        addLog(`🧪 ${FIGHTER_DEFINITIONS[state.player.champKey].name} usou uma Poção de Cura (+${heal} HP)!`, 'player-hit');
+        addLog(`🧪 ${document.getElementById('player-name').innerText} usou uma Poção de Cura (+${heal} HP)!`, 'player-hit');
         updateHudDisplay();
         renderActionDeck();
         await wait(800);
@@ -1183,14 +1253,14 @@
         setFighterAnim(state.player, 'guard');
         sound.playShieldClang();
         spawnFloatingNumber(state.player.x, state.player.y - 120, 'GUARDA ATIVA!', '#38bdf8');
-        addLog(`🛡️ ${FIGHTER_DEFINITIONS[state.player.champKey].name} assumiu postura defensiva blindada!`, 'player-hit');
+        addLog(`🛡️ ${document.getElementById('player-name').innerText} assumiu postura defensiva blindada!`, 'player-hit');
         await wait(800);
         setFighterAnim(state.player, 'idle');
         endPlayerTurn();
         return;
       }
 
-      // Golpe com Animação e Efeitos
+      // Golpe com Animação Modular e Efeitos
       await performAttackAnimation(state.player, state.opponent, action, true);
 
       // Verificar Vitória
@@ -1205,44 +1275,41 @@
     function endPlayerTurn() {
       state.turn = 'opponent';
       refreshActionButtonsAvailability();
-
-      // Turno da CPU (com inteligência tática)
       setTimeout(executeOpponentTurn, 900);
     }
 
     async function executeOpponentTurn() {
       if (state.turn !== 'opponent' || state.opponent.hp <= 0) return;
 
-      const oDef = FIGHTER_DEFINITIONS[state.opponent.champKey];
+      const oMeta = FIGHTER_METADATA[state.opponent.champKey];
 
       // Se estiver atordoado
       if (state.opponent.isStunned) {
         state.opponent.isStunned = false;
-        addLog(`💫 ${oDef.name} está atordoado e perdeu este turno!`, 'opponent-hit');
+        addLog(`💫 ${oMeta.name} está atordoado e perdeu este turno!`, 'opponent-hit');
         spawnFloatingNumber(state.opponent.x, state.opponent.y - 120, 'ATORDOADO!', '#fbbf24');
         await wait(800);
         startPlayerTurn();
         return;
       }
 
-      // Escolha de Ação da CPU
-      let chosenAction = oDef.actions[0]; // Ataque físico padrão
+      // Escolha Tática de Ação da CPU
+      let chosenAction = { id: 'basic_attack', name: state.opponent.champKey === 'cap' ? 'Soco Direto' : 'Cyclone Kick', cost: 0, mp_gain: 15, fury_gain: 12, damage_multiplier: 1.0, animation_id: 100 };
       if (state.opponent.fury >= 100) {
-        chosenAction = oDef.actions.find(a => a.isHyper) || chosenAction;
+        chosenAction = { id: 'hyper', name: state.opponent.champKey === 'cap' ? 'FINAL JUSTICE' : 'MEGA OPTIC BLAST', cost: 0, isHyper: true, furyCost: 100, damage_multiplier: 3.8, animation_id: 600 };
       } else if (state.opponent.hp < 120 && state.opponent.potionUses > 0) {
-        chosenAction = oDef.actions.find(a => a.isPotion) || chosenAction;
+        chosenAction = { id: 'item', isPotion: true };
       } else if (state.opponent.mp >= 35 && Math.random() < 0.45) {
-        chosenAction = oDef.actions[3]; // Habilidade 3
+        chosenAction = { id: 'skill_3', name: state.opponent.champKey === 'cap' ? 'Charging Star' : 'Gene Splice', cost: 35, damage_multiplier: 2.3, animation_id: state.opponent.champKey === 'cap' ? 4 : 3 };
       } else if (state.opponent.mp >= 25 && Math.random() < 0.5) {
-        chosenAction = oDef.actions[2]; // Habilidade 2
+        chosenAction = { id: 'skill_2', name: state.opponent.champKey === 'cap' ? 'Stars & Stripes' : 'Optic Sweep', cost: 25, damage_multiplier: 1.9, animation_id: state.opponent.champKey === 'cap' ? 3 : 5 };
       } else if (state.opponent.mp >= 15) {
-        chosenAction = oDef.actions[1]; // Habilidade 1
+        chosenAction = { id: 'skill_1', name: state.opponent.champKey === 'cap' ? 'Shield Slash' : 'Optic Blast', cost: 15, damage_multiplier: 1.5, animation_id: state.opponent.champKey === 'cap' ? 1 : 2 };
       }
 
-      // Consumo de recursos da CPU
       if (chosenAction.cost) state.opponent.mp -= chosenAction.cost;
-      if (chosenAction.mpGain) state.opponent.mp = Math.min(state.opponent.maxMp, state.opponent.mp + chosenAction.mpGain);
-      if (chosenAction.furyGain) state.opponent.fury = Math.min(100, state.opponent.fury + chosenAction.furyGain);
+      if (chosenAction.mp_gain) state.opponent.mp = Math.min(state.opponent.maxMp, state.opponent.mp + chosenAction.mp_gain);
+      if (chosenAction.fury_gain) state.opponent.fury = Math.min(100, state.opponent.fury + chosenAction.fury_gain);
       if (chosenAction.isHyper) state.opponent.fury = 0;
 
       updateHudDisplay();
@@ -1252,27 +1319,15 @@
         const heal = 70;
         state.opponent.hp = Math.min(state.opponent.maxHp, state.opponent.hp + heal);
         spawnFloatingNumber(state.opponent.x, state.opponent.y - 120, `+${heal} HP`, '#4ade80');
-        addLog(`🧪 ${oDef.name} recuperou +${heal} HP com poção!`, 'opponent-hit');
+        addLog(`🧪 ${oMeta.name} recuperou +${heal} HP com poção!`, 'opponent-hit');
         updateHudDisplay();
         await wait(800);
         startPlayerTurn();
         return;
       }
 
-      if (chosenAction.isGuard) {
-        state.opponent.isGuarding = true;
-        setFighterAnim(state.opponent, 'guard');
-        sound.playShieldClang();
-        addLog(`🛡️ ${oDef.name} se defendeu!`, 'opponent-hit');
-        await wait(800);
-        setFighterAnim(state.opponent, 'idle');
-        startPlayerTurn();
-        return;
-      }
-
       await performAttackAnimation(state.opponent, state.player, chosenAction, false);
 
-      // Verificar Derrota
       if (state.player.hp <= 0) {
         handleBattleEnd('DEFEAT');
         return;
@@ -1284,14 +1339,37 @@
     function startPlayerTurn() {
       state.turnsCount++;
       state.turn = 'player';
-      state.player.isGuarding = false; // Guarda reseta ao iniciar o turno
+      state.player.isGuarding = false;
       refreshActionButtonsAvailability();
+    }
+
+    // ─── MAPEAMENTO MODULAR DE ANIMAÇÃO POR ANIMATION_ID ──────────────
+    function resolveAnimationKey(champKey, animId) {
+      switch (animId) {
+        case 1: // Projétil de Arremesso
+          return champKey === 'cap' ? 'shield_slash' : 'optic_blast';
+        case 2: // Feixe Laser Horizontal
+          return champKey === 'cyclops' ? 'optic_blast' : 'shield_slash';
+        case 3: // Gancho Aéreo Ascendente
+          return champKey === 'cap' ? 'stars_stripes' : 'gene_splice';
+        case 4: // Investida / Dash com Escudo
+          return champKey === 'cap' ? 'charging_star' : 'gene_splice';
+        case 5: // Varredura de Solo
+          return champKey === 'cyclops' ? 'optic_sweep' : 'shield_slash';
+        case 100: // Ataque Básico Físico (Soco/Chute)
+          return 'attack';
+        case 600: // Hyper / Golpe Supremo
+          return 'hyper';
+        default:
+          return 'attack';
+      }
     }
 
     // ─── EXECUÇÃO DE ANIMAÇÕES DE ATAQUE & DANO ─────────────────────
     async function performAttackAnimation(attacker, target, action, isPlayer) {
-      const attDef = FIGHTER_DEFINITIONS[attacker.champKey];
-      const tarDef = FIGHTER_DEFINITIONS[target.champKey];
+      const animKey = resolveAnimationKey(attacker.champKey, action.animation_id);
+      const direction = target.x > attacker.x ? 1 : -1;
+      const isMelee = action.animation_id === 100 || action.animation_id === 4;
 
       // Efeito de Hyper
       if (action.isHyper) {
@@ -1300,55 +1378,62 @@
         triggerScreenShake(30, 15);
       }
 
-      // Ativar animação do atacante
-      setFighterAnim(attacker, action.id);
-
-      // Caso tenha projétil de escudo (Capitão América)
-      if (action.projectile) {
-        sound.playShieldClang();
-        await animateShieldProjectile(attacker, target);
-      } 
-      // Caso tenha raio de laser óptico (Ciclope)
-      else if (action.beam) {
-        sound.playLaser();
-        await animateLaserBeam(attacker, target);
-      } 
-      else {
-        // Golpe físico / investida
-        sound.playPunch();
-        await wait(350);
+      // DASH FÍSICO PARA FRENTE (em ataques corpo a corpo)
+      if (isMelee) {
+        attacker.x += 160 * direction;
       }
 
-      // Cálculo de Dano
-      let rawDamage = Math.floor((attDef.atkPower * (action.power || 1.0)) + (Math.random() * 12 - 6));
-      let isCrit = Math.random() < (action.critBonus || 0.15);
+      setFighterAnim(attacker, animKey);
+
+      // Execução de Projéteis ou Feixes
+      if (action.animation_id === 1 || animKey === 'shield_slash') {
+        sound.playShieldClang();
+        await animateShieldProjectile(attacker, target);
+      } else if (action.animation_id === 2 || action.animation_id === 5 || animKey === 'optic_blast' || animKey === 'optic_sweep') {
+        sound.playLaser();
+        await animateLaserBeam(attacker, target);
+      } else {
+        sound.playPunch();
+        await wait(360);
+      }
+
+      // Cálculo de Dano baseado na Ficha do Herói (FOR para Físico, INT para Mágico)
+      const baseAtk = (animKey === 'optic_blast' || animKey === 'optic_sweep') ? attacker.atkMagic : attacker.atkPhys;
+      let rawDamage = Math.floor((baseAtk * (action.damage_multiplier || 1.0)) + (Math.random() * 10 - 5));
+
+      let isCrit = Math.random() < (attacker.critChance || 0.12);
       if (isCrit) rawDamage = Math.floor(rawDamage * 1.5);
 
       if (target.isGuarding) {
         rawDamage = Math.floor(rawDamage * 0.5);
-        addLog(`🛡️ ${tarDef.name} bloqueou parte do impacto!`, 'normal');
+        addLog(`🛡️ ${target === state.player ? 'Você' : 'Oponente'} bloqueou metade do golpe!`, 'normal');
       }
 
       target.hp = Math.max(0, target.hp - rawDamage);
-      target.fury = Math.min(100, target.fury + (rawDamage * 0.25)); // Levar dano gera Fúria!
+      target.fury = Math.min(100, target.fury + (rawDamage * 0.25));
 
-      // Atordoamento (Stun)
-      if (action.stunChance && Math.random() < action.stunChance) {
+      // Efeito de Atordoamento (Stun) no Gancho
+      if (action.animation_id === 3 && Math.random() < 0.4) {
         target.isStunned = true;
-        addLog(`⚡ IMPACTO CRÍTICO! ${tarDef.name} ficou atordoado!`, 'hyper-log');
+        addLog(`⚡ IMPACTO CRÍTICO! Oponente ficou atordoado!`, 'hyper-log');
+      }
+
+      // Retorno do Dash
+      if (isMelee) {
+        attacker.x = attacker.homeX;
       }
 
       // Animação de Dano no Alvo
       setFighterAnim(target, 'hit');
       triggerScreenShake(15, action.isHyper ? 12 : 5);
+      spawnHitSpark(target.x, target.y - 60);
       spawnFloatingNumber(target.x, target.y - 120, `-${rawDamage}${isCrit ? ' CRÍTICO!' : ''}`, isCrit ? '#fbbf24' : '#ef4444');
 
-      addLog(`${isPlayer ? '⚔️' : '🔴'} ${attDef.name} desferiu <b>${action.name}</b> em ${tarDef.name} (-${rawDamage} HP)!`, isPlayer ? 'player-hit' : 'opponent-hit');
+      addLog(`${isPlayer ? '⚔️' : '🔴'} ${isPlayer ? document.getElementById('player-name').innerText : 'Oponente'} usou <b>${action.name}</b> (-${rawDamage} HP)!`, isPlayer ? 'player-hit' : 'opponent-hit');
 
       updateHudDisplay();
       await wait(450);
 
-      // Retornar alvos à pose Idle
       if (target.hp > 0) setFighterAnim(target, 'idle');
       else setFighterAnim(target, 'defeat');
 
@@ -1373,17 +1458,19 @@
       state.shakeMagnitude = magnitude;
     }
 
+    // ─── PROJÉTEIS BIDIRECIONAIS (ESQUERDA <-> DIREITA) ──────────────
     function animateShieldProjectile(attacker, target) {
       return new Promise(resolve => {
-        const startX = attacker.x + 30;
-        const targetX = target.x - 20;
+        const direction = target.x > attacker.x ? 1 : -1;
+        const startX = attacker.x + (30 * direction);
+        const targetX = target.x - (20 * direction);
         const y = attacker.y - 50;
         let progress = 0;
         let returning = false;
 
         const interval = setInterval(() => {
           if (!returning) {
-            progress += 0.08;
+            progress += 0.09;
             if (progress >= 1) {
               returning = true;
               progress = 1;
@@ -1391,7 +1478,7 @@
               spawnHitSpark(targetX, y);
             }
           } else {
-            progress -= 0.08;
+            progress -= 0.09;
             if (progress <= 0) {
               clearInterval(interval);
               attacker.activeProjectile = null;
@@ -1410,17 +1497,20 @@
       });
     }
 
+    // ─── FEIXES DE LASER BIDIRECIONAIS (ESQUERDA <-> DIREITA) ────────
     function animateLaserBeam(attacker, target) {
       return new Promise(resolve => {
-        const startX = attacker.x + 20;
+        const direction = target.x > attacker.x ? 1 : -1;
+        const startX = attacker.x + (35 * direction);
         const targetX = target.x;
         const y = attacker.y - 65;
-        let duration = 300;
+        let duration = 320;
 
         attacker.activeBeam = {
           startX,
           targetX,
           y,
+          direction,
           frame: 0
         };
 
@@ -1480,7 +1570,6 @@
 
       sound.playExplosion();
 
-      // Chamar backend para creditar Ouro e XP
       let goldAwarded = isVictory ? 50 : 10;
       let xpAwarded = isVictory ? 80 : 25;
 
@@ -1515,13 +1604,12 @@
 
       await wait(1000);
 
-      // Exibir Modal de Resultado
       document.getElementById('result-modal-title').innerText = isVictory ? '👑 VITÓRIA TRIUNFANTE!' : '💀 DERROTA!';
       document.getElementById('result-modal-title').style.color = isVictory ? '#fbbf24' : '#ef4444';
       document.getElementById('result-modal-icon').innerText = isVictory ? '🏆' : '💀';
       document.getElementById('result-modal-desc').innerText = isVictory
-        ? `Você dominou a Arena de Batalha 2D com maestria tática!`
-        : `Seu oponente venceu este combate. Treine suas habilidades e tente novamente!`;
+        ? `Sua ficha e suas habilidades garantiram o triunfo na Arena 2D!`
+        : `Oponente foi mais rápido desta vez. Aprimore seus atributos no mundo real e tente novamente!`;
       document.getElementById('result-gold-reward').innerText = `+${goldAwarded} Ouro`;
       document.getElementById('result-xp-reward').innerText = `+${xpAwarded} XP`;
 
@@ -1530,7 +1618,7 @@
 
     function restartBattle() {
       document.getElementById('battle-result-modal').style.display = 'none';
-      initBattleMatch(selectedPlayerChamp, selectedOpponentChamp);
+      confirmChampionAndStart();
     }
 
     function returnToArcade() {
@@ -1548,7 +1636,6 @@
     function renderLoop() {
       requestAnimationFrame(renderLoop);
 
-      // Screen Shake
       ctx.save();
       if (state.shakeDuration > 0) {
         state.shakeDuration--;
@@ -1557,7 +1644,7 @@
         ctx.translate(offsetX, offsetY);
       }
 
-      // Desenhar Fundo da Arena
+      // Fundo da Arena
       if (bgImage.complete && bgImage.naturalWidth > 0) {
         ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
       } else {
@@ -1565,23 +1652,21 @@
         ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
 
-      // Desenhar Sombras dos Lutadores no Chão
+      // Sombras
       drawFighterShadow(ctx, state.player.x, state.player.y);
       drawFighterShadow(ctx, state.opponent.x, state.opponent.y);
 
-      // Desenhar Lutador do Jogador (Esquerda -> Direita)
+      // Lutador Esquerdo (Jogador, normal)
       drawFighter(ctx, state.player, false);
 
-      // Desenhar Oponente (Direita -> Esquerda, Flipped Horizontalmente)
+      // Lutador Direito (Oponente, espelhado horizontalmente)
       drawFighter(ctx, state.opponent, true);
 
-      // Desenhar Projéteis Ativos (ex: Escudo voando)
+      // Projéteis e Feixes Ativos
       drawActiveProjectiles(ctx);
 
-      // Desenhar Partículas de Faíscas
+      // Partículas e Números
       drawParticles(ctx);
-
-      // Desenhar Números Flutuantes de Dano / Cura
       drawFloatingNumbers(ctx);
 
       ctx.restore();
@@ -1604,7 +1689,6 @@
       const now = Date.now();
       const frameDuration = anim.durationPerFrame || 80;
 
-      // Avançar quadro se atingiu a duração
       if (now - fighter.lastFrameTime >= frameDuration) {
         fighter.lastFrameTime = now;
         if (anim.loop) {
@@ -1617,14 +1701,14 @@
       const frameData = anim.frames[fighter.frameIndex] || anim.frames[0];
       if (!frameData) return;
 
-      const scale = FIGHTER_DEFINITIONS[fighter.champKey].scale;
-      const assetDir = FIGHTER_DEFINITIONS[fighter.champKey].assetDir;
+      const scale = FIGHTER_METADATA[fighter.champKey].scale;
+      const assetDir = FIGHTER_METADATA[fighter.champKey].assetDir;
 
       ctx.save();
       ctx.translate(fighter.x, fighter.y);
       if (isFlipped) ctx.scale(-1, 1);
 
-      // 1. Desenhar Corpo do Lutador
+      // 1. Corpo
       if (frameData.body) {
         const imgBody = loadImage(assetDir + frameData.body);
         if (imgBody.complete && imgBody.naturalWidth > 0) {
@@ -1636,7 +1720,7 @@
         }
       }
 
-      // 2. Desenhar Escudo Sobreposto (caso do Capitão)
+      // 2. Escudo (Capitão)
       if (frameData.shield && !fighter.activeProjectile) {
         const imgShield = loadImage(assetDir + frameData.shield);
         if (imgShield.complete && imgShield.naturalWidth > 0) {
@@ -1648,7 +1732,7 @@
         }
       }
 
-      // 3. Desenhar Efeito Visual Acoplado (Aura / Plasma)
+      // 3. Efeito Visual Acoplado
       if (frameData.fx) {
         const imgFx = loadImage('/assets/characters/effects/' + frameData.fx);
         if (imgFx.complete && imgFx.naturalWidth > 0) {
@@ -1664,28 +1748,32 @@
     }
 
     function drawActiveProjectiles(ctx) {
-      // Escudo voador do Capitão América
-      if (state.player.activeProjectile) {
-        const p = state.player.activeProjectile;
+      // 1. Escudos Voando (Jogador ou Oponente)
+      const projectiles = [state.player.activeProjectile, state.opponent.activeProjectile].filter(Boolean);
+      projectiles.forEach(p => {
         const img = loadImage(`/assets/characters/effects/11000-${p.frame}.png`);
         if (img.complete && img.naturalWidth > 0) {
           ctx.save();
           ctx.drawImage(img, p.x - 30, p.y - 20, 60, 45);
           ctx.restore();
         }
-      }
+      });
 
-      // Feixe de Laser Óptico do Ciclope
-      if (state.opponent.activeBeam) {
-        const b = state.opponent.activeBeam;
+      // 2. Feixes de Laser Óptico (Jogador ou Oponente)
+      const beams = [state.player.activeBeam, state.opponent.activeBeam].filter(Boolean);
+      beams.forEach(b => {
         const img = loadImage(`/assets/characters/effects/11000-${b.frame}.png`);
         if (img.complete && img.naturalWidth > 0) {
           ctx.save();
-          const beamWidth = b.targetX - b.startX;
-          ctx.drawImage(img, b.startX, b.y, beamWidth, 35);
+          const length = Math.abs(b.targetX - b.startX);
+          ctx.translate(b.startX, b.y);
+          if (b.direction < 0) {
+            ctx.scale(-1, 1);
+          }
+          ctx.drawImage(img, 0, -17, length, 35);
           ctx.restore();
         }
-      }
+      });
     }
 
     function drawParticles(ctx) {
@@ -1729,7 +1817,7 @@
       await loadManifests();
       renderLoop();
 
-      // Carregar saldo real de energia e ouro se logado
+      // Carregar dados reais da Ficha do Herói se logado
       const token = localStorage.getItem('liraquest_token');
       if (token) {
         try {
@@ -1739,11 +1827,29 @@
           ]);
           const progData = await resProg.json();
           const charData = await resChar.json();
+
           if (progData.success && progData.progress) {
             document.getElementById('player-energy-display').innerText = progData.progress.adventure_energy ?? 15;
           }
+
           if (charData.success && charData.character) {
-            document.getElementById('player-gold-display').innerText = charData.character.gold ?? 0;
+            loadedCharacterSheet = charData.character;
+            document.getElementById('header-hero-name').innerText = loadedCharacterSheet.name || 'Herói';
+            document.getElementById('header-hero-level').innerText = loadedCharacterSheet.level || 1;
+            document.getElementById('player-gold-display').innerText = loadedCharacterSheet.gold ?? 0;
+
+            document.getElementById('modal-hero-name').innerText = loadedCharacterSheet.name || 'Herói';
+            document.getElementById('modal-hero-level').innerText = loadedCharacterSheet.level || 1;
+
+            if (loadedCharacterSheet.attributes) {
+              const aMap = {};
+              loadedCharacterSheet.attributes.forEach(a => {
+                const code = a.attribute_info?.code?.toUpperCase();
+                if (code) aMap[code] = (a.base_value || 10) + (a.bonus_value || 0);
+              });
+              document.getElementById('modal-hero-attrs').innerText = 
+                `FOR: ${aMap.STR || 10} | CON: ${aMap.CON || 10} | INT: ${aMap.INT || 10} | AGI: ${aMap.AGI || 10} | SOR: ${aMap.LUK || 10}`;
+            }
           }
         } catch(e) {
           console.warn('Executando modo local:', e);

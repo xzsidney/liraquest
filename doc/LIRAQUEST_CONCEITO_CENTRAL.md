@@ -223,7 +223,20 @@ O **Arcade de Lira** é o centro de diversão acessível pelo Terminal do Avatar
    - **Progressão e Resgate Final:** Ao alcançar o Ato Final sem esgotar seus Pontos de Vida (HP), o jogador abre o Baú Épico, conquistando Ouro Virtual, XP de Classe e +1 ponto de aprimoramento no atributo mais utilizado com sucesso durante a expedição. Em caso de derrota (HP zerado), os socorristas do clã resgatam o aventureiro, mantendo o aprendizado e a diversão familiar.
 4. **⚔️ Arena de Batalha 2D (RPG de Turnos com Sprites Clássicos MUGEN — Capitão América vs Ciclope):**
    - **Mecânica Tática por Turnos (Estilo Final Fantasy & Summoners War):** Combate 2D estratégico com barra de Iniciativa (ATB), pontos de vida (HP), pontos de magia (MP) e barra de Fúria (0 a 100%).
-   - **Animações Fluidas & Efeitos Visuais Originais:** Utiliza pacotes de sprites de alta fidelidade da era dourada dos arcades da Capcom (Marvel vs Capcom). O herói executa animações completas com sincronização de frames baseada nos arquivos de animação (`.air`) e alinhamento de precisão sub-pixel derivado dos arquivos de eixo (`.ffe`).
+   - **Conexão Direta com a Ficha de Atributos do Herói:**
+     - O poder de combate não é genérico: é derivado diretamente dos atributos da ficha viva do Herói (`CharacterAttributes` e bônus de itens equipados em `CharacterInventory`).
+     - **HP Máximo:** Calculado com base na Constituição (`CON`) e Nível do Herói (`180 + CON * 18 + Level * 25`).
+     - **MP Máximo:** Calculado com base na Inteligência (`INT`) e Nível (`70 + INT * 8 + Level * 6`).
+     - **Ataque Físico:** Baseado em Força (`STR`) e bônus de armas (`30 + STR * 3.2 + WeaponBonus`).
+     - **Ataque Mágico / Feixe Óptico:** Baseado em Inteligência (`INT`) (`35 + INT * 3.5`).
+     - **Defesa & Absorção:** Baseado em Constituição (`CON`) e bônus de armaduras (`CON * 1.5 + ArmorBonus`).
+     - **Velocidade de Iniciativa:** Baseado em Agilidade (`AGI`) (`10 + AGI * 0.9`).
+     - **Taxa Crítica:** Baseado na Sorte (`LUK`) (`5% + LUK * 0.7%`).
+   - **Deck Modular de Ações (1 Ataque Básico + 3 Habilidades Equipadas):**
+     - O herói sempre possui **1 Ataque Básico** (soco ou chute padrão de custo 0 MP).
+     - Carrega até **3 Habilidades Especiais** adquiridas na Árvore de Talentos (`definition_skills` com `is_equipped: true` em `character_skills`).
+     - **Desacoplamento Visual via `animation_id`:** As habilidades no banco de dados contêm um ponteiro numérico (`animation_id`), permitindo que novas habilidades criadas pelo administrador utilizem animações da engine (1 = arremesso, 2 = feixe contínuo, 3 = gancho ascendente, 4 = investida/dash, 5 = rasteira, 100 = básico, 600 = golpe supremo) sem reescrever código de batalha.
+   - **Animações Fluidas & Efeitos Visuais Originais:** Utiliza pacotes de sprites de alta fidelidade da era dourada dos arcades da Capcom (Marvel vs Capcom) com suporte a física bidirecional de projéteis e feixes laser contínuos, espelhamento inteligente de coordenadas, avanço dinâmico (dash) em golpes corpo a corpo e retorno à posição base.
    - **Duelo Épico de Campeões:**
      - **🛡️ Capitão América (Tanque / Vanguarda):** Combate com o lendário Escudo de Vibranium. Possui ataques físicos diretos, arremesso perfurante à distância (*Shield Slash* com projétil dinâmico que vai e volta), gancho aéreo ascendente com chance de atordoar (*Stars & Stripes* com rastro de poeira estelar), investida com escudo de choque (*Charging Star*) e o Golpe Supremo *FINAL JUSTICE* com explosão cósmica dourada.
      - **🔴 Ciclope (Artilheiro / Mestre Óptico):** Mestre de controle de campo à distância. Utiliza chutes giratórios (*Cyclone Kick*), rajada óptica concentrada (*Optic Blast* com feixe laser contínuo), varredura rasteira que atrasa a iniciativa adversária (*Optic Sweep*), gancho de plasma (*Gene Splice*) e o Golpe Supremo cinematográfico de tela cheia *MEGA OPTIC BLAST*.
