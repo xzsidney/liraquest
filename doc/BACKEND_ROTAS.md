@@ -192,8 +192,15 @@ Endpoints do mini-game **Aventuras em Quest**, com carregamento de masmorras rel
 |:---|:---|:---|:---|
 | `GET` | `/api/dungeon/adventures` | Pública | Lista todas as masmorras ativas do reino com títulos, dificuldades, custos e prêmios |
 | `GET` | `/api/dungeon/adventures/:id` | Pública | Retorna os dados completos da masmorra selecionada com todas as suas cenas e ações contendo as ramificações de Causa e Consequência (`success_scene_code` e `failure_scene_code`) |
-| `POST` | `/api/dungeon/start` | JWT | Valida e consome 5 de Energia de Aventura (`UserProgress.adventure_energy`), inicializando a expedição na tabela `family_dungeon_runs` |
+| `GET` | `/api/dungeon/start` | JWT | Valida e consome 5 de Energia de Aventura (`UserProgress.adventure_energy`), inicializando a expedição na tabela `family_dungeon_runs` |
 | `POST` | `/api/dungeon/finish` | JWT | Finaliza a expedição (`is_victory`, `final_hp`, `primary_attribute_used`, `choices_summary`, `bonus_gold_collected`), creditando Ouro no Herói (`Character.gold`), XP na classe ativa (`CharacterClass.xp`), checando Level Up e aprimorando permanentemente (+1) o atributo mais utilizado na run em `CharacterAttribute` |
 
+---
 
+## ⚔️ 13. Arena de Batalha 2D (Mini-Game Arcade RPG por Turnos)
+Rotas dedicadas ao Jogo 4 do Arcade (`/battle.html`): combate tático por turnos com sprites MUGEN clássicos (Capitão América vs Ciclope).
 
+| Método | Rota | Autenticação | Descrição |
+|:---|:---|:---|:---|
+| `POST` | `/api/battle/start` | JWT | Inicia a batalha 2D na Arena, consumindo 5 de Energia de Aventura do membro (`UserProgress.adventure_energy`), gerando a sessão e retornando os dados do lutador |
+| `POST` | `/api/battle/finish` | JWT | Registra o desfecho da batalha (`VICTORY` ou `DEFEAT`). Em caso de vitória, credita +50 de Ouro (`Character.gold`) e +80 de XP (`Character.current_xp`), processando subida de nível (`Character.level`) |

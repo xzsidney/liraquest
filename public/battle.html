@@ -1,0 +1,1755 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>LiraQuest — Arena de Batalha 2D (RPG por Turnos)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --primary-bordeaux: #800020;
+      --primary-bordeaux-light: #9b111e;
+      --primary-bordeaux-dark: #4a0e17;
+      --secondary-blue: #1e3a8a;
+      --secondary-blue-light: #2563eb;
+      --secondary-blue-dark: #0f172a;
+      --accent-gold: #d4af37;
+      --accent-gold-bright: #fbbf24;
+      --accent-gold-light: #fef08a;
+      --bg-dark: #080c16;
+      --card-surface: rgba(15, 23, 42, 0.85);
+      --card-border: rgba(212, 175, 55, 0.35);
+      --hp-green: #22c55e;
+      --mp-blue: #38bdf8;
+      --fury-gold: #f59e0b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* ─── TOPO DE NAVEGAÇÃO & STATS ────────────────────────────────── */
+    header {
+      background: linear-gradient(180deg, rgba(8, 12, 22, 0.98) 0%, rgba(15, 23, 42, 0.85) 100%);
+      border-bottom: 1.5px solid var(--card-border);
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(12px);
+    }
+
+    .nav-btn {
+      background: rgba(128, 0, 32, 0.3);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      color: var(--accent-gold-bright);
+      padding: 8px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover {
+      background: var(--primary-bordeaux);
+      border-color: var(--accent-gold);
+      transform: translateY(-1px);
+    }
+
+    .player-stats-bar {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .stat-pill {
+      background: rgba(30, 58, 138, 0.4);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ─── CONTAINER PRINCIPAL DA ARENA ─────────────────────────────── */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 20px;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      gap: 16px;
+    }
+
+    /* ─── PAINEL DE COMBATE / HUD ──────────────────────────────────── */
+    .battle-hud {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 120px 1fr;
+      gap: 16px;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1.5px solid var(--card-border);
+      border-radius: 16px;
+      padding: 14px 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .fighter-hud-card {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .fighter-hud-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .fighter-portrait {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      border: 2px solid var(--accent-gold);
+      background: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      overflow: hidden;
+    }
+
+    .fighter-name {
+      font-family: 'Cinzel', serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: var(--accent-gold-bright);
+    }
+
+    .fighter-badge {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* BARRAS DE STATUS */
+    .meter-container {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .meter-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .meter-track {
+      width: 100%;
+      height: 10px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+    }
+
+    .meter-fill {
+      height: 100%;
+      border-radius: 6px;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .fill-hp { background: linear-gradient(90deg, #15803d, #22c55e); }
+    .fill-mp { background: linear-gradient(90deg, #0284c7, #38bdf8); }
+    .fill-fury {
+      background: linear-gradient(90deg, #ea580c, #f59e0b, #fef08a);
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+    }
+    .fill-atb { background: linear-gradient(90deg, #800020, #d4af37); }
+
+    .vs-center-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .vs-badge-text {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: 1.6rem;
+      color: var(--accent-gold-bright);
+      text-shadow: 0 0 12px rgba(212, 175, 55, 0.8);
+    }
+
+    .turn-indicator {
+      margin-top: 4px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 12px;
+      background: rgba(128, 0, 32, 0.5);
+      border: 1px solid var(--accent-gold);
+      color: #fff;
+    }
+
+    /* ─── STAGE DO CANVAS 2D ───────────────────────────────────────── */
+    .stage-wrapper {
+      width: 100%;
+      position: relative;
+      background: #000;
+      border: 2px solid var(--accent-gold);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.8), 0 0 20px rgba(128, 0, 32, 0.3);
+      aspect-ratio: 16 / 9;
+      max-height: 520px;
+    }
+
+    #battleCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    /* OVERLAYS CINEMATOGRÁFICOS DO CANVAS */
+    .hyper-flash-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle, rgba(212, 175, 55, 0.4) 0%, rgba(128, 0, 32, 0.8) 100%);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 10;
+    }
+
+    .hyper-flash-active {
+      opacity: 1;
+    }
+
+    .hyper-title-banner {
+      position: absolute;
+      top: 30%;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: var(--accent-gold-light);
+      text-shadow: 0 0 24px rgba(251, 191, 36, 1), 0 4px 8px #000;
+      background: linear-gradient(90deg, transparent 0%, rgba(128, 0, 32, 0.95) 25%, rgba(128, 0, 32, 0.95) 75%, transparent 100%);
+      padding: 12px 0;
+      letter-spacing: 4px;
+      transform: scale(0.8);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 15;
+    }
+
+    .hyper-banner-show {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    /* ─── COMANDOS TÁTICOS (MENU DE TURNO) ─────────────────────────── */
+    .tactical-deck {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1.5px solid var(--card-border);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      backdrop-filter: blur(12px);
+    }
+
+    .deck-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .deck-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--accent-gold-bright);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .action-buttons-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+    }
+
+    .action-card-btn {
+      background: linear-gradient(135deg, rgba(30, 58, 138, 0.4) 0%, rgba(15, 23, 42, 0.6) 100%);
+      border: 1.5px solid rgba(212, 175, 55, 0.3);
+      border-radius: 12px;
+      padding: 10px 12px;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .action-card-btn:hover:not(:disabled) {
+      background: linear-gradient(135deg, rgba(128, 0, 32, 0.7) 0%, rgba(30, 58, 138, 0.7) 100%);
+      border-color: var(--accent-gold-bright);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(212, 175, 55, 0.25);
+    }
+
+    .action-card-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      filter: grayscale(0.8);
+    }
+
+    .action-card-btn.hyper-btn {
+      background: linear-gradient(135deg, #b45309 0%, #800020 100%);
+      border-color: var(--accent-gold-bright);
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.4);
+    }
+
+    .action-btn-top {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      align-items: center;
+    }
+
+    .action-name {
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .action-cost {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--mp-blue);
+      background: rgba(2, 132, 199, 0.2);
+      padding: 2px 6px;
+      border-radius: 6px;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    .action-desc {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      line-height: 1.3;
+      text-align: left;
+    }
+
+    /* ─── LOG DE COMBATE ───────────────────────────────────────────── */
+    .battle-log-card {
+      width: 100%;
+      background: rgba(8, 12, 22, 0.9);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      border-radius: 12px;
+      padding: 10px 14px;
+      max-height: 110px;
+      overflow-y: auto;
+      font-size: 0.82rem;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .log-item {
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 3px solid var(--accent-gold);
+      animation: fadeIn 0.2s ease;
+    }
+
+    .log-item.player-hit { border-left-color: #38bdf8; }
+    .log-item.opponent-hit { border-left-color: #ef4444; }
+    .log-item.hyper-log { border-left-color: #f59e0b; font-weight: 700; background: rgba(245, 158, 11, 0.1); }
+
+    /* ─── MODAIS (SELEÇÃO DE PERSONAGEM & RESULTADO) ────────────────── */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 6, 12, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+    }
+
+    .modal-box {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(20, 10, 25, 0.95) 100%);
+      border: 2px solid var(--accent-gold);
+      border-radius: 20px;
+      padding: 28px;
+      max-width: 650px;
+      width: 100%;
+      box-shadow: 0 16px 64px rgba(0, 0, 0, 0.9);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .modal-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.6rem;
+      color: var(--accent-gold-bright);
+      font-weight: 900;
+    }
+
+    .char-select-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .char-card {
+      background: rgba(15, 23, 42, 0.8);
+      border: 2px solid rgba(212, 175, 55, 0.3);
+      border-radius: 16px;
+      padding: 16px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.25s ease;
+    }
+
+    .char-card:hover, .char-card.selected {
+      border-color: var(--accent-gold-bright);
+      background: linear-gradient(135deg, rgba(128, 0, 32, 0.5) 0%, rgba(30, 58, 138, 0.5) 100%);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(212, 175, 55, 0.3);
+    }
+
+    .char-card-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 16px;
+      border: 2px solid var(--accent-gold);
+      background: #0b1120;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.6rem;
+    }
+
+    .btn-main {
+      background: linear-gradient(135deg, var(--primary-bordeaux) 0%, var(--secondary-blue) 100%);
+      color: #ffffff;
+      border: 1.5px solid var(--accent-gold);
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 16px rgba(128, 0, 32, 0.4);
+    }
+
+    .btn-main:hover {
+      transform: scale(1.03);
+      border-color: var(--accent-gold-light);
+      box-shadow: 0 6px 24px rgba(212, 175, 55, 0.4);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes modalPop {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    /* RESPONSIVIDADE */
+    @media (max-width: 768px) {
+      .battle-hud {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      .vs-center-badge { display: none; }
+      .char-select-grid { grid-template-columns: 1fr; }
+      .action-buttons-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER NAVEGAÇÃO -->
+  <header>
+    <button class="nav-btn" onclick="returnToArcade()">
+      <span>⬅️</span> Voltar ao Arcade
+    </button>
+    <div class="player-stats-bar">
+      <div class="stat-pill" style="color: #fbbf24;">
+        <span>⚡ Energia:</span> <span id="player-energy-display">15</span>
+      </div>
+      <div class="stat-pill" style="color: #facc15;">
+        <span>💰 Ouro:</span> <span id="player-gold-display">0</span>
+      </div>
+      <button class="nav-btn" id="sound-toggle-btn" onclick="toggleAudio()" style="padding: 6px 10px;">
+        🔊 Som: ON
+      </button>
+    </div>
+  </header>
+
+  <!-- ARENA PRINCIPAL -->
+  <main>
+
+    <!-- HUD SUPERIOR (VIDA, MP, FÚRIA, ATB) -->
+    <section class="battle-hud">
+      <!-- JOGADOR (LADO ESQUERDO) -->
+      <div class="fighter-hud-card">
+        <div class="fighter-hud-header">
+          <div class="fighter-portrait" id="player-portrait">🛡️</div>
+          <div>
+            <div class="fighter-name" id="player-name">Capitão América</div>
+            <div class="fighter-badge" id="player-role-badge">Vanguarda Blindada</div>
+          </div>
+        </div>
+
+        <div class="meter-container">
+          <div class="meter-label">
+            <span style="color: #4ade80;">HP (Vida)</span>
+            <span id="player-hp-text">350 / 350</span>
+          </div>
+          <div class="meter-track">
+            <div class="meter-fill fill-hp" id="player-hp-bar" style="width: 100%;"></div>
+          </div>
+        </div>
+
+        <div class="meter-container">
+          <div class="meter-label">
+            <span style="color: #38bdf8;">MP (Energia)</span>
+            <span id="player-mp-text">100 / 100</span>
+          </div>
+          <div class="meter-track">
+            <div class="meter-fill fill-mp" id="player-mp-bar" style="width: 100%;"></div>
+          </div>
+        </div>
+
+        <div class="meter-container">
+          <div class="meter-label">
+            <span style="color: #f59e0b;">Fúria / Hyper</span>
+            <span id="player-fury-text">0%</span>
+          </div>
+          <div class="meter-track">
+            <div class="meter-fill fill-fury" id="player-fury-bar" style="width: 0%;"></div>
+          </div>
+        </div>
+
+        <div class="meter-container">
+          <div class="meter-label">
+            <span style="color: var(--accent-gold);">Iniciativa (ATB)</span>
+          </div>
+          <div class="meter-track" style="height: 6px;">
+            <div class="meter-fill fill-atb" id="player-atb-bar" style="width: 100%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CENTRO: VS & TURNO -->
+      <div class="vs-center-badge">
+        <div class="vs-badge-text">VS</div>
+        <div class="turn-indicator" id="turn-indicator">SEU TURNO</div>
+      </div>
+
+      <!-- OPONENTE (LADO DIREITO) -->
+      <div class="fighter-hud-card" style="align-items: flex-end; text-align: right;">
+        <div class="fighter-hud-header" style="flex-direction: row-reverse;">
+          <div class="fighter-portrait" id="opponent-portrait">🔴</div>
+          <div>
+            <div class="fighter-name" id="opponent-name">Ciclope</div>
+            <div class="fighter-badge" id="opponent-role-badge">Mestre Óptico</div>
+          </div>
+        </div>
+
+        <div class="meter-container" style="width: 100%;">
+          <div class="meter-label">
+            <span id="opponent-hp-text">350 / 350</span>
+            <span style="color: #4ade80;">HP (Vida)</span>
+          </div>
+          <div class="meter-track">
+            <div class="meter-fill fill-hp" id="opponent-hp-bar" style="width: 100%;"></div>
+          </div>
+        </div>
+
+        <div class="meter-container" style="width: 100%;">
+          <div class="meter-label">
+            <span id="opponent-mp-text">100 / 100</span>
+            <span style="color: #38bdf8;">MP (Energia)</span>
+          </div>
+          <div class="meter-track">
+            <div class="meter-fill fill-mp" id="opponent-mp-bar" style="width: 100%;"></div>
+          </div>
+        </div>
+
+        <div class="meter-container" style="width: 100%;">
+          <div class="meter-label">
+            <span id="opponent-fury-text">0%</span>
+            <span style="color: #f59e0b;">Fúria / Hyper</span>
+          </div>
+          <div class="meter-track">
+            <div class="meter-fill fill-fury" id="opponent-fury-bar" style="width: 0%;"></div>
+          </div>
+        </div>
+
+        <div class="meter-container" style="width: 100%;">
+          <div class="meter-label">
+            <span></span>
+            <span style="color: var(--accent-gold);">Iniciativa (ATB)</span>
+          </div>
+          <div class="meter-track" style="height: 6px;">
+            <div class="meter-fill fill-atb" id="opponent-atb-bar" style="width: 0%;"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PALCO DO COMBATE 2D CANVAS -->
+    <div class="stage-wrapper" id="stage-wrapper">
+      <canvas id="battleCanvas" width="960" height="540"></canvas>
+      <div class="hyper-flash-overlay" id="hyper-flash-overlay"></div>
+      <div class="hyper-title-banner" id="hyper-title-banner">FINAL JUSTICE!</div>
+    </div>
+
+    <!-- COMANDOS TÁTICOS (DECK DE AÇÕES) -->
+    <section class="tactical-deck">
+      <div class="deck-header">
+        <div class="deck-title">
+          <span>⚔️</span> Comandos Táticos de Combate por Turno
+        </div>
+        <div style="font-size: 0.8rem; color: var(--accent-gold);" id="deck-status-hint">
+          Selecione uma ação para executar o turno:
+        </div>
+      </div>
+
+      <div class="action-buttons-grid" id="action-buttons-grid">
+        <!-- Preenchido dinamicamente de acordo com o personagem escolhido -->
+      </div>
+    </section>
+
+    <!-- LOG DE COMBATE -->
+    <div class="battle-log-card" id="battle-log">
+      <div class="log-item">⚔️ A Arena de Batalha 2D está pronta! Escolha sua estratégia no seu turno.</div>
+    </div>
+
+  </main>
+
+  <!-- MODAL DE SELEÇÃO DE PERSONAGEM -->
+  <div class="modal-backdrop" id="char-select-modal">
+    <div class="modal-box">
+      <div class="modal-title">ESCOLHA SEU CAMPEÃO</div>
+      <p style="font-size: 0.9rem; color: var(--text-muted);">
+        Selecione o lutador que você comandará na Arena 2D (Custo: 5 ⚡ Energia):
+      </p>
+
+      <div class="char-select-grid">
+        <!-- CAPITÃO AMÉRICA -->
+        <div class="char-card selected" id="card-pick-cap" onclick="selectChampion('cap')">
+          <div class="char-card-avatar">🛡️</div>
+          <h3 style="color: #fff; font-size: 1.1rem;">Capitão América</h3>
+          <span style="font-size: 0.75rem; color: #38bdf8; font-weight: 700;">Tanque & Vanguarda</span>
+          <p style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.3;">
+            Escudo de Vibranium, defesa blindada, arremesso perfurante e investidas supersônicas.
+          </p>
+        </div>
+
+        <!-- CICLOPE -->
+        <div class="char-card" id="card-pick-cyclops" onclick="selectChampion('cyclops')">
+          <div class="char-card-avatar">🔴</div>
+          <h3 style="color: #fff; font-size: 1.1rem;">Ciclope</h3>
+          <span style="font-size: 0.75rem; color: #f59e0b; font-weight: 700;">Artilharia Óptica</span>
+          <p style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.3;">
+            Disparos de feixes de plasma, controle de campo à distância e o destrutivo Mega Optic Blast.
+          </p>
+        </div>
+      </div>
+
+      <button class="btn-main" onclick="confirmChampionAndStart()">
+        ⚔️ Entrar na Batalha (5 ⚡)
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL DE RESULTADO (VITÓRIA / DERROTA) -->
+  <div class="modal-backdrop" id="battle-result-modal" style="display: none;">
+    <div class="modal-box">
+      <div class="modal-title" id="result-modal-title">VITÓRIA ÉPICA!</div>
+      <div id="result-modal-icon" style="font-size: 4rem; margin: 8px 0;">👑</div>
+      <p id="result-modal-desc" style="color: var(--text-muted); font-size: 0.95rem;">
+        Você demonstrou grande perícia tática na Arena de Batalha 2D!
+      </p>
+
+      <div style="display: flex; justify-content: center; gap: 16px; margin: 10px 0;">
+        <div class="stat-pill" style="font-size: 0.9rem; color: #facc15;">
+          <span>💰 Ouro:</span> <span id="result-gold-reward">+50</span>
+        </div>
+        <div class="stat-pill" style="font-size: 0.9rem; color: #a855f7;">
+          <span>⭐ XP:</span> <span id="result-xp-reward">+80</span>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 12px; justify-content: center;">
+        <button class="nav-btn" style="padding: 12px 20px;" onclick="restartBattle()">
+          🔄 Batalhar Novamente
+        </button>
+        <button class="btn-main" style="padding: 12px 24px;" onclick="returnToArcade()">
+          ⬅️ Retornar ao Arcade
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT ENGINE DA BATALHA 2D -->
+  <script>
+    // ─── GERENCIADOR DE ÁUDIO WEB AUDIO API NATIVO ────────────────────
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.enabled = true;
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) this.ctx = new AudioContext();
+        }
+      }
+      playPunch() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(140, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(30, this.ctx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.15);
+      }
+      playLaser() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(800, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(120, this.ctx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.35, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.3);
+      }
+      playShieldClang() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(950, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(400, this.ctx.currentTime + 0.35);
+        gain.gain.setValueAtTime(0.5, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.35);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.35);
+      }
+      playExplosion() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(90, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(20, this.ctx.currentTime + 0.6);
+        gain.gain.setValueAtTime(0.6, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.6);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.6);
+      }
+    }
+    const sound = new SoundEngine();
+
+    function toggleAudio() {
+      sound.enabled = !sound.enabled;
+      document.getElementById('sound-toggle-btn').innerText = sound.enabled ? '🔊 Som: ON' : '🔇 Som: OFF';
+    }
+
+    // ─── CONFIGURAÇÕES E ESTADO DO JOGO ────────────────────────────────
+    let selectedPlayerChamp = 'cap'; // 'cap' ou 'cyclops'
+    let selectedOpponentChamp = 'cyclops';
+
+    const FIGHTER_DEFINITIONS = {
+      cap: {
+        name: 'Capitão América',
+        role: 'Vanguarda & Tanque',
+        icon: '🛡️',
+        assetDir: '/assets/characters/cap/',
+        maxHp: 380,
+        maxMp: 100,
+        atkPower: 45,
+        defense: 25,
+        speed: 14,
+        scale: 2.2,
+        actions: [
+          { id: 'attack', name: 'Golpe Físico', cost: 0, mpGain: 15, furyGain: 12, desc: 'Combo de socos diretos. Gera +15 MP.', power: 1.0 },
+          { id: 'shield_slash', name: 'Shield Slash', cost: 15, furyGain: 18, desc: 'Arremesso perfurante de escudo que ignora 30% da armadura.', power: 1.5, projectile: true },
+          { id: 'stars_stripes', name: 'Stars & Stripes', cost: 25, furyGain: 22, desc: 'Gancho aéreo ascendente com 45% de chance de atordoar (Stun).', power: 1.9, stunChance: 0.45 },
+          { id: 'charging_star', name: 'Charging Star', cost: 35, furyGain: 25, desc: 'Investida com escudo de energia. Causa alto dano e concede guarda.', power: 2.3, grantShield: 0.3 },
+          { id: 'hyper', name: 'FINAL JUSTICE', cost: 0, furyCost: 100, desc: 'GOLPE SUPREMO! Investida cinematográfica de energia cósmica.', power: 3.8, isHyper: true },
+          { id: 'guard', name: 'Defender', cost: 0, mpGain: 20, furyGain: 15, desc: 'Entra em guarda com o vibranium. Reduz 50% do próximo dano.', isGuard: true },
+          { id: 'item', name: 'Poção de HP', cost: 0, desc: 'Cura 70 pontos de vida da mochila familiar.', isPotion: true, uses: 2 }
+        ]
+      },
+      cyclops: {
+        name: 'Ciclope',
+        role: 'Mestre Óptico',
+        icon: '🔴',
+        assetDir: '/assets/characters/cyclops/',
+        maxHp: 340,
+        maxMp: 100,
+        atkPower: 52,
+        defense: 18,
+        speed: 16,
+        scale: 2.2,
+        actions: [
+          { id: 'attack', name: 'Cyclone Kick', cost: 0, mpGain: 15, furyGain: 12, desc: 'Chute acrobático giratório. Gera +15 MP.', power: 1.0 },
+          { id: 'optic_blast', name: 'Optic Blast', cost: 15, furyGain: 18, desc: 'Disparo concentrado de feixe laser pelo visor em linha reta.', power: 1.55, beam: true },
+          { id: 'optic_sweep', name: 'Optic Sweep', cost: 25, furyGain: 22, desc: 'Varredura óptica rasteira que atrasa a iniciativa do adversário.', power: 1.8, delayAtb: 40 },
+          { id: 'gene_splice', name: 'Gene Splice', cost: 35, furyGain: 25, desc: 'Gancho ascendente envolto em plasma vermelho com alta chance crítica.', power: 2.4, critBonus: 0.35 },
+          { id: 'hyper', name: 'MEGA OPTIC BLAST', cost: 0, furyCost: 100, desc: 'GOLPE SUPREMO! Canhão colossal de plasma que vaporiza o campo.', power: 4.0, isHyper: true },
+          { id: 'guard', name: 'Defender', cost: 0, mpGain: 20, furyGain: 15, desc: 'Bloqueio tático com antebraços. Reduz 40% de dano e gera 20 MP.', isGuard: true },
+          { id: 'item', name: 'Poção de HP', cost: 0, desc: 'Cura 70 pontos de vida da mochila familiar.', isPotion: true, uses: 2 }
+        ]
+      }
+    };
+
+    // Imagens carregadas em memória cache
+    const imageCache = {};
+    function loadImage(src) {
+      if (imageCache[src]) return imageCache[src];
+      const img = new Image();
+      img.src = src;
+      imageCache[src] = img;
+      return img;
+    }
+
+    // Manifestos carregados
+    let manifests = { cap: null, cyclops: null };
+    async function loadManifests() {
+      try {
+        const [rCap, rCyc] = await Promise.all([
+          fetch('/assets/characters/cap/manifest.json'),
+          fetch('/assets/characters/cyclops/manifest.json')
+        ]);
+        manifests.cap = await rCap.json();
+        manifests.cyclops = await rCyc.json();
+      } catch (e) {
+        console.error('Erro ao carregar manifestos:', e);
+      }
+    }
+
+    // Estado da Batalha
+    const state = {
+      isReady: false,
+      turn: 'player', // 'player' | 'opponent' | 'animating'
+      turnsCount: 1,
+      shakeDuration: 0,
+      shakeMagnitude: 0,
+      player: {
+        champKey: 'cap',
+        hp: 380,
+        maxHp: 380,
+        mp: 100,
+        maxMp: 100,
+        fury: 0,
+        isGuarding: false,
+        potionUses: 2,
+        isStunned: false,
+        x: 240,
+        y: 430,
+        currentAnim: 'idle',
+        frameIndex: 0,
+        lastFrameTime: 0,
+        activeProjectile: null
+      },
+      opponent: {
+        champKey: 'cyclops',
+        hp: 340,
+        maxHp: 340,
+        mp: 100,
+        maxMp: 100,
+        fury: 0,
+        isGuarding: false,
+        potionUses: 2,
+        isStunned: false,
+        x: 720,
+        y: 430,
+        currentAnim: 'idle',
+        frameIndex: 0,
+        lastFrameTime: 0,
+        activeBeam: null
+      },
+      floatingNumbers: [],
+      particles: []
+    };
+
+    // ─── CARREGAR DADOS DO USUÁRIO & SELEÇÃO DE CAMPEÃO ──────────────
+    function selectChampion(champ) {
+      selectedPlayerChamp = champ;
+      selectedOpponentChamp = champ === 'cap' ? 'cyclops' : 'cap';
+
+      document.getElementById('card-pick-cap').classList.toggle('selected', champ === 'cap');
+      document.getElementById('card-pick-cyclops').classList.toggle('selected', champ === 'cyclops');
+    }
+
+    async function confirmChampionAndStart() {
+      document.getElementById('char-select-modal').style.display = 'none';
+
+      // Chamar backend para iniciar run de batalha (-5 energia)
+      const token = localStorage.getItem('liraquest_token');
+      if (token) {
+        try {
+          const res = await fetch('/api/battle/start', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              player_hero: selectedPlayerChamp,
+              opponent: selectedOpponentChamp,
+              energy_cost: 5
+            })
+          });
+          const data = await res.json();
+          if (data.success && data.energy_remaining !== undefined) {
+            document.getElementById('player-energy-display').innerText = data.energy_remaining;
+          }
+        } catch (err) {
+          console.warn('Iniciando em modo offline / arcade autônomo:', err);
+        }
+      }
+
+      initBattleMatch(selectedPlayerChamp, selectedOpponentChamp);
+    }
+
+    function initBattleMatch(pChampKey, oChampKey) {
+      const pDef = FIGHTER_DEFINITIONS[pChampKey];
+      const oDef = FIGHTER_DEFINITIONS[oChampKey];
+
+      state.player.champKey = pChampKey;
+      state.player.hp = pDef.maxHp;
+      state.player.maxHp = pDef.maxHp;
+      state.player.mp = pDef.maxMp;
+      state.player.maxMp = pDef.maxMp;
+      state.player.fury = 0;
+      state.player.isGuarding = false;
+      state.player.isStunned = false;
+      state.player.potionUses = 2;
+      state.player.currentAnim = 'idle';
+      state.player.frameIndex = 0;
+
+      state.opponent.champKey = oChampKey;
+      state.opponent.hp = oDef.maxHp;
+      state.opponent.maxHp = oDef.maxHp;
+      state.opponent.mp = oDef.maxMp;
+      state.opponent.maxMp = oDef.maxMp;
+      state.opponent.fury = 0;
+      state.opponent.isGuarding = false;
+      state.opponent.isStunned = false;
+      state.opponent.potionUses = 2;
+      state.opponent.currentAnim = 'idle';
+      state.opponent.frameIndex = 0;
+
+      state.turn = 'player';
+      state.turnsCount = 1;
+      state.floatingNumbers = [];
+      state.particles = [];
+
+      // Atualizar Nomes e Badges no HUD
+      document.getElementById('player-name').innerText = pDef.name;
+      document.getElementById('player-portrait').innerText = pDef.icon;
+      document.getElementById('player-role-badge').innerText = pDef.role;
+
+      document.getElementById('opponent-name').innerText = oDef.name;
+      document.getElementById('opponent-portrait').innerText = oDef.icon;
+      document.getElementById('opponent-role-badge').innerText = oDef.role;
+
+      updateHudDisplay();
+      renderActionDeck();
+      addLog(`⚔️ O duelo começou! ${pDef.name} vs ${oDef.name}!`, 'hyper-log');
+    }
+
+    function renderActionDeck() {
+      const pDef = FIGHTER_DEFINITIONS[state.player.champKey];
+      const container = document.getElementById('action-buttons-grid');
+      container.innerHTML = '';
+
+      pDef.actions.forEach(action => {
+        const btn = document.createElement('button');
+        btn.className = `action-card-btn ${action.isHyper ? 'hyper-btn' : ''}`;
+        btn.id = `btn-action-${action.id}`;
+
+        let costLabel = '';
+        if (action.cost > 0) costLabel = `${action.cost} MP`;
+        else if (action.furyCost) costLabel = '100% FÚRIA';
+        else if (action.isPotion) costLabel = `${state.player.potionUses}x`;
+        else costLabel = '0 MP';
+
+        btn.innerHTML = `
+          <div class="action-btn-top">
+            <span class="action-name">${action.name}</span>
+            <span class="action-cost">${costLabel}</span>
+          </div>
+          <div class="action-desc">${action.desc}</div>
+        `;
+
+        btn.onclick = () => executePlayerAction(action);
+        container.appendChild(btn);
+      });
+
+      refreshActionButtonsAvailability();
+    }
+
+    function refreshActionButtonsAvailability() {
+      const isPlayerTurn = state.turn === 'player';
+      const pDef = FIGHTER_DEFINITIONS[state.player.champKey];
+
+      pDef.actions.forEach(act => {
+        const btn = document.getElementById(`btn-action-${act.id}`);
+        if (!btn) return;
+
+        let disabled = !isPlayerTurn;
+        if (act.cost > state.player.mp) disabled = true;
+        if (act.isHyper && state.player.fury < 100) disabled = true;
+        if (act.isPotion && state.player.potionUses <= 0) disabled = true;
+
+        btn.disabled = disabled;
+      });
+
+      document.getElementById('turn-indicator').innerText = isPlayerTurn ? 'SEU TURNO' : 'TURNO DO INIMIGO';
+      document.getElementById('turn-indicator').style.background = isPlayerTurn ? 'rgba(34, 197, 94, 0.4)' : 'rgba(239, 68, 68, 0.4)';
+    }
+
+    function updateHudDisplay() {
+      // HP Jogador
+      const pPct = Math.max(0, (state.player.hp / state.player.maxHp) * 100);
+      document.getElementById('player-hp-bar').style.width = `${pPct}%`;
+      document.getElementById('player-hp-text').innerText = `${state.player.hp} / ${state.player.maxHp}`;
+
+      // MP Jogador
+      const pMpPct = Math.max(0, (state.player.mp / state.player.maxMp) * 100);
+      document.getElementById('player-mp-bar').style.width = `${pMpPct}%`;
+      document.getElementById('player-mp-text').innerText = `${state.player.mp} / ${state.player.maxMp}`;
+
+      // Fúria Jogador
+      document.getElementById('player-fury-bar').style.width = `${state.player.fury}%`;
+      document.getElementById('player-fury-text').innerText = state.player.fury >= 100 ? '🔥 100% PRONTO!' : `${Math.floor(state.player.fury)}%`;
+
+      // HP Oponente
+      const oPct = Math.max(0, (state.opponent.hp / state.opponent.maxHp) * 100);
+      document.getElementById('opponent-hp-bar').style.width = `${oPct}%`;
+      document.getElementById('opponent-hp-text').innerText = `${state.opponent.hp} / ${state.opponent.maxHp}`;
+
+      // MP Oponente
+      const oMpPct = Math.max(0, (state.opponent.mp / state.opponent.maxMp) * 100);
+      document.getElementById('opponent-mp-bar').style.width = `${oMpPct}%`;
+      document.getElementById('opponent-mp-text').innerText = `${state.opponent.mp} / ${state.opponent.maxMp}`;
+
+      // Fúria Oponente
+      document.getElementById('opponent-fury-bar').style.width = `${state.opponent.fury}%`;
+      document.getElementById('opponent-fury-text').innerText = `${Math.floor(state.opponent.fury)}%`;
+    }
+
+    function addLog(msg, type = 'normal') {
+      const logBox = document.getElementById('battle-log');
+      const item = document.createElement('div');
+      item.className = `log-item ${type}`;
+      item.innerHTML = msg;
+      logBox.appendChild(item);
+      logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    // ─── EXECUÇÃO DE AÇÕES NO TURNO ──────────────────────────────────
+    async function executePlayerAction(action) {
+      if (state.turn !== 'player') return;
+      state.turn = 'animating';
+      refreshActionButtonsAvailability();
+
+      // Consumo de recursos
+      if (action.cost) state.player.mp -= action.cost;
+      if (action.mpGain) state.player.mp = Math.min(state.player.maxMp, state.player.mp + action.mpGain);
+      if (action.furyGain) state.player.fury = Math.min(100, state.player.fury + action.furyGain);
+      if (action.isHyper) state.player.fury = 0;
+
+      updateHudDisplay();
+
+      // Caso seja Poção
+      if (action.isPotion) {
+        state.player.potionUses--;
+        const heal = 70;
+        state.player.hp = Math.min(state.player.maxHp, state.player.hp + heal);
+        spawnFloatingNumber(state.player.x, state.player.y - 120, `+${heal} HP`, '#4ade80');
+        addLog(`🧪 ${FIGHTER_DEFINITIONS[state.player.champKey].name} usou uma Poção de Cura (+${heal} HP)!`, 'player-hit');
+        updateHudDisplay();
+        renderActionDeck();
+        await wait(800);
+        endPlayerTurn();
+        return;
+      }
+
+      // Caso seja Defesa
+      if (action.isGuard) {
+        state.player.isGuarding = true;
+        setFighterAnim(state.player, 'guard');
+        sound.playShieldClang();
+        spawnFloatingNumber(state.player.x, state.player.y - 120, 'GUARDA ATIVA!', '#38bdf8');
+        addLog(`🛡️ ${FIGHTER_DEFINITIONS[state.player.champKey].name} assumiu postura defensiva blindada!`, 'player-hit');
+        await wait(800);
+        setFighterAnim(state.player, 'idle');
+        endPlayerTurn();
+        return;
+      }
+
+      // Golpe com Animação e Efeitos
+      await performAttackAnimation(state.player, state.opponent, action, true);
+
+      // Verificar Vitória
+      if (state.opponent.hp <= 0) {
+        handleBattleEnd('VICTORY');
+        return;
+      }
+
+      endPlayerTurn();
+    }
+
+    function endPlayerTurn() {
+      state.turn = 'opponent';
+      refreshActionButtonsAvailability();
+
+      // Turno da CPU (com inteligência tática)
+      setTimeout(executeOpponentTurn, 900);
+    }
+
+    async function executeOpponentTurn() {
+      if (state.turn !== 'opponent' || state.opponent.hp <= 0) return;
+
+      const oDef = FIGHTER_DEFINITIONS[state.opponent.champKey];
+
+      // Se estiver atordoado
+      if (state.opponent.isStunned) {
+        state.opponent.isStunned = false;
+        addLog(`💫 ${oDef.name} está atordoado e perdeu este turno!`, 'opponent-hit');
+        spawnFloatingNumber(state.opponent.x, state.opponent.y - 120, 'ATORDOADO!', '#fbbf24');
+        await wait(800);
+        startPlayerTurn();
+        return;
+      }
+
+      // Escolha de Ação da CPU
+      let chosenAction = oDef.actions[0]; // Ataque físico padrão
+      if (state.opponent.fury >= 100) {
+        chosenAction = oDef.actions.find(a => a.isHyper) || chosenAction;
+      } else if (state.opponent.hp < 120 && state.opponent.potionUses > 0) {
+        chosenAction = oDef.actions.find(a => a.isPotion) || chosenAction;
+      } else if (state.opponent.mp >= 35 && Math.random() < 0.45) {
+        chosenAction = oDef.actions[3]; // Habilidade 3
+      } else if (state.opponent.mp >= 25 && Math.random() < 0.5) {
+        chosenAction = oDef.actions[2]; // Habilidade 2
+      } else if (state.opponent.mp >= 15) {
+        chosenAction = oDef.actions[1]; // Habilidade 1
+      }
+
+      // Consumo de recursos da CPU
+      if (chosenAction.cost) state.opponent.mp -= chosenAction.cost;
+      if (chosenAction.mpGain) state.opponent.mp = Math.min(state.opponent.maxMp, state.opponent.mp + chosenAction.mpGain);
+      if (chosenAction.furyGain) state.opponent.fury = Math.min(100, state.opponent.fury + chosenAction.furyGain);
+      if (chosenAction.isHyper) state.opponent.fury = 0;
+
+      updateHudDisplay();
+
+      if (chosenAction.isPotion) {
+        state.opponent.potionUses--;
+        const heal = 70;
+        state.opponent.hp = Math.min(state.opponent.maxHp, state.opponent.hp + heal);
+        spawnFloatingNumber(state.opponent.x, state.opponent.y - 120, `+${heal} HP`, '#4ade80');
+        addLog(`🧪 ${oDef.name} recuperou +${heal} HP com poção!`, 'opponent-hit');
+        updateHudDisplay();
+        await wait(800);
+        startPlayerTurn();
+        return;
+      }
+
+      if (chosenAction.isGuard) {
+        state.opponent.isGuarding = true;
+        setFighterAnim(state.opponent, 'guard');
+        sound.playShieldClang();
+        addLog(`🛡️ ${oDef.name} se defendeu!`, 'opponent-hit');
+        await wait(800);
+        setFighterAnim(state.opponent, 'idle');
+        startPlayerTurn();
+        return;
+      }
+
+      await performAttackAnimation(state.opponent, state.player, chosenAction, false);
+
+      // Verificar Derrota
+      if (state.player.hp <= 0) {
+        handleBattleEnd('DEFEAT');
+        return;
+      }
+
+      startPlayerTurn();
+    }
+
+    function startPlayerTurn() {
+      state.turnsCount++;
+      state.turn = 'player';
+      state.player.isGuarding = false; // Guarda reseta ao iniciar o turno
+      refreshActionButtonsAvailability();
+    }
+
+    // ─── EXECUÇÃO DE ANIMAÇÕES DE ATAQUE & DANO ─────────────────────
+    async function performAttackAnimation(attacker, target, action, isPlayer) {
+      const attDef = FIGHTER_DEFINITIONS[attacker.champKey];
+      const tarDef = FIGHTER_DEFINITIONS[target.champKey];
+
+      // Efeito de Hyper
+      if (action.isHyper) {
+        triggerHyperCinematic(action.name);
+        sound.playExplosion();
+        triggerScreenShake(30, 15);
+      }
+
+      // Ativar animação do atacante
+      setFighterAnim(attacker, action.id);
+
+      // Caso tenha projétil de escudo (Capitão América)
+      if (action.projectile) {
+        sound.playShieldClang();
+        await animateShieldProjectile(attacker, target);
+      } 
+      // Caso tenha raio de laser óptico (Ciclope)
+      else if (action.beam) {
+        sound.playLaser();
+        await animateLaserBeam(attacker, target);
+      } 
+      else {
+        // Golpe físico / investida
+        sound.playPunch();
+        await wait(350);
+      }
+
+      // Cálculo de Dano
+      let rawDamage = Math.floor((attDef.atkPower * (action.power || 1.0)) + (Math.random() * 12 - 6));
+      let isCrit = Math.random() < (action.critBonus || 0.15);
+      if (isCrit) rawDamage = Math.floor(rawDamage * 1.5);
+
+      if (target.isGuarding) {
+        rawDamage = Math.floor(rawDamage * 0.5);
+        addLog(`🛡️ ${tarDef.name} bloqueou parte do impacto!`, 'normal');
+      }
+
+      target.hp = Math.max(0, target.hp - rawDamage);
+      target.fury = Math.min(100, target.fury + (rawDamage * 0.25)); // Levar dano gera Fúria!
+
+      // Atordoamento (Stun)
+      if (action.stunChance && Math.random() < action.stunChance) {
+        target.isStunned = true;
+        addLog(`⚡ IMPACTO CRÍTICO! ${tarDef.name} ficou atordoado!`, 'hyper-log');
+      }
+
+      // Animação de Dano no Alvo
+      setFighterAnim(target, 'hit');
+      triggerScreenShake(15, action.isHyper ? 12 : 5);
+      spawnFloatingNumber(target.x, target.y - 120, `-${rawDamage}${isCrit ? ' CRÍTICO!' : ''}`, isCrit ? '#fbbf24' : '#ef4444');
+
+      addLog(`${isPlayer ? '⚔️' : '🔴'} ${attDef.name} desferiu <b>${action.name}</b> em ${tarDef.name} (-${rawDamage} HP)!`, isPlayer ? 'player-hit' : 'opponent-hit');
+
+      updateHudDisplay();
+      await wait(450);
+
+      // Retornar alvos à pose Idle
+      if (target.hp > 0) setFighterAnim(target, 'idle');
+      else setFighterAnim(target, 'defeat');
+
+      setFighterAnim(attacker, 'idle');
+    }
+
+    function triggerHyperCinematic(moveName) {
+      const flash = document.getElementById('hyper-flash-overlay');
+      const banner = document.getElementById('hyper-title-banner');
+      banner.innerText = moveName;
+      flash.classList.add('hyper-flash-active');
+      banner.classList.add('hyper-banner-show');
+
+      setTimeout(() => {
+        flash.classList.remove('hyper-flash-active');
+        banner.classList.remove('hyper-banner-show');
+      }, 700);
+    }
+
+    function triggerScreenShake(durationMs, magnitude) {
+      state.shakeDuration = durationMs;
+      state.shakeMagnitude = magnitude;
+    }
+
+    function animateShieldProjectile(attacker, target) {
+      return new Promise(resolve => {
+        const startX = attacker.x + 30;
+        const targetX = target.x - 20;
+        const y = attacker.y - 50;
+        let progress = 0;
+        let returning = false;
+
+        const interval = setInterval(() => {
+          if (!returning) {
+            progress += 0.08;
+            if (progress >= 1) {
+              returning = true;
+              progress = 1;
+              sound.playShieldClang();
+              spawnHitSpark(targetX, y);
+            }
+          } else {
+            progress -= 0.08;
+            if (progress <= 0) {
+              clearInterval(interval);
+              attacker.activeProjectile = null;
+              resolve();
+              return;
+            }
+          }
+
+          const currentX = startX + (targetX - startX) * progress;
+          attacker.activeProjectile = {
+            x: currentX,
+            y: y + Math.sin(progress * Math.PI) * -15,
+            frame: Math.floor(Date.now() / 40) % 6
+          };
+        }, 20);
+      });
+    }
+
+    function animateLaserBeam(attacker, target) {
+      return new Promise(resolve => {
+        const startX = attacker.x + 20;
+        const targetX = target.x;
+        const y = attacker.y - 65;
+        let duration = 300;
+
+        attacker.activeBeam = {
+          startX,
+          targetX,
+          y,
+          frame: 0
+        };
+
+        const interval = setInterval(() => {
+          attacker.activeBeam.frame = (attacker.activeBeam.frame + 1) % 5;
+          duration -= 30;
+          if (duration <= 0) {
+            clearInterval(interval);
+            attacker.activeBeam = null;
+            spawnHitSpark(targetX, y);
+            resolve();
+          }
+        }, 30);
+      });
+    }
+
+    function spawnFloatingNumber(x, y, text, color) {
+      state.floatingNumbers.push({
+        x,
+        y,
+        text,
+        color,
+        opacity: 1,
+        life: 45
+      });
+    }
+
+    function spawnHitSpark(x, y) {
+      for (let i = 0; i < 8; i++) {
+        state.particles.push({
+          x,
+          y,
+          vx: (Math.random() - 0.5) * 8,
+          vy: (Math.random() - 0.5) * 8 - 2,
+          color: Math.random() < 0.5 ? '#fbbf24' : '#ef4444',
+          size: Math.random() * 4 + 2,
+          life: 20
+        });
+      }
+    }
+
+    function setFighterAnim(fighter, animName) {
+      fighter.currentAnim = animName;
+      fighter.frameIndex = 0;
+      fighter.lastFrameTime = Date.now();
+    }
+
+    function wait(ms) {
+      return new Promise(r => setTimeout(r, ms));
+    }
+
+    // ─── FINALIZAÇÃO DA BATALHA & RECOMPENSAS ────────────────────────
+    async function handleBattleEnd(result) {
+      const isVictory = result === 'VICTORY';
+      const winner = isVictory ? state.player : state.opponent;
+      setFighterAnim(winner, 'victory');
+
+      sound.playExplosion();
+
+      // Chamar backend para creditar Ouro e XP
+      let goldAwarded = isVictory ? 50 : 10;
+      let xpAwarded = isVictory ? 80 : 25;
+
+      const token = localStorage.getItem('liraquest_token');
+      if (token) {
+        try {
+          const res = await fetch('/api/battle/finish', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              result,
+              player_hero: state.player.champKey,
+              opponent: state.opponent.champKey,
+              turns_count: state.turnsCount
+            })
+          });
+          const data = await res.json();
+          if (data.success && data.rewards) {
+            goldAwarded = data.rewards.gold;
+            xpAwarded = data.rewards.xp;
+            if (data.character) {
+              document.getElementById('player-gold-display').innerText = data.character.gold;
+            }
+          }
+        } catch (e) {
+          console.warn('Erro ao finalizar batalha online:', e);
+        }
+      }
+
+      await wait(1000);
+
+      // Exibir Modal de Resultado
+      document.getElementById('result-modal-title').innerText = isVictory ? '👑 VITÓRIA TRIUNFANTE!' : '💀 DERROTA!';
+      document.getElementById('result-modal-title').style.color = isVictory ? '#fbbf24' : '#ef4444';
+      document.getElementById('result-modal-icon').innerText = isVictory ? '🏆' : '💀';
+      document.getElementById('result-modal-desc').innerText = isVictory
+        ? `Você dominou a Arena de Batalha 2D com maestria tática!`
+        : `Seu oponente venceu este combate. Treine suas habilidades e tente novamente!`;
+      document.getElementById('result-gold-reward').innerText = `+${goldAwarded} Ouro`;
+      document.getElementById('result-xp-reward').innerText = `+${xpAwarded} XP`;
+
+      document.getElementById('battle-result-modal').style.display = 'flex';
+    }
+
+    function restartBattle() {
+      document.getElementById('battle-result-modal').style.display = 'none';
+      initBattleMatch(selectedPlayerChamp, selectedOpponentChamp);
+    }
+
+    function returnToArcade() {
+      try {
+        localStorage.setItem('liraquest_avatar_tab', 'arcade');
+      } catch(e) {}
+      window.location.href = '/index.html';
+    }
+
+    // ─── LOOP DE RENDERIZAÇÃO DO CANVAS 2D ───────────────────────────
+    const canvas = document.getElementById('battleCanvas');
+    const ctx = canvas.getContext('2d');
+    const bgImage = loadImage('/assets/battle/arena_bg.jpg');
+
+    function renderLoop() {
+      requestAnimationFrame(renderLoop);
+
+      // Screen Shake
+      ctx.save();
+      if (state.shakeDuration > 0) {
+        state.shakeDuration--;
+        const offsetX = (Math.random() - 0.5) * state.shakeMagnitude;
+        const offsetY = (Math.random() - 0.5) * state.shakeMagnitude;
+        ctx.translate(offsetX, offsetY);
+      }
+
+      // Desenhar Fundo da Arena
+      if (bgImage.complete && bgImage.naturalWidth > 0) {
+        ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
+      } else {
+        ctx.fillStyle = '#080c16';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+
+      // Desenhar Sombras dos Lutadores no Chão
+      drawFighterShadow(ctx, state.player.x, state.player.y);
+      drawFighterShadow(ctx, state.opponent.x, state.opponent.y);
+
+      // Desenhar Lutador do Jogador (Esquerda -> Direita)
+      drawFighter(ctx, state.player, false);
+
+      // Desenhar Oponente (Direita -> Esquerda, Flipped Horizontalmente)
+      drawFighter(ctx, state.opponent, true);
+
+      // Desenhar Projéteis Ativos (ex: Escudo voando)
+      drawActiveProjectiles(ctx);
+
+      // Desenhar Partículas de Faíscas
+      drawParticles(ctx);
+
+      // Desenhar Números Flutuantes de Dano / Cura
+      drawFloatingNumbers(ctx);
+
+      ctx.restore();
+    }
+
+    function drawFighterShadow(ctx, x, y) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+      ctx.beginPath();
+      ctx.ellipse(x, y - 5, 55, 14, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawFighter(ctx, fighter, isFlipped) {
+      const manifest = manifests[fighter.champKey];
+      if (!manifest) return;
+
+      const anim = manifest[fighter.currentAnim] || manifest.idle;
+      const now = Date.now();
+      const frameDuration = anim.durationPerFrame || 80;
+
+      // Avançar quadro se atingiu a duração
+      if (now - fighter.lastFrameTime >= frameDuration) {
+        fighter.lastFrameTime = now;
+        if (anim.loop) {
+          fighter.frameIndex = (fighter.frameIndex + 1) % anim.frames.length;
+        } else if (fighter.frameIndex < anim.frames.length - 1) {
+          fighter.frameIndex++;
+        }
+      }
+
+      const frameData = anim.frames[fighter.frameIndex] || anim.frames[0];
+      if (!frameData) return;
+
+      const scale = FIGHTER_DEFINITIONS[fighter.champKey].scale;
+      const assetDir = FIGHTER_DEFINITIONS[fighter.champKey].assetDir;
+
+      ctx.save();
+      ctx.translate(fighter.x, fighter.y);
+      if (isFlipped) ctx.scale(-1, 1);
+
+      // 1. Desenhar Corpo do Lutador
+      if (frameData.body) {
+        const imgBody = loadImage(assetDir + frameData.body);
+        if (imgBody.complete && imgBody.naturalWidth > 0) {
+          const axisX = (frameData.bodyAxis ? frameData.bodyAxis.xaxis : 38) * scale;
+          const axisY = (frameData.bodyAxis ? frameData.bodyAxis.yaxis : 102) * scale;
+          const w = imgBody.naturalWidth * scale;
+          const h = imgBody.naturalHeight * scale;
+          ctx.drawImage(imgBody, -axisX, -axisY, w, h);
+        }
+      }
+
+      // 2. Desenhar Escudo Sobreposto (caso do Capitão)
+      if (frameData.shield && !fighter.activeProjectile) {
+        const imgShield = loadImage(assetDir + frameData.shield);
+        if (imgShield.complete && imgShield.naturalWidth > 0) {
+          const axisX = (frameData.shieldAxis ? frameData.shieldAxis.xaxis : 42) * scale;
+          const axisY = (frameData.shieldAxis ? frameData.shieldAxis.yaxis : 91) * scale;
+          const w = imgShield.naturalWidth * scale;
+          const h = imgShield.naturalHeight * scale;
+          ctx.drawImage(imgShield, -axisX, -axisY, w, h);
+        }
+      }
+
+      // 3. Desenhar Efeito Visual Acoplado (Aura / Plasma)
+      if (frameData.fx) {
+        const imgFx = loadImage('/assets/characters/effects/' + frameData.fx);
+        if (imgFx.complete && imgFx.naturalWidth > 0) {
+          const axisX = (frameData.fxAxis ? frameData.fxAxis.xaxis : 50) * scale;
+          const axisY = (frameData.fxAxis ? frameData.fxAxis.yaxis : 50) * scale;
+          const w = imgFx.naturalWidth * scale;
+          const h = imgFx.naturalHeight * scale;
+          ctx.drawImage(imgFx, -axisX, -axisY, w, h);
+        }
+      }
+
+      ctx.restore();
+    }
+
+    function drawActiveProjectiles(ctx) {
+      // Escudo voador do Capitão América
+      if (state.player.activeProjectile) {
+        const p = state.player.activeProjectile;
+        const img = loadImage(`/assets/characters/effects/11000-${p.frame}.png`);
+        if (img.complete && img.naturalWidth > 0) {
+          ctx.save();
+          ctx.drawImage(img, p.x - 30, p.y - 20, 60, 45);
+          ctx.restore();
+        }
+      }
+
+      // Feixe de Laser Óptico do Ciclope
+      if (state.opponent.activeBeam) {
+        const b = state.opponent.activeBeam;
+        const img = loadImage(`/assets/characters/effects/11000-${b.frame}.png`);
+        if (img.complete && img.naturalWidth > 0) {
+          ctx.save();
+          const beamWidth = b.targetX - b.startX;
+          ctx.drawImage(img, b.startX, b.y, beamWidth, 35);
+          ctx.restore();
+        }
+      }
+    }
+
+    function drawParticles(ctx) {
+      for (let i = state.particles.length - 1; i >= 0; i--) {
+        const p = state.particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life--;
+
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (p.life <= 0) state.particles.splice(i, 1);
+      }
+    }
+
+    function drawFloatingNumbers(ctx) {
+      for (let i = state.floatingNumbers.length - 1; i >= 0; i--) {
+        const fn = state.floatingNumbers[i];
+        fn.y -= 1.2;
+        fn.life--;
+        fn.opacity = fn.life / 45;
+
+        ctx.save();
+        ctx.font = '900 22px Orbitron, Inter, sans-serif';
+        ctx.fillStyle = fn.color;
+        ctx.shadowColor = '#000';
+        ctx.shadowBlur = 6;
+        ctx.globalAlpha = fn.opacity;
+        ctx.fillText(fn.text, fn.x - 35, fn.y);
+        ctx.restore();
+
+        if (fn.life <= 0) state.floatingNumbers.splice(i, 1);
+      }
+    }
+
+    // ─── INICIALIZAÇÃO GERAL AO CARREGAR A PÁGINA ────────────────────
+    window.addEventListener('DOMContentLoaded', async () => {
+      await loadManifests();
+      renderLoop();
+
+      // Carregar saldo real de energia e ouro se logado
+      const token = localStorage.getItem('liraquest_token');
+      if (token) {
+        try {
+          const [resProg, resChar] = await Promise.all([
+            fetch('/api/progress', { headers: { 'Authorization': `Bearer ${token}` } }),
+            fetch('/api/character', { headers: { 'Authorization': `Bearer ${token}` } })
+          ]);
+          const progData = await resProg.json();
+          const charData = await resChar.json();
+          if (progData.success && progData.progress) {
+            document.getElementById('player-energy-display').innerText = progData.progress.adventure_energy ?? 15;
+          }
+          if (charData.success && charData.character) {
+            document.getElementById('player-gold-display').innerText = charData.character.gold ?? 0;
+          }
+        } catch(e) {
+          console.warn('Executando modo local:', e);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

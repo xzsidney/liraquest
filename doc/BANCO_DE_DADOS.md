@@ -482,5 +482,20 @@ Histórico de expedições realizadas pelos heróis do clã.
 | `rewards_collected` | `JSON` | Sim | Resumo de Ouro, XP e Atributo aprimorado |
 | `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
 
+---
+
+### ⚔️ `battles`
+Histórico e estado das sessões de combate da Arena 2D e Raids Familiares.
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único da batalha |
+| `family_id` | `UUID` (FK) | Não | Família à qual a batalha pertence |
+| `monster_id` | `UUID` (FK) | Não | Monstro/Oponente enfrentado |
+| `status` | `ENUM('IN_PROGRESS','VICTORY','DEFEAT')` | Não | Status da batalha |
+| `battle_log` | `JSON` | Sim | Histórico de turnos, danos, bloqueios e golpes especiais executados |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+
+
 
 
