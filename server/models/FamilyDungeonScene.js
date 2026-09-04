@@ -36,6 +36,10 @@ FamilyDungeonScene.init(
       allowNull: true,
       defaultValue: '🏛️',
     },
+    scene_image_url: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
     is_final_scene: {
       type: DataTypes.BOOLEAN,
       allowNull: false,

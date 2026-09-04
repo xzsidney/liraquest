@@ -1063,6 +1063,7 @@ async function seed() {
             title: scnData.title,
             narrative_text: scnData.narrative_text,
             scene_icon: scnData.scene_icon,
+            scene_image_url: scnData.scene_image_url || null,
             is_final_scene: scnData.is_final_scene,
           });
         } else {
@@ -1071,6 +1072,7 @@ async function seed() {
             title: scnData.title,
             narrative_text: scnData.narrative_text,
             scene_icon: scnData.scene_icon,
+            scene_image_url: scnData.scene_image_url || null,
             is_final_scene: scnData.is_final_scene,
           });
         }

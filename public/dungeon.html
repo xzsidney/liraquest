@@ -392,10 +392,14 @@
     .view-story {
       display: none;
       flex-direction: column;
+      justify-content: space-between;
+      min-height: 100%;
+      height: 100%;
       gap: 14px;
       width: 100%;
-      max-width: 820px;
+      max-width: 840px;
       margin: 0 auto;
+      flex: 1;
     }
 
     /* Faixa de progresso da masmorra */
@@ -403,12 +407,15 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid rgba(212, 175, 55, 0.3);
+      background: rgba(12, 19, 36, 0.82);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(212, 175, 55, 0.35);
       border-radius: 12px;
       padding: 8px 14px;
       font-size: 0.8rem;
       font-weight: 700;
+      flex-shrink: 0;
     }
 
     .progress-steps {
@@ -436,21 +443,34 @@
       border-color: #4ade80;
     }
 
-    /* O Livro de Pergaminho (Card de Cena do Livro) */
+    /* O Livro de Pergaminho (Card de Cena Ancorado na Parte Baixa) */
     .parchment-book {
       position: relative;
-      background: rgba(12, 19, 36, 0.84);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 2px solid var(--gold);
+      margin-top: auto;
+      background: rgba(10, 16, 32, 0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1.5px solid rgba(212, 175, 55, 0.5);
       border-radius: 18px;
-      padding: 18px;
-      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.75), 0 0 20px rgba(212, 175, 55, 0.2), inset 0 0 25px rgba(0, 0, 0, 0.5);
+      padding: 16px 18px;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.85), 0 0 25px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(0, 0, 0, 0.5);
+      max-height: 62vh;
+      overflow-y: auto;
+      flex-shrink: 1;
+    }
+
+    .parchment-book::-webkit-scrollbar {
+      width: 5px;
+    }
+    .parchment-book::-webkit-scrollbar-thumb {
+      background: rgba(212, 175, 55, 0.4);
+      border-radius: 4px;
     }
 
     @media (min-width: 640px) {
       .parchment-book {
-        padding: 24px;
+        padding: 20px 24px;
+        max-height: 56vh;
       }
     }
 
@@ -1390,16 +1410,41 @@
       document.getElementById('scene-title').innerText = scene.title;
       document.getElementById('scene-text').innerText = scene.narrative_text;
 
-      // Imagem de Fundo Temática da Masmorra no DIV MAIOR (Arena / Container Principal)
-      const wrapper = document.getElementById('dungeon-wrapper');
-      if (wrapper && activeAdventure) {
-        const bgMap = {
+      // Imagem de Fundo Temática por CENA no DIV MAIOR (Arena / Container Principal)
+      let sceneBg = scene.scene_image_url || null;
+
+      if (!sceneBg) {
+        const sceneImagesMap = {
+          // Masmorra 1: Covil do Goblin da Poeira
+          'sotao_entrada': '/assets/dungeons/scenes/covil_sotao_entrada.jpg',
+          'sala_arrombada': '/assets/dungeons/scenes/covil_sala_arrombada.jpg',
+          'porta_travada_alerta': '/assets/dungeons/scenes/covil_porta_travada.jpg',
+          'sala_infiltrada': '/assets/dungeons/scenes/covil_sala_arrombada.jpg',
+          'fechadura_quebrada': '/assets/dungeons/scenes/covil_porta_travada.jpg',
+          'sala_chave_mestra': '/assets/dungeons/scenes/covil_sotao_entrada.jpg',
+          'armadilha_poeira': '/assets/dungeons/scenes/covil_porta_travada.jpg',
+          'nevoa_poeira': '/assets/dungeons/covil_goblin_poeira.jpg',
+          'piso_brinquedos': '/assets/dungeons/scenes/covil_sala_arrombada.jpg',
+          'duelo_goblin': '/assets/dungeons/scenes/covil_duelo_goblin.jpg',
+          'bau_tesouro_goblin': '/assets/dungeons/scenes/covil_bau_tesouro.jpg',
+        };
+        if (scene.scene_code && sceneImagesMap[scene.scene_code]) {
+          sceneBg = sceneImagesMap[scene.scene_code];
+        }
+      }
+
+      if (!sceneBg && activeAdventure) {
+        const dungeonFallbackMap = {
           'covil_goblin_poeira': '/assets/dungeons/covil_goblin_poeira.jpg',
           'torre_devorador_paginas': '/assets/dungeons/torre_devorador_paginas.jpg',
           'catacumbas_procrastinacao': '/assets/dungeons/catacumbas_procrastinacao.jpg',
         };
-        const bgUrl = bgMap[activeAdventure.code] || '/assets/dungeons/covil_goblin_poeira.jpg';
-        wrapper.style.backgroundImage = `url('${bgUrl}')`;
+        sceneBg = dungeonFallbackMap[activeAdventure.code] || '/assets/dungeons/covil_goblin_poeira.jpg';
+      }
+
+      const wrapper = document.getElementById('dungeon-wrapper');
+      if (wrapper && sceneBg) {
+        wrapper.style.backgroundImage = `url('${sceneBg}')`;
       }
       const bookCard = document.querySelector('.parchment-book');
       if (bookCard) bookCard.style.backgroundImage = '';

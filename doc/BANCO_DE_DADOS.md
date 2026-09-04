@@ -444,6 +444,7 @@ Capítulos, salas e nós sequenciais que compõem cada livro de masmorra.
 | `title` | `VARCHAR(150)` | Não | Título da sala/capítulo |
 | `narrative_text` | `TEXT` | Não | Prosa narrativa imersiva com descrição do ambiente |
 | `scene_icon` | `VARCHAR(50)` | Sim | Ícone temático da cena |
+| `scene_image_url` | `VARCHAR(255)` | Sim | Caminho/URL da ilustração artística específica da cena |
 | `is_final_scene` | `BOOLEAN` | Não | Se é a câmara do Baú Épico final |
 | `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
 
