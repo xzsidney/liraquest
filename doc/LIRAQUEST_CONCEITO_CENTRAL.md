@@ -150,7 +150,15 @@ O Arcade do Reino é o hub de lazer onde o Avatar gasta a **⚡ Energia de Avent
    - ⚖️ **Placar Dinâmico em "Cabo de Guerra":** Uma barra superior dinâmica com gema central oscila em tempo real conforme os acertos e combos de cada arqueiro, gerando engajamento e adrenalina saudável.
    - ⚡ **Desempenho Zero Lag:** A física e renderização ocorrem 100% no cliente (Canvas 2D nativo); o servidor Hostinger apenas propaga pings leves de pontuação e combo via WebSocket, operando com consumo mínimo de recursos.
    - 👑 **Glória e Recompensas:** O vencedor ganha +50 Ouro, +80 XP e +2 INT; o vice-campeão recebe prêmio de participação valoroso (+25 Ouro, +40 XP e +1 INT), reforçando sempre a cooperação e o esforço.
-4. 📜 **Aventuras em Quest (Livro-Jogo 3 Escolhas):** Histórias ilustradas com caminhos ramificados baseadas nos atributos da ficha.
+4. 📜 **Aventuras em Quest (Livro-Jogo Interativo de Masmorra - ATIVO):** RPG Solo de narrativa ramificada em estilo livro-jogo clássico com 3 escolhas estratégicas por cena e testes dinâmicos de atributos com D20 animado:
+   - 🏰 **Campanhas no Catálogo:** Três masmorras disponíveis com 5 cenas/capítulos cada:
+     - 🧹 *O Covil do Goblin da Poeira (Fácil):* Foco em organização do lar, bravura e iniciativa contra a sujeira.
+     - 📚 *A Torre do Devorador de Páginas (Média):* Foco em sabedoria, leitura, enigmas arcanos e concentração escolar.
+     - ⏳ *As Catacumbas da Procrastinação Eterna (Difícil):* Foco em determinação, agilidade e vitória sobre a preguiça e adiamento.
+   - 🎲 **Mesa de Rolagem D20 Animada:** A cada cena, o jogador escolhe entre 3 ações (Força/Combate, Agilidade/Destreza, ou Inteligência/Magia). O dado D20 virtual rola com física e som tátil (Web Audio API), somando o modificador de atributo da ficha do herói contra a Classe de Dificuldade (CD).
+   - ❤️ **Sistema de Pontos de Vida (HP):** O HP do herói na expedição é baseado em sua Constituição ($\text{HP} = 30 + \text{CON} \times 2$). Falhas nos testes causam dano com efeito de tremor de tela.
+   - 👑 **Baú Épico & Evolução Real:** Ao vencer a câmara final, o Baú Épico se abre com fanfarra real, creditando Ouro no Herói, XP na Classe Ativa (com checagem de Level Up) e aprimorando permanentemente (+1) o atributo mais utilizado com sucesso na run! Em caso de derrota, a Guarda Real realiza o resgate honroso com recompensas de consolação (+15 Ouro, +25 XP), mantendo o princípio de reforço positivo sem punição severa.
+   - ⚡ **Economia:** Consome 5 ⚡ Energia de Aventura ganha nas tarefas do mundo real.
 5. ⚔️ **Arena de Batalha 2D:** Combates contra os Monstros da Casa.
 
 ### 7.2 Masmorras Solo & Desafios Diários

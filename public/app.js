@@ -922,8 +922,14 @@ function openArcherGameArena() {
   window.location.href = '/archer.html';
 }
 
+function openDungeonGameArena() {
+  try { localStorage.setItem('liraquest_avatar_tab', 'arcade'); } catch (e) {}
+  window.location.href = '/dungeon.html';
+}
+
 window.openChameleonGameArena = openChameleonGameArena;
 window.openArcherGameArena = openArcherGameArena;
+window.openDungeonGameArena = openDungeonGameArena;
 
 function closeChameleonGameArena() {
   if (chameleonGameInstance) {
@@ -5403,6 +5409,11 @@ window.openArcherGameArena = function() {
 window.openDuelGameArena = function() {
   try { localStorage.setItem('liraquest_avatar_tab', 'arcade'); } catch(e) {}
   window.location.href = '/duel.html';
+};
+
+window.openDungeonGameArena = function() {
+  try { localStorage.setItem('liraquest_avatar_tab', 'arcade'); } catch(e) {}
+  window.location.href = '/dungeon.html';
 };
 
 

@@ -23,6 +23,10 @@ import { FamilyReward } from './FamilyReward.js';
 import { FamilyRewardRedemption } from './FamilyRewardRedemption.js';
 import { FamilyQuizQuestion } from './FamilyQuizQuestion.js';
 import { FamilyQuizOption } from './FamilyQuizOption.js';
+import { FamilyDungeonAdventure } from './FamilyDungeonAdventure.js';
+import { FamilyDungeonScene } from './FamilyDungeonScene.js';
+import { FamilyDungeonAction } from './FamilyDungeonAction.js';
+import { FamilyDungeonRun } from './FamilyDungeonRun.js';
 
 // ==========================================
 // 1. Associações de Usuário & Família
@@ -132,6 +136,24 @@ FamilyRewardRedemption.belongsTo(FamilyUser, { foreignKey: 'reviewed_by', as: 'r
 FamilyQuizQuestion.hasMany(FamilyQuizOption, { foreignKey: 'question_id', as: 'options', onDelete: 'CASCADE' });
 FamilyQuizOption.belongsTo(FamilyQuizQuestion, { foreignKey: 'question_id', as: 'question' });
 
+// ==========================================
+// 9. Associações do Livro-Jogo de Masmorras (Aventuras em Quest)
+// ==========================================
+FamilyDungeonAdventure.hasMany(FamilyDungeonScene, { foreignKey: 'adventure_id', as: 'scenes', onDelete: 'CASCADE' });
+FamilyDungeonScene.belongsTo(FamilyDungeonAdventure, { foreignKey: 'adventure_id', as: 'adventure' });
+
+FamilyDungeonScene.hasMany(FamilyDungeonAction, { foreignKey: 'scene_id', as: 'actions', onDelete: 'CASCADE' });
+FamilyDungeonAction.belongsTo(FamilyDungeonScene, { foreignKey: 'scene_id', as: 'scene' });
+
+FamilyUser.hasMany(FamilyDungeonRun, { foreignKey: 'user_id', as: 'dungeon_runs' });
+FamilyDungeonRun.belongsTo(FamilyUser, { foreignKey: 'user_id', as: 'user' });
+
+Character.hasMany(FamilyDungeonRun, { foreignKey: 'character_id', as: 'dungeon_runs' });
+FamilyDungeonRun.belongsTo(Character, { foreignKey: 'character_id', as: 'character' });
+
+FamilyDungeonAdventure.hasMany(FamilyDungeonRun, { foreignKey: 'adventure_id', as: 'runs' });
+FamilyDungeonRun.belongsTo(FamilyDungeonAdventure, { foreignKey: 'adventure_id', as: 'adventure' });
+
 export {
   sequelize,
   FamilyUser,
@@ -157,4 +179,8 @@ export {
   FamilyRewardRedemption,
   FamilyQuizQuestion,
   FamilyQuizOption,
+  FamilyDungeonAdventure,
+  FamilyDungeonScene,
+  FamilyDungeonAction,
+  FamilyDungeonRun,
 };

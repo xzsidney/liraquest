@@ -3701,13 +3701,13 @@
                 </button>
               </div>
 
-              <!-- Card Jogo 3: Livro-Jogo de Aventuras -->
-              <div class="arcade-card" style="opacity: 0.85;">
+              <!-- Card Jogo 3: Livro-Jogo de Aventuras (ATIVO / JOGÁVEL) -->
+              <div class="arcade-card active-game">
                 <div>
                   <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-                    <span style="font-size: 2.5rem; background: rgba(120, 53, 15, 0.5); width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(245, 158, 11, 0.4);">📜</span>
-                    <span style="background: rgba(245, 158, 11, 0.2); color: #fde047; border: 1px solid rgba(245, 158, 11, 0.4); padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800;">
-                      ⏳ EM BREVE
+                    <span style="font-size: 2.5rem; background: linear-gradient(135deg, rgba(120, 53, 15, 0.6) 0%, rgba(128, 0, 32, 0.6) 100%); width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--gold);">📜</span>
+                    <span style="background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800;">
+                      🟢 DISPONÍVEL
                     </span>
                   </div>
                   <h3 style="font-size: 1.3rem; color: #ffffff; margin-bottom: 6px;">Aventuras em Quest (Livro-Jogo)</h3>
@@ -3717,10 +3717,11 @@
                   <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
                     <span class="reward-pill-energy" style="font-size: 0.75rem;">⚡ Custa: 5 Energia</span>
                     <span class="reward-pill-gold" style="font-size: 0.75rem;">💰 Prêmio: Baú Épico</span>
+                    <span class="reward-pill-xp" style="font-size: 0.75rem;">⭐ +XP & Atributos</span>
                   </div>
                 </div>
-                <button class="btn btn-secondary" style="width: 100%; padding: 12px; opacity: 0.6; cursor: not-allowed;" disabled>
-                  🔒 Em Desenvolvimento
+                <button class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 1rem; background: linear-gradient(135deg, #800020 0%, #1e3a8a 100%);" onclick="openDungeonGameArena()">
+                  📜 Explorar Masmorra (5 ⚡)
                 </button>
               </div>
 
@@ -4126,8 +4127,14 @@
       window.location.href = '/duel.html';
     }
     window.openDuelGameArena = openDuelGameArena;
+
+    function openDungeonGameArena() {
+      try { localStorage.setItem('liraquest_avatar_tab', 'arcade'); } catch(e) {}
+      window.location.href = '/dungeon.html';
+    }
+    window.openDungeonGameArena = openDungeonGameArena;
   </script>
   <script src="/socket.io/socket.io.js"></script>
-  <script src="/app.js?v=20260904_duel_v1"></script>
+  <script src="/app.js?v=20260904_dungeon_v1"></script>
 </body>
 </html>

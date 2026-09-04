@@ -409,5 +409,75 @@ Alternativas / alvos móveis vinculados a cada pergunta do quiz (1 correta e 3 d
 | `is_correct` | `BOOLEAN` | Não | `true` se for a alternativa correta, `false` para distratores |
 | `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
 
+---
+
+## 8. Módulo do Livro-Jogo de Masmorras (`family_dungeon_*`)
+
+Estrutura 100% relacional e modular para o **Jogo 3 do Arcade: Aventuras em Quest** (1 História ➔ N Cenas ➔ 3 Ações por cena + Histórico de Runs).
+
+### 📜 `family_dungeon_adventures`
+Catálogo de masmorras e livros-jogos disponíveis no reino.
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único UUID |
+| `code` | `VARCHAR(50)` (Unique) | Não | Código legível da aventura (ex: `'covil_goblin_poeira'`) |
+| `title` | `VARCHAR(150)` | Não | Título épico da masmorra |
+| `description` | `TEXT` | Sim | Sinopse e contexto narrativo |
+| `cover_icon` | `VARCHAR(50)` | Não | Emoji/ícone de capa |
+| `difficulty_level` | `ENUM('EASY','MEDIUM','HARD')` | Não | Nível de dificuldade calibrado |
+| `energy_cost` | `INT` | Não | Custo em Energia de Aventura (padrão: 5 ⚡) |
+| `base_gold_reward` | `INT` | Não | Ouro base ao triunfar no Baú Épico |
+| `base_xp_reward` | `INT` | Não | XP base creditado na classe ativa |
+| `is_active` | `BOOLEAN` | Não | Flag de ativação (default: `true`) |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+
+### 🏛️ `family_dungeon_scenes`
+Capítulos, salas e nós sequenciais que compõem cada livro de masmorra.
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único UUID |
+| `adventure_id` | `UUID` (FK) | Não | Referência a `family_dungeon_adventures.id` (CASCADE) |
+| `step_order` | `INT` | Não | Ordem cronológica da cena (1 a 5) |
+| `scene_code` | `VARCHAR(50)` | Não | Identificador do nó (ex: `'sotao_entrada'`, `'nevoa_poeira'`) |
+| `title` | `VARCHAR(150)` | Não | Título da sala/capítulo |
+| `narrative_text` | `TEXT` | Não | Prosa narrativa imersiva com descrição do ambiente |
+| `scene_icon` | `VARCHAR(50)` | Sim | Ícone temático da cena |
+| `is_final_scene` | `BOOLEAN` | Não | Se é a câmara do Baú Épico final |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+
+### ⚔️ `family_dungeon_actions`
+As 3 opções de ação disponíveis em cada cena para o herói escolher e testar seus atributos.
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único UUID |
+| `scene_id` | `UUID` (FK) | Não | Referência a `family_dungeon_scenes.id` (CASCADE) |
+| `action_number` | `INT` | Não | Posição da ação (1, 2 ou 3) |
+| `title` | `VARCHAR(255)` | Não | Texto descritivo da ação escolhida pelo jogador |
+| `attribute_code` | `VARCHAR(20)` | Não | Código do atributo testado (`str`, `agi`, `con`, `int`, `cha`, `luk`) |
+| `difficulty_dc` | `INT` | Não | Classe de Dificuldade (CD) para teste no D20 |
+| `success_text` | `TEXT` | Não | Desfecho glorioso em caso de sucesso |
+| `failure_text` | `TEXT` | Não | Desfecho em caso de falha |
+| `failure_damage` | `INT` | Não | Dano infligido ao HP em caso de falha |
+| `bonus_gold` | `INT` | Não | Ouro extra encontrado caso supere com louvor |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+
+### 🛡️ `family_dungeon_runs`
+Histórico de expedições realizadas pelos heróis do clã.
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único da partida |
+| `user_id` | `UUID` (FK) | Não | Membro do clã (`family_users.id`) |
+| `character_id` | `UUID` (FK) | Sim | Herói participante (`characters.id`) |
+| `adventure_id` | `UUID` (FK) | Não | Masmorra explorada (`family_dungeon_adventures.id`) |
+| `status` | `ENUM('IN_PROGRESS','VICTORY','DEFEAT')` | Não | Desfecho da expedição |
+| `final_hp` | `INT` | Não | HP restante do herói ao concluir |
+| `choices_log` | `JSON` | Sim | Histórico das rolagens e decisões tomadas |
+| `rewards_collected` | `JSON` | Sim | Resumo de Ouro, XP e Atributo aprimorado |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+
 
 

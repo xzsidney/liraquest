@@ -182,5 +182,18 @@ Namespace dedicado para partidas 1v1 entre irmãos e membros do clã:
 - `duel_request_rematch`: Reinicia a arena para uma nova revanche familiar.
 - `duel_player_disconnected`: Notifica o oponente caso um dos duelistas perca a conexão.
 
+---
+
+## 14. Módulo do Livro-Jogo de Masmorras (`/api/dungeon`)
+
+Endpoints do mini-game **Aventuras em Quest**, com carregamento de masmorras relacionais, 3 escolhas por cena, consumo de energia e entrega de recompensas:
+
+| Método | Rota | Autenticação | Descrição |
+|:---|:---|:---|:---|
+| `GET` | `/api/dungeon/adventures` | Pública | Lista todas as masmorras ativas do reino com títulos, dificuldades, custos e prêmios |
+| `GET` | `/api/dungeon/adventures/:id` | Pública | Retorna os dados completos da masmorra selecionada com suas 5 cenas ordenadas e as 3 opções de ação de cada cena |
+| `POST` | `/api/dungeon/start` | JWT | Valida e consome 5 de Energia de Aventura (`UserProgress.adventure_energy`), inicializando a expedição na tabela `family_dungeon_runs` |
+| `POST` | `/api/dungeon/finish` | JWT | Finaliza a expedição (`is_victory`, `final_hp`, `primary_attribute_used`, `choices_summary`, `bonus_gold_collected`), creditando Ouro no Herói (`Character.gold`), XP na classe ativa (`CharacterClass.xp`), checando Level Up e aprimorando permanentemente (+1) o atributo mais utilizado na run em `CharacterAttribute` |
+
 
 

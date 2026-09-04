@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>LiraQuest — Aventuras em Quest (Livro-Jogo Interativo)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=MedievalSharp&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    :root {
+      --bordeaux: #800020;
+      --bordeaux-light: #9b111e;
+      --bordeaux-dark: #4a0e17;
+      --blue-royal: #1e3a8a;
+      --blue-royal-light: #2563eb;
+      --gold: #d4af37;
+      --gold-light: #fde047;
+      --dark-bg: #070a13;
+      --card-bg: rgba(13, 20, 37, 0.95);
+      --parchment: #fbf5e6;
+      --parchment-border: #d4af37;
+    }
+
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #04060c radial-gradient(circle at 50% 20%, #101935 0%, #04060c 85%);
+      color: #ffffff;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      touch-action: manipulation;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 6px;
+    }
+
+    @media (min-width: 768px) {
+      body {
+        padding: 14px;
+      }
+    }
+
+    /* ─── CONTAINER PRINCIPAL DA MASMORRA ─── */
+    .dungeon-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      max-width: 960px;
+      max-height: 94vh;
+      background: rgba(10, 15, 28, 0.96);
+      border: 2px solid rgba(212, 175, 55, 0.45);
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.95), 0 0 30px rgba(212, 175, 55, 0.2);
+    }
+
+    /* ─── HUD SUPERIOR COMPACTO ─── */
+    .dungeon-hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background: linear-gradient(90deg, rgba(74, 14, 23, 0.95) 0%, rgba(15, 23, 42, 0.95) 50%, rgba(30, 58, 138, 0.95) 100%);
+      border-bottom: 1.5px solid rgba(212, 175, 55, 0.4);
+      z-index: 20;
+      gap: 8px;
+    }
+
+    .hud-hero {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .hero-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      border: 2px solid var(--gold);
+      background: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+    }
+
+    .hero-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hero-name {
+      font-family: 'Cinzel', serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+
+    .hero-class {
+      font-size: 0.72rem;
+      color: var(--gold-light);
+      font-weight: 600;
+    }
+
+    /* Barra de HP */
+    .hp-container {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 120px;
+      max-width: 170px;
+      flex: 1;
+    }
+
+    @media (min-width: 640px) {
+      .hp-container {
+        min-width: 180px;
+      }
+    }
+
+    .hp-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .hp-bar-bg {
+      width: 100%;
+      height: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 6px;
+      border: 1px solid rgba(248, 113, 113, 0.4);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hp-bar-fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #ef4444 0%, #22c55e 100%);
+      transition: width 0.4s ease, background 0.4s ease;
+    }
+
+    .hud-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-hud {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      color: #ffffff;
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s;
+    }
+
+    .btn-hud:hover {
+      background: var(--bordeaux-light);
+      border-color: var(--gold);
+      transform: translateY(-1px);
+    }
+
+    /* ─── CORPO PRINCIPAL ROLÁVEL ─── */
+    .dungeon-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Scrollbar estilizada */
+    .dungeon-body::-webkit-scrollbar {
+      width: 6px;
+    }
+    .dungeon-body::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.3);
+    }
+    .dungeon-body::-webkit-scrollbar-thumb {
+      background: rgba(212, 175, 55, 0.4);
+      border-radius: 4px;
+    }
+
+    /* ─── TELA 1: SELEÇÃO DE MASMORRA ─── */
+    .view-select {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+      margin: auto 0;
+      width: 100%;
+    }
+
+    .select-header {
+      text-align: center;
+      max-width: 620px;
+    }
+
+    .select-header h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.6rem;
+      color: var(--gold);
+      margin-bottom: 6px;
+      text-shadow: 0 2px 10px rgba(212, 175, 55, 0.4);
+    }
+
+    .select-header p {
+      font-size: 0.88rem;
+      color: #94a3b8;
+      line-height: 1.4;
+    }
+
+    .adventures-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      width: 100%;
+      max-width: 860px;
+    }
+
+    @media (min-width: 768px) {
+      .adventures-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .adventure-card {
+      background: linear-gradient(180deg, rgba(20, 29, 53, 0.92) 0%, rgba(10, 15, 29, 0.95) 100%);
+      border: 1.5px solid rgba(212, 175, 55, 0.3);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      position: relative;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+
+    .adventure-card:hover {
+      border-color: var(--gold);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(212, 175, 55, 0.25);
+    }
+
+    .adv-icon-badge {
+      font-size: 2.2rem;
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(30, 58, 138, 0.3);
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      margin-bottom: 12px;
+    }
+
+    .adv-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.15rem;
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+
+    .adv-desc {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      line-height: 1.45;
+      margin-bottom: 14px;
+      flex: 1;
+    }
+
+    .adv-pills {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .pill-diff {
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-size: 0.7rem;
+      font-weight: 800;
+    }
+    .pill-diff.easy { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); }
+    .pill-diff.medium { background: rgba(234, 179, 8, 0.2); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.4); }
+    .pill-diff.hard { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+
+    .pill-energy {
+      background: rgba(37, 99, 235, 0.2);
+      color: #60a5fa;
+      border: 1px solid rgba(37, 99, 235, 0.4);
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    .pill-reward {
+      background: rgba(212, 175, 55, 0.2);
+      color: var(--gold-light);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    .btn-start-adv {
+      width: 100%;
+      background: linear-gradient(135deg, var(--bordeaux) 0%, var(--bordeaux-light) 100%);
+      border: 1px solid var(--gold);
+      color: #ffffff;
+      padding: 10px;
+      border-radius: 12px;
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      font-size: 0.92rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-start-adv:hover {
+      background: linear-gradient(135deg, #a11326 0%, #c01a33 100%);
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+    }
+
+    /* ─── TELA 2: CENA ATIVA DA HISTÓRIA (LIVRO) ─── */
+    .view-story {
+      display: none;
+      flex-direction: column;
+      gap: 14px;
+      width: 100%;
+      max-width: 820px;
+      margin: 0 auto;
+    }
+
+    /* Faixa de progresso da masmorra */
+    .story-progress-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 12px;
+      padding: 8px 14px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .progress-steps {
+      display: flex;
+      gap: 6px;
+    }
+
+    .step-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      transition: all 0.3s;
+    }
+
+    .step-dot.active {
+      background: var(--gold);
+      border-color: var(--gold-light);
+      box-shadow: 0 0 8px var(--gold);
+    }
+
+    .step-dot.done {
+      background: #22c55e;
+      border-color: #4ade80;
+    }
+
+    /* O Livro de Pergaminho */
+    .parchment-book {
+      background: #0f1628 linear-gradient(145deg, rgba(26, 38, 66, 0.85) 0%, rgba(13, 20, 36, 0.95) 100%);
+      border: 2px solid var(--gold);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 30px rgba(0, 0, 0, 0.5);
+      position: relative;
+    }
+
+    @media (min-width: 640px) {
+      .parchment-book {
+        padding: 24px;
+      }
+    }
+
+    .scene-title-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+      padding-bottom: 10px;
+    }
+
+    .scene-big-icon {
+      font-size: 2.2rem;
+      width: 52px;
+      height: 52px;
+      background: rgba(128, 0, 32, 0.3);
+      border: 1.5px solid var(--gold);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .scene-title-text h2 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.25rem;
+      color: var(--gold-light);
+      line-height: 1.2;
+    }
+
+    .scene-title-text span {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .scene-narrative-text {
+      font-size: 0.96rem;
+      color: #e2e8f0;
+      line-height: 1.65;
+      margin-bottom: 16px;
+      text-align: justify;
+    }
+
+    /* Barra de Atributos do Herói na Masmorra */
+    .hero-stats-strip {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 6px 10px;
+      margin-bottom: 16px;
+      align-items: center;
+      font-size: 0.75rem;
+    }
+
+    .stat-chip {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+      color: #cbd5e1;
+    }
+
+    .stat-chip b {
+      color: var(--gold-light);
+    }
+
+    /* ─── PAINEL DAS 3 ESCOLHAS DE AÇÃO ─── */
+    .choices-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .choice-card {
+      background: linear-gradient(90deg, rgba(30, 58, 138, 0.25) 0%, rgba(15, 23, 42, 0.85) 100%);
+      border: 1.5px solid rgba(59, 130, 246, 0.4);
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .choice-card:hover {
+      background: linear-gradient(90deg, rgba(128, 0, 32, 0.4) 0%, rgba(30, 58, 138, 0.5) 100%);
+      border-color: var(--gold);
+      transform: translateX(4px);
+    }
+
+    .choice-num {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: rgba(128, 0, 32, 0.6);
+      border: 1px solid var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cinzel', serif;
+      font-weight: 900;
+      font-size: 1rem;
+      color: var(--gold-light);
+      flex-shrink: 0;
+    }
+
+    .choice-details {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .choice-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.3;
+    }
+
+    .choice-attr-tag {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      color: #93c5fd;
+      font-weight: 600;
+    }
+
+    .choice-dc-badge {
+      background: rgba(212, 175, 55, 0.2);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      color: var(--gold-light);
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-weight: 800;
+      font-size: 0.7rem;
+    }
+
+    /* ─── MODAL DE ROLAGEM D20 ─── */
+    .d20-modal-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(4, 7, 15, 0.92);
+      backdrop-filter: blur(8px);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 100;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .d20-box {
+      background: linear-gradient(145deg, rgba(20, 29, 53, 0.98) 0%, rgba(10, 15, 29, 0.98) 100%);
+      border: 2px solid var(--gold);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 480px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 0 50px rgba(212, 175, 55, 0.35);
+      position: relative;
+    }
+
+    .d20-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.15rem;
+      color: var(--gold);
+      margin-bottom: 12px;
+    }
+
+    /* Dado D20 Visual Animado */
+    .d20-dice-wrapper {
+      position: relative;
+      width: 110px;
+      height: 110px;
+      margin: 10px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .d20-canvas-icon {
+      font-size: 5rem;
+      filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.6));
+      transition: transform 0.1s linear;
+    }
+
+    .d20-rolling {
+      animation: rollD20 0.8s ease-out forwards;
+    }
+
+    @keyframes rollD20 {
+      0% { transform: rotate(0deg) scale(0.6); }
+      30% { transform: rotate(180deg) scale(1.2); }
+      60% { transform: rotate(360deg) scale(0.9); }
+      80% { transform: rotate(500deg) scale(1.1); }
+      100% { transform: rotate(720deg) scale(1); }
+    }
+
+    .d20-number-display {
+      position: absolute;
+      font-family: 'Cinzel', serif;
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: #050813;
+      text-shadow: 0 0 2px #ffffff;
+      pointer-events: none;
+    }
+
+    .d20-calc-row {
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      margin: 8px 0;
+      background: rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 6px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+
+    .d20-result-banner {
+      font-family: 'Cinzel', serif;
+      font-size: 1.4rem;
+      font-weight: 900;
+      margin: 8px 0;
+      letter-spacing: 1px;
+    }
+    .d20-result-banner.success { color: #4ade80; text-shadow: 0 0 15px rgba(74, 222, 128, 0.6); }
+    .d20-result-banner.failure { color: #f87171; text-shadow: 0 0 15px rgba(248, 113, 113, 0.6); }
+    .d20-result-banner.critical { color: var(--gold-light); text-shadow: 0 0 20px var(--gold); }
+
+    .d20-outcome-text {
+      font-size: 0.88rem;
+      color: #e2e8f0;
+      line-height: 1.5;
+      margin-bottom: 16px;
+      background: rgba(0,0,0,0.35);
+      border-radius: 10px;
+      padding: 10px 12px;
+      width: 100%;
+    }
+
+    .btn-continue {
+      background: linear-gradient(135deg, var(--blue-royal) 0%, var(--blue-royal-light) 100%);
+      border: 1.5px solid var(--gold);
+      color: #ffffff;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      width: 100%;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      transition: all 0.2s;
+    }
+
+    .btn-continue:hover {
+      background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+      transform: translateY(-2px);
+    }
+
+    /* ─── MODAL DE VITÓRIA (BAÚ ÉPICO) ─── */
+    .victory-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(4, 7, 15, 0.95);
+      backdrop-filter: blur(10px);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 150;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .victory-card {
+      background: linear-gradient(180deg, rgba(74, 14, 23, 0.95) 0%, rgba(13, 20, 36, 0.98) 100%);
+      border: 2px solid var(--gold);
+      border-radius: 24px;
+      width: 100%;
+      max-width: 520px;
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 0 60px rgba(212, 175, 55, 0.5);
+    }
+
+    .chest-sparkle {
+      font-size: 5rem;
+      animation: pulseChest 1.5s infinite alternate ease-in-out;
+      margin-bottom: 8px;
+    }
+
+    @keyframes pulseChest {
+      0% { transform: scale(0.95); filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.4)); }
+      100% { transform: scale(1.08); filter: drop-shadow(0 0 30px rgba(212, 175, 55, 0.9)); }
+    }
+
+    .victory-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.6rem;
+      color: var(--gold-light);
+      margin-bottom: 4px;
+    }
+
+    .victory-subtitle {
+      font-size: 0.88rem;
+      color: #cbd5e1;
+      margin-bottom: 18px;
+    }
+
+    .rewards-box {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+      width: 100%;
+    }
+
+    .reward-item {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1.5px solid rgba(212, 175, 55, 0.4);
+      padding: 8px 14px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
+      font-weight: 800;
+    }
+
+    .reward-item.gold { color: var(--gold-light); }
+    .reward-item.xp { color: #38bdf8; }
+    .reward-item.attr { color: #c084fc; width: 100%; justify-content: center; }
+
+    /* Efeito de Dano (Shake) */
+    .screen-shake {
+      animation: shake 0.4s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="dungeon-container" id="dungeon-wrapper">
+    
+    <!-- HUD SUPERIOR -->
+    <header class="dungeon-hud">
+      <div class="hud-hero">
+        <div class="hero-avatar" id="hud-avatar">⚔️</div>
+        <div class="hero-meta">
+          <span class="hero-name" id="hud-hero-name">Herói</span>
+          <span class="hero-class" id="hud-hero-class">Carregando...</span>
+        </div>
+      </div>
+
+      <!-- Barra de Vida -->
+      <div class="hp-container">
+        <div class="hp-meta">
+          <span style="color: #f87171;">❤️ Pontos de Vida</span>
+          <span id="hud-hp-text" style="color: var(--gold-light);">30 / 30</span>
+        </div>
+        <div class="hp-bar-bg">
+          <div class="hp-bar-fill" id="hud-hp-fill" style="width: 100%;"></div>
+        </div>
+      </div>
+
+      <!-- Controles -->
+      <div class="hud-controls">
+        <button class="btn-hud" id="btn-sound-toggle" onclick="toggleAudio()" title="Som">
+          <span id="sound-icon">🔊</span>
+        </button>
+        <button class="btn-hud" onclick="exitDungeon()" style="background: rgba(128, 0, 32, 0.8);" title="Voltar ao Reino">
+          <span>🏰 Sair</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- CORPO ROLÁVEL -->
+    <main class="dungeon-body" id="dungeon-body">
+      
+      <!-- TELA 1: SELEÇÃO DE MASMORRA -->
+      <div class="view-select" id="view-select">
+        <div class="select-header">
+          <h1>📜 Aventuras em Quest</h1>
+          <p>Selecione um Livro-Jogo de Masmorra para explorar. Suas escolhas narrativas e atributos definirão a vitória ou derrota!</p>
+        </div>
+
+        <div class="adventures-grid" id="adventures-grid">
+          <!-- Renderizado dinamicamente via JS -->
+          <div style="text-align: center; color: #94a3b8; padding: 30px; grid-column: 1 / -1;">
+            ⏳ Carregando masmorras disponíveis no reino...
+          </div>
+        </div>
+      </div>
+
+      <!-- TELA 2: CENA ATIVA DO LIVRO-JOGO -->
+      <div class="view-story" id="view-story">
+        
+        <!-- Faixa de Progresso -->
+        <div class="story-progress-bar">
+          <span id="story-step-text" style="color: var(--gold-light);">Sala 1 de 5</span>
+          <div class="progress-steps" id="progress-dots">
+            <div class="step-dot active"></div>
+            <div class="step-dot"></div>
+            <div class="step-dot"></div>
+            <div class="step-dot"></div>
+            <div class="step-dot"></div>
+          </div>
+        </div>
+
+        <!-- Livro de Pergaminho -->
+        <div class="parchment-book">
+          <div class="scene-title-row">
+            <div class="scene-big-icon" id="scene-icon">🏚️</div>
+            <div class="scene-title-text">
+              <span id="scene-order-badge">Capítulo 1</span>
+              <h2 id="scene-title">Título da Cena</h2>
+            </div>
+          </div>
+
+          <p class="scene-narrative-text" id="scene-text">
+            O texto narrativo da masmorra aparecerá aqui...
+          </p>
+
+          <!-- Faixa de Atributos do Herói -->
+          <div class="hero-stats-strip" id="hero-stats-strip">
+            <span style="color: var(--gold); font-weight: 800;">Atributos da Ficha:</span>
+            <span class="stat-chip">FOR: <b id="stat-str">10</b></span>
+            <span class="stat-chip">AGI: <b id="stat-agi">10</b></span>
+            <span class="stat-chip">CON: <b id="stat-con">10</b></span>
+            <span class="stat-chip">INT: <b id="stat-int">10</b></span>
+            <span class="stat-chip">CAR: <b id="stat-cha">10</b></span>
+            <span class="stat-chip">SOR: <b id="stat-luk">10</b></span>
+          </div>
+
+          <!-- 3 Escolhas de Ação -->
+          <div class="choices-container" id="choices-container">
+            <!-- Gerado dinamicamente -->
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+    <!-- MODAL DE ROLAGEM D20 -->
+    <div class="d20-modal-overlay" id="d20-modal">
+      <div class="d20-box">
+        <h3 class="d20-title" id="d20-action-title">🎲 Teste de Atributo</h3>
+        
+        <!-- Dado Animado -->
+        <div class="d20-dice-wrapper">
+          <div class="d20-canvas-icon" id="d20-icon">🎲</div>
+          <span class="d20-number-display" id="d20-number">--</span>
+        </div>
+
+        <div class="d20-calc-row" id="d20-calc-row">
+          Rolando o dado d20...
+        </div>
+
+        <div class="d20-result-banner" id="d20-banner">
+          ...
+        </div>
+
+        <div class="d20-outcome-text" id="d20-outcome">
+          Avaliando o impacto da sua ação...
+        </div>
+
+        <button class="btn-continue" id="btn-d20-continue" onclick="advanceAfterRoll()">
+          Continuar Jornada ➔
+        </button>
+      </div>
+    </div>
+
+    <!-- MODAL DE VITÓRIA (BAÚ ÉPICO) -->
+    <div class="victory-overlay" id="victory-modal">
+      <div class="victory-card">
+        <div class="chest-sparkle" id="victory-chest-icon">👑</div>
+        <h2 class="victory-title">BAÚ ÉPICO CONQUISTADO!</h2>
+        <p class="victory-subtitle" id="victory-msg">Você superou todos os perigos da masmorra com louvor!</p>
+
+        <div class="rewards-box">
+          <div class="reward-item gold" id="rec-gold">💰 +50 Ouro</div>
+          <div class="reward-item xp" id="rec-xp">⭐ +80 XP</div>
+          <div class="reward-item attr" id="rec-attr" style="display: none;">🧠 +1 Inteligência Permanente</div>
+        </div>
+
+        <button class="btn-continue" onclick="exitDungeon()" style="background: linear-gradient(135deg, var(--bordeaux) 0%, var(--gold) 100%);">
+          🏰 Retornar Triunfante ao Reino
+        </button>
+      </div>
+    </div>
+
+    <!-- MODAL DE RESGATE DA GUARDA REAL (DERROTA SEM FRUSTRAÇÃO) -->
+    <div class="victory-overlay" id="defeat-modal">
+      <div class="victory-card" style="background: linear-gradient(180deg, rgba(30, 58, 138, 0.95) 0%, rgba(13, 20, 36, 0.98) 100%); border-color: #60a5fa;">
+        <div class="chest-sparkle" style="filter: drop-shadow(0 0 15px #60a5fa);">🛡️</div>
+        <h2 class="victory-title" style="color: #93c5fd;">Resgate da Guarda Real!</h2>
+        <p class="victory-subtitle">Seus ferimentos foram tratados com honra. Todo grande aventureiro aprende com as quedas!</p>
+
+        <div class="rewards-box">
+          <div class="reward-item gold">💰 +15 Ouro de Consolação</div>
+          <div class="reward-item xp">⭐ +25 XP de Bravura</div>
+        </div>
+
+        <button class="btn-continue" onclick="exitDungeon()" style="background: #1e3a8a;">
+          🏰 Descansar e Retornar ao Reino
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    /* ==========================================================================
+       ESTADO DO JOGO E VARIÁVEIS GLOBAIS
+       ========================================================================== */
+    let currentHero = null;
+    let heroAttributes = { str: 10, agi: 10, con: 10, int: 10, cha: 10, luk: 10 };
+    let maxHP = 30;
+    let currentHP = 30;
+    let currentEnergy = 10;
+    let activeAdventure = null;
+    let activeRunId = null;
+    let currentSceneIndex = 0;
+    let choicesLog = [];
+    let attributeSuccessCount = { str: 0, agi: 0, con: 0, int: 0, cha: 0, luk: 0 };
+    let totalBonusGold = 0;
+    let isSoundEnabled = true;
+
+    // Web Audio API para efeitos sonoros táteis e dinâmicos (Zero lag, zero mp3)
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function toggleAudio() {
+      isSoundEnabled = !isSoundEnabled;
+      document.getElementById('sound-icon').innerText = isSoundEnabled ? '🔊' : '🔇';
+    }
+
+    function playSound(type) {
+      if (!isSoundEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+
+        if (type === 'dice') {
+          // Cliques do dado
+          for (let i = 0; i < 4; i++) {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(300 + Math.random() * 400, now + (i * 0.08));
+            gain.gain.setValueAtTime(0.15, now + (i * 0.08));
+            gain.gain.exponentialRampToValueAtTime(0.01, now + (i * 0.08) + 0.05);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now + (i * 0.08));
+            osc.stop(now + (i * 0.08) + 0.06);
+          }
+        } else if (type === 'success') {
+          // Acorde triunfal
+          [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + (idx * 0.06));
+            gain.gain.setValueAtTime(0.2, now + (idx * 0.06));
+            gain.gain.exponentialRampToValueAtTime(0.01, now + (idx * 0.06) + 0.35);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now + (idx * 0.06));
+            osc.stop(now + (idx * 0.06) + 0.4);
+          });
+        } else if (type === 'hit') {
+          // Baque de dano
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(150, now);
+          osc.frequency.exponentialRampToValueAtTime(40, now + 0.25);
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.28);
+        } else if (type === 'victory') {
+          // Fanfarra do Baú Real
+          [392, 523.25, 659.25, 783.99, 1046.50, 1318.51].forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now + (idx * 0.1));
+            gain.gain.setValueAtTime(0.25, now + (idx * 0.1));
+            gain.gain.exponentialRampToValueAtTime(0.01, now + (idx * 0.1) + 0.5);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now + (idx * 0.1));
+            osc.stop(now + (idx * 0.1) + 0.55);
+          });
+        }
+      } catch (e) {
+        console.warn('Áudio não disponível:', e);
+      }
+    }
+
+    /* ==========================================================================
+       INICIALIZAÇÃO DO JOGO
+       ========================================================================== */
+    async function initGame() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Sessão expirada. Redirecionando para o login...');
+        window.location.href = '/index.html';
+        return;
+      }
+
+      await loadHeroData(token);
+      await loadAdventuresList();
+    }
+
+    // Carregar ficha viva do herói
+    async function loadHeroData(token) {
+      try {
+        const res = await fetch('/api/character/me', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+
+        if (data.success && data.character) {
+          currentHero = data.character;
+          document.getElementById('hud-hero-name').innerText = currentHero.name || 'Aventureiro';
+          
+          if (currentHero.current_class && currentHero.current_class.name) {
+            document.getElementById('hud-hero-class').innerText = `Classe: ${currentHero.current_class.name}`;
+          } else {
+            document.getElementById('hud-hero-class').innerText = 'Herói do Lar';
+          }
+
+          // Avatar
+          if (currentHero.avatar_value && currentHero.avatar_type === 'PHOTO') {
+            document.getElementById('hud-avatar').innerHTML = `<img src="${currentHero.avatar_value}" alt="Avatar">`;
+          } else {
+            document.getElementById('hud-avatar').innerText = currentHero.current_class?.icon || '⚔️';
+          }
+
+          // Mapear Atributos
+          if (Array.isArray(currentHero.attributes)) {
+            currentHero.attributes.forEach(attr => {
+              const code = attr.attribute_info?.code?.toLowerCase();
+              const totalVal = (attr.base_value || 10) + (attr.bonus_value || 0);
+              if (code && heroAttributes[code] !== undefined) {
+                heroAttributes[code] = totalVal;
+                const el = document.getElementById(`stat-${code}`);
+                if (el) el.innerText = totalVal;
+              }
+            });
+          }
+
+          // Calcular HP máximo baseado na Constituição: HP = 30 + (CON * 2)
+          const conVal = heroAttributes.con || 10;
+          maxHP = 30 + (conVal * 2);
+          currentHP = maxHP;
+          updateHPBar();
+        }
+      } catch (err) {
+        console.error('Erro ao carregar herói:', err);
+      }
+    }
+
+    function updateHPBar() {
+      const pct = Math.max(0, Math.min(100, Math.round((currentHP / maxHP) * 100)));
+      document.getElementById('hud-hp-text').innerText = `${currentHP} / ${maxHP}`;
+      const fillEl = document.getElementById('hud-hp-fill');
+      fillEl.style.width = `${pct}%`;
+
+      if (pct < 30) {
+        fillEl.style.background = '#ef4444';
+      } else if (pct < 60) {
+        fillEl.style.background = '#f59e0b';
+      } else {
+        fillEl.style.background = 'linear-gradient(90deg, #ef4444 0%, #22c55e 100%)';
+      }
+    }
+
+    // Carregar Masmorras Ativas da API
+    async function loadAdventuresList() {
+      try {
+        const res = await fetch('/api/dungeon/adventures');
+        const data = await res.json();
+
+        if (data.success && Array.isArray(data.adventures)) {
+          renderAdventures(data.adventures);
+        }
+      } catch (err) {
+        console.error('Erro ao carregar masmorras:', err);
+      }
+    }
+
+    function renderAdventures(adventures) {
+      const grid = document.getElementById('adventures-grid');
+      grid.innerHTML = '';
+
+      adventures.forEach(adv => {
+        const diffMap = {
+          'EASY': { label: 'Fácil', class: 'easy' },
+          'MEDIUM': { label: 'Média', class: 'medium' },
+          'HARD': { label: 'Difícil', class: 'hard' }
+        };
+        const diff = diffMap[adv.difficulty_level] || diffMap['MEDIUM'];
+
+        const card = document.createElement('div');
+        card.className = 'adventure-card';
+        card.innerHTML = `
+          <div>
+            <div class="adv-icon-badge">${adv.cover_icon || '📜'}</div>
+            <h3 class="adv-title">${adv.title}</h3>
+            <p class="adv-desc">${adv.description}</p>
+            <div class="adv-pills">
+              <span class="pill-diff ${diff.class}">Nível: ${diff.label}</span>
+              <span class="pill-energy">⚡ ${adv.energy_cost} Energia</span>
+              <span class="pill-reward">💰 +${adv.base_gold_reward} Ouro</span>
+              <span class="pill-reward">⭐ +${adv.base_xp_reward} XP</span>
+            </div>
+          </div>
+          <button class="btn-start-adv" onclick="startAdventure('${adv.id}')">
+            ▶️ Abrir Livro (${adv.energy_cost} ⚡)
+          </button>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    /* ==========================================================================
+       INICIAR EXPEDIÇÃO / MASMORRA
+       ========================================================================== */
+    async function startAdventure(adventureId) {
+      const token = localStorage.getItem('token');
+      try {
+        const res = await fetch('/api/dungeon/start', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ adventure_id: adventureId })
+        });
+        const data = await res.json();
+
+        if (!data.success) {
+          alert(data.message || 'Não foi possível iniciar a masmorra.');
+          return;
+        }
+
+        activeRunId = data.run_id;
+
+        // Buscar detalhes completos com as cenas
+        const detailRes = await fetch(`/api/dungeon/adventures/${adventureId}`);
+        const detailData = await detailRes.json();
+
+        if (detailData.success && detailData.adventure) {
+          activeAdventure = detailData.adventure;
+          currentSceneIndex = 0;
+          choicesLog = [];
+          attributeSuccessCount = { str: 0, agi: 0, con: 0, int: 0, cha: 0, luk: 0 };
+          totalBonusGold = 0;
+          currentHP = maxHP;
+          updateHPBar();
+
+          // Alternar para a tela da história
+          document.getElementById('view-select').style.display = 'none';
+          document.getElementById('view-story').style.display = 'flex';
+
+          renderScene();
+        }
+      } catch (err) {
+        console.error('Erro ao iniciar expedição:', err);
+        alert('Erro de conexão ao carregar a masmorra.');
+      }
+    }
+
+    /* ==========================================================================
+       RENDERIZAÇÃO DA CENA E ESCOLHAS
+       ========================================================================== */
+    function renderScene() {
+      if (!activeAdventure || !activeAdventure.scenes || !activeAdventure.scenes[currentSceneIndex]) {
+        console.warn('Cena não encontrada!');
+        return;
+      }
+
+      const scene = activeAdventure.scenes[currentSceneIndex];
+      const totalScenes = activeAdventure.scenes.length;
+
+      // Progresso
+      document.getElementById('story-step-text').innerText = `Sala ${currentSceneIndex + 1} de ${totalScenes}`;
+      const dotsContainer = document.getElementById('progress-dots');
+      dotsContainer.innerHTML = '';
+      for (let i = 0; i < totalScenes; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'step-dot' + (i === currentSceneIndex ? ' active' : (i < currentSceneIndex ? ' done' : ''));
+        dotsContainer.appendChild(dot);
+      }
+
+      // Detalhes da Cena
+      document.getElementById('scene-icon').innerText = scene.scene_icon || '🏛️';
+      document.getElementById('scene-order-badge').innerText = `Capítulo ${scene.step_order || (currentSceneIndex + 1)}`;
+      document.getElementById('scene-title').innerText = scene.title;
+      document.getElementById('scene-text').innerText = scene.narrative_text;
+
+      // 3 Escolhas
+      const container = document.getElementById('choices-container');
+      container.innerHTML = '';
+
+      const attrNameMap = {
+        'str': 'Força (FOR)',
+        'agi': 'Agilidade (AGI)',
+        'con': 'Constituição (CON)',
+        'int': 'Inteligência (INT)',
+        'cha': 'Carisma (CAR)',
+        'luk': 'Sorte (SOR)'
+      };
+
+      if (Array.isArray(scene.actions)) {
+        scene.actions.forEach((act, idx) => {
+          const card = document.createElement('div');
+          card.className = 'choice-card';
+          const attrLabel = attrNameMap[act.attribute_code] || act.attribute_code.toUpperCase();
+
+          card.innerHTML = `
+            <div class="choice-num">${act.action_number || (idx + 1)}</div>
+            <div class="choice-details">
+              <span class="choice-title">${act.title}</span>
+              <div class="choice-attr-tag">
+                <span>🎯 Teste: ${attrLabel}</span>
+                <span class="choice-dc-badge">Dificuldade: CD ${act.difficulty_dc}</span>
+              </div>
+            </div>
+          `;
+          card.onclick = () => rollActionTest(act);
+          container.appendChild(card);
+        });
+      }
+
+      // Rolar para o topo suavemente
+      document.getElementById('dungeon-body').scrollTop = 0;
+    }
+
+    /* ==========================================================================
+       ROLAGEM DE DADOS D20 & RESOLUÇÃO DE TESTES
+       ========================================================================== */
+    let lastRollOutcome = null;
+
+    function rollActionTest(action) {
+      const modal = document.getElementById('d20-modal');
+      const icon = document.getElementById('d20-icon');
+      const numberDisp = document.getElementById('d20-number');
+      const calcRow = document.getElementById('d20-calc-row');
+      const banner = document.getElementById('d20-banner');
+      const outcome = document.getElementById('d20-outcome');
+      const btnContinue = document.getElementById('btn-d20-continue');
+
+      document.getElementById('d20-action-title').innerText = `🎲 ${action.title}`;
+      modal.style.display = 'flex';
+      btnContinue.style.display = 'none';
+
+      // Reset
+      numberDisp.innerText = '--';
+      calcRow.innerText = 'Rolando o dado d20...';
+      banner.innerText = '...';
+      banner.className = 'd20-result-banner';
+      outcome.innerText = 'Conjurando a sorte do herói...';
+
+      // Animação do dado
+      icon.classList.remove('d20-rolling');
+      void icon.offsetWidth; // trigger reflow
+      icon.classList.add('d20-rolling');
+      playSound('dice');
+
+      setTimeout(() => {
+        // Cálculo da Rolagem
+        const d20 = Math.floor(Math.random() * 20) + 1;
+        const attrCode = action.attribute_code.toLowerCase();
+        const heroStat = heroAttributes[attrCode] || 10;
+        // Modificador de atributo no LiraQuest: (Stat - 10) / 2 arredondado para baixo
+        const mod = Math.floor((heroStat - 10) / 2);
+        const total = d20 + mod;
+        const dc = action.difficulty_dc || 12;
+
+        numberDisp.innerText = d20;
+        calcRow.innerHTML = `[Dado: <b>${d20}</b>] + [Bônus ${attrCode.toUpperCase()}: <b>${mod >= 0 ? '+' + mod : mod}</b>] = <b>${total}</b> vs CD ${dc}`;
+
+        const isSuccess = (d20 === 20) || (d20 !== 1 && total >= dc);
+        const isCritical = (d20 === 20);
+        const isCriticalFail = (d20 === 1);
+
+        if (isSuccess) {
+          playSound('success');
+          banner.innerText = isCritical ? '🌟 SUCESSO CRÍTICO!' : '✨ SUCESSO!';
+          banner.className = 'd20-result-banner ' + (isCritical ? 'critical' : 'success');
+          outcome.innerText = action.success_text + (action.bonus_gold ? ` (💰 +${action.bonus_gold} Ouro extra encontrado!)` : '');
+          
+          attributeSuccessCount[attrCode] = (attributeSuccessCount[attrCode] || 0) + 1;
+          if (action.bonus_gold) totalBonusGold += action.bonus_gold;
+        } else {
+          playSound('hit');
+          banner.innerText = isCriticalFail ? '💥 FALHA CRÍTICA!' : '⚠️ FALHA!';
+          banner.className = 'd20-result-banner failure';
+          
+          const damage = isCriticalFail ? Math.round(action.failure_damage * 1.5) : action.failure_damage;
+          outcome.innerText = action.failure_text;
+
+          // Aplicar dano
+          currentHP = Math.max(0, currentHP - damage);
+          updateHPBar();
+
+          // Tremor de tela
+          const wrap = document.getElementById('dungeon-wrapper');
+          wrap.classList.add('screen-shake');
+          setTimeout(() => wrap.classList.remove('screen-shake'), 400);
+        }
+
+        lastRollOutcome = {
+          action,
+          d20,
+          mod,
+          total,
+          isSuccess,
+          damageTaken: isSuccess ? 0 : action.failure_damage,
+        };
+        choicesLog.push(lastRollOutcome);
+
+        btnContinue.style.display = 'block';
+      }, 850);
+    }
+
+    function advanceAfterRoll() {
+      const modal = document.getElementById('d20-modal');
+      modal.style.display = 'none';
+
+      // 1. Checar se o herói foi derrotado (HP zerado)
+      if (currentHP <= 0) {
+        finishDungeon(false);
+        return;
+      }
+
+      // 2. Avançar para a próxima cena ou vitória
+      currentSceneIndex++;
+      if (activeAdventure && currentSceneIndex < activeAdventure.scenes.length) {
+        renderScene();
+      } else {
+        // Todas as cenas concluídas com sucesso!
+        finishDungeon(true);
+      }
+    }
+
+    /* ==========================================================================
+       FINALIZAÇÃO DA EXPEDIÇÃO & RESGATE / VITÓRIA
+       ========================================================================== */
+    async function finishDungeon(isVictory) {
+      const token = localStorage.getItem('token');
+
+      // Determinar o atributo que mais teve sucessos
+      let bestAttr = 'int';
+      let maxWins = -1;
+      for (const [code, wins] of Object.entries(attributeSuccessCount)) {
+        if (wins > maxWins) {
+          maxWins = wins;
+          bestAttr = code;
+        }
+      }
+
+      try {
+        const res = await fetch('/api/dungeon/finish', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            run_id: activeRunId,
+            adventure_id: activeAdventure?.id,
+            is_victory: isVictory,
+            final_hp: currentHP,
+            primary_attribute_used: bestAttr,
+            choices_summary: choicesLog,
+            bonus_gold_collected: totalBonusGold
+          })
+        });
+        const data = await res.json();
+
+        if (isVictory) {
+          playSound('victory');
+          document.getElementById('view-story').style.display = 'none';
+          const vicModal = document.getElementById('victory-modal');
+          vicModal.style.display = 'flex';
+
+          document.getElementById('rec-gold').innerText = `💰 +${data.rewards?.gold_earned || 50} Ouro`;
+          document.getElementById('rec-xp').innerText = `⭐ +${data.rewards?.xp_earned || 80} XP`;
+
+          if (data.rewards?.attribute_boosted && data.rewards?.boosted_attribute) {
+            const attrItem = document.getElementById('rec-attr');
+            attrItem.innerText = `🧠 +1 Permanente em ${data.rewards.boosted_attribute}!`;
+            attrItem.style.display = 'flex';
+          }
+        } else {
+          document.getElementById('view-story').style.display = 'none';
+          const defModal = document.getElementById('defeat-modal');
+          defModal.style.display = 'flex';
+        }
+      } catch (err) {
+        console.error('Erro ao finalizar masmorra:', err);
+        alert('Expedição concluída! Retornando ao reino...');
+        exitDungeon();
+      }
+    }
+
+    function exitDungeon() {
+      try {
+        localStorage.setItem('liraquest_avatar_tab', 'arcade');
+      } catch(e) {}
+      window.location.href = '/index.html';
+    }
+
+    // Inicializar ao carregar o DOM
+    window.addEventListener('DOMContentLoaded', initGame);
+  </script>
+</body>
+</html>
