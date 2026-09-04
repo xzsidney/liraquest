@@ -16,6 +16,7 @@ import shopRoutes from './server/routes/shopRoutes.js';
 import uploadRoutes from './server/routes/uploadRoutes.js';
 import progressRoutes from './server/routes/progressRoutes.js';
 import rewardRoutes from './server/routes/rewardRoutes.js';
+import quizRoutes from './server/routes/quizRoutes.js';
 import { initChameleonSocket } from './server/sockets/chameleonSocket.js';
 
 dotenv.config();
@@ -55,6 +56,7 @@ app.use('/api/shop', shopRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/progress', progressRoutes);
 app.use('/api/rewards', rewardRoutes);
+app.use('/api/quiz', quizRoutes);
 
 
 // Health check & status

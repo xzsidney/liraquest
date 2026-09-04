@@ -137,7 +137,10 @@ O Arcade do Reino é o hub de lazer onde o Avatar gasta a **⚡ Energia de Avent
 1. 🔦 **Esconde-Esconde Camaleão (Lanterna Dinâmica & Modo Família):** O jogador comanda uma bolinha colorida em uma arena com 4 quadrantes de cores nobres (Rubi, Safira, Esmeralda, Ouro). Ao parar sobre a cor correspondente, fica 100% camuflado! Possui dois modos de jogo:
    - 🤖 **Modo Solo:** O jogador enfrenta a Patrulha da IA e precisa sobreviver por 45 segundos coletando cristais 💎 de ouro.
    - 👨‍👩‍👧‍👦 **Modo Família em Tempo Real (WebSockets / Socket.IO):** Pais e filhos entram no Saguão do Clã. A **Roleta da Sorte 🎰** gira e elege aleatoriamente um membro como o **🔦 Caçador da Lanterna** da rodada. Os outros viram os **👻 Camaleões**, que têm 10 segundos de escuridão para se esconder antes da caçada começar!
-2. 📚 **Oráculo do Saber (Quiz Educativo):** Perguntas contra o relógio de matemática rápida, ciências e língua portuguesa para evoluir a Inteligência do herói.
+2. 🏹 **O Arqueiro do Saber (Tiroteio de Conhecimento e Reflexo - ATIVO):** Jogo de precisão motora e agilidade mental em Canvas 2D nativo (ultra leve para a Hostinger). O herói dispara flechas de luz contra 4 alvos/balões rúnicos flutuantes correspondentes às alternativas de enigmas curriculares reais.
+   - 🎒 **Calibração por Etapas de Ensino:** Permite escolher entre *Fundamental 1 (Primário)*, *Fundamental 2*, *Ensino Médio* e *Ensino Superior / Faculdade*.
+   - ⚡ **Economia e Atributos:** Consome 4 ⚡ Energia de Aventura, premia com Ouro 💰, XP ⭐ e bônus direto no atributo **Inteligência (INT)** do herói.
+   - ⚡ **Alvo Relâmpago de Reflexo:** Aparição periódica de um alvo dourado de alta velocidade para testar o tempo de reação e conceder bônus extras.
 3. 📜 **Aventuras em Quest (Livro-Jogo 3 Escolhas):** Histórias ilustradas com caminhos ramificados baseadas nos atributos da ficha.
 4. ⚔️ **Arena de Batalha 2D:** Combates contra os Monstros da Casa.
 

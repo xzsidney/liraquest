@@ -377,4 +377,37 @@ O **Painel do Clã** (`/api/family/analytics`) realiza agregações analíticas 
 - **Insígnias Coletivas (`clanAchievements`):** Metas dinâmicas do clã combinando total de tarefas, sequências e acúmulo de ouro.
 - **Relatório Pedagógico (`pedagogicalInsights`):** Heurística baseada no equilíbrio de hábitos, sequências ativas e incentivo individual.
 
+---
+
+## 7. Módulo Arcade & Quiz Educativo (`family_quiz_*`)
+
+Tabelas de suporte para o mini-jogo **O Arqueiro do Saber** e testes de conhecimento calibrados do primário à faculdade.
+
+### ❓ `family_quiz_questions`
+Catálogo de enigmas e perguntas com classificação pedagógica, nível de dificuldade e explicações.
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único do enigma |
+| `question_text` | `TEXT` | Não | Enunciado completo da pergunta |
+| `discipline` | `VARCHAR(50)` | Não | Disciplina (`matematica`, `portugues`, `ciencias`, `historia`, `geografia`, `logica_geral`, etc.) |
+| `education_stage` | `ENUM` | Não | Etapa: `fundamental_1`, `fundamental_2`, `ensino_medio`, `superior` |
+| `school_year` | `VARCHAR(50)` | Sim | Detalhamento da série (ex: `1_ao_3_ano`, `6_ao_8_ano`, `faculdade`) |
+| `difficulty_level` | `INT` | Não | Nível de 1 a 10 (calibra velocidade e pontos) |
+| `explanation` | `TEXT` | Sim | Explicação didática exibida em caso de erro |
+| `is_active` | `BOOLEAN` | Não | Ativação da pergunta (default: `true`) |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+
+### 🎯 `family_quiz_options`
+Alternativas / alvos móveis vinculados a cada pergunta do quiz (1 correta e 3 distratores contextuais).
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador da alternativa |
+| `question_id` | `UUID` (FK) | Não | Chave estrangeira para `family_quiz_questions.id` (CASCADE) |
+| `option_text` | `VARCHAR(255)` | Não | Texto exibido no alvo flutuante |
+| `is_correct` | `BOOLEAN` | Não | `true` se for a alternativa correta, `false` para distratores |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+
+
 

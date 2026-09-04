@@ -936,6 +936,10 @@ function openChameleonGameArena() {
   window.location.href = '/game.html';
 }
 
+function openArcherGameArena() {
+  window.location.href = '/archer.html';
+}
+
 function closeChameleonGameArena() {
   if (chameleonGameInstance) {
     chameleonGameInstance.stop();

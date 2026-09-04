@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>LiraQuest — O Arqueiro do Saber (Arcade Educativo)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    :root {
+      --primary-bordeaux: #800020;
+      --primary-bordeaux-light: #9b111e;
+      --secondary-blue: #1e3a8a;
+      --gold: #d4af37;
+      --gold-light: #fde047;
+      --dark-bg: #090c15;
+      --card-bg: rgba(15, 23, 42, 0.92);
+    }
+
+    body {
+      background: radial-gradient(circle at center, #111827 0%, #030712 100%);
+      color: #ffffff;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      touch-action: none;
+    }
+
+    .game-wrapper {
+      position: relative;
+      background: #0b0f19;
+      border: 2px solid rgba(212, 175, 55, 0.5);
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(212, 175, 55, 0.2);
+      width: 100%;
+      height: 100%;
+      max-width: min(98vw, calc((100vh - 20px) * 1.6));
+      max-height: calc(100vh - 20px);
+      aspect-ratio: 16 / 10;
+      touch-action: none;
+    }
+
+    #game-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: fill;
+      background: #080d1a;
+      cursor: crosshair;
+      touch-action: none;
+    }
+
+    /* ─── HUD SUPERIOR SOBREPOSTO ─── */
+    .hud-overlay {
+      position: absolute;
+      top: 12px;
+      left: 14px;
+      right: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .hud-chip {
+      background: rgba(11, 17, 32, 0.88);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      padding: 8px 16px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+
+    .hud-chip.gold { color: var(--gold-light); }
+    .hud-chip.combo { color: #f97316; font-family: 'Cinzel', serif; }
+    .hud-chip.timer { color: #38bdf8; font-family: monospace; font-size: 1.1rem; }
+
+    /* ─── BANNER DA PERGUNTA NO TOPO ─── */
+    .question-banner {
+      position: absolute;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 780px;
+      background: linear-gradient(135deg, rgba(128, 0, 32, 0.9) 0%, rgba(30, 58, 138, 0.92) 100%);
+      border: 2px solid var(--gold);
+      border-radius: 14px;
+      padding: 10px 18px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(212, 175, 55, 0.3);
+      z-index: 10;
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+
+    .question-meta {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+
+    .question-text {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.35;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    }
+
+    /* ─── OVERLAYS DE MENU (START & FIM DE JOGO) ─── */
+    .screen-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(5, 8, 16, 0.94);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 50;
+      backdrop-filter: blur(12px);
+      text-align: center;
+    }
+
+    .overlay-title {
+      font-family: 'Cinzel', serif;
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: var(--gold);
+      text-shadow: 0 0 25px rgba(212, 175, 55, 0.5);
+      margin-bottom: 8px;
+    }
+
+    .overlay-subtitle {
+      font-size: 0.95rem;
+      color: #94a3b8;
+      max-width: 580px;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    /* Grade de Seletor de Nível */
+    .stage-selector {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      width: 100%;
+      max-width: 600px;
+      margin-bottom: 24px;
+    }
+
+    @media (min-width: 640px) {
+      .stage-selector {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .stage-card {
+      background: rgba(30, 41, 59, 0.7);
+      border: 2px solid rgba(212, 175, 55, 0.25);
+      border-radius: 14px;
+      padding: 12px 8px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .stage-card:hover, .stage-card.selected {
+      background: linear-gradient(135deg, rgba(128, 0, 32, 0.6) 0%, rgba(30, 58, 138, 0.6) 100%);
+      border-color: var(--gold);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(212, 175, 55, 0.35);
+    }
+
+    .stage-card.selected {
+      border-width: 2.5px;
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+    }
+
+    .stage-icon { font-size: 1.8rem; }
+    .stage-name { font-size: 0.85rem; font-weight: 800; color: #ffffff; }
+    .stage-desc { font-size: 0.7rem; color: #94a3b8; }
+
+    /* Botões de Ação */
+    .btn {
+      padding: 12px 28px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 1rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border: none;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-bordeaux) 0%, var(--primary-bordeaux-light) 100%);
+      color: #ffffff;
+      border: 1px solid var(--gold);
+      box-shadow: 0 6px 20px rgba(128, 0, 32, 0.6), 0 0 15px rgba(212, 175, 55, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(128, 0, 32, 0.8), 0 0 25px rgba(212, 175, 55, 0.5);
+    }
+
+    .btn-secondary {
+      background: rgba(30, 41, 59, 0.8);
+      color: #cbd5e1;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(51, 65, 85, 0.9);
+      color: #ffffff;
+    }
+
+    /* Modal de Vitória / Resultados */
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      width: 100%;
+      max-width: 480px;
+      margin-bottom: 24px;
+    }
+
+    .result-item {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .result-label { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; }
+    .result-val { font-size: 1.4rem; font-weight: 800; color: var(--gold); margin-top: 4px; }
+  </style>
+</head>
+<body>
+
+  <main class="game-wrapper">
+    <!-- Canvas 2D de Alta Performance -->
+    <canvas id="game-canvas" width="1280" height="800"></canvas>
+
+    <!-- HUD FLUTUANTE EM JOGO -->
+    <div class="hud-overlay" id="game-hud" style="display: none;">
+      <div style="display: flex; gap: 8px;">
+        <div class="hud-chip gold">
+          <span>💰</span> <span id="hud-score">0 pts</span>
+        </div>
+        <div class="hud-chip combo">
+          <span>🔥</span> <span id="hud-combo">Combo x1</span>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 8px;">
+        <div class="hud-chip">
+          <span>🎯</span> <span id="hud-hits">0 / 10</span>
+        </div>
+        <div class="hud-chip timer">
+          <span>⏱️</span> <span id="hud-timer">45s</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BANNER DA PERGUNTA ATUAL -->
+    <div class="question-banner" id="question-banner" style="display: none;">
+      <div class="question-meta">
+        <span id="banner-stage">🎒 Fundamental 1</span> • 
+        <span id="banner-discipline">Matemática</span>
+      </div>
+      <div class="question-text" id="banner-text">Carregando enigma do conhecimento...</div>
+    </div>
+
+    <!-- TELA 1: LOBBY / SELETOR DE NÍVEL ESCOLAR -->
+    <div class="screen-overlay" id="screen-start">
+      <h1 class="overlay-title">🏹 O Arqueiro do Saber</h1>
+      <p class="overlay-subtitle">
+        Mire com precisão e atire as flechas arcanas nos alvos da resposta certa! 
+        Treine seus reflexos e evolua a <strong>Inteligência (INT)</strong> do seu herói.
+      </p>
+
+      <!-- Saldo do Jogador -->
+      <div style="display: flex; gap: 14px; margin-bottom: 20px;">
+        <div class="hud-chip" style="color: #38bdf8;">
+          <span>⚡ Energia:</span> <strong id="lobby-energy">...</strong>
+        </div>
+        <div class="hud-chip gold">
+          <span>💰 Ouro:</span> <strong id="lobby-gold">...</strong>
+        </div>
+      </div>
+
+      <!-- Seletor de Nível Escolar -->
+      <div style="font-size: 0.85rem; font-weight: 800; color: var(--gold); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">
+        Selecione o Nível do Conhecimento:
+      </div>
+      <div class="stage-selector">
+        <div class="stage-card selected" onclick="selectStage('fundamental_1', this)">
+          <span class="stage-icon">🎒</span>
+          <span class="stage-name">Primário</span>
+          <span class="stage-desc">Fund. 1 (1º ao 5º)</span>
+        </div>
+        <div class="stage-card" onclick="selectStage('fundamental_2', this)">
+          <span class="stage-icon">📚</span>
+          <span class="stage-name">Fund. 2</span>
+          <span class="stage-desc">6º ao 9º Ano</span>
+        </div>
+        <div class="stage-card" onclick="selectStage('ensino_medio', this)">
+          <span class="stage-icon">🎓</span>
+          <span class="stage-name">Ensino Médio</span>
+          <span class="stage-desc">1º ao 3º Ano</span>
+        </div>
+        <div class="stage-card" onclick="selectStage('superior', this)">
+          <span class="stage-icon">🏛️</span>
+          <span class="stage-name">Faculdade</span>
+          <span class="stage-desc">Ensino Superior</span>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 12px;">
+        <a href="/index.html#arcade" class="btn btn-secondary">
+          ⬅️ Voltar ao Arcade
+        </a>
+        <button class="btn btn-primary" onclick="startGameSession()">
+          ▶️ Disparar Flechas (4 ⚡)
+        </button>
+      </div>
+    </div>
+
+    <!-- TELA 2: FIM DE PARTIDA & RECOMPENSAS -->
+    <div class="screen-overlay" id="screen-game-over" style="display: none;">
+      <h2 class="overlay-title" id="game-over-title">🎯 Vitória da Sabedoria!</h2>
+      <p class="overlay-subtitle" id="game-over-msg">
+        Você demonstrou excelente pontaria e raciocínio afiado!
+      </p>
+
+      <div class="results-grid">
+        <div class="result-item">
+          <div class="result-label">Pontuação</div>
+          <div class="result-val" id="res-score">0</div>
+        </div>
+        <div class="result-item">
+          <div class="result-label">Precisão</div>
+          <div class="result-val" id="res-accuracy">100%</div>
+        </div>
+        <div class="result-item">
+          <div class="result-label">💰 Ouro Ganho</div>
+          <div class="result-val" id="res-gold">+35</div>
+        </div>
+        <div class="result-item">
+          <div class="result-label">⭐ XP Ganho</div>
+          <div class="result-val" id="res-xp">+60</div>
+        </div>
+      </div>
+
+      <div id="int-bonus-banner" style="display: none; background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; border-radius: 12px; padding: 10px 18px; margin-bottom: 20px; font-weight: 700; color: #93c5fd;">
+        🧠 <strong>Inteligência Aprimorada!</strong> +1 no atributo INT do seu Herói!
+      </div>
+
+      <div style="display: flex; gap: 12px;">
+        <button class="btn btn-secondary" onclick="backToLobby()">
+          🏰 Escolher Outro Nível
+        </button>
+        <button class="btn btn-primary" onclick="startGameSession()">
+          🏹 Jogar Novamente (4 ⚡)
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // ─── ESTADO E CONFIGURAÇÃO ──────────────────────────────────
+    const token = localStorage.getItem('liraquest_token') || localStorage.getItem('token');
+    let selectedStage = 'fundamental_1';
+    let currentQuestions = [];
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let hits = 0;
+    let misses = 0;
+    let combo = 1;
+    let maxCombo = 1;
+    let roundTimeRemaining = 50;
+    let roundTimerInterval = null;
+    let isGameRunning = false;
+
+    // Canvas
+    const canvas = document.getElementById('game-canvas');
+    const ctx = canvas.getContext('2d');
+    const CANVAS_WIDTH = 1280;
+    const CANVAS_HEIGHT = 800;
+
+    // Entidades do Jogo
+    let targets = [];
+    let arrows = [];
+    let particles = [];
+    let floatingTexts = [];
+    let goldenSnitch = null;
+    let snitchTimer = 0;
+
+    // Jogador (Arco na base central)
+    const bow = {
+      x: CANVAS_WIDTH / 2,
+      y: CANVAS_HEIGHT - 60,
+      angle: -Math.PI / 2,
+      isAiming: false,
+    };
+
+    // ─── GERADOR DE ÁUDIO SINTETIZADO (WEB AUDIO API - ZERO LAG) ──
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'shoot') {
+        // Zunido da flecha voando
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(450, now);
+        osc.frequency.exponentialRampToValueAtTime(150, now + 0.12);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+        osc.start(now);
+        osc.stop(now + 0.12);
+      } else if (type === 'hit_correct') {
+        // Som límpido de acerto de sino / cristal
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(523.25, now); // C5
+        osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+        osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+        osc.frequency.setValueAtTime(1046.50, now + 0.24); // C6
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
+        osc.start(now);
+        osc.stop(now + 0.45);
+      } else if (type === 'hit_wrong') {
+        // Som abafado de erro
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(180, now);
+        osc.frequency.linearRampToValueAtTime(110, now + 0.25);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      } else if (type === 'snitch') {
+        // Som dourado especial
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(800, now);
+        osc.frequency.linearRampToValueAtTime(1600, now + 0.2);
+        gain.gain.setValueAtTime(0.35, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+        osc.start(now);
+        osc.stop(now + 0.35);
+      }
+    }
+
+    // ─── CARREGAR DADOS DO USUÁRIO ─────────────────────────────
+    async function loadLobbyData() {
+      if (!token) return;
+      try {
+        const res = await fetch('/api/progress/me', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.success && data.progress) {
+          document.getElementById('lobby-energy').innerText = `${data.progress.adventure_energy || 0} ⚡`;
+          document.getElementById('lobby-gold').innerText = `${data.progress.gold_virtual || 0} 💰`;
+        }
+      } catch (e) {
+        console.error('Erro ao carregar dados do lobby:', e);
+      }
+    }
+    loadLobbyData();
+
+    function selectStage(stage, el) {
+      selectedStage = stage;
+      document.querySelectorAll('.stage-card').forEach(c => c.classList.remove('selected'));
+      if (el) el.classList.add('selected');
+    }
+
+    // ─── INÍCIO DA PARTIDA ─────────────────────────────────────
+    async function startGameSession() {
+      try {
+        // 1. Consumir Energia no Backend
+        const startRes = await fetch('/api/quiz/start', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const startData = await startRes.json();
+        if (!startData.success && startData.message?.includes('insuficiente')) {
+          alert(startData.message);
+          return;
+        }
+
+        // 2. Buscar Perguntas da Etapa Escolar Escolhida
+        const qRes = await fetch(`/api/quiz/questions/random?stage=${selectedStage}&limit=10`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const qData = await qRes.json();
+
+        if (!qData.success || !qData.questions || qData.questions.length === 0) {
+          alert('Nenhuma pergunta encontrada para este nível.');
+          return;
+        }
+
+        currentQuestions = qData.questions;
+        currentQuestionIndex = 0;
+        score = 0;
+        hits = 0;
+        misses = 0;
+        combo = 1;
+        maxCombo = 1;
+        roundTimeRemaining = 50;
+
+        document.getElementById('screen-start').style.display = 'none';
+        document.getElementById('screen-game-over').style.display = 'none';
+        document.getElementById('game-hud').style.display = 'flex';
+        document.getElementById('question-banner').style.display = 'block';
+
+        updateHUD();
+        spawnTargetsForQuestion(currentQuestions[0]);
+
+        if (roundTimerInterval) clearInterval(roundTimerInterval);
+        roundTimerInterval = setInterval(() => {
+          roundTimeRemaining--;
+          updateHUD();
+          if (roundTimeRemaining <= 0) {
+            endGameSession();
+          }
+        }, 1000);
+
+        isGameRunning = true;
+      } catch (err) {
+        console.error('Erro ao iniciar jogo:', err);
+        alert('Falha ao conectar com a arena do quiz.');
+      }
+    }
+
+    function updateHUD() {
+      document.getElementById('hud-score').innerText = `${score} pts`;
+      document.getElementById('hud-combo').innerText = `Combo x${combo}`;
+      document.getElementById('hud-hits').innerText = `${hits} / ${currentQuestions.length}`;
+      document.getElementById('hud-timer').innerText = `${roundTimeRemaining}s`;
+
+      const timerEl = document.getElementById('hud-timer');
+      if (roundTimeRemaining <= 10) {
+        timerEl.style.color = '#ef4444';
+      } else {
+        timerEl.style.color = '#38bdf8';
+      }
+    }
+
+    // ─── SPAWN DOS ALVOS FLUTUANTES COM AS ALTERNATIVAS ───────
+    function spawnTargetsForQuestion(q) {
+      if (!q) return;
+
+      // Atualizar Banner
+      const stageNames = {
+        fundamental_1: '🎒 Fundamental 1 (Primário)',
+        fundamental_2: '📚 Fundamental 2',
+        ensino_medio: '🎓 Ensino Médio',
+        superior: '🏛️ Ensino Superior',
+      };
+      document.getElementById('banner-stage').innerText = stageNames[q.education_stage] || 'Desafio';
+      document.getElementById('banner-discipline').innerText = (q.discipline || 'Geral').toUpperCase();
+      document.getElementById('banner-text').innerText = q.question_text;
+
+      targets = [];
+      const options = q.options || [];
+      const numOptions = options.length;
+
+      // Distribuir 4 alvos horizontalmente no terço superior da arena
+      const padding = 160;
+      const availableWidth = CANVAS_WIDTH - padding * 2;
+      const step = numOptions > 1 ? availableWidth / (numOptions - 1) : 0;
+
+      options.forEach((opt, idx) => {
+        const baseX = padding + step * idx;
+        const baseY = 240 + (idx % 2 === 0 ? -30 : 30);
+
+        targets.push({
+          id: opt.id,
+          text: opt.option_text,
+          isCorrect: opt.is_correct,
+          x: baseX,
+          y: baseY,
+          baseX: baseX,
+          baseY: baseY,
+          radius: 64,
+          speed: 0.8 + Math.random() * 0.4,
+          phase: Math.random() * Math.PI * 2,
+          color: opt.is_correct ? '#3b82f6' : '#800020',
+          borderColor: '#d4af37',
+          pulse: 0,
+          isAlive: true,
+        });
+      });
+    }
+
+    // ─── MIRA E DISPARO DE FLECHAS (TOQUE & MOUSE) ────────────
+    function shootArrowAt(targetX, targetY) {
+      if (!isGameRunning) return;
+
+      const dx = targetX - bow.x;
+      const dy = targetY - bow.y;
+      const angle = Math.atan2(dy, dx);
+      bow.angle = angle;
+
+      const speed = 26;
+      arrows.push({
+        x: bow.x,
+        y: bow.y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        angle: angle,
+        trail: [],
+        isAlive: true,
+      });
+
+      playSound('shoot');
+    }
+
+    function getCanvasCoordinates(e) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      return {
+        x: (clientX - rect.left) * scaleX,
+        y: (clientY - rect.top) * scaleY,
+      };
+    }
+
+    canvas.addEventListener('pointerdown', (e) => {
+      const coords = getCanvasCoordinates(e);
+      shootArrowAt(coords.x, coords.y);
+    });
+
+    canvas.addEventListener('pointermove', (e) => {
+      const coords = getCanvasCoordinates(e);
+      const dx = coords.x - bow.x;
+      const dy = coords.y - bow.y;
+      bow.angle = Math.atan2(dy, dx);
+    });
+
+    // ─── SISTEMA DE PARTÍCULAS E TEXTOS FLUTUANTES ────────────
+    function createExplosion(x, y, color, count = 25) {
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 2 + Math.random() * 7;
+        particles.push({
+          x,
+          y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          color,
+          size: 3 + Math.random() * 5,
+          alpha: 1,
+          decay: 0.02 + Math.random() * 0.02,
+        });
+      }
+    }
+
+    function addFloatingText(text, x, y, color = '#facc15', size = 28) {
+      floatingTexts.push({
+        text,
+        x,
+        y,
+        color,
+        size,
+        alpha: 1,
+        vy: -2,
+      });
+    }
+
+    // ─── FINALIZAR PARTIDA E SALVAR NO BANCO ──────────────────
+    async function endGameSession() {
+      if (!isGameRunning) return;
+      isGameRunning = false;
+      if (roundTimerInterval) clearInterval(roundTimerInterval);
+
+      document.getElementById('game-hud').style.display = 'none';
+      document.getElementById('question-banner').style.display = 'none';
+
+      try {
+        const res = await fetch('/api/quiz/finish', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            hits,
+            misses,
+            max_combo: maxCombo,
+            score,
+            stage: selectedStage,
+          })
+        });
+        const data = await res.json();
+
+        const totalAttempts = hits + misses;
+        const accuracy = totalAttempts > 0 ? Math.round((hits / totalAttempts) * 100) : 0;
+
+        document.getElementById('res-score').innerText = `${score} pts`;
+        document.getElementById('res-accuracy').innerText = `${accuracy}%`;
+        document.getElementById('res-gold').innerText = `+${data.rewards?.gold_earned || 25} 💰`;
+        document.getElementById('res-xp').innerText = `+${data.rewards?.xp_earned || 50} ⭐`;
+
+        if (data.rewards?.int_boosted) {
+          document.getElementById('int-bonus-banner').style.display = 'block';
+        } else {
+          document.getElementById('int-bonus-banner').style.display = 'none';
+        }
+
+        document.getElementById('screen-game-over').style.display = 'flex';
+      } catch (err) {
+        console.error('Erro ao enviar pontuação final:', err);
+        document.getElementById('screen-game-over').style.display = 'flex';
+      }
+    }
+
+    function backToLobby() {
+      document.getElementById('screen-game-over').style.display = 'none';
+      document.getElementById('screen-start').style.display = 'flex';
+      loadLobbyData();
+    }
+
+    // ─── LOOP PRINCIPAL DO CANVAS (60 FPS NATIVO) ─────────────
+    let lastTime = performance.now();
+
+    function gameLoop(time) {
+      const dt = (time - lastTime) / 1000;
+      lastTime = time;
+
+      update(dt);
+      draw();
+
+      requestAnimationFrame(gameLoop);
+    }
+    requestAnimationFrame(gameLoop);
+
+    function update(dt) {
+      if (!isGameRunning) return;
+
+      // 1. Atualizar Alvos Normais
+      targets.forEach((t) => {
+        if (!t.isAlive) return;
+        t.pulse += dt * 3;
+        // Movimento senoidal suave
+        t.x = t.baseX + Math.sin(t.pulse + t.phase) * 35;
+        t.y = t.baseY + Math.cos((t.pulse * 0.7) + t.phase) * 20;
+      });
+
+      // 2. Alvo Bônus Relâmpago (O Goblin/Pássaro Dourado)
+      snitchTimer += dt;
+      if (snitchTimer > 14 && !goldenSnitch) {
+        snitchTimer = 0;
+        goldenSnitch = {
+          x: -50,
+          y: 120 + Math.random() * 80,
+          vx: 380,
+          radius: 26,
+          pulse: 0,
+        };
+      }
+
+      if (goldenSnitch) {
+        goldenSnitch.x += goldenSnitch.vx * dt;
+        goldenSnitch.pulse += dt * 8;
+        goldenSnitch.y += Math.sin(goldenSnitch.pulse) * 2.5;
+
+        if (goldenSnitch.x > CANVAS_WIDTH + 60) {
+          goldenSnitch = null;
+        }
+      }
+
+      // 3. Atualizar Flechas
+      for (let i = arrows.length - 1; i >= 0; i--) {
+        const arr = arrows[i];
+        arr.trail.push({ x: arr.x, y: arr.y });
+        if (arr.trail.length > 8) arr.trail.shift();
+
+        arr.x += arr.vx;
+        arr.y += arr.vy;
+
+        // Verificar Colisão com Alvo Dourado Relâmpago
+        if (goldenSnitch) {
+          const distSnitch = Math.hypot(arr.x - goldenSnitch.x, arr.y - goldenSnitch.y);
+          if (distSnitch < goldenSnitch.radius + 15) {
+            playSound('snitch');
+            createExplosion(goldenSnitch.x, goldenSnitch.y, '#fde047', 40);
+            addFloatingText('⚡ RELÂMPAGO! +250 PTS!', goldenSnitch.x, goldenSnitch.y, '#fde047', 32);
+            score += 250;
+            goldenSnitch = null;
+            arr.isAlive = false;
+            updateHUD();
+            continue;
+          }
+        }
+
+        // Verificar Colisão com os Alvos de Resposta
+        for (let j = 0; j < targets.length; j++) {
+          const t = targets[j];
+          if (!t.isAlive) continue;
+
+          const dist = Math.hypot(arr.x - t.x, arr.y - t.y);
+          if (dist < t.radius + 10) {
+            arr.isAlive = false;
+
+            if (t.isCorrect) {
+              // ACERTO!
+              playSound('hit_correct');
+              t.isAlive = false;
+              hits++;
+              const ptsEarned = 100 * combo;
+              score += ptsEarned;
+              combo++;
+              if (combo > maxCombo) maxCombo = combo;
+
+              createExplosion(t.x, t.y, '#facc15', 35);
+              createExplosion(t.x, t.y, '#38bdf8', 20);
+              addFloatingText(`🎯 ACERTO! +${ptsEarned}`, t.x, t.y, '#4ade80', 32);
+
+              updateHUD();
+
+              // Próxima Pergunta com delay elegante
+              setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < currentQuestions.length) {
+                  spawnTargetsForQuestion(currentQuestions[currentQuestionIndex]);
+                } else {
+                  endGameSession();
+                }
+              }, 400);
+
+            } else {
+              // ERRO!
+              playSound('hit_wrong');
+              t.isAlive = false;
+              misses++;
+              combo = 1;
+
+              createExplosion(t.x, t.y, '#ef4444', 25);
+              addFloatingText('❌ OPS!', t.x, t.y, '#f87171', 28);
+              updateHUD();
+            }
+            break;
+          }
+        }
+
+        // Fora da tela
+        if (arr.x < 0 || arr.x > CANVAS_WIDTH || arr.y < 0 || arr.y > CANVAS_HEIGHT) {
+          arr.isAlive = false;
+        }
+
+        if (!arr.isAlive) {
+          arrows.splice(i, 1);
+        }
+      }
+
+      // 4. Atualizar Partículas
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= p.decay;
+        if (p.alpha <= 0) particles.splice(i, 1);
+      }
+
+      // 5. Atualizar Textos Flutuantes
+      for (let i = floatingTexts.length - 1; i >= 0; i--) {
+        const ft = floatingTexts[i];
+        ft.y += ft.vy;
+        ft.alpha -= dt * 1.5;
+        if (ft.alpha <= 0) floatingTexts.splice(i, 1);
+      }
+    }
+
+    // ─── RENDERIZAÇÃO GRÁFICA NO CANVAS ───────────────────────
+    function draw() {
+      ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+      // Fundo em degradê nobre
+      const bgGrad = ctx.createRadialGradient(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 80, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH / 1.1);
+      bgGrad.addColorStop(0, '#101a33');
+      bgGrad.addColorStop(0.6, '#090e1f');
+      bgGrad.addColorStop(1, '#04060d');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+      // Linhas rúnicas / constelação mística no fundo
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.06)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(CANVAS_WIDTH / 2, CANVAS_HEIGHT - 60, 450, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Desenhar Alvos de Alternativas
+      targets.forEach((t) => {
+        if (!t.isAlive) return;
+
+        ctx.save();
+        ctx.translate(t.x, t.y);
+
+        // Brilho exterior (Glow)
+        ctx.shadowColor = 'rgba(212, 175, 55, 0.4)';
+        ctx.shadowBlur = 18;
+
+        // Círculo base do alvo
+        const targetGrad = ctx.createRadialGradient(0, 0, 10, 0, 0, t.radius);
+        targetGrad.addColorStop(0, '#1e293b');
+        targetGrad.addColorStop(0.7, '#0f172a');
+        targetGrad.addColorStop(1, '#020617');
+        ctx.fillStyle = targetGrad;
+        ctx.beginPath();
+        ctx.arc(0, 0, t.radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Borda dourada nobre
+        ctx.strokeStyle = '#d4af37';
+        ctx.lineWidth = 3.5;
+        ctx.stroke();
+
+        // Borda interna pontilhada rúnica
+        ctx.strokeStyle = 'rgba(212, 175, 55, 0.4)';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.arc(0, 0, t.radius - 8, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.shadowBlur = 0; // Desativar shadow para texto nítido
+
+        // Texto da Alternativa (Quebra de linha se for longo)
+        ctx.fillStyle = '#ffffff';
+        ctx.font = t.text.length > 12 ? 'bold 15px Plus Jakarta Sans' : 'bold 20px Plus Jakarta Sans';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        const words = t.text.split(' ');
+        if (words.length > 2 && t.text.length > 12) {
+          const mid = Math.ceil(words.length / 2);
+          const line1 = words.slice(0, mid).join(' ');
+          const line2 = words.slice(mid).join(' ');
+          ctx.fillText(line1, 0, -10);
+          ctx.fillText(line2, 0, 12);
+        } else {
+          ctx.fillText(t.text, 0, 0);
+        }
+
+        ctx.restore();
+      });
+
+      // Desenhar Alvo Dourado Relâmpago
+      if (goldenSnitch) {
+        ctx.save();
+        ctx.translate(goldenSnitch.x, goldenSnitch.y);
+        ctx.shadowColor = '#facc15';
+        ctx.shadowBlur = 25;
+
+        // Bola de ouro
+        const snitchGrad = ctx.createRadialGradient(0, 0, 2, 0, 0, goldenSnitch.radius);
+        snitchGrad.addColorStop(0, '#fef08a');
+        snitchGrad.addColorStop(0.7, '#eab308');
+        snitchGrad.addColorStop(1, '#a16207');
+        ctx.fillStyle = snitchGrad;
+        ctx.beginPath();
+        ctx.arc(0, 0, goldenSnitch.radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Asas místicas brilhantes
+        ctx.fillStyle = 'rgba(254, 240, 138, 0.7)';
+        ctx.beginPath();
+        ctx.ellipse(-24, -4, 18, 6, Math.PI / 4, 0, Math.PI * 2);
+        ctx.ellipse(24, -4, 18, 6, -Math.PI / 4, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+      }
+
+      // Desenhar Flechas em voo
+      arrows.forEach((arr) => {
+        // Rastro de luz
+        if (arr.trail.length > 1) {
+          ctx.strokeStyle = 'rgba(212, 175, 55, 0.4)';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(arr.trail[0].x, arr.trail[0].y);
+          for (let i = 1; i < arr.trail.length; i++) {
+            ctx.lineTo(arr.trail[i].x, arr.trail[i].y);
+          }
+          ctx.stroke();
+        }
+
+        ctx.save();
+        ctx.translate(arr.x, arr.y);
+        ctx.rotate(arr.angle);
+
+        // Corpo da flecha de luz
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(-25, 0);
+        ctx.lineTo(15, 0);
+        ctx.stroke();
+
+        // Ponta da flecha
+        ctx.fillStyle = '#fde047';
+        ctx.beginPath();
+        ctx.moveTo(18, 0);
+        ctx.lineTo(6, -6);
+        ctx.lineTo(8, 0);
+        ctx.lineTo(6, 6);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.restore();
+      });
+
+      // Desenhar Partículas
+      particles.forEach((p) => {
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      // Desenhar Textos Flutuantes
+      floatingTexts.forEach((ft) => {
+        ctx.save();
+        ctx.globalAlpha = ft.alpha;
+        ctx.fillStyle = ft.color;
+        ctx.font = `800 ${ft.size}px Plus Jakarta Sans`;
+        ctx.textAlign = 'center';
+        ctx.shadowColor = '#000000';
+        ctx.shadowBlur = 8;
+        ctx.fillText(ft.text, ft.x, ft.y);
+        ctx.restore();
+      });
+
+      // Desenhar o Arco Mágico na base
+      ctx.save();
+      ctx.translate(bow.x, bow.y);
+      ctx.rotate(bow.angle + Math.PI / 2);
+
+      // Arco dourado curvado
+      ctx.strokeStyle = '#d4af37';
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.arc(0, 0, 48, Math.PI * 0.15, Math.PI * 0.85);
+      ctx.stroke();
+
+      // Corda do arco
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(-44, 18);
+      ctx.lineTo(0, 36);
+      ctx.lineTo(44, 18);
+      ctx.stroke();
+
+      // Flecha engatilhada
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(0, 36);
+      ctx.lineTo(0, -45);
+      ctx.stroke();
+
+      // Ponta brilhante
+      ctx.fillStyle = '#fde047';
+      ctx.beginPath();
+      ctx.moveTo(0, -52);
+      ctx.lineTo(-6, -42);
+      ctx.lineTo(6, -42);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.restore();
+    }
+  </script>
+</body>
+</html>

@@ -21,6 +21,8 @@ import { Event } from './Event.js';
 import { Battle } from './Battle.js';
 import { FamilyReward } from './FamilyReward.js';
 import { FamilyRewardRedemption } from './FamilyRewardRedemption.js';
+import { FamilyQuizQuestion } from './FamilyQuizQuestion.js';
+import { FamilyQuizOption } from './FamilyQuizOption.js';
 
 // ==========================================
 // 1. Associações de Usuário & Família
@@ -124,6 +126,12 @@ FamilyRewardRedemption.belongsTo(FamilyUser, { foreignKey: 'user_id', as: 'user'
 FamilyUser.hasMany(FamilyRewardRedemption, { foreignKey: 'reviewed_by', as: 'reviewed_redemptions' });
 FamilyRewardRedemption.belongsTo(FamilyUser, { foreignKey: 'reviewed_by', as: 'reviewer' });
 
+// ==========================================
+// 8. Associações do Quiz & Perguntas Educativas
+// ==========================================
+FamilyQuizQuestion.hasMany(FamilyQuizOption, { foreignKey: 'question_id', as: 'options', onDelete: 'CASCADE' });
+FamilyQuizOption.belongsTo(FamilyQuizQuestion, { foreignKey: 'question_id', as: 'question' });
+
 export {
   sequelize,
   FamilyUser,
@@ -147,4 +155,6 @@ export {
   Battle,
   FamilyReward,
   FamilyRewardRedemption,
+  FamilyQuizQuestion,
+  FamilyQuizOption,
 };
