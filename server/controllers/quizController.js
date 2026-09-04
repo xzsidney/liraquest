@@ -255,3 +255,129 @@ export const finishQuizSession = async (req, res) => {
     });
   }
 };
+
+/**
+ * POST /api/quiz/duel/finish
+ * Finaliza o Duelo 1v1, concedendo Ouro, XP e bônus de Inteligência conforme vitória, empate ou vice
+ */
+export const finishDuelSession = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const {
+      isWinner = false,
+      isTie = false,
+      score = 0,
+      hits = 0,
+      opponentName = 'Adversário',
+      stage = 'fundamental_1',
+    } = req.body;
+
+    const parsedHits = Math.max(0, parseInt(hits, 10) || 0);
+
+    // Recompensas baseadas no resultado
+    let goldEarned = 25;
+    let xpEarned = 40;
+    let intBoost = 1;
+
+    if (isWinner) {
+      goldEarned = 50;
+      xpEarned = 80;
+      intBoost = 2;
+    } else if (isTie) {
+      goldEarned = 35;
+      xpEarned = 60;
+      intBoost = 1;
+    }
+
+    // Bônus adicional por volume de acertos
+    goldEarned += parsedHits * 2;
+    xpEarned += parsedHits * 3;
+
+    // 1. Atualizar Ouro no Herói
+    let currentGold = 0;
+    const character = await Character.findOne({ where: { user_id: userId } });
+    if (character) {
+      await character.update({
+        gold: (character.gold || 0) + goldEarned,
+      });
+      currentGold = character.gold;
+    }
+
+    // 2. Atualizar XP e Level da Classe Ativa
+    let newLevel = 1;
+    let newXP = 0;
+    let leveledUp = false;
+
+    if (character && character.current_class_id) {
+      const classProgress = await CharacterClass.findOne({
+        where: { character_id: character.id, class_id: character.current_class_id },
+      });
+
+      if (classProgress) {
+        let currentXP = (classProgress.xp || 0) + xpEarned;
+        let currentLevel = classProgress.level || 1;
+        let reqXP = currentLevel * 100;
+
+        while (currentXP >= reqXP) {
+          currentXP -= reqXP;
+          currentLevel += 1;
+          leveledUp = true;
+          reqXP = currentLevel * 100;
+        }
+
+        await classProgress.update({ xp: currentXP, level: currentLevel });
+        newLevel = currentLevel;
+        newXP = currentXP;
+      }
+    }
+
+    // 3. Aprimoramento de Inteligência (INT)
+    let intBoosted = false;
+    if (character) {
+      const intAttrDef = await DefinitionAttribute.findOne({ where: { code: 'int' } });
+      if (intAttrDef) {
+        const [charAttr] = await CharacterAttribute.findOrCreate({
+          where: {
+            character_id: character.id,
+            attribute_id: intAttrDef.id,
+          },
+          defaults: {
+            id: randomUUID().toLowerCase(),
+            base_value: 10,
+            bonus_value: 0,
+          },
+        });
+        await charAttr.increment('bonus_value', { by: intBoost });
+        intBoosted = true;
+      }
+    }
+
+    return res.json({
+      success: true,
+      message: isWinner
+        ? 'Vitória gloriosa no Duelo Familiar!'
+        : isTie
+        ? 'Empate épico entre valorosos arqueiros!'
+        : 'Duelo disputado com bravura!',
+      rewards: {
+        isWinner,
+        isTie,
+        gold_earned: goldEarned,
+        xp_earned: xpEarned,
+        int_boosted: intBoosted,
+        int_bonus_added: intBoost,
+        current_gold: currentGold,
+        current_xp: newXP,
+        current_level: newLevel,
+        leveled_up: leveledUp,
+      },
+    });
+  } catch (error) {
+    console.error('❌ Erro ao finalizar duelo de quiz:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Erro interno ao registrar resultado do duelo.',
+    });
+  }
+};
+

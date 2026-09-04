@@ -1,0 +1,1656 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>LiraQuest — ⚔️ Duelo de Arqueiros (1v1 Família)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    :root {
+      --primary-bordeaux: #800020;
+      --primary-bordeaux-light: #9b111e;
+      --secondary-blue: #1e3a8a;
+      --gold: #d4af37;
+      --gold-light: #fde047;
+      --dark-bg: #090c15;
+      --card-bg: rgba(15, 23, 42, 0.92);
+      --p1-color: #3b82f6;
+      --p2-color: #ef4444;
+    }
+
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #030712;
+      color: #ffffff;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      touch-action: none;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 4px;
+    }
+
+    @media (min-width: 768px) {
+      body {
+        padding: 12px;
+      }
+    }
+
+    .game-wrapper {
+      position: relative;
+      background: #0b0f19;
+      border: 2px solid rgba(212, 175, 55, 0.45);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.95), 0 0 25px rgba(212, 175, 55, 0.15);
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
+      touch-action: none;
+    }
+
+    @media (min-width: 900px) and (orientation: landscape) {
+      .game-wrapper {
+        max-width: min(96vw, calc((100vh - 24px) * 1.6));
+        max-height: calc(100vh - 24px);
+        aspect-ratio: 16 / 10;
+        border-radius: 20px;
+      }
+    }
+
+    #game-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: #080d1a;
+      cursor: crosshair;
+      touch-action: none;
+    }
+
+    /* ─── HUD SUPERIOR DE DUELO (PLACAR CABO DE GUERRA) ─── */
+    .duel-hud {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      right: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      pointer-events: none;
+      z-index: 20;
+    }
+
+    .tug-of-war-container {
+      width: 96%;
+      max-width: 520px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1.5px solid rgba(212, 175, 55, 0.4);
+      border-radius: 20px;
+      padding: 4px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+    }
+
+    .tug-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.76rem;
+      font-weight: 800;
+    }
+
+    .p1-tag { color: var(--p1-color); display: flex; align-items: center; gap: 4px; }
+    .p2-tag { color: var(--p2-color); display: flex; align-items: center; gap: 4px; }
+    .duel-timer { color: #38bdf8; font-family: monospace; font-size: 0.88rem; }
+
+    .tug-bar-track {
+      position: relative;
+      height: 10px;
+      background: #1e293b;
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+    }
+
+    .tug-bar-p1 {
+      height: 100%;
+      background: linear-gradient(90deg, #1d4ed8, #3b82f6);
+      width: 50%;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .tug-bar-p2 {
+      height: 100%;
+      background: linear-gradient(90deg, #ef4444, #b91c1c);
+      width: 50%;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .hud-chips-row {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .hud-chip {
+      background: rgba(11, 17, 32, 0.92);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      padding: 3px 10px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+
+    /* ─── BANNER DA PERGUNTA INDIVIDUAL ─── */
+    .question-banner {
+      position: absolute;
+      top: 68px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 94%;
+      max-width: 720px;
+      background: linear-gradient(135deg, rgba(128, 0, 32, 0.94) 0%, rgba(30, 58, 138, 0.95) 100%);
+      border: 1.5px solid var(--gold);
+      border-radius: 12px;
+      padding: 8px 14px;
+      text-align: center;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.8), 0 0 15px rgba(212, 175, 55, 0.25);
+      z-index: 15;
+      pointer-events: none;
+    }
+
+    @media (min-width: 640px) {
+      .question-banner {
+        top: 76px;
+        padding: 10px 18px;
+        border-width: 2px;
+      }
+    }
+
+    .question-meta {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--gold);
+      margin-bottom: 2px;
+    }
+
+    .question-text {
+      font-size: clamp(0.9rem, 3.6vw, 1.2rem);
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.3;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    }
+
+    /* ─── OVERLAYS / TELAS DE LOBBY E FIM DE JOGO ─── */
+    .screen-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(5, 8, 16, 0.96);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 50;
+      backdrop-filter: blur(12px);
+      text-align: center;
+      overflow-y: auto;
+    }
+
+    .overlay-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(1.4rem, 5vw, 2.2rem);
+      font-weight: 900;
+      color: var(--gold);
+      text-shadow: 0 0 25px rgba(212, 175, 55, 0.5);
+      margin-bottom: 4px;
+    }
+
+    .overlay-subtitle {
+      font-size: clamp(0.78rem, 2.8vw, 0.92rem);
+      color: #94a3b8;
+      max-width: 540px;
+      line-height: 1.4;
+      margin-bottom: 12px;
+    }
+
+    /* Cards dos Duelistas no Lobby */
+    .duelists-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      width: 100%;
+      max-width: 520px;
+      margin-bottom: 14px;
+    }
+
+    .duelist-slot {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1.5px dashed rgba(212, 175, 55, 0.35);
+      border-radius: 12px;
+      padding: 12px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      min-height: 140px;
+      justify-content: center;
+      position: relative;
+    }
+
+    .duelist-slot.active {
+      border-style: solid;
+      border-color: var(--gold);
+      background: linear-gradient(135deg, rgba(30, 58, 138, 0.4) 0%, rgba(15, 23, 42, 0.9) 100%);
+    }
+
+    .duelist-slot.ready {
+      border-color: #22c55e;
+      box-shadow: 0 0 15px rgba(34, 197, 94, 0.3);
+    }
+
+    .duelist-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 2px solid var(--gold);
+      object-fit: cover;
+      background: #1e293b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .duelist-name {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .duelist-status {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: #334155;
+      color: #cbd5e1;
+    }
+
+    .duelist-status.ready {
+      background: #15803d;
+      color: #ffffff;
+    }
+
+    /* Seletor de Nível Escolar Individual */
+    .selector-title {
+      font-size: 0.74rem;
+      font-weight: 800;
+      color: var(--gold);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .selector-grid {
+      display: grid;
+      gap: 6px;
+      width: 100%;
+      max-width: 520px;
+      margin-bottom: 12px;
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    @media (max-width: 540px) {
+      .selector-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .select-card {
+      background: rgba(30, 41, 59, 0.75);
+      border: 1.5px solid rgba(212, 175, 55, 0.25);
+      border-radius: 10px;
+      padding: 8px 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .select-card:hover, .select-card.selected {
+      background: linear-gradient(135deg, rgba(128, 0, 32, 0.6) 0%, rgba(30, 58, 138, 0.6) 100%);
+      border-color: var(--gold);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+    }
+
+    .select-card.selected {
+      border-width: 2px;
+      box-shadow: 0 0 14px rgba(212, 175, 55, 0.5);
+    }
+
+    .card-icon { font-size: 1.2rem; }
+    .card-name { font-size: 0.72rem; font-weight: 800; color: #ffffff; }
+
+    /* Botões */
+    .btn {
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border: none;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-bordeaux) 0%, var(--primary-bordeaux-light) 100%);
+      color: #ffffff;
+      border: 1px solid var(--gold);
+      box-shadow: 0 4px 15px rgba(128, 0, 32, 0.6), 0 0 15px rgba(212, 175, 55, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(128, 0, 32, 0.8), 0 0 20px rgba(212, 175, 55, 0.5);
+    }
+
+    .btn-ready {
+      background: linear-gradient(135deg, #15803d 0%, #22c55e 100%);
+      color: #ffffff;
+      border: 1px solid #4ade80;
+      box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+    }
+
+    .btn-secondary {
+      background: rgba(30, 41, 59, 0.85);
+      color: #cbd5e1;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(51, 65, 85, 0.95);
+      color: #ffffff;
+    }
+
+    /* Contagem regressiva de início */
+    .countdown-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 60;
+    }
+
+    .countdown-number {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(4rem, 15vw, 8rem);
+      font-weight: 900;
+      color: var(--gold);
+      text-shadow: 0 0 40px rgba(212, 175, 55, 0.8);
+      animation: pulsePop 1s ease infinite;
+    }
+
+    @keyframes pulsePop {
+      0% { transform: scale(0.6); opacity: 0; }
+      50% { transform: scale(1.1); opacity: 1; }
+      100% { transform: scale(1); opacity: 0.9; }
+    }
+
+    /* Pódio Final */
+    .podium-box {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1.5px solid var(--gold);
+      border-radius: 14px;
+      padding: 16px;
+      width: 100%;
+      max-width: 480px;
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .winner-announcement {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      width: 100%;
+    }
+
+    .result-card {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .result-card.first {
+      border-color: var(--gold);
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.25);
+    }
+  </style>
+</head>
+<body>
+
+  <main class="game-wrapper">
+    <!-- Canvas 2D Auto-Responsivo -->
+    <canvas id="game-canvas"></canvas>
+
+    <!-- HUD SUPERIOR CABO DE GUERRA -->
+    <div class="duel-hud" id="duel-hud" style="display: none;">
+      <div class="tug-of-war-container">
+        <div class="tug-header">
+          <span class="p1-tag">🔵 <span id="p1-hud-name">Você</span>: <strong id="p1-hud-score">0 pts</strong></span>
+          <span class="duel-timer" id="duel-timer">60s</span>
+          <span class="p2-tag"><strong id="p2-hud-score">0 pts</strong>: <span id="p2-hud-name">Rival</span> 🔴</span>
+        </div>
+        <div class="tug-bar-track">
+          <div class="tug-bar-p1" id="tug-bar-p1"></div>
+          <div class="tug-bar-p2" id="tug-bar-p2"></div>
+        </div>
+      </div>
+
+      <div class="hud-chips-row">
+        <div class="hud-chip" style="color: #fde047;">
+          <span>🏹</span> <span id="hud-my-hits">0 acertos</span>
+        </div>
+        <div class="hud-chip" style="color: #f97316;">
+          <span>🔥</span> <span id="hud-my-combo">x1 Combo</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BANNER DA PERGUNTA INDIVIDUAL -->
+    <div class="question-banner" id="question-banner" style="display: none;">
+      <div class="question-meta">
+        <span id="banner-stage">🎒 Fund. 1</span> • 
+        <span id="banner-discipline">Matemática</span>
+      </div>
+      <div class="question-text" id="banner-text">Carregando enigma...</div>
+    </div>
+
+    <!-- CONTAGEM REGRESSIVA 3, 2, 1 -->
+    <div class="countdown-overlay" id="screen-countdown" style="display: none;">
+      <div style="font-family: 'Cinzel', serif; font-size: 1.2rem; color: #cbd5e1; letter-spacing: 2px;">PREPAREM SEUS ARCOS!</div>
+      <div class="countdown-number" id="countdown-num">3</div>
+    </div>
+
+    <!-- TELA 1: LOBBY DE DUELO FAMILIAR -->
+    <div class="screen-overlay" id="screen-lobby">
+      <h1 class="overlay-title">⚔️ Duelo de Arqueiros 1v1</h1>
+      <p class="overlay-subtitle">
+        Desafie um membro do seu clã em tempo real! Cada duelista responde perguntas no seu próprio nível escolar. Quem tiver mais precisão e agilidade vence o duelo!
+      </p>
+
+      <!-- Saldo da Família -->
+      <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+        <div class="hud-chip" style="color: #38bdf8;">
+          <span>⚡ Energia:</span> <strong id="lobby-energy">...</strong>
+        </div>
+        <div class="hud-chip" style="color: #fde047;">
+          <span>💰 Ouro:</span> <strong id="lobby-gold">...</strong>
+        </div>
+      </div>
+
+      <!-- Slots dos 2 Duelistas -->
+      <div class="duelists-container">
+        <!-- Slot 1: Jogador Local -->
+        <div class="duelist-slot active" id="slot-p1">
+          <div class="duelist-avatar" id="p1-avatar">🏹</div>
+          <div class="duelist-name" id="p1-name">Você</div>
+          <div class="duelist-status" id="p1-ready-status">Aguardando...</div>
+        </div>
+
+        <!-- Slot 2: Rival / Irmão -->
+        <div class="duelist-slot" id="slot-p2">
+          <div class="duelist-avatar" id="p2-avatar">⏳</div>
+          <div class="duelist-name" id="p2-name">Aguardando Rival...</div>
+          <div class="duelist-status" id="p2-ready-status">Desconectado</div>
+        </div>
+      </div>
+
+      <!-- Seletor do Nível Escolar Individual -->
+      <div class="selector-title">Seu Nível Escolar para o Duelo:</div>
+      <div class="selector-grid">
+        <div class="select-card selected" onclick="selectStage('fundamental_1', this)">
+          <span class="card-icon">🎒</span>
+          <span class="card-name">Fund. 1</span>
+        </div>
+        <div class="select-card" onclick="selectStage('fundamental_2', this)">
+          <span class="card-icon">📚</span>
+          <span class="card-name">Fund. 2</span>
+        </div>
+        <div class="select-card" onclick="selectStage('ensino_medio', this)">
+          <span class="card-icon">🎓</span>
+          <span class="card-name">Médio</span>
+        </div>
+        <div class="select-card" onclick="selectStage('superior', this)">
+          <span class="card-icon">🏛️</span>
+          <span class="card-name">Superior</span>
+        </div>
+      </div>
+
+      <!-- Ações do Lobby -->
+      <div style="display: flex; gap: 10px; margin-top: 6px;">
+        <button class="btn btn-secondary" onclick="returnToArcade()">
+          <span>🚪</span> Sair
+        </button>
+        <button class="btn btn-primary" id="btn-toggle-ready" onclick="toggleReady()">
+          <span>⚔️</span> Estou Pronto!
+        </button>
+      </div>
+    </div>
+
+    <!-- TELA 3: RESULTADO DO DUELO (PÓDIO FINAL) -->
+    <div class="screen-overlay" id="screen-game-over" style="display: none;">
+      <h1 class="overlay-title" id="duel-end-title">Fim do Duelo!</h1>
+      <p class="overlay-subtitle" id="duel-end-subtitle">A disputa de arquearia foi finalizada com glória!</p>
+
+      <div class="podium-box">
+        <div class="winner-announcement" id="winner-banner">
+          <span>👑</span> <span id="winner-name-text">Vencedor!</span>
+        </div>
+
+        <div class="results-grid">
+          <div class="result-card first" id="res-card-p1">
+            <div style="font-size: 0.72rem; color: #94a3b8; font-weight: 700;">DUELISTA 1</div>
+            <div style="font-weight: 800; font-size: 0.95rem; color: #ffffff;" id="res-p1-name">Você</div>
+            <div style="font-size: 1.3rem; font-weight: 900; color: var(--gold);" id="res-p1-score">0 pts</div>
+            <div style="font-size: 0.72rem; color: #cbd5e1;" id="res-p1-hits">0 acertos</div>
+          </div>
+
+          <div class="result-card" id="res-card-p2">
+            <div style="font-size: 0.72rem; color: #94a3b8; font-weight: 700;">DUELISTA 2</div>
+            <div style="font-weight: 800; font-size: 0.95rem; color: #ffffff;" id="res-p2-name">Rival</div>
+            <div style="font-size: 1.3rem; font-weight: 900; color: #ef4444;" id="res-p2-score">0 pts</div>
+            <div style="font-size: 0.72rem; color: #cbd5e1;" id="res-p2-hits">0 acertos</div>
+          </div>
+        </div>
+
+        <!-- Recompensas Concedidas no Reino -->
+        <div style="background: rgba(0,0,0,0.4); border-radius: 8px; padding: 8px; display: flex; justify-content: space-around; font-size: 0.82rem; font-weight: 700;">
+          <span style="color: #fde047;">💰 <span id="reward-gold">+50 Ouro</span></span>
+          <span style="color: #60a5fa;">⭐ <span id="reward-xp">+80 XP</span></span>
+          <span style="color: #a855f7;">🧠 <span id="reward-int">+2 INT</span></span>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <button class="btn btn-secondary" onclick="returnToArcade()">
+          <span>🏰</span> Arcade
+        </button>
+        <button class="btn btn-primary" onclick="requestRematch()">
+          <span>🔄</span> Revanche
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- SOCKET.IO CLIENTE -->
+  <script src="/socket.io/socket.io.js"></script>
+
+  <script>
+    // ─── ESTADO E AUTENTICAÇÃO ─────────────────────────────────
+    const token = localStorage.getItem('liraquest_token') || localStorage.getItem('token');
+    let currentUser = null;
+    let selectedStage = 'fundamental_1';
+    let socket = null;
+    let isReady = false;
+    let isGameRunning = false;
+    let myDuelistId = null;
+
+    try {
+      const storedUser = localStorage.getItem('liraquest_user') || localStorage.getItem('user');
+      if (storedUser) currentUser = JSON.parse(storedUser);
+    } catch (e) {}
+
+    // Variáveis do Jogo
+    let questions = [];
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let hits = 0;
+    let misses = 0;
+    let combo = 1;
+    let maxCombo = 1;
+    let duelDuration = 60;
+    let matchTimerInterval = null;
+
+    let opponentData = {
+      id: null,
+      name: 'Rival',
+      score: 0,
+      hits: 0,
+      isReady: false,
+    };
+
+    // Canvas & Render Engine
+    const canvas = document.getElementById('game-canvas');
+    const ctx = canvas.getContext('2d');
+    let canvasWidth = 0;
+    let canvasHeight = 0;
+
+    const bow = { x: 0, y: 0, angle: -Math.PI / 2 };
+    let targets = [];
+    let arrows = [];
+    let particles = [];
+    let floatingTexts = [];
+    let goldenSnitch = null;
+    let snitchTimer = 0;
+
+    // ─── RESPONSIVIDADE PRECISA DO CANVAS (1:1 PIXEL MATCH) ────
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvasWidth = rect.width;
+      canvasHeight = rect.height;
+
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+
+      bow.x = canvasWidth / 2;
+      bow.y = canvasHeight - Math.max(36, canvasHeight * 0.08);
+
+      if (isGameRunning && questions[currentQuestionIndex]) {
+        positionTargets(questions[currentQuestionIndex]);
+      }
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('orientationchange', () => setTimeout(resizeCanvas, 200));
+
+    // ─── SÍNTESE DE ÁUDIO WEB AUDIO API ────────────────────────
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playSound(type) {
+      try {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === 'shoot') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(450, now);
+          osc.frequency.exponentialRampToValueAtTime(150, now + 0.12);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+          osc.start(now);
+          osc.stop(now + 0.12);
+        } else if (type === 'hit_correct') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(523.25, now);
+          osc.frequency.setValueAtTime(659.25, now + 0.08);
+          osc.frequency.setValueAtTime(783.99, now + 0.16);
+          osc.frequency.setValueAtTime(1046.50, now + 0.24);
+          gain.gain.setValueAtTime(0.25, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+          osc.start(now);
+          osc.stop(now + 0.4);
+        } else if (type === 'hit_wrong') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(180, now);
+          osc.frequency.linearRampToValueAtTime(100, now + 0.25);
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+          osc.start(now);
+          osc.stop(now + 0.25);
+        } else if (type === 'snitch') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(800, now);
+          osc.frequency.linearRampToValueAtTime(1600, now + 0.2);
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+          osc.start(now);
+          osc.stop(now + 0.3);
+        }
+      } catch (e) {}
+    }
+
+    // ─── NAVEGAÇÃO SEGURA PARA O ARCADE ────────────────────────
+    function returnToArcade() {
+      if (socket) {
+        socket.disconnect();
+        socket = null;
+      }
+      try {
+        localStorage.setItem('liraquest_avatar_tab', 'arcade');
+      } catch (e) {}
+      window.location.href = '/avatar';
+    }
+
+    // ─── CARREGAR DADOS DO USUÁRIO ────────────────────────────
+    async function loadUserData() {
+      if (!token) return;
+      try {
+        const res = await fetch('/api/progress/me', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.success && data.progress) {
+          document.getElementById('lobby-energy').innerText = `${data.progress.adventure_energy || 0} ⚡`;
+          document.getElementById('lobby-gold').innerText = `${data.progress.gold_virtual || 0} 💰`;
+        }
+      } catch (e) {
+        console.error('Erro ao buscar progresso:', e);
+      }
+    }
+    loadUserData();
+
+    function selectStage(stage, el) {
+      selectedStage = stage;
+      document.querySelectorAll('.selector-grid .select-card').forEach(c => c.classList.remove('selected'));
+      if (el) el.classList.add('selected');
+
+      if (socket && socket.connected) {
+        socket.emit('update_player_settings', { stage: selectedStage });
+      }
+    }
+
+    // ─── CONEXÃO WEBSOCKET DO DUELO (/duel) ────────────────────
+    function connectDuelSocket() {
+      const familyId = currentUser?.family_id || 'family_clan_default';
+      const roomId = `duel_family_${familyId}`;
+
+      socket = io('/duel', {
+        reconnection: true,
+        reconnectionAttempts: 5,
+      });
+
+      socket.on('connect', () => {
+        myDuelistId = socket.id;
+        socket.emit('join_duel_lobby', {
+          roomId,
+          user: currentUser,
+          stage: selectedStage,
+          difficulty: 'facil',
+        });
+      });
+
+      socket.on('duel_error', ({ message }) => {
+        alert(message || 'Erro no duelo.');
+      });
+
+      // Atualização do Lobby
+      socket.on('duel_lobby_updated', ({ players }) => {
+        updateLobbyUI(players);
+      });
+
+      // Contagem regressiva
+      socket.on('duel_countdown_tick', ({ countdown }) => {
+        const cdScreen = document.getElementById('screen-countdown');
+        const cdNum = document.getElementById('countdown-num');
+        cdScreen.style.display = 'flex';
+        cdNum.innerText = countdown;
+      });
+
+      // Início Sincronizado do Combate
+      socket.on('duel_started', async ({ durationSeconds, players }) => {
+        document.getElementById('screen-countdown').style.display = 'none';
+        document.getElementById('screen-lobby').style.display = 'none';
+        document.getElementById('screen-game-over').style.display = 'none';
+
+        duelDuration = durationSeconds || 60;
+        await startDuelMatch();
+      });
+
+      // Sincronização dos Pontos em Tempo Real (Cabo de Guerra)
+      socket.on('duel_scores_synced', ({ players, lastEvent }) => {
+        const me = players.find(p => p.id === socket.id);
+        const opp = players.find(p => p.id !== socket.id);
+
+        if (opp) {
+          opponentData.score = opp.score || 0;
+          opponentData.hits = opp.hits || 0;
+          opponentData.name = opp.name || 'Rival';
+        }
+
+        updateTugOfWarBar(me ? me.score : score, opponentData.score);
+
+        // Feedback visual do rival acertando
+        if (lastEvent && lastEvent.socketId !== socket.id) {
+          if (lastEvent.isHit) {
+            addFloatingText(`🔴 Rival +${lastEvent.scoreDelta}!`, canvasWidth * 0.75, 120, '#ef4444', 16);
+          }
+        }
+      });
+
+      // Partida Finalizada
+      socket.on('duel_match_over', ({ isTie, winner, leaderboard }) => {
+        finishDuelMatch(isTie, winner, leaderboard);
+      });
+
+      // Desconexão do Rival
+      socket.on('duel_player_disconnected', ({ disconnectedPlayerName, players }) => {
+        if (isGameRunning) {
+          alert(`${disconnectedPlayerName} desconectou-se da partida.`);
+          isGameRunning = false;
+          if (matchTimerInterval) clearInterval(matchTimerInterval);
+          document.getElementById('duel-hud').style.display = 'none';
+          document.getElementById('question-banner').style.display = 'none';
+          document.getElementById('screen-lobby').style.display = 'flex';
+        }
+        updateLobbyUI(players);
+      });
+    }
+
+    function updateLobbyUI(players) {
+      const me = players.find(p => p.id === socket?.id);
+      const opp = players.find(p => p.id !== socket?.id);
+
+      // Atualiza Slot 1 (Você)
+      if (me) {
+        document.getElementById('p1-name').innerText = `${me.name} (Você)`;
+        const p1Status = document.getElementById('p1-ready-status');
+        p1Status.innerText = me.isReady ? '✅ PRONTO' : 'Aguardando...';
+        p1Status.className = `duelist-status ${me.isReady ? 'ready' : ''}`;
+        document.getElementById('slot-p1').className = `duelist-slot active ${me.isReady ? 'ready' : ''}`;
+
+        const btnReady = document.getElementById('btn-toggle-ready');
+        btnReady.innerText = me.isReady ? '❌ Cancelar Preparo' : '⚔️ Estou Pronto!';
+        btnReady.className = me.isReady ? 'btn btn-secondary' : 'btn btn-ready';
+      }
+
+      // Atualiza Slot 2 (Rival)
+      const slotP2 = document.getElementById('slot-p2');
+      const p2Name = document.getElementById('p2-name');
+      const p2Status = document.getElementById('p2-ready-status');
+
+      if (opp) {
+        slotP2.className = `duelist-slot active ${opp.isReady ? 'ready' : ''}`;
+        p2Name.innerText = opp.name;
+        p2Status.innerText = opp.isReady ? '✅ PRONTO' : 'Escolhendo nível...';
+        p2Status.className = `duelist-status ${opp.isReady ? 'ready' : ''}`;
+        opponentData.name = opp.name;
+      } else {
+        slotP2.className = 'duelist-slot';
+        p2Name.innerText = 'Aguardando Rival...';
+        p2Status.innerText = 'Desconectado';
+        p2Status.className = 'duelist-status';
+      }
+    }
+
+    function toggleReady() {
+      if (socket && socket.connected) {
+        socket.emit('player_toggle_ready');
+      }
+    }
+
+    function requestRematch() {
+      document.getElementById('screen-game-over').style.display = 'none';
+      document.getElementById('screen-lobby').style.display = 'flex';
+      if (socket && socket.connected) {
+        socket.emit('duel_request_rematch');
+      }
+    }
+
+    // ─── INICIAR O DUELO ───────────────────────────────────────
+    async function startDuelMatch() {
+      resizeCanvas();
+      score = 0;
+      hits = 0;
+      misses = 0;
+      combo = 1;
+      maxCombo = 1;
+      opponentData.score = 0;
+      opponentData.hits = 0;
+
+      // 1. Consumir Energia (4 ⚡)
+      try {
+        await fetch('/api/quiz/start', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+      } catch (e) {}
+
+      // 2. Carregar Perguntas da Etapa Escolar Escolhida pelo Jogador
+      try {
+        const qRes = await fetch(`/api/quiz/questions/random?stage=${selectedStage}&limit=12`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const qData = await qRes.json();
+        questions = qData.questions || [];
+      } catch (e) {
+        console.error('Erro ao buscar perguntas:', e);
+      }
+
+      currentQuestionIndex = 0;
+      document.getElementById('duel-hud').style.display = 'flex';
+      document.getElementById('question-banner').style.display = 'block';
+
+      document.getElementById('p1-hud-name').innerText = currentUser?.name?.split(' ')[0] || 'Você';
+      document.getElementById('p2-hud-name').innerText = opponentData.name?.split(' ')[0] || 'Rival';
+
+      updateHUD();
+      updateTugOfWarBar(0, 0);
+      positionTargets(questions[0]);
+
+      isGameRunning = true;
+
+      // Timer da Partida
+      let timeLeft = duelDuration;
+      document.getElementById('duel-timer').innerText = `${timeLeft}s`;
+
+      if (matchTimerInterval) clearInterval(matchTimerInterval);
+      matchTimerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('duel-timer').innerText = `${timeLeft}s`;
+
+        if (timeLeft <= 0) {
+          clearInterval(matchTimerInterval);
+          isGameRunning = false;
+
+          if (socket && socket.connected) {
+            socket.emit('duel_client_finished', {
+              finalScore: score,
+              finalHits: hits,
+              finalMisses: misses,
+              maxCombo: maxCombo,
+            });
+          }
+        }
+      }, 1000);
+    }
+
+    function updateHUD() {
+      document.getElementById('p1-hud-score').innerText = `${score} pts`;
+      document.getElementById('p2-hud-score').innerText = `${opponentData.score} pts`;
+      document.getElementById('hud-my-hits').innerText = `${hits} acertos`;
+      document.getElementById('hud-my-combo').innerText = `x${combo} Combo`;
+    }
+
+    function updateTugOfWarBar(p1Score, p2Score) {
+      const total = p1Score + p2Score;
+      let p1Percent = 50;
+      let p2Percent = 50;
+
+      if (total > 0) {
+        p1Percent = Math.min(85, Math.max(15, Math.round((p1Score / total) * 100)));
+        p2Percent = 100 - p1Percent;
+      }
+
+      document.getElementById('tug-bar-p1').style.width = `${p1Percent}%`;
+      document.getElementById('tug-bar-p2').style.width = `${p2Percent}%`;
+      document.getElementById('p1-hud-score').innerText = `${p1Score} pts`;
+      document.getElementById('p2-hud-score').innerText = `${p2Score} pts`;
+    }
+
+    // ─── DISTRIBUIÇÃO DOS ALVOS EM LINHA PANORÂMICA (SEM OBSTRUÇÃO) ─
+    function positionTargets(q) {
+      if (!q) return;
+
+      const stageNames = {
+        fundamental_1: '🎒 Fund. 1',
+        fundamental_2: '📚 Fund. 2',
+        ensino_medio: '🎓 Ensino Médio',
+        superior: '🏛️ Superior',
+      };
+
+      document.getElementById('banner-stage').innerText = stageNames[q.education_stage] || 'Desafio';
+      document.getElementById('banner-discipline').innerText = (q.discipline || 'Geral').toUpperCase();
+      document.getElementById('banner-text').innerText = q.question_text;
+
+      const options = q.options || [];
+      const numOptions = options.length;
+      targets = [];
+
+      const isPortrait = canvasHeight > canvasWidth;
+
+      if (isPortrait) {
+        // Modo Retrato / Celular em pé (100% dentro da tela)
+        const targetRadius = Math.min(canvasWidth * 0.088, 33);
+        const padding = targetRadius + Math.max(12, canvasWidth * 0.04);
+        const availableWidth = canvasWidth - padding * 2;
+        const step = numOptions > 1 ? availableWidth / (numOptions - 1) : 0;
+        const baseY = Math.max(180, canvasHeight * 0.38);
+
+        options.forEach((opt, idx) => {
+          const baseX = padding + step * idx;
+          const arcOffset = (idx === 1 || idx === 2) ? -12 : 8;
+          const targetY = baseY + arcOffset;
+
+          targets.push({
+            id: opt.id,
+            text: opt.option_text,
+            isCorrect: opt.is_correct,
+            x: baseX,
+            y: targetY,
+            baseX: baseX,
+            baseY: targetY,
+            radius: targetRadius,
+            phase: Math.random() * Math.PI * 2,
+            isAlive: true,
+          });
+        });
+      } else {
+        // Modo Paisagem / PC / Celular deitado
+        const targetRadius = Math.min(canvasHeight * 0.10, 50);
+        const padding = targetRadius + Math.max(16, canvasWidth * 0.05);
+        const availableWidth = canvasWidth - padding * 2;
+        const step = numOptions > 1 ? availableWidth / (numOptions - 1) : 0;
+        const baseYLine = Math.max(170, canvasHeight * 0.38);
+
+        options.forEach((opt, idx) => {
+          const baseX = padding + step * idx;
+          const baseY = baseYLine + (idx % 2 === 0 ? -16 : 16);
+
+          targets.push({
+            id: opt.id,
+            text: opt.option_text,
+            isCorrect: opt.is_correct,
+            x: baseX,
+            y: baseY,
+            baseX: baseX,
+            baseY: baseY,
+            radius: targetRadius,
+            phase: Math.random() * Math.PI * 2,
+            isAlive: true,
+          });
+        });
+      }
+    }
+
+    // ─── DISPARO DE FLECHAS ───────────────────────────────────
+    function shootArrowAt(targetX, targetY) {
+      if (!isGameRunning) return;
+
+      const dx = targetX - bow.x;
+      const dy = targetY - bow.y;
+      const angle = Math.atan2(dy, dx);
+      bow.angle = angle;
+
+      const arrowSpeed = Math.min(canvasHeight * 0.022, 19);
+
+      arrows.push({
+        x: bow.x,
+        y: bow.y,
+        vx: Math.cos(angle) * arrowSpeed,
+        vy: Math.sin(angle) * arrowSpeed,
+        angle: angle,
+        trail: [],
+        isAlive: true,
+      });
+
+      playSound('shoot');
+    }
+
+    // Eventos de Toque e Mouse
+    function handlePointerShoot(e) {
+      if (!isGameRunning) return;
+      const rect = canvas.getBoundingClientRect();
+      let clientX = e.clientX;
+      let clientY = e.clientY;
+
+      if (e.touches && e.touches.length > 0) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      }
+
+      if (clientY > rect.bottom - 40) return; // Não dispara se tocar na borda inferior
+
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
+      shootArrowAt(x, y);
+    }
+
+    canvas.addEventListener('pointerdown', handlePointerShoot);
+
+    // ─── FINALIZAR A PARTIDA & SALVAR RECOMPENSAS NO BACKEND ───
+    async function finishDuelMatch(isTie, winner, leaderboard) {
+      isGameRunning = false;
+      if (matchTimerInterval) clearInterval(matchTimerInterval);
+
+      document.getElementById('duel-hud').style.display = 'none';
+      document.getElementById('question-banner').style.display = 'none';
+
+      const isWinner = winner && winner.id === socket?.id;
+
+      // Monta tela de pódio
+      const winnerBanner = document.getElementById('winner-banner');
+      if (isTie) {
+        winnerBanner.innerHTML = '<span>🤝</span> <span>Empate Heróico!</span>';
+      } else if (isWinner) {
+        winnerBanner.innerHTML = '<span>👑</span> <span style="color: #fde047;">Você Venceu o Duelo!</span>';
+      } else {
+        winnerBanner.innerHTML = `<span>⚔️</span> <span>${winner?.name || 'Rival'} Venceu!</span>`;
+      }
+
+      document.getElementById('res-p1-name').innerText = currentUser?.name || 'Você';
+      document.getElementById('res-p1-score').innerText = `${score} pts`;
+      document.getElementById('res-p1-hits').innerText = `${hits} acertos`;
+
+      document.getElementById('res-p2-name').innerText = opponentData.name || 'Rival';
+      document.getElementById('res-p2-score').innerText = `${opponentData.score} pts`;
+      document.getElementById('res-p2-hits').innerText = `${opponentData.hits} acertos`;
+
+      // Recompensas no Backend
+      try {
+        const res = await fetch('/api/quiz/duel/finish', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            isWinner,
+            isTie,
+            score,
+            hits,
+            opponentName: opponentData.name,
+            stage: selectedStage,
+          })
+        });
+        const data = await res.json();
+
+        if (data.success && data.rewards) {
+          document.getElementById('reward-gold').innerText = `+${data.rewards.gold_earned} Ouro`;
+          document.getElementById('reward-xp').innerText = `+${data.rewards.xp_earned} XP`;
+          document.getElementById('reward-int').innerText = `+${data.rewards.int_bonus_added} INT`;
+        }
+      } catch (e) {
+        console.error('Erro ao salvar recompensa de duelo:', e);
+      }
+
+      document.getElementById('screen-game-over').style.display = 'flex';
+    }
+
+    // ─── LOOP PRINCIPAL DO CANVAS (60 FPS) ────────────────────
+    let lastTime = performance.now();
+
+    function gameLoop(time) {
+      const dt = (time - lastTime) / 1000;
+      lastTime = time;
+
+      update(dt);
+      draw();
+
+      requestAnimationFrame(gameLoop);
+    }
+    requestAnimationFrame(gameLoop);
+
+    function update(dt) {
+      if (!isGameRunning) return;
+
+      // 1. Atualizar Alvos (Oscilação vertical mantendo X fixo para nunca obstruir)
+      targets.forEach((t) => {
+        if (!t.isAlive) return;
+        t.pulse = (t.pulse || 0) + dt * 2.2;
+        t.x = t.baseX;
+        t.y = t.baseY + Math.sin(t.pulse + t.phase) * 6;
+      });
+
+      // 2. Alvo Bônus Relâmpago (Pássaro Dourado em Voo Acrobático)
+      snitchTimer += dt;
+      if (snitchTimer > 14 && !goldenSnitch) {
+        snitchTimer = 0;
+        const fromLeft = Math.random() > 0.5;
+        goldenSnitch = {
+          progress: 0,
+          duration: 4.0,
+          fromLeft,
+          radius: Math.min(26, canvasWidth * 0.06),
+          wingFlap: 0,
+          baseY: Math.max(90, canvasHeight * 0.25),
+        };
+      }
+
+      if (goldenSnitch) {
+        goldenSnitch.progress += dt / goldenSnitch.duration;
+        goldenSnitch.wingFlap += dt * 16;
+        const p = goldenSnitch.progress;
+
+        if (goldenSnitch.fromLeft) {
+          goldenSnitch.x = -40 + (canvasWidth + 80) * p;
+        } else {
+          goldenSnitch.x = canvasWidth + 40 - (canvasWidth + 80) * p;
+        }
+
+        const waveY = Math.sin(p * Math.PI * 2) * (canvasHeight * 0.15);
+        goldenSnitch.y = goldenSnitch.baseY + waveY;
+
+        if (Math.random() < 0.25) {
+          particles.push({
+            x: goldenSnitch.x,
+            y: goldenSnitch.y,
+            vx: (Math.random() - 0.5) * 1.5,
+            vy: (Math.random() - 0.5) * 1.5,
+            color: '#fef08a',
+            size: 2.5,
+            alpha: 0.85,
+            decay: 0.04,
+          });
+        }
+
+        if (goldenSnitch.progress >= 1) {
+          goldenSnitch = null;
+        }
+      }
+
+      // 3. Atualizar Flechas
+      for (let i = arrows.length - 1; i >= 0; i--) {
+        const arr = arrows[i];
+        arr.trail.push({ x: arr.x, y: arr.y });
+        if (arr.trail.length > 7) arr.trail.shift();
+
+        arr.x += arr.vx;
+        arr.y += arr.vy;
+
+        // Colisão com Alvo Dourado Relâmpago
+        if (goldenSnitch) {
+          const distSnitch = Math.hypot(arr.x - goldenSnitch.x, arr.y - goldenSnitch.y);
+          if (distSnitch < goldenSnitch.radius + 12) {
+            playSound('snitch');
+            createExplosion(goldenSnitch.x, goldenSnitch.y, '#fde047', 35);
+            addFloatingText('⚡ +250 PTS!', goldenSnitch.x, goldenSnitch.y, '#fde047', 26);
+            score += 250;
+            goldenSnitch = null;
+            arr.isAlive = false;
+
+            updateHUD();
+            updateTugOfWarBar(score, opponentData.score);
+
+            if (socket && socket.connected) {
+              socket.emit('duel_score_update', {
+                scoreDelta: 250,
+                isHit: false,
+                isMiss: false,
+                combo: combo,
+                isSnitch: true,
+              });
+            }
+            continue;
+          }
+        }
+
+        // Colisão com os Alvos de Resposta
+        for (let j = 0; j < targets.length; j++) {
+          const t = targets[j];
+          if (!t.isAlive) continue;
+
+          const dist = Math.hypot(arr.x - t.x, arr.y - t.y);
+          if (dist < t.radius + 8) {
+            arr.isAlive = false;
+
+            if (t.isCorrect) {
+              // ACERTO!
+              playSound('hit_correct');
+              t.isAlive = false;
+              hits++;
+              const ptsEarned = 100 * combo;
+              score += ptsEarned;
+              combo++;
+              if (combo > maxCombo) maxCombo = combo;
+
+              createExplosion(t.x, t.y, '#22c55e', 24);
+              addFloatingText(`+${ptsEarned}!`, t.x, t.y, '#fde047', 24);
+
+              updateHUD();
+              updateTugOfWarBar(score, opponentData.score);
+
+              if (socket && socket.connected) {
+                socket.emit('duel_score_update', {
+                  scoreDelta: ptsEarned,
+                  isHit: true,
+                  isMiss: false,
+                  combo: combo,
+                  isSnitch: false,
+                });
+              }
+
+              // Próxima Pergunta
+              setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < questions.length) {
+                  positionTargets(questions[currentQuestionIndex]);
+                } else {
+                  // Se esgotou perguntas, reembaralha as existentes para o duelo contínuo
+                  currentQuestionIndex = 0;
+                  positionTargets(questions[0]);
+                }
+              }, 400);
+
+            } else {
+              // ERRO
+              playSound('hit_wrong');
+              combo = 1;
+              misses++;
+              createExplosion(t.x, t.y, '#ef4444', 16);
+              addFloatingText('ERROU!', t.x, t.y, '#ef4444', 20);
+
+              updateHUD();
+              if (socket && socket.connected) {
+                socket.emit('duel_score_update', {
+                  scoreDelta: 0,
+                  isHit: false,
+                  isMiss: true,
+                  combo: 1,
+                  isSnitch: false,
+                });
+              }
+            }
+            break;
+          }
+        }
+
+        // Remove flechas que saíram do canvas
+        if (arr.x < -50 || arr.x > canvasWidth + 50 || arr.y < -50 || arr.y > canvasHeight + 50) {
+          arr.isAlive = false;
+        }
+      }
+
+      arrows = arrows.filter(a => a.isAlive);
+
+      // 4. Atualizar Partículas
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= p.decay;
+        if (p.alpha <= 0) particles.splice(i, 1);
+      }
+
+      // 5. Atualizar Textos Flutuantes
+      for (let i = floatingTexts.length - 1; i >= 0; i--) {
+        const ft = floatingTexts[i];
+        ft.y += ft.vy;
+        ft.alpha -= ft.decay;
+        if (ft.alpha <= 0) floatingTexts.splice(i, 1);
+      }
+    }
+
+    function createExplosion(x, y, color, count) {
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 1.5 + Math.random() * 4.5;
+        particles.push({
+          x,
+          y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          color,
+          size: 2 + Math.random() * 3,
+          alpha: 1,
+          decay: 0.025 + Math.random() * 0.03,
+        });
+      }
+    }
+
+    function addFloatingText(text, x, y, color, size = 20) {
+      floatingTexts.push({
+        text,
+        x,
+        y,
+        vy: -1.4,
+        color,
+        size,
+        alpha: 1,
+        decay: 0.02,
+      });
+    }
+
+    // ─── RENDERIZAÇÃO DO CANVAS ────────────────────────────────
+    function draw() {
+      ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+      // Fundo Noturno Mágico
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, canvasHeight);
+      bgGrad.addColorStop(0, '#060a16');
+      bgGrad.addColorStop(0.5, '#0d152a');
+      bgGrad.addColorStop(1, '#05070d');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+      // Desenhar Alvos de Resposta
+      targets.forEach((t) => {
+        if (!t.isAlive) return;
+
+        ctx.save();
+        ctx.shadowColor = 'rgba(212, 175, 55, 0.4)';
+        ctx.shadowBlur = 12;
+
+        const grad = ctx.createRadialGradient(t.x, t.y, 4, t.x, t.y, t.radius);
+        grad.addColorStop(0, '#1e293b');
+        grad.addColorStop(0.7, '#0f172a');
+        grad.addColorStop(1, '#020617');
+
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(t.x, t.y, t.radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = '#d4af37';
+        ctx.lineWidth = 2.2;
+        ctx.stroke();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        const textStr = String(t.text || '');
+        let fontSize = Math.round(t.radius * 0.52);
+        ctx.font = `800 ${fontSize}px Plus Jakarta Sans`;
+
+        const maxWidth = t.radius * 1.7;
+        let textWidth = ctx.measureText(textStr).width;
+        while (textWidth > maxWidth && fontSize > 10) {
+          fontSize -= 1;
+          ctx.font = `800 ${fontSize}px Plus Jakarta Sans`;
+          textWidth = ctx.measureText(textStr).width;
+        }
+
+        ctx.shadowColor = '#000000';
+        ctx.shadowBlur = 4;
+        ctx.fillText(textStr, t.x, t.y);
+
+        ctx.restore();
+      });
+
+      // Desenhar Alvo Dourado Relâmpago
+      if (goldenSnitch) {
+        ctx.save();
+        const snitchX = goldenSnitch.x;
+        const snitchY = goldenSnitch.y;
+        const r = goldenSnitch.radius;
+
+        // Asas batendo
+        const flap = Math.sin(goldenSnitch.wingFlap) * 0.7;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        ctx.beginPath();
+        ctx.ellipse(snitchX - r * 0.7, snitchY - r * 0.4 + flap * 6, r * 0.8, r * 0.35, -0.4 + flap * 0.3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(snitchX + r * 0.7, snitchY - r * 0.4 + flap * 6, r * 0.8, r * 0.35, 0.4 - flap * 0.3, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Esfera Dourada
+        const snitchGrad = ctx.createRadialGradient(snitchX, snitchY, 2, snitchX, snitchY, r);
+        snitchGrad.addColorStop(0, '#ffffff');
+        snitchGrad.addColorStop(0.3, '#fef08a');
+        snitchGrad.addColorStop(0.8, '#eab308');
+        snitchGrad.addColorStop(1, '#ca8a04');
+
+        ctx.shadowColor = '#facc15';
+        ctx.shadowBlur = 18;
+        ctx.fillStyle = snitchGrad;
+        ctx.beginPath();
+        ctx.arc(snitchX, snitchY, r, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+      }
+
+      // Desenhar Flechas
+      arrows.forEach((arr) => {
+        ctx.save();
+        // Rastro de luz
+        if (arr.trail.length > 1) {
+          ctx.beginPath();
+          ctx.moveTo(arr.trail[0].x, arr.trail[0].y);
+          for (let k = 1; k < arr.trail.length; k++) {
+            ctx.lineTo(arr.trail[k].x, arr.trail[k].y);
+          }
+          ctx.strokeStyle = 'rgba(253, 224, 71, 0.35)';
+          ctx.lineWidth = 3;
+          ctx.stroke();
+        }
+
+        ctx.translate(arr.x, arr.y);
+        ctx.rotate(arr.angle);
+
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(-20, 0);
+        ctx.lineTo(12, 0);
+        ctx.stroke();
+
+        ctx.fillStyle = '#fde047';
+        ctx.beginPath();
+        ctx.moveTo(15, 0);
+        ctx.lineTo(5, -5);
+        ctx.lineTo(7, 0);
+        ctx.lineTo(5, 5);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.restore();
+      });
+
+      // Partículas
+      particles.forEach((p) => {
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      // Textos Flutuantes
+      floatingTexts.forEach((ft) => {
+        ctx.save();
+        ctx.globalAlpha = ft.alpha;
+        ctx.fillStyle = ft.color;
+        ctx.font = `800 ${ft.size}px Plus Jakarta Sans`;
+        ctx.textAlign = 'center';
+        ctx.shadowColor = '#000000';
+        ctx.shadowBlur = 8;
+        ctx.fillText(ft.text, ft.x, ft.y);
+        ctx.restore();
+      });
+
+      // Arco Mágico na base
+      ctx.save();
+      ctx.translate(bow.x, bow.y);
+      ctx.rotate(bow.angle + Math.PI / 2);
+
+      const bowRadius = Math.min(canvasWidth * 0.1, 42);
+
+      ctx.strokeStyle = '#d4af37';
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.arc(0, 0, bowRadius, Math.PI * 0.15, Math.PI * 0.85);
+      ctx.stroke();
+
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(-bowRadius * 0.9, bowRadius * 0.4);
+      ctx.lineTo(0, bowRadius * 0.75);
+      ctx.lineTo(bowRadius * 0.9, bowRadius * 0.4);
+      ctx.stroke();
+
+      // Flecha pronta na corda
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(0, bowRadius * 0.75);
+      ctx.lineTo(0, -bowRadius * 0.9);
+      ctx.stroke();
+
+      ctx.fillStyle = '#fde047';
+      ctx.beginPath();
+      ctx.moveTo(0, -bowRadius * 1.05);
+      ctx.lineTo(-5, -bowRadius * 0.85);
+      ctx.lineTo(5, -bowRadius * 0.85);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    // Inicialização
+    setTimeout(() => {
+      resizeCanvas();
+      connectDuelSocket();
+    }, 60);
+  </script>
+</body>
+</html>

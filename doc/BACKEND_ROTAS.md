@@ -160,7 +160,27 @@ Este documento cataloga todos os endpoints REST e eventos de WebSocket (Socket.I
 | Método | Rota | Autenticação | Descrição |
 |:---|:---|:---|:---|
 | `GET` | `/api/quiz/questions/random` | Pública | Retorna perguntas aleatórias com suas 4 alternativas embaralhadas, filtradas por `stage` (`fundamental_1`, `fundamental_2`, `ensino_medio`, `superior`) e opcionalmente `discipline` |
-| `POST` | `/api/quiz/start` | JWT | Valida e debita 4 de Energia de Aventura (`adventure_energy`) para iniciar a sessão do Arqueiro do Saber |
-| `POST` | `/api/quiz/finish` | JWT | Registra desfecho da partida (`hits`, `misses`, `max_combo`, `score`, `stage`, `difficulty`), creditando Ouro no Herói (`Character.gold`), XP na classe ativa (`CharacterClass.xp`), verificando Level Up e aprimorando o atributo Inteligência (`INT`) do Herói |
+| `POST` | `/api/quiz/start` | JWT | Valida e debita 4 de Energia de Aventura (`adventure_energy`) para iniciar a sessão do Arqueiro do Saber ou Duelo 1v1 |
+| `POST` | `/api/quiz/finish` | JWT | Registra desfecho da partida solo (`hits`, `misses`, `max_combo`, `score`, `stage`, `difficulty`), creditando Ouro no Herói (`Character.gold`), XP na classe ativa (`CharacterClass.xp`), verificando Level Up e aprimorando o atributo Inteligência (`INT`) do Herói |
+| `POST` | `/api/quiz/duel/finish` | JWT | Registra desfecho do Duelo 1v1 em Tempo Real (`isWinner`, `isTie`, `score`, `hits`, `opponentName`, `stage`), creditando Ouro, XP e bônus de Inteligência (+2 INT para vencedor, +1 INT para empate/vice) no Herói |
+
+---
+
+## 13. WebSockets do Duelo de Arqueiros 1v1 (`/duel`)
+
+Namespace dedicado para partidas 1v1 entre irmãos e membros do clã:
+- `join_duel_lobby`: Jogador conecta à sala familiar com suas preferências de nível escolar individual (`stage`) e dados de usuário.
+- `duel_lobby_updated`: Broadcast com a lista dos 2 duelistas, prontidão (`isReady`) e status da arena.
+- `update_player_settings`: Atualiza a etapa de ensino escolhida pelo jogador durante o lobby.
+- `player_toggle_ready`: Alterna status "Pronto para o Combate". Quando ambos estão prontos, dispara contagem regressiva de 3s.
+- `duel_countdown_tick`: Envia pulsos de 3, 2, 1 para os navegadores sincronizarem a abertura da arena.
+- `duel_started`: Inicia o duelo cronometrado (60 segundos) com perguntas independentes para cada jogador.
+- `duel_score_update`: Disparado client-side a cada acerto, combo ou captura do Pássaro Dourado Relâmpago.
+- `duel_scores_synced`: Sincroniza em tempo real a barra dinâmica estilo "Cabo de Guerra" e os pontos dos 2 jogadores.
+- `duel_client_finished`: Emite resultado final de pontuação para apuração do vencedor.
+- `duel_match_over`: Declaração oficial do vencedor, pódio e liberação para resgate de prêmios.
+- `duel_request_rematch`: Reinicia a arena para uma nova revanche familiar.
+- `duel_player_disconnected`: Notifica o oponente caso um dos duelistas perca a conexão.
+
 
 

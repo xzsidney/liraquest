@@ -3708,7 +3708,7 @@
                   </div>
                   <h3 style="font-size: 1.3rem; color: #ffffff; margin-bottom: 6px;">O Arqueiro do Saber</h3>
                   <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 14px;">
-                    Desafio de pontaria e reflexo! Mire com o arco e flecha nos alvos da resposta certa para treinar sua agilidade mental e evoluir a Inteligência do herói (do primário à faculdade).
+                    Desafio de pontaria e reflexo solo! Mire com o arco e flecha nos alvos da resposta certa para treinar sua agilidade mental e evoluir a Inteligência do herói (do primário à faculdade).
                   </p>
                   <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
                     <span class="reward-pill-energy" style="font-size: 0.75rem;">⚡ Custa: 4 Energia</span>
@@ -3718,7 +3718,32 @@
                   </div>
                 </div>
                 <button class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 1rem;" onclick="openArcherGameArena()">
-                  ▶️ Jogar Arqueiro do Saber (4 ⚡)
+                  ▶️ Jogar Arqueiro Solo (4 ⚡)
+                </button>
+              </div>
+
+              <!-- Card Jogo 3: ⚔️ Duelo de Arqueiros (1v1 Família em Tempo Real) (ATIVO / JOGÁVEL) -->
+              <div class="arcade-card active-game">
+                <div>
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                    <span style="font-size: 2.5rem; background: linear-gradient(135deg, rgba(128, 0, 32, 0.6) 0%, rgba(30, 58, 138, 0.6) 100%); width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--gold);">⚔️</span>
+                    <span style="background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 800;">
+                      🟢 NOVO 1v1
+                    </span>
+                  </div>
+                  <h3 style="font-size: 1.3rem; color: #ffffff; margin-bottom: 6px;">Duelo de Arqueiros (1v1)</h3>
+                  <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 14px;">
+                    Duelo multijogador familiar em tempo real! Compita com seus irmãos na mesma partida, cada um no seu próprio nível escolar, disputando quem domina a barra de pontaria!
+                  </p>
+                  <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
+                    <span class="reward-pill-energy" style="font-size: 0.75rem;">⚡ Custa: 4 Energia</span>
+                    <span class="reward-pill-gold" style="font-size: 0.75rem;">💰 Prêmio: +50 Ouro</span>
+                    <span class="reward-pill-xp" style="font-size: 0.75rem;">⭐ +80 XP</span>
+                    <span style="background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4); padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 700;">🧠 +2 INT</span>
+                  </div>
+                </div>
+                <button class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 1rem; background: linear-gradient(135deg, #1e3a8a 0%, #800020 100%);" onclick="openDuelGameArena()">
+                  ⚔️ Desafiar no Duelo 1v1 (4 ⚡)
                 </button>
               </div>
 
@@ -4141,8 +4166,14 @@
       window.location.href = '/archer.html';
     }
     window.openArcherGameArena = openArcherGameArena;
+
+    function openDuelGameArena() {
+      try { localStorage.setItem('liraquest_avatar_tab', 'arcade'); } catch(e) {}
+      window.location.href = '/duel.html';
+    }
+    window.openDuelGameArena = openDuelGameArena;
   </script>
   <script src="/socket.io/socket.io.js"></script>
-  <script src="/app.js?v=20260903_archer_v3"></script>
+  <script src="/app.js?v=20260904_duel_v1"></script>
 </body>
 </html>

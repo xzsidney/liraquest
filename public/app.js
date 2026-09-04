@@ -5414,3 +5414,15 @@ document.addEventListener('DOMContentLoaded', () => {
   if (submitProofForm) submitProofForm.addEventListener('submit', handleSubmitProof);
 });
 
+// Funções Globais de Abertura das Arenas do Arcade
+window.openArcherGameArena = function() {
+  try { localStorage.setItem('liraquest_avatar_tab', 'arcade'); } catch(e) {}
+  window.location.href = '/archer.html';
+};
+
+window.openDuelGameArena = function() {
+  try { localStorage.setItem('liraquest_avatar_tab', 'arcade'); } catch(e) {}
+  window.location.href = '/duel.html';
+};
+
+

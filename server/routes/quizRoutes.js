@@ -3,6 +3,7 @@ import {
   getRandomQuestions,
   startQuizSession,
   finishQuizSession,
+  finishDuelSession,
 } from '../controllers/quizController.js';
 import { authenticateToken } from '../middlewares/authMiddleware.js';
 
@@ -16,5 +17,8 @@ router.post('/start', authenticateToken, startQuizSession);
 
 // POST /api/quiz/finish (Credita Ouro, XP e aprimora INT)
 router.post('/finish', authenticateToken, finishQuizSession);
+
+// POST /api/quiz/duel/finish (Credita Ouro, XP e bônus de Duelo 1v1)
+router.post('/duel/finish', authenticateToken, finishDuelSession);
 
 export default router;

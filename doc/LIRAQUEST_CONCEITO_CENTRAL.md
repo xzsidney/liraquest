@@ -145,8 +145,13 @@ O Arcade do Reino é o hub de lazer onde o Avatar gasta a **⚡ Energia de Avent
      - 🔴 *Difícil (Mestre Arqueiro):* Aljava com 12 flechas, alvos mais velozes e penalidade de -1 flecha extra por erro de resposta (+50% de Ouro e XP e bônus dobrado em INT).
    - ⚡ **Economia e Atributos:** Consome 4 ⚡ Energia de Aventura, credita Ouro 💰 direto no Herói, XP ⭐ na classe ativa e bônus no atributo **Inteligência (INT)**.
    - ⚡ **Alvo Relâmpago de Reflexo:** Aparição periódica de um alvo dourado de alta velocidade para testar o tempo de reação e conceder bônus extras (+250 pts).
-3. 📜 **Aventuras em Quest (Livro-Jogo 3 Escolhas):** Histórias ilustradas com caminhos ramificados baseadas nos atributos da ficha.
-4. ⚔️ **Arena de Batalha 2D:** Combates contra os Monstros da Casa.
+3. ⚔️ **Duelo de Arqueiros (1v1 Família em Tempo Real - ATIVO):** Modo multijogador competitivo em tempo real baseado em Socket.IO (`/duel`) e Canvas 2D:
+   - 🛡️ **Equidade Pedagógica:** Dois irmãos ou membros da família duelam na mesma arena de seus celulares ou PCs, cada um respondendo perguntas do seu próprio nível escolar (ex: caçula com Fundamental 1 e primogênito com Ensino Médio/Faculdade).
+   - ⚖️ **Placar Dinâmico em "Cabo de Guerra":** Uma barra superior dinâmica com gema central oscila em tempo real conforme os acertos e combos de cada arqueiro, gerando engajamento e adrenalina saudável.
+   - ⚡ **Desempenho Zero Lag:** A física e renderização ocorrem 100% no cliente (Canvas 2D nativo); o servidor Hostinger apenas propaga pings leves de pontuação e combo via WebSocket, operando com consumo mínimo de recursos.
+   - 👑 **Glória e Recompensas:** O vencedor ganha +50 Ouro, +80 XP e +2 INT; o vice-campeão recebe prêmio de participação valoroso (+25 Ouro, +40 XP e +1 INT), reforçando sempre a cooperação e o esforço.
+4. 📜 **Aventuras em Quest (Livro-Jogo 3 Escolhas):** Histórias ilustradas com caminhos ramificados baseadas nos atributos da ficha.
+5. ⚔️ **Arena de Batalha 2D:** Combates contra os Monstros da Casa.
 
 ### 7.2 Masmorras Solo & Desafios Diários
 * O filho consome a **Energia de Aventura** ganha nas tarefas para entrar em masmorras curtas.

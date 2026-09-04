@@ -381,7 +381,7 @@ O **Painel do Clã** (`/api/family/analytics`) realiza agregações analíticas 
 
 ## 7. Módulo Arcade & Quiz Educativo (`family_quiz_*`)
 
-Tabelas de suporte para o mini-jogo **O Arqueiro do Saber** e testes de conhecimento calibrados do primário à faculdade.
+Tabelas de suporte para os mini-jogos **O Arqueiro do Saber (Solo)** e **⚔️ Duelo de Arqueiros (1v1 Família em Tempo Real)**, fornecendo perguntas pedagógicas calibradas do primário à faculdade. O modo 1v1 reutiliza este catálogo em tempo real para permitir que dois irmãos joguem simultaneamente com etapas de ensino independentes.
 
 ### ❓ `family_quiz_questions`
 Catálogo de enigmas e perguntas com classificação pedagógica, nível de dificuldade e explicações.

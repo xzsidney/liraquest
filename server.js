@@ -18,6 +18,7 @@ import progressRoutes from './server/routes/progressRoutes.js';
 import rewardRoutes from './server/routes/rewardRoutes.js';
 import quizRoutes from './server/routes/quizRoutes.js';
 import { initChameleonSocket } from './server/sockets/chameleonSocket.js';
+import { initDuelSocket } from './server/sockets/duelSocket.js';
 
 dotenv.config();
 
@@ -33,8 +34,9 @@ const io = new Server(httpServer, {
   },
 });
 
-// Inicializar WebSockets do Esconde-Esconde
+// Inicializar WebSockets do Esconde-Esconde e Duelo de Arqueiros
 initChameleonSocket(io);
+initDuelSocket(io);
 
 const PORT = process.env.PORT || 3000;
 
