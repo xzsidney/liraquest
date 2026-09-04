@@ -240,5 +240,10 @@ O **Arcade de Lira** é o centro de diversão acessível pelo Terminal do Avatar
    - **Duelo Épico de Campeões:**
      - **🛡️ Capitão América (Tanque / Vanguarda):** Combate com o lendário Escudo de Vibranium. Possui ataques físicos diretos, arremesso perfurante à distância (*Shield Slash* com projétil dinâmico que vai e volta), gancho aéreo ascendente com chance de atordoar (*Stars & Stripes* com rastro de poeira estelar), investida com escudo de choque (*Charging Star*) e o Golpe Supremo *FINAL JUSTICE* com explosão cósmica dourada.
      - **🔴 Ciclope (Artilheiro / Mestre Óptico):** Mestre de controle de campo à distância. Utiliza chutes giratórios (*Cyclone Kick*), rajada óptica concentrada (*Optic Blast* com feixe laser contínuo), varredura rasteira que atrasa a iniciativa adversária (*Optic Sweep*), gancho de plasma (*Gene Splice*) e o Golpe Supremo cinematográfico de tela cheia *MEGA OPTIC BLAST*.
-   - **Efeitos Dinâmicos de Combate:** Textos flutuantes de dano e cura (`-140 CRÍTICO!`, `GUARDA!`, `ATORDOADO!`), trepidação de tela dinâmico (*Screen Shake*) nos golpes pesados, sombras volumétricas nos pés dos lutadores e sintetizador de áudio Web Audio API nativo para golpes, tiros laser, clangs de metal e fanfarras de vitória.
    - **Economia e Recompensas:** Custo de 5 Energia de Aventura. Vitórias concedem +50 Ouro e +80 XP para evolução de nível do herói.
+5. **🎞️ Visualizador & Editor de Animações 2D (`/animator.html`):**
+   - Ferramenta visual do Arcade para inspeção, calibração e criação de golpes dos lutadores.
+   - **Canvas com Eixo e Linhas Guia:** Visualização do centro de gravidade (0,0) e linha do chão com opção de grade milimétrica, sombra e espelhamento (lado 1P vs 2P).
+   - **Calibração Rápida via Teclado e Mouse:** Ajuste pixel a pixel do ponto pivô (`bodyAxis.xaxis`, `bodyAxis.yaxis`, `shieldAxis.xaxis`, `shieldAxis.yaxis`) usando as setas direcionais (`←` `↑` `→` `↓`) ou `Shift + Setas` para saltos de 5px.
+   - **Manipulação Completa de Sequências:** Permite duplicar frames, adicionar novos frames a partir de qualquer sprite PNG disponível na pasta do personagem, reordenar, alterar durações (`durationPerFrame`) e criar novas animações com 1 clique.
+   - **Persistência Segura:** Salva as configurações diretamente no `manifest.json` com criação automática de backup de segurança (`manifest.backup.json`).

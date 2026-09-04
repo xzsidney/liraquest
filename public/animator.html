@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiraQuest — Editor & Visualizador de Animações 2D</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-bordo: #800020;
+      --primary-bordo-dark: #4a0e17;
+      --primary-bordo-light: #9b111e;
+      --secondary-blue: #1e3a8a;
+      --secondary-blue-dark: #0f172a;
+      --secondary-blue-light: #2563eb;
+      --accent-gold: #d4af37;
+      --accent-gold-light: #fbbf24;
+      --accent-gold-glow: rgba(212, 175, 55, 0.4);
+      --bg-dark: #070a13;
+      --surface-dark: #0e1526;
+      --surface-card: #151e34;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-noble: rgba(212, 175, 55, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 10%, #171d33 0%, var(--bg-dark) 90%);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* HEADER */
+    header {
+      background: linear-gradient(180deg, rgba(14, 21, 38, 0.98), rgba(7, 10, 19, 0.95));
+      border-bottom: 2px solid var(--accent-gold);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+      z-index: 50;
+    }
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-title h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.4rem;
+      color: var(--accent-gold-light);
+      letter-spacing: 1px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+      text-decoration: none;
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, var(--accent-gold), #b8860b);
+      color: #000;
+      border-color: var(--accent-gold-light);
+      box-shadow: 0 2px 10px var(--accent-gold-glow);
+    }
+    .btn-gold:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(251, 191, 36, 0.6);
+    }
+
+    .btn-bordo {
+      background: linear-gradient(135deg, var(--primary-bordo), var(--primary-bordo-dark));
+      color: #fff;
+      border-color: var(--primary-bordo-light);
+    }
+    .btn-bordo:hover {
+      background: var(--primary-bordo-light);
+    }
+
+    .btn-blue {
+      background: linear-gradient(135deg, var(--secondary-blue), #1e293b);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .btn-blue:hover {
+      background: var(--secondary-blue-light);
+    }
+
+    /* WORKSPACE LAYOUT */
+    .workspace {
+      display: grid;
+      grid-template-columns: 320px 1fr 360px;
+      flex: 1;
+      height: calc(100vh - 65px);
+      overflow: hidden;
+    }
+
+    /* SIDEBAR ESQUERDA (PERSONAGEM & ANIMAÇÕES) */
+    .panel-left {
+      background: var(--surface-dark);
+      border-right: 1px solid rgba(212, 175, 55, 0.2);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: auto;
+    }
+
+    .section-box {
+      background: var(--surface-card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    .section-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.95rem;
+      color: var(--accent-gold);
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .form-group label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    select, input[type="text"], input[type="number"] {
+      background: #090d1a;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    select:focus, input:focus {
+      border-color: var(--accent-gold-light);
+      box-shadow: 0 0 8px var(--accent-gold-glow);
+    }
+
+    .anim-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 280px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .anim-item {
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.15s ease;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+    }
+    .anim-item:hover {
+      background: rgba(212, 175, 55, 0.1);
+      border-color: rgba(212, 175, 55, 0.4);
+    }
+    .anim-item.active {
+      background: linear-gradient(90deg, rgba(128, 0, 32, 0.5), rgba(30, 58, 138, 0.5));
+      border-color: var(--accent-gold);
+      color: var(--accent-gold-light);
+      font-weight: bold;
+    }
+
+    .anim-badge {
+      font-size: 0.7rem;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--text-muted);
+    }
+
+    /* ÁREA CENTRAL (CANVAS & CONTROLES DE TIMELINE) */
+    .panel-center {
+      display: flex;
+      flex-direction: column;
+      background: #050811;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .canvas-toolbar {
+      padding: 10px 20px;
+      background: rgba(14, 21, 38, 0.8);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+    }
+
+    .canvas-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      cursor: crosshair;
+    }
+
+    #animCanvas {
+      background: #090d18;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    /* TIMELINE & PLAYER INFERIOR */
+    .timeline-bar {
+      background: var(--surface-dark);
+      border-top: 1px solid rgba(212, 175, 55, 0.2);
+      padding: 14px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .player-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .btn-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      background: var(--surface-card);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.15s ease;
+    }
+    .icon-btn:hover {
+      border-color: var(--accent-gold);
+      background: rgba(212, 175, 55, 0.15);
+      color: var(--accent-gold-light);
+    }
+    .icon-btn.active {
+      background: var(--primary-bordo);
+      border-color: var(--accent-gold);
+      color: #fff;
+    }
+
+    .frames-strip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      max-width: 100%;
+    }
+
+    .frame-thumb {
+      min-width: 60px;
+      height: 60px;
+      background: #070a13;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.15s ease;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+    .frame-thumb:hover {
+      border-color: var(--accent-gold);
+    }
+    .frame-thumb.active {
+      border-color: var(--accent-gold-light);
+      background: rgba(212, 175, 55, 0.15);
+      color: #fff;
+      box-shadow: 0 0 10px var(--accent-gold-glow);
+    }
+    .frame-thumb img {
+      max-width: 44px;
+      max-height: 44px;
+      object-fit: contain;
+      image-rendering: pixelated;
+    }
+
+    /* SIDEBAR DIREITA (INSPETOR DE PROPRIEDADES & AJUSTES) */
+    .panel-right {
+      background: var(--surface-dark);
+      border-left: 1px solid rgba(212, 175, 55, 0.2);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: auto;
+    }
+
+    .axis-numpad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .numpad-btn {
+      padding: 8px;
+      background: #090d18;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-align: center;
+    }
+    .numpad-btn:hover {
+      background: rgba(212, 175, 55, 0.2);
+      border-color: var(--accent-gold);
+    }
+
+    .key-tip {
+      font-size: 0.75rem;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.1);
+      padding: 8px 12px;
+      border-radius: 6px;
+      border-left: 3px solid #38bdf8;
+      line-height: 1.4;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+      font-weight: bold;
+      display: none;
+      z-index: 100;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-title">
+      <span style="font-size: 1.5rem;">🎞️</span>
+      <div>
+        <h1>LiraQuest — Editor de Animações 2D</h1>
+        <div style="font-size: 0.75rem; color: var(--text-muted);">Calibração de Sprites MUGEN e Eixos de Combate</div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <a href="/battle.html" class="btn btn-blue" target="_blank">
+        <span>⚔️</span> Testar na Arena 2D
+      </a>
+      <button class="btn btn-bordo" onclick="resetCurrentFrameAxis()">
+        <span>🔄</span> Resetar Eixo
+      </button>
+      <button class="btn btn-gold" onclick="saveManifest()">
+        <span>💾</span> Salvar Manifest.json
+      </button>
+    </div>
+  </header>
+
+  <!-- WORKSPACE -->
+  <main class="workspace">
+
+    <!-- PAINEL ESQUERDO: SELEÇÃO -->
+    <aside class="panel-left">
+      <!-- 1. Herói -->
+      <div class="section-box">
+        <div class="section-title">
+          <span>🦸‍♂️ Campeão</span>
+        </div>
+        <div class="form-group">
+          <label for="select-hero">Selecione o Lutador:</label>
+          <select id="select-hero" onchange="loadHero(this.value)">
+            <option value="cap">Capitão América (cap)</option>
+            <option value="cyclops">Ciclope (cyclops)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 2. Lista de Animações -->
+      <div class="section-box" style="flex: 1; display: flex; flex-direction: column;">
+        <div class="section-title">
+          <span>🎬 Animações</span>
+          <button class="btn btn-gold" style="padding: 4px 8px; font-size: 0.72rem;" onclick="promptNewAnimation()">
+            ➕ Nova
+          </button>
+        </div>
+        <div class="anim-list" id="anim-list-container">
+          <!-- Gerado via JS -->
+        </div>
+      </div>
+
+      <!-- 3. Propriedades Globais da Animação -->
+      <div class="section-box">
+        <div class="section-title">
+          <span>⚙️ Configuração da Ação</span>
+        </div>
+        <div class="form-group">
+          <label for="input-anim-duration">Duração por Frame (ms):</label>
+          <input type="number" id="input-anim-duration" min="20" max="1000" step="5" value="80" onchange="updateAnimConfig()">
+        </div>
+        <div class="form-group" style="flex-direction: row; align-items: center; justify-content: space-between;">
+          <label for="checkbox-anim-loop" style="margin: 0; cursor: pointer;">Repetir em Loop:</label>
+          <input type="checkbox" id="checkbox-anim-loop" checked onchange="updateAnimConfig()" style="width: 18px; height: 18px; cursor: pointer;">
+        </div>
+      </div>
+    </aside>
+
+    <!-- PAINEL CENTRAL: CANVAS DE VISUALIZAÇÃO & TIMELINE -->
+    <section class="panel-center">
+      <div class="canvas-toolbar">
+        <div>
+          <span style="color: var(--accent-gold);">Zoom:</span>
+          <button class="icon-btn" style="width: 26px; height: 26px; display: inline-flex;" onclick="setZoom(1)">1x</button>
+          <button class="icon-btn" style="width: 26px; height: 26px; display: inline-flex;" onclick="setZoom(1.5)">1.5x</button>
+          <button class="icon-btn" style="width: 26px; height: 26px; display: inline-flex;" onclick="setZoom(2)">2x</button>
+        </div>
+        <div>
+          <label style="margin-right: 12px; cursor: pointer; color: var(--text-muted);">
+            <input type="checkbox" id="toggle-grid" checked onchange="drawCanvas()"> Grade
+          </label>
+          <label style="margin-right: 12px; cursor: pointer; color: #4ade80;">
+            <input type="checkbox" id="toggle-ground" checked onchange="drawCanvas()"> Chão / Eixo (0,0)
+          </label>
+          <label style="margin-right: 12px; cursor: pointer; color: #60a5fa;">
+            <input type="checkbox" id="toggle-shadow" checked onchange="drawCanvas()"> Sombra
+          </label>
+          <label style="cursor: pointer; color: #f43f5e;">
+            <input type="checkbox" id="toggle-flip" onchange="drawCanvas()"> Espelhar (Lado 2P)
+          </label>
+        </div>
+      </div>
+
+      <div class="canvas-container" id="canvas-wrapper">
+        <canvas id="animCanvas" width="600" height="500"></canvas>
+      </div>
+
+      <!-- TIMELINE INFERIOR -->
+      <div class="timeline-bar">
+        <div class="player-controls">
+          <div class="btn-group">
+            <button class="icon-btn" onclick="prevFrame()" title="Frame Anterior (Q)">⏮️</button>
+            <button class="icon-btn" id="btn-play-pause" onclick="togglePlay()" title="Play / Pause (Espaço)">⏸️</button>
+            <button class="icon-btn" onclick="nextFrame()" title="Próximo Frame (E)">⏭️</button>
+            <span style="font-family: 'JetBrains Mono'; font-size: 0.85rem; margin-left: 10px;" id="frame-counter-label">
+              Frame: 1 / 1
+            </span>
+          </div>
+
+          <div class="btn-group">
+            <button class="btn btn-blue" style="padding: 6px 12px; font-size: 0.78rem;" onclick="duplicateCurrentFrame()">
+              📋 Duplicar Frame
+            </button>
+            <button class="btn btn-bordo" style="padding: 6px 12px; font-size: 0.78rem;" onclick="removeCurrentFrame()">
+              🗑️ Remover Frame
+            </button>
+            <button class="btn btn-gold" style="padding: 6px 12px; font-size: 0.78rem;" onclick="addNewFrameModal()">
+              ➕ Adicionar Frame
+            </button>
+          </div>
+        </div>
+
+        <!-- CARROSSEL DE THUMBNAILS -->
+        <div class="frames-strip" id="frames-strip">
+          <!-- Gerado via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- PAINEL DIREITO: INSPETOR DE EIXO & SPRITES -->
+    <aside class="panel-right">
+      <div class="section-box">
+        <div class="section-title">
+          <span>🎯 Ajuste de Eixo (Frame Atual)</span>
+        </div>
+
+        <div class="key-tip">
+          💡 <b>Dica Pro:</b> Use as <b>Setas do Teclado</b> (← ↑ → ↓) para calibrar o sprite pixel a pixel. Segure <b>Shift</b> para saltar 5 pixels!
+        </div>
+
+        <div style="margin-top: 12px;">
+          <div class="form-group">
+            <label for="select-layer-mode">Camada Ativa para Calibrar:</label>
+            <select id="select-layer-mode" onchange="drawCanvas()">
+              <option value="body">Corpo do Personagem (bodyAxis)</option>
+              <option value="shield">Escudo / Acessório (shieldAxis)</option>
+            </select>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div class="form-group">
+              <label>X-Axis (Largura):</label>
+              <input type="number" id="input-axis-x" value="0" oninput="updateAxisFromInput()">
+            </div>
+            <div class="form-group">
+              <label>Y-Axis (Altura):</label>
+              <input type="number" id="input-axis-y" value="0" oninput="updateAxisFromInput()">
+            </div>
+          </div>
+
+          <!-- BOTÕES DIRECIONAIS RÁPIDOS -->
+          <div class="axis-numpad">
+            <div></div>
+            <button class="numpad-btn" onclick="nudgeAxis(0, -1)">▲ (Y-)</button>
+            <div></div>
+            <button class="numpad-btn" onclick="nudgeAxis(-1, 0)">◄ (X-)</button>
+            <button class="numpad-btn" style="color: var(--accent-gold);" onclick="nudgeAxis(0, 0)">● 0</button>
+            <button class="numpad-btn" onclick="nudgeAxis(1, 0)">► (X+)</button>
+            <div></div>
+            <button class="numpad-btn" onclick="nudgeAxis(0, 1)">▼ (Y+)</button>
+            <div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SELEÇÃO DO SPRITE DO FRAME -->
+      <div class="section-box" style="flex: 1; display: flex; flex-direction: column;">
+        <div class="section-title">
+          <span>🖼️ Arquivo Sprite (PNG)</span>
+        </div>
+
+        <div class="form-group">
+          <label for="select-frame-body-png">Sprite do Corpo (`body`):</label>
+          <select id="select-frame-body-png" onchange="updateCurrentFrameSprite('body', this.value)">
+            <!-- Opções via JS -->
+          </select>
+        </div>
+
+        <div class="form-group" id="group-shield-png" style="display: none;">
+          <label for="select-frame-shield-png">Sprite do Escudo (`shield`):</label>
+          <select id="select-frame-shield-png" onchange="updateCurrentFrameSprite('shield', this.value)">
+            <option value="">(Nenhum / Ocultar)</option>
+            <!-- Opções via JS -->
+          </select>
+        </div>
+
+        <div style="margin-top: 8px; font-size: 0.75rem; color: var(--text-muted);" id="sprite-specs-info">
+          Tamanho do arquivo: -
+        </div>
+      </div>
+    </aside>
+
+  </main>
+
+  <div class="toast" id="toast-msg">Salvo com sucesso!</div>
+
+  <script>
+    // ─── ESTADO GLOBAL DO EDITOR ─────────────────────────────────────
+    let currentHero = 'cap';
+    let heroManifest = {};
+    let availableSprites = [];
+    let currentAnimKey = 'idle';
+    let currentFrameIdx = 0;
+    let isPlaying = true;
+    let lastTick = Date.now();
+    let zoomLevel = 1.5;
+
+    const canvas = document.getElementById('animCanvas');
+    const ctx = canvas.getContext('2d');
+    const imageCache = {};
+
+    function loadImage(url) {
+      if (imageCache[url]) return imageCache[url];
+      const img = new Image();
+      img.src = url;
+      imageCache[url] = img;
+      return img;
+    }
+
+    // ─── INICIALIZAÇÃO E CARREGAMENTO DO BACKEND ─────────────────────
+    async function loadHero(hero) {
+      currentHero = hero;
+      try {
+        const res = await fetch(`/api/battle/manifest/${hero}`);
+        const data = await res.json();
+        if (data.success) {
+          heroManifest = data.manifest;
+          availableSprites = data.available_sprites || [];
+          populateSpriteDropdowns();
+          renderAnimationList();
+          selectAnimation(Object.keys(heroManifest)[0] || 'idle');
+          showToast(`Lutador '${hero}' carregado!`);
+        } else {
+          alert('Erro ao carregar manifest: ' + data.message);
+        }
+      } catch (err) {
+        console.error('Falha ao carregar hero:', err);
+      }
+    }
+
+    function populateSpriteDropdowns() {
+      const selectBody = document.getElementById('select-frame-body-png');
+      const selectShield = document.getElementById('select-frame-shield-png');
+
+      selectBody.innerHTML = '';
+      selectShield.innerHTML = '<option value="">(Nenhum / Ocultar)</option>';
+
+      availableSprites.forEach(file => {
+        const opt1 = document.createElement('option');
+        opt1.value = file;
+        opt1.textContent = file;
+        selectBody.appendChild(opt1);
+
+        const opt2 = document.createElement('option');
+        opt2.value = file;
+        opt2.textContent = file;
+        selectShield.appendChild(opt2);
+      });
+
+      // Se for capitão, mostra opção de escudo
+      document.getElementById('group-shield-png').style.display = (currentHero === 'cap') ? 'block' : 'none';
+    }
+
+    function renderAnimationList() {
+      const container = document.getElementById('anim-list-container');
+      container.innerHTML = '';
+
+      Object.keys(heroManifest).forEach(key => {
+        const anim = heroManifest[key];
+        const item = document.createElement('div');
+        item.className = `anim-item ${key === currentAnimKey ? 'active' : ''}`;
+        item.onclick = () => selectAnimation(key);
+
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = key;
+
+        const countSpan = document.createElement('span');
+        countSpan.className = 'anim-badge';
+        countSpan.textContent = `${anim.frames ? anim.frames.length : 0} f`;
+
+        item.appendChild(nameSpan);
+        item.appendChild(countSpan);
+        container.appendChild(item);
+      });
+    }
+
+    function selectAnimation(key) {
+      currentAnimKey = key;
+      currentFrameIdx = 0;
+      const anim = heroManifest[key] || { durationPerFrame: 80, loop: true, frames: [] };
+
+      document.getElementById('input-anim-duration').value = anim.durationPerFrame || 80;
+      document.getElementById('checkbox-anim-loop').checked = !!anim.loop;
+
+      renderAnimationList();
+      renderTimelineThumbs();
+      updateInspector();
+      drawCanvas();
+    }
+
+    function updateAnimConfig() {
+      const anim = heroManifest[currentAnimKey];
+      if (!anim) return;
+      anim.durationPerFrame = parseInt(document.getElementById('input-anim-duration').value) || 80;
+      anim.loop = document.getElementById('checkbox-anim-loop').checked;
+    }
+
+    // ─── CARROSSEL DE THUMBNAILS DA TIMELINE ─────────────────────────
+    function renderTimelineThumbs() {
+      const strip = document.getElementById('frames-strip');
+      strip.innerHTML = '';
+      const anim = heroManifest[currentAnimKey];
+      if (!anim || !anim.frames) return;
+
+      document.getElementById('frame-counter-label').textContent = `Frame: ${currentFrameIdx + 1} / ${anim.frames.length}`;
+
+      anim.frames.forEach((frame, idx) => {
+        const thumb = document.createElement('div');
+        thumb.className = `frame-thumb ${idx === currentFrameIdx ? 'active' : ''}`;
+        thumb.onclick = () => {
+          currentFrameIdx = idx;
+          renderTimelineThumbs();
+          updateInspector();
+          drawCanvas();
+        };
+
+        if (frame.body) {
+          const img = document.createElement('img');
+          img.src = `/assets/characters/${currentHero}/${frame.body}`;
+          thumb.appendChild(img);
+        }
+
+        const label = document.createElement('span');
+        label.textContent = `#${idx + 1}`;
+        thumb.appendChild(label);
+
+        strip.appendChild(thumb);
+      });
+    }
+
+    function updateInspector() {
+      const anim = heroManifest[currentAnimKey];
+      if (!anim || !anim.frames || !anim.frames[currentFrameIdx]) return;
+      const frame = anim.frames[currentFrameIdx];
+      const layer = document.getElementById('select-layer-mode').value;
+
+      const axis = (layer === 'shield')
+        ? (frame.shieldAxis || { xaxis: 0, yaxis: 0 })
+        : (frame.bodyAxis || { xaxis: 0, yaxis: 0 });
+
+      document.getElementById('input-axis-x').value = axis.xaxis || 0;
+      document.getElementById('input-axis-y').value = axis.yaxis || 0;
+
+      if (frame.body) document.getElementById('select-frame-body-png').value = frame.body;
+      if (frame.shield) document.getElementById('select-frame-shield-png').value = frame.shield;
+      else document.getElementById('select-frame-shield-png').value = '';
+
+      // Tamanho do sprite
+      if (frame.body) {
+        const img = loadImage(`/assets/characters/${currentHero}/${frame.body}`);
+        img.onload = () => {
+          document.getElementById('sprite-specs-info').textContent = `Sprite: ${frame.body} (${img.naturalWidth}x${img.naturalHeight}px)`;
+        };
+        if (img.complete && img.naturalWidth > 0) {
+          document.getElementById('sprite-specs-info').textContent = `Sprite: ${frame.body} (${img.naturalWidth}x${img.naturalHeight}px)`;
+        }
+      }
+    }
+
+    function updateCurrentFrameSprite(type, val) {
+      const anim = heroManifest[currentAnimKey];
+      if (!anim || !anim.frames || !anim.frames[currentFrameIdx]) return;
+      const frame = anim.frames[currentFrameIdx];
+
+      if (type === 'body') {
+        frame.body = val;
+        if (!frame.bodyAxis) frame.bodyAxis = { xaxis: 38, yaxis: 102 };
+      } else if (type === 'shield') {
+        frame.shield = val || null;
+        if (!frame.shieldAxis && val) frame.shieldAxis = { xaxis: 42, yaxis: 91 };
+      }
+      renderTimelineThumbs();
+      updateInspector();
+      drawCanvas();
+    }
+
+    function updateAxisFromInput() {
+      const anim = heroManifest[currentAnimKey];
+      if (!anim || !anim.frames || !anim.frames[currentFrameIdx]) return;
+      const frame = anim.frames[currentFrameIdx];
+      const layer = document.getElementById('select-layer-mode').value;
+
+      const newX = parseInt(document.getElementById('input-axis-x').value) || 0;
+      const newY = parseInt(document.getElementById('input-axis-y').value) || 0;
+
+      if (layer === 'shield') {
+        if (!frame.shieldAxis) frame.shieldAxis = {};
+        frame.shieldAxis.xaxis = newX;
+        frame.shieldAxis.yaxis = newY;
+      } else {
+        if (!frame.bodyAxis) frame.bodyAxis = {};
+        frame.bodyAxis.xaxis = newX;
+        frame.bodyAxis.yaxis = newY;
+      }
+      drawCanvas();
+    }
+
+    function nudgeAxis(dx, dy) {
+      const anim = heroManifest[currentAnimKey];
+      if (!anim || !anim.frames || !anim.frames[currentFrameIdx]) return;
+      const frame = anim.frames[currentFrameIdx];
+      const layer = document.getElementById('select-layer-mode').value;
+
+      const axis = (layer === 'shield')
+        ? (frame.shieldAxis || (frame.shieldAxis = { xaxis: 0, yaxis: 0 }))
+        : (frame.bodyAxis || (frame.bodyAxis = { xaxis: 0, yaxis: 0 }));
+
+      if (dx === 0 && dy === 0) {
+        axis.xaxis = 0;
+        axis.yaxis = 0;
+      } else {
+        axis.xaxis = (axis.xaxis || 0) + dx;
+        axis.yaxis = (axis.yaxis || 0) + dy;
+      }
+
+      document.getElementById('input-axis-x').value = axis.xaxis;
+      document.getElementById('input-axis-y').value = axis.yaxis;
+      drawCanvas();
+    }
+
+    function resetCurrentFrameAxis() {
+      nudgeAxis(0, 0);
+    }
+
+    // ─── DESENHO NO CANVAS ───────────────────────────────────────────
+    function drawCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height * 0.72; // Linha do chão
+
+      // 1. Grade
+      if (document.getElementById('toggle-grid').checked) {
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+        ctx.lineWidth = 1;
+        for (let x = 0; x < canvas.width; x += 20) {
+          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+        }
+        for (let y = 0; y < canvas.height; y += 20) {
+          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+        }
+      }
+
+      // 2. Chão & Eixos (0, 0)
+      if (document.getElementById('toggle-ground').checked) {
+        // Linha do chão horizontal
+        ctx.strokeStyle = '#4ade80';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, centerY);
+        ctx.lineTo(canvas.width, centerY);
+        ctx.stroke();
+
+        // Linha vertical do centro de gravidade
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(centerX, 0);
+        ctx.lineTo(centerX, canvas.height);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Marcador do Pivô (0,0)
+        ctx.fillStyle = '#ef4444';
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, 5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // 3. Sombra
+      if (document.getElementById('toggle-shadow').checked) {
+        ctx.save();
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.beginPath();
+        ctx.ellipse(centerX, centerY, 50 * zoomLevel, 12 * zoomLevel, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // 4. Desenhar Sprites do Frame Atual
+      const anim = heroManifest[currentAnimKey];
+      if (!anim || !anim.frames || anim.frames.length === 0) return;
+
+      const frame = anim.frames[currentFrameIdx] || anim.frames[0];
+      if (!frame) return;
+
+      const isFlipped = document.getElementById('toggle-flip').checked;
+
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      if (isFlipped) ctx.scale(-1, 1);
+
+      // Desenhar Corpo
+      if (frame.body) {
+        const imgBody = loadImage(`/assets/characters/${currentHero}/${frame.body}`);
+        if (imgBody.complete && imgBody.naturalWidth > 0) {
+          const axisX = (frame.bodyAxis ? frame.bodyAxis.xaxis : 38) * zoomLevel;
+          const axisY = (frame.bodyAxis ? frame.bodyAxis.yaxis : 102) * zoomLevel;
+          const w = imgBody.naturalWidth * zoomLevel;
+          const h = imgBody.naturalHeight * zoomLevel;
+          ctx.drawImage(imgBody, -axisX, -axisY, w, h);
+        }
+      }
+
+      // Desenhar Escudo
+      if (frame.shield) {
+        const imgShield = loadImage(`/assets/characters/${currentHero}/${frame.shield}`);
+        if (imgShield.complete && imgShield.naturalWidth > 0) {
+          const axisX = (frame.shieldAxis ? frame.shieldAxis.xaxis : 42) * zoomLevel;
+          const axisY = (frame.shieldAxis ? frame.shieldAxis.yaxis : 91) * zoomLevel;
+          const w = imgShield.naturalWidth * zoomLevel;
+          const h = imgShield.naturalHeight * zoomLevel;
+          ctx.drawImage(imgShield, -axisX, -axisY, w, h);
+        }
+      }
+
+      ctx.restore();
+    }
+
+    // ─── LOOP DE ANIMAÇÃO / PLAYBACK ─────────────────────────────────
+    function animationLoop() {
+      requestAnimationFrame(animationLoop);
+
+      if (isPlaying) {
+        const anim = heroManifest[currentAnimKey];
+        if (anim && anim.frames && anim.frames.length > 1) {
+          const now = Date.now();
+          const duration = anim.durationPerFrame || 80;
+
+          if (now - lastTick >= duration) {
+            lastTick = now;
+            if (anim.loop) {
+              currentFrameIdx = (currentFrameIdx + 1) % anim.frames.length;
+            } else if (currentFrameIdx < anim.frames.length - 1) {
+              currentFrameIdx++;
+            }
+            renderTimelineThumbs();
+            updateInspector();
+            drawCanvas();
+          }
+        }
+      }
+    }
+
+    function togglePlay() {
+      isPlaying = !isPlaying;
+      document.getElementById('btn-play-pause').textContent = isPlaying ? '⏸️' : '▶️';
+    }
+
+    function prevFrame() {
+      isPlaying = false;
+      document.getElementById('btn-play-pause').textContent = '▶️';
+      const anim = heroManifest[currentAnimKey];
+      if (!anim || !anim.frames) return;
+      currentFrameIdx = (currentFrameIdx - 1 + anim.frames.length) % anim.frames.length;
+      renderTimelineThumbs();
+      updateInspector();
+      drawCanvas();
+    }
+
+    function nextFrame() {
+      isPlaying = false;
+      document.getElementById('btn-play-pause').textContent = '▶️';
+      const anim = heroManifest[currentAnimKey];
+      if (!anim || !anim.frames) return;
+      currentFrameIdx = (currentFrameIdx + 1) % anim.frames.length;
+      renderTimelineThumbs();
+      updateInspector();
+      drawCanvas();
+    }
+
+    function setZoom(z) {
+      zoomLevel = z;
+      drawCanvas();
+    }
+
+    // ─── MANIPULAÇÃO DE FRAMES ───────────────────────────────────────
+    function duplicateCurrentFrame() {
+      const anim = heroManifest[currentAnimKey];
+      if (!anim || !anim.frames) return;
+      const current = anim.frames[currentFrameIdx];
+      if (!current) return;
+
+      const clone = JSON.parse(JSON.stringify(current));
+      anim.frames.splice(currentFrameIdx + 1, 0, clone);
+      currentFrameIdx++;
+      renderTimelineThumbs();
+      updateInspector();
+      drawCanvas();
+      showToast('Frame duplicado!');
+    }
+
+    function removeCurrentFrame() {
+      const anim = heroManifest[currentAnimKey];
+      if (!anim || !anim.frames || anim.frames.length <= 1) {
+        alert('A animação precisa de pelo menos 1 frame!');
+        return;
+      }
+      anim.frames.splice(currentFrameIdx, 1);
+      if (currentFrameIdx >= anim.frames.length) currentFrameIdx = anim.frames.length - 1;
+      renderTimelineThumbs();
+      updateInspector();
+      drawCanvas();
+      showToast('Frame removido!');
+    }
+
+    function addNewFrameModal() {
+      const anim = heroManifest[currentAnimKey];
+      if (!anim || !anim.frames) return;
+      const defaultPng = availableSprites[0] || '0-0.png';
+      anim.frames.push({
+        body: defaultPng,
+        bodyAxis: { xaxis: 38, yaxis: 102 }
+      });
+      currentFrameIdx = anim.frames.length - 1;
+      renderTimelineThumbs();
+      updateInspector();
+      drawCanvas();
+      showToast('Novo frame adicionado no final!');
+    }
+
+    function promptNewAnimation() {
+      const name = prompt('Digite o nome da nova animação (ex: chute_alto, especial, pose):');
+      if (!name) return;
+      const cleanName = name.toLowerCase().trim().replace(/[^a-z0-9_-]/g, '_');
+      if (heroManifest[cleanName]) {
+        alert('Essa animação já existe!');
+        return;
+      }
+      heroManifest[cleanName] = {
+        durationPerFrame: 80,
+        loop: false,
+        frames: [
+          {
+            body: availableSprites[0] || '0-0.png',
+            bodyAxis: { xaxis: 38, yaxis: 102 }
+          }
+        ]
+      };
+      renderAnimationList();
+      selectAnimation(cleanName);
+      showToast(`Animação '${cleanName}' criada!`);
+    }
+
+    // ─── SALVAR MANIFEST NO BACKEND ──────────────────────────────────
+    async function saveManifest() {
+      try {
+        const res = await fetch(`/api/battle/manifest/${currentHero}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ manifest: heroManifest })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(`✅ ${data.message}`);
+        } else {
+          alert('Erro ao salvar: ' + data.message);
+        }
+      } catch (err) {
+        console.error('Erro ao salvar:', err);
+        alert('Erro ao se comunicar com o servidor.');
+      }
+    }
+
+    function showToast(text) {
+      const t = document.getElementById('toast-msg');
+      t.textContent = text;
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 2800);
+    }
+
+    // ─── ATALHOS DE TECLADO (SETAS, ESPAÇO, Q, E) ────────────────────
+    window.addEventListener('keydown', (e) => {
+      // Ignorar se estiver digitando em campos de input
+      if (['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName)) return;
+
+      const step = e.shiftKey ? 5 : 1;
+
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        nudgeAxis(-step, 0);
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        nudgeAxis(step, 0);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        nudgeAxis(0, -step);
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        nudgeAxis(0, step);
+      } else if (e.code === 'Space') {
+        e.preventDefault();
+        togglePlay();
+      } else if (e.key === 'q' || e.key === 'Q') {
+        prevFrame();
+      } else if (e.key === 'e' || e.key === 'E') {
+        nextFrame();
+      }
+    });
+
+    // Iniciar carregando o Capitão
+    window.addEventListener('DOMContentLoaded', () => {
+      loadHero('cap');
+      animationLoop();
+    });
+  </script>
+</body>
+</html>

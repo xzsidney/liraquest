@@ -204,3 +204,6 @@ Rotas dedicadas ao Jogo 4 do Arcade (`/battle.html`): combate tático por turnos
 |:---|:---|:---|:---|
 | `POST` | `/api/battle/start` | JWT | Inicia a batalha 2D na Arena, consumindo 5 de Energia de Aventura (`UserProgress.adventure_energy`). Calcula estatísticas de combate a partir da ficha viva do Herói (CON, STR, INT, AGI, LUK, bônus de equipamentos), equipa até 3 habilidades adquiridas em `character_skills`, gera o deck tático com `animation_id` modular e calibra o adversário de acordo com o nível do herói. |
 | `POST` | `/api/battle/finish` | JWT | Registra o desfecho da batalha (`VICTORY` ou `DEFEAT`). Em caso de vitória, credita +50 de Ouro (`Character.gold`) e +80 de XP (`Character.current_xp`), processando subida de nível (`Character.level`). |
+| `GET` | `/api/battle/manifest/:hero` | Pública | Retorna o arquivo `manifest.json` do personagem e a lista completa de sprites PNG disponíveis na pasta para o Visualizador e Editor 2D (`/animator.html`). |
+| `POST` | `/api/battle/manifest/:hero` | Pública | Salva as alterações de eixos (`bodyAxis`, `shieldAxis`), durações e sequências de frames no `manifest.json` do herói com backup automático (`manifest.backup.json`). |
+

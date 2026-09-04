@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { startBattle, finishBattle } from '../controllers/battleController.js';
+import { startBattle, finishBattle, getHeroManifest, saveHeroManifest } from '../controllers/battleController.js';
 import { authenticateToken } from '../middlewares/authMiddleware.js';
 
 const router = Router();
@@ -9,5 +9,11 @@ router.post('/start', authenticateToken, startBattle);
 
 // POST /api/battle/finish (Registra resultado, XP e Ouro)
 router.post('/finish', authenticateToken, finishBattle);
+
+// GET /api/battle/manifest/:hero (Retorna manifest e sprites do herói)
+router.get('/manifest/:hero', getHeroManifest);
+
+// POST /api/battle/manifest/:hero (Salva manifest atualizado)
+router.post('/manifest/:hero', saveHeroManifest);
 
 export default router;

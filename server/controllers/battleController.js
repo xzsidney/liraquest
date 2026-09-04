@@ -1,4 +1,10 @@
 import { randomUUID } from 'crypto';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 import {
   Character,
   UserProgress,
@@ -293,5 +299,84 @@ export const finishBattle = async (req, res) => {
       success: false,
       message: 'Erro interno ao registrar resultado da batalha.',
     });
+  }
+};
+
+/**
+ * GET /api/battle/manifest/:hero
+ * Retorna o manifest.json e a lista de sprites disponíveis na pasta do personagem
+ */
+export const getHeroManifest = async (req, res) => {
+  try {
+    const hero = req.params.hero?.toLowerCase().replace(/[^a-z0-9_-]/g, '');
+    const charDir = path.join(__dirname, '..', '..', 'public', 'assets', 'characters', hero);
+
+    if (!fs.existsSync(charDir)) {
+      return res.status(404).json({ success: false, message: `Herói '${hero}' não encontrado em assets.` });
+    }
+
+    const manifestPath = path.join(charDir, 'manifest.json');
+    let manifest = {};
+    if (fs.existsSync(manifestPath)) {
+      manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    }
+
+    const availablePngs = fs.readdirSync(charDir)
+      .filter(f => f.toLowerCase().endsWith('.png'))
+      .sort((a, b) => {
+        const numA = parseInt(a.replace(/[^0-9]/g, '')) || 0;
+        const numB = parseInt(b.replace(/[^0-9]/g, '')) || 0;
+        return numA - numB;
+      });
+
+    return res.json({
+      success: true,
+      hero,
+      manifest,
+      available_sprites: availablePngs,
+    });
+  } catch (err) {
+    console.error('❌ Erro ao ler manifest do herói:', err);
+    return res.status(500).json({ success: false, message: 'Erro ao ler manifest do herói.' });
+  }
+};
+
+/**
+ * POST /api/battle/manifest/:hero
+ * Salva o manifest.json atualizado do personagem com backup de segurança
+ */
+export const saveHeroManifest = async (req, res) => {
+  try {
+    const hero = req.params.hero?.toLowerCase().replace(/[^a-z0-9_-]/g, '');
+    const { manifest } = req.body;
+
+    if (!manifest || typeof manifest !== 'object') {
+      return res.status(400).json({ success: false, message: 'Estrutura de manifest inválida.' });
+    }
+
+    const charDir = path.join(__dirname, '..', '..', 'public', 'assets', 'characters', hero);
+    if (!fs.existsSync(charDir)) {
+      return res.status(404).json({ success: false, message: `Pasta do herói '${hero}' não encontrada.` });
+    }
+
+    const manifestPath = path.join(charDir, 'manifest.json');
+    const backupPath = path.join(charDir, 'manifest.backup.json');
+
+    // Cria backup do anterior se existir
+    if (fs.existsSync(manifestPath)) {
+      fs.copyFileSync(manifestPath, backupPath);
+    }
+
+    // Salva o novo manifest formatado
+    fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2), 'utf8');
+
+    return res.json({
+      success: true,
+      message: `Manifest de '${hero}' salvo com sucesso! Backup criado em manifest.backup.json.`,
+      hero,
+    });
+  } catch (err) {
+    console.error('❌ Erro ao salvar manifest do herói:', err);
+    return res.status(500).json({ success: false, message: 'Erro ao salvar manifest.' });
   }
 };
