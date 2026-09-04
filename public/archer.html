@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -29,117 +29,166 @@
       --card-bg: rgba(15, 23, 42, 0.92);
     }
 
-    body {
-      background: radial-gradient(circle at center, #111827 0%, #030712 100%);
-      color: #ffffff;
-      font-family: 'Plus Jakarta Sans', sans-serif;
+    html, body {
       width: 100vw;
       height: 100vh;
       overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 10px;
+      background: #030712;
+      color: #ffffff;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       touch-action: none;
     }
 
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 4px;
+    }
+
+    @media (min-width: 768px) {
+      body {
+        padding: 12px;
+      }
+    }
+
+    /* ─── ARENA DO JOGO TOTALMENTE RESPONSIVA (PORTRAIT & LANDSCAPE) ─── */
     .game-wrapper {
       position: relative;
       background: #0b0f19;
-      border: 2px solid rgba(212, 175, 55, 0.5);
-      border-radius: 20px;
+      border: 2px solid rgba(212, 175, 55, 0.45);
+      border-radius: 16px;
       overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(212, 175, 55, 0.2);
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.95), 0 0 25px rgba(212, 175, 55, 0.15);
       width: 100%;
       height: 100%;
-      max-width: min(98vw, calc((100vh - 20px) * 1.6));
-      max-height: calc(100vh - 20px);
-      aspect-ratio: 16 / 10;
+      max-width: 100%;
+      max-height: 100%;
       touch-action: none;
+    }
+
+    @media (min-width: 900px) and (orientation: landscape) {
+      .game-wrapper {
+        max-width: min(96vw, calc((100vh - 24px) * 1.6));
+        max-height: calc(100vh - 24px);
+        aspect-ratio: 16 / 10;
+        border-radius: 20px;
+      }
     }
 
     #game-canvas {
       display: block;
       width: 100%;
       height: 100%;
-      object-fit: fill;
       background: #080d1a;
       cursor: crosshair;
       touch-action: none;
     }
 
-    /* ─── HUD SUPERIOR SOBREPOSTO ─── */
+    /* ─── HUD SUPERIOR COMPACTO E RESPONSIVO ─── */
     .hud-overlay {
       position: absolute;
-      top: 10px;
-      left: 12px;
-      right: 12px;
+      top: 8px;
+      left: 8px;
+      right: 8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       pointer-events: none;
-      z-index: 10;
+      z-index: 15;
+      gap: 6px;
+    }
+
+    .hud-group {
+      display: flex;
+      gap: 6px;
+      align-items: center;
     }
 
     .hud-chip {
-      background: rgba(11, 17, 32, 0.9);
-      border: 1px solid rgba(212, 175, 55, 0.4);
-      padding: 6px 14px;
-      border-radius: 12px;
+      background: rgba(11, 17, 32, 0.92);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      padding: 4px 10px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
-      gap: 6px;
-      font-size: 0.85rem;
+      gap: 4px;
+      font-size: 0.78rem;
       font-weight: 700;
       backdrop-filter: blur(8px);
-      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+      white-space: nowrap;
+    }
+
+    @media (min-width: 640px) {
+      .hud-chip {
+        padding: 6px 14px;
+        font-size: 0.88rem;
+        gap: 6px;
+      }
     }
 
     .hud-chip.gold { color: var(--gold-light); }
     .hud-chip.combo { color: #f97316; font-family: 'Cinzel', serif; }
-    .hud-chip.quiver { color: #fde047; font-size: 0.95rem; font-weight: 800; }
-    .hud-chip.timer { color: #38bdf8; font-family: monospace; font-size: 1rem; }
+    .hud-chip.quiver { color: #fde047; font-weight: 800; }
+    .hud-chip.timer { color: #38bdf8; font-family: monospace; font-size: 0.9rem; }
 
-    /* ─── BANNER DA PERGUNTA NO TOPO ─── */
+    /* ─── BANNER DA PERGUNTA DINÂMICO ─── */
     .question-banner {
       position: absolute;
-      top: 56px;
+      top: 44px;
       left: 50%;
       transform: translateX(-50%);
-      width: 92%;
-      max-width: 800px;
-      background: linear-gradient(135deg, rgba(128, 0, 32, 0.92) 0%, rgba(30, 58, 138, 0.94) 100%);
-      border: 2px solid var(--gold);
+      width: 94%;
+      max-width: 720px;
+      background: linear-gradient(135deg, rgba(128, 0, 32, 0.94) 0%, rgba(30, 58, 138, 0.95) 100%);
+      border: 1.5px solid var(--gold);
       border-radius: 14px;
-      padding: 8px 16px;
+      padding: 8px 14px;
       text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(212, 175, 55, 0.3);
-      z-index: 10;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.8), 0 0 15px rgba(212, 175, 55, 0.25);
+      z-index: 15;
       pointer-events: none;
-      transition: all 0.3s ease;
+      transition: all 0.25s ease;
+    }
+
+    @media (min-width: 640px) {
+      .question-banner {
+        top: 56px;
+        padding: 10px 18px;
+        border-width: 2px;
+      }
     }
 
     .question-meta {
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 12px;
-      font-size: 0.72rem;
+      gap: 8px;
+      font-size: 0.68rem;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 0.8px;
       color: var(--gold);
-      margin-bottom: 3px;
+      margin-bottom: 2px;
+    }
+
+    @media (min-width: 640px) {
+      .question-meta {
+        font-size: 0.75rem;
+        margin-bottom: 4px;
+        gap: 12px;
+      }
     }
 
     .question-text {
-      font-size: 1.12rem;
-      font-weight: 700;
+      font-size: clamp(0.92rem, 3.8vw, 1.25rem);
+      font-weight: 800;
       color: #ffffff;
-      line-height: 1.35;
+      line-height: 1.3;
       text-shadow: 0 2px 4px rgba(0,0,0,0.8);
     }
 
@@ -147,50 +196,50 @@
     .screen-overlay {
       position: absolute;
       inset: 0;
-      background: rgba(5, 8, 16, 0.95);
+      background: rgba(5, 8, 16, 0.96);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 16px;
       z-index: 50;
       backdrop-filter: blur(12px);
       text-align: center;
+      overflow-y: auto;
     }
 
     .overlay-title {
       font-family: 'Cinzel', serif;
-      font-size: 2rem;
+      font-size: clamp(1.4rem, 5vw, 2.2rem);
       font-weight: 900;
       color: var(--gold);
       text-shadow: 0 0 25px rgba(212, 175, 55, 0.5);
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .overlay-subtitle {
-      font-size: 0.9rem;
+      font-size: clamp(0.78rem, 2.8vw, 0.92rem);
       color: #94a3b8;
-      max-width: 580px;
-      line-height: 1.45;
-      margin-bottom: 16px;
+      max-width: 540px;
+      line-height: 1.4;
+      margin-bottom: 12px;
     }
 
-    /* Grade de Seletor de Nível */
     .selector-title {
-      font-size: 0.78rem;
+      font-size: 0.74rem;
       font-weight: 800;
       color: var(--gold);
       margin-bottom: 6px;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 0.8px;
     }
 
     .selector-grid {
       display: grid;
-      gap: 8px;
+      gap: 6px;
       width: 100%;
-      max-width: 600px;
-      margin-bottom: 14px;
+      max-width: 560px;
+      margin-bottom: 10px;
     }
 
     .stage-grid {
@@ -201,51 +250,51 @@
       grid-template-columns: repeat(3, 1fr);
     }
 
-    @media (max-width: 640px) {
-      .stage-grid { grid-template-columns: repeat(2, 1fr); }
-      .diff-grid { grid-template-columns: repeat(3, 1fr); }
+    @media (max-width: 580px) {
+      .stage-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+      .diff-grid { grid-template-columns: repeat(3, 1fr); gap: 4px; }
     }
 
     .select-card {
-      background: rgba(30, 41, 59, 0.7);
-      border: 2px solid rgba(212, 175, 55, 0.25);
-      border-radius: 12px;
-      padding: 10px 6px;
+      background: rgba(30, 41, 59, 0.75);
+      border: 1.5px solid rgba(212, 175, 55, 0.25);
+      border-radius: 10px;
+      padding: 8px 4px;
       cursor: pointer;
       transition: all 0.2s ease;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 2px;
     }
 
     .select-card:hover, .select-card.selected {
       background: linear-gradient(135deg, rgba(128, 0, 32, 0.6) 0%, rgba(30, 58, 138, 0.6) 100%);
       border-color: var(--gold);
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.35);
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
     }
 
     .select-card.selected {
-      border-width: 2.5px;
-      box-shadow: 0 0 16px rgba(212, 175, 55, 0.5);
+      border-width: 2px;
+      box-shadow: 0 0 14px rgba(212, 175, 55, 0.5);
     }
 
-    .card-icon { font-size: 1.5rem; }
-    .card-name { font-size: 0.8rem; font-weight: 800; color: #ffffff; }
-    .card-desc { font-size: 0.65rem; color: #94a3b8; line-height: 1.2; }
+    .card-icon { font-size: 1.3rem; }
+    .card-name { font-size: 0.75rem; font-weight: 800; color: #ffffff; }
+    .card-desc { font-size: 0.62rem; color: #94a3b8; line-height: 1.1; }
 
-    /* Botões de Ação */
+    /* Botões */
     .btn {
-      padding: 10px 24px;
+      padding: 10px 20px;
       border-radius: 12px;
       font-weight: 800;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 6px;
       border: none;
       transition: all 0.2s ease;
       text-decoration: none;
@@ -255,12 +304,12 @@
       background: linear-gradient(135deg, var(--primary-bordeaux) 0%, var(--primary-bordeaux-light) 100%);
       color: #ffffff;
       border: 1px solid var(--gold);
-      box-shadow: 0 6px 20px rgba(128, 0, 32, 0.6), 0 0 15px rgba(212, 175, 55, 0.3);
+      box-shadow: 0 4px 15px rgba(128, 0, 32, 0.6), 0 0 15px rgba(212, 175, 55, 0.3);
     }
 
     .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(128, 0, 32, 0.8), 0 0 25px rgba(212, 175, 55, 0.5);
+      box-shadow: 0 8px 20px rgba(128, 0, 32, 0.8), 0 0 20px rgba(212, 175, 55, 0.5);
     }
 
     .btn-secondary {
@@ -274,50 +323,49 @@
       color: #ffffff;
     }
 
-    /* Modal de Vitória / Resultados */
     .results-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
+      gap: 8px;
       width: 100%;
-      max-width: 480px;
-      margin-bottom: 20px;
+      max-width: 440px;
+      margin-bottom: 16px;
     }
 
     .result-item {
       background: rgba(15, 23, 42, 0.85);
       border: 1px solid rgba(212, 175, 55, 0.3);
-      border-radius: 12px;
-      padding: 10px;
+      border-radius: 10px;
+      padding: 8px;
     }
 
-    .result-label { font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; }
-    .result-val { font-size: 1.35rem; font-weight: 800; color: var(--gold); margin-top: 2px; }
+    .result-label { font-size: 0.68rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; }
+    .result-val { font-size: 1.25rem; font-weight: 800; color: var(--gold); margin-top: 2px; }
   </style>
 </head>
 <body>
 
   <main class="game-wrapper">
-    <!-- Canvas 2D de Alta Performance -->
-    <canvas id="game-canvas" width="1280" height="800"></canvas>
+    <!-- Canvas 2D Auto-Responsivo -->
+    <canvas id="game-canvas"></canvas>
 
-    <!-- HUD FLUTUANTE EM JOGO -->
+    <!-- HUD SUPERIOR EM JOGO -->
     <div class="hud-overlay" id="game-hud" style="display: none;">
-      <div style="display: flex; gap: 8px;">
+      <div class="hud-group">
         <div class="hud-chip gold">
           <span>💰</span> <span id="hud-score">0 pts</span>
         </div>
         <div class="hud-chip combo">
-          <span>🔥</span> <span id="hud-combo">Combo x1</span>
-        </div>
-        <div class="hud-chip quiver" id="hud-quiver-chip">
-          <span>🏹</span> <span id="hud-arrows">∞</span>
+          <span>🔥</span> <span id="hud-combo">x1</span>
         </div>
       </div>
 
-      <div style="display: flex; gap: 8px;">
+      <div class="hud-group">
+        <div class="hud-chip quiver" id="hud-quiver-chip">
+          <span>🏹</span> <span id="hud-arrows">∞</span>
+        </div>
         <div class="hud-chip">
-          <span>🎯</span> <span id="hud-hits">0 / 10</span>
+          <span>🎯</span> <span id="hud-hits">0/10</span>
         </div>
         <div class="hud-chip timer">
           <span>⏱️</span> <span id="hud-timer">50s</span>
@@ -328,14 +376,14 @@
     <!-- BANNER DA PERGUNTA ATUAL -->
     <div class="question-banner" id="question-banner" style="display: none;">
       <div class="question-meta">
-        <span id="banner-stage">🎒 Fundamental 1</span> • 
+        <span id="banner-stage">🎒 Fund. 1</span> • 
         <span id="banner-discipline">Matemática</span> •
-        <span id="banner-diff" style="color: #60a5fa;">🟢 Modo Fácil</span>
+        <span id="banner-diff" style="color: #60a5fa;">🟢 Fácil</span>
       </div>
-      <div class="question-text" id="banner-text">Carregando enigma do conhecimento...</div>
+      <div class="question-text" id="banner-text">Carregando enigma...</div>
     </div>
 
-    <!-- TELA 1: LOBBY / SELETOR DE NÍVEL ESCOLAR E DIFICULDADE -->
+    <!-- TELA 1: LOBBY / SELETOR DE NÍVEL E DIFICULDADE -->
     <div class="screen-overlay" id="screen-start">
       <h1 class="overlay-title">🏹 O Arqueiro do Saber</h1>
       <p class="overlay-subtitle">
@@ -344,7 +392,7 @@
       </p>
 
       <!-- Saldo do Jogador -->
-      <div style="display: flex; gap: 14px; margin-bottom: 12px;">
+      <div style="display: flex; gap: 10px; margin-bottom: 10px;">
         <div class="hud-chip" style="color: #38bdf8;">
           <span>⚡ Energia:</span> <strong id="lobby-energy">...</strong>
         </div>
@@ -354,7 +402,7 @@
       </div>
 
       <!-- 1. Seletor de Nível Escolar -->
-      <div class="selector-title">1. Selecione a Etapa do Conhecimento:</div>
+      <div class="selector-title">1. Selecione o Nível de Ensino:</div>
       <div class="selector-grid stage-grid">
         <div class="select-card selected" onclick="selectStage('fundamental_1', this)">
           <span class="card-icon">🎒</span>
@@ -389,16 +437,16 @@
         <div class="select-card" onclick="selectDifficulty('medio', this)">
           <span class="card-icon">🟡</span>
           <span class="card-name">Médio (+25% 💰)</span>
-          <span class="card-desc">15 Flechas na Aljava</span>
+          <span class="card-desc">15 Flechas</span>
         </div>
         <div class="select-card" onclick="selectDifficulty('dificil', this)">
           <span class="card-icon">🔴</span>
           <span class="card-name">Difícil (+50% 💰)</span>
-          <span class="card-desc">12 Flechas (-1 por erro)</span>
+          <span class="card-desc">12 Flechas (-1/erro)</span>
         </div>
       </div>
 
-      <div style="display: flex; gap: 12px; margin-top: 6px;">
+      <div style="display: flex; gap: 10px; margin-top: 6px;">
         <button class="btn btn-secondary" onclick="returnToArcade()">
           ⬅️ Voltar ao Arcade
         </button>
@@ -434,11 +482,11 @@
         </div>
       </div>
 
-      <div id="int-bonus-banner" style="display: none; background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; border-radius: 12px; padding: 10px 18px; margin-bottom: 16px; font-weight: 700; color: #93c5fd;">
-        🧠 <strong>Inteligência Aprimorada!</strong> Bônus adicionado ao atributo INT do seu Herói!
+      <div id="int-bonus-banner" style="display: none; background: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; border-radius: 10px; padding: 8px 14px; margin-bottom: 14px; font-weight: 700; color: #93c5fd; font-size: 0.85rem;">
+        🧠 <strong>Inteligência Aprimorada!</strong> Bônus adicionado ao atributo INT do Herói!
       </div>
 
-      <div style="display: flex; gap: 12px;">
+      <div style="display: flex; gap: 10px;">
         <button class="btn btn-secondary" onclick="returnToArcade()">
           ⬅️ Voltar ao Arcade
         </button>
@@ -473,11 +521,41 @@
     // Aljava de Flechas
     let remainingArrows = Infinity;
 
-    // Canvas
+    // Canvas Auto-Responsivo
     const canvas = document.getElementById('game-canvas');
     const ctx = canvas.getContext('2d');
-    const CANVAS_WIDTH = 1280;
-    const CANVAS_HEIGHT = 800;
+    const wrapper = document.querySelector('.game-wrapper');
+
+    let canvasWidth = 800;
+    let canvasHeight = 600;
+
+    // Jogador (Arco na base central)
+    const bow = {
+      x: canvasWidth / 2,
+      y: canvasHeight - 50,
+      angle: -Math.PI / 2,
+    };
+
+    function resizeCanvas() {
+      const rect = wrapper.getBoundingClientRect();
+      // Ajustar resolução interna 1:1 com os pixels reais da tela (evita distorções de ovais)
+      canvasWidth = Math.floor(rect.width);
+      canvasHeight = Math.floor(rect.height);
+      canvas.width = canvasWidth;
+      canvas.height = canvasHeight;
+
+      // Posição do arco na base
+      bow.x = canvasWidth / 2;
+      bow.y = canvasHeight - (canvasHeight > canvasWidth ? 55 : 45);
+
+      // Reposicionar alvos se estiver em jogo
+      if (isGameRunning && currentQuestions[currentQuestionIndex]) {
+        positionTargets(currentQuestions[currentQuestionIndex]);
+      }
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('orientationchange', () => setTimeout(resizeCanvas, 200));
 
     // Entidades do Jogo
     let targets = [];
@@ -486,13 +564,6 @@
     let floatingTexts = [];
     let goldenSnitch = null;
     let snitchTimer = 0;
-
-    // Jogador (Arco na base central)
-    const bow = {
-      x: CANVAS_WIDTH / 2,
-      y: CANVAS_HEIGHT - 60,
-      angle: -Math.PI / 2,
-    };
 
     // ─── GERADOR DE ÁUDIO SINTETIZADO (WEB AUDIO API - ZERO LAG) ──
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -585,6 +656,8 @@
     // ─── INÍCIO DA PARTIDA ─────────────────────────────────────
     async function startGameSession() {
       try {
+        resizeCanvas();
+
         // 1. Consumir Energia no Backend
         const startRes = await fetch('/api/quiz/start', {
           method: 'POST',
@@ -619,7 +692,6 @@
         maxCombo = 1;
         roundTimeRemaining = 50;
 
-        // Configurar Aljava de acordo com a Dificuldade
         if (selectedDifficulty === 'facil') {
           remainingArrows = Infinity;
         } else if (selectedDifficulty === 'medio') {
@@ -634,7 +706,7 @@
         document.getElementById('question-banner').style.display = 'block';
 
         updateHUD();
-        spawnTargetsForQuestion(currentQuestions[0]);
+        positionTargets(currentQuestions[0]);
 
         if (roundTimerInterval) clearInterval(roundTimerInterval);
         roundTimerInterval = setInterval(() => {
@@ -654,8 +726,8 @@
 
     function updateHUD() {
       document.getElementById('hud-score').innerText = `${score} pts`;
-      document.getElementById('hud-combo').innerText = `Combo x${combo}`;
-      document.getElementById('hud-hits').innerText = `${hits} / ${currentQuestions.length}`;
+      document.getElementById('hud-combo').innerText = `x${combo}`;
+      document.getElementById('hud-hits').innerText = `${hits}/${currentQuestions.length}`;
       document.getElementById('hud-timer').innerText = `${roundTimeRemaining}s`;
 
       const arrowsEl = document.getElementById('hud-arrows');
@@ -663,36 +735,28 @@
         arrowsEl.innerText = '∞';
         arrowsEl.style.color = '#fde047';
       } else {
-        arrowsEl.innerText = `${remainingArrows} flechas`;
-        if (remainingArrows <= 3) {
-          arrowsEl.style.color = '#ef4444';
-        } else {
-          arrowsEl.style.color = '#fde047';
-        }
+        arrowsEl.innerText = `${remainingArrows}🏹`;
+        arrowsEl.style.color = remainingArrows <= 3 ? '#ef4444' : '#fde047';
       }
 
       const timerEl = document.getElementById('hud-timer');
-      if (roundTimeRemaining <= 10) {
-        timerEl.style.color = '#ef4444';
-      } else {
-        timerEl.style.color = '#38bdf8';
-      }
+      timerEl.style.color = roundTimeRemaining <= 10 ? '#ef4444' : '#38bdf8';
     }
 
-    // ─── SPAWN DOS ALVOS FLUTUANTES COM AS ALTERNATIVAS ───────
-    function spawnTargetsForQuestion(q) {
+    // ─── DISTRIBUIÇÃO ADAPTATIVA DOS ALVOS (PORTRAIT 2x2 vs LANDSCAPE 1x4) ───
+    function positionTargets(q) {
       if (!q) return;
 
       const stageNames = {
-        fundamental_1: '🎒 Fundamental 1',
-        fundamental_2: '📚 Fundamental 2',
+        fundamental_1: '🎒 Fund. 1',
+        fundamental_2: '📚 Fund. 2',
         ensino_medio: '🎓 Ensino Médio',
-        superior: '🏛️ Ensino Superior',
+        superior: '🏛️ Superior',
       };
       const diffLabels = {
-        facil: '🟢 Fácil (∞)',
-        medio: '🟡 Médio (15 Flechas)',
-        dificil: '🔴 Difícil (12 Flechas)',
+        facil: '🟢 Fácil',
+        medio: '🟡 Médio',
+        dificil: '🔴 Difícil',
       };
 
       document.getElementById('banner-stage').innerText = stageNames[q.education_stage] || 'Desafio';
@@ -700,41 +764,88 @@
       document.getElementById('banner-diff').innerText = diffLabels[selectedDifficulty] || 'Fácil';
       document.getElementById('banner-text').innerText = q.question_text;
 
-      targets = [];
       const options = q.options || [];
       const numOptions = options.length;
+      targets = [];
 
-      const padding = 160;
-      const availableWidth = CANVAS_WIDTH - padding * 2;
-      const step = numOptions > 1 ? availableWidth / (numOptions - 1) : 0;
-
+      const isPortrait = canvasHeight > canvasWidth;
       const speedMultiplier = selectedDifficulty === 'dificil' ? 1.3 : 1.0;
 
-      options.forEach((opt, idx) => {
-        const baseX = padding + step * idx;
-        const baseY = 240 + (idx % 2 === 0 ? -30 : 30);
+      if (isPortrait) {
+        // ── MODO RETRATO / CELULAR EM PÉ (GRID 2x2 PERFEITO) ──
+        // Deixa espaço limpo abaixo do Banner (banner ocupa até ~110px)
+        const startY = Math.max(130, canvasHeight * 0.22);
+        const endY = Math.min(canvasHeight - 110, canvasHeight * 0.76);
+        const rowHeight = (endY - startY) / 2;
 
-        targets.push({
-          id: opt.id,
-          text: opt.option_text,
-          isCorrect: opt.is_correct,
-          x: baseX,
-          y: baseY,
-          baseX: baseX,
-          baseY: baseY,
-          radius: 64,
-          speed: (0.8 + Math.random() * 0.4) * speedMultiplier,
-          phase: Math.random() * Math.PI * 2,
-          isAlive: true,
+        const targetRadius = Math.min(canvasWidth * 0.17, 56);
+        const colLeftX = canvasWidth * 0.28;
+        const colRightX = canvasWidth * 0.72;
+
+        options.forEach((opt, idx) => {
+          let baseX, baseY;
+          if (idx === 0) {
+            baseX = colLeftX;
+            baseY = startY + rowHeight * 0.45;
+          } else if (idx === 1) {
+            baseX = colRightX;
+            baseY = startY + rowHeight * 0.45;
+          } else if (idx === 2) {
+            baseX = colLeftX;
+            baseY = startY + rowHeight * 1.45;
+          } else {
+            baseX = colRightX;
+            baseY = startY + rowHeight * 1.45;
+          }
+
+          targets.push({
+            id: opt.id,
+            text: opt.option_text,
+            isCorrect: opt.is_correct,
+            x: baseX,
+            y: baseY,
+            baseX: baseX,
+            baseY: baseY,
+            radius: targetRadius,
+            speed: (0.7 + Math.random() * 0.3) * speedMultiplier,
+            phase: Math.random() * Math.PI * 2,
+            isAlive: true,
+          });
         });
-      });
+
+      } else {
+        // ── MODO PAISAGEM / PC / CELULAR DEITADO (LINHA SUAVE) ──
+        const padding = Math.min(canvasWidth * 0.12, 140);
+        const availableWidth = canvasWidth - padding * 2;
+        const step = numOptions > 1 ? availableWidth / (numOptions - 1) : 0;
+        const targetRadius = Math.min(canvasHeight * 0.11, 58);
+        const baseYLine = Math.max(170, canvasHeight * 0.35);
+
+        options.forEach((opt, idx) => {
+          const baseX = padding + step * idx;
+          const baseY = baseYLine + (idx % 2 === 0 ? -20 : 20);
+
+          targets.push({
+            id: opt.id,
+            text: opt.option_text,
+            isCorrect: opt.is_correct,
+            x: baseX,
+            y: baseY,
+            baseX: baseX,
+            baseY: baseY,
+            radius: targetRadius,
+            speed: (0.8 + Math.random() * 0.4) * speedMultiplier,
+            phase: Math.random() * Math.PI * 2,
+            isAlive: true,
+          });
+        });
+      }
     }
 
-    // ─── MIRA E DISPARO DE FLECHAS (TOQUE & MOUSE) ────────────
+    // ─── MIRA E DISPARO DE FLECHAS (TOQUE & MOUSE COM MÁXIMA PRECISÃO) ──
     function shootArrowAt(targetX, targetY) {
       if (!isGameRunning) return;
 
-      // Verificar Aljava
       if (remainingArrows !== Infinity) {
         if (remainingArrows <= 0) {
           endGameSession('flechas');
@@ -749,7 +860,7 @@
       const angle = Math.atan2(dy, dx);
       bow.angle = angle;
 
-      const speed = 26;
+      const speed = Math.max(22, canvasHeight * 0.038);
       arrows.push({
         x: bow.x,
         y: bow.y,
@@ -762,25 +873,22 @@
 
       playSound('shoot');
 
-      // Se acabou a última flecha após o disparo, e não há mais flechas em voo
       if (remainingArrows === 0) {
         setTimeout(() => {
           if (isGameRunning && arrows.length === 0) {
             endGameSession('flechas');
           }
-        }, 800);
+        }, 700);
       }
     }
 
     function getCanvasCoordinates(e) {
       const rect = canvas.getBoundingClientRect();
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
       return {
-        x: (clientX - rect.left) * scaleX,
-        y: (clientY - rect.top) * scaleY,
+        x: clientX - rect.left,
+        y: clientY - rect.top,
       };
     }
 
@@ -797,24 +905,24 @@
     });
 
     // ─── SISTEMA DE PARTÍCULAS E TEXTOS FLUTUANTES ────────────
-    function createExplosion(x, y, color, count = 25) {
+    function createExplosion(x, y, color, count = 22) {
       for (let i = 0; i < count; i++) {
         const angle = Math.random() * Math.PI * 2;
-        const speed = 2 + Math.random() * 7;
+        const speed = 2 + Math.random() * 6;
         particles.push({
           x,
           y,
           vx: Math.cos(angle) * speed,
           vy: Math.sin(angle) * speed,
           color,
-          size: 3 + Math.random() * 5,
+          size: 3 + Math.random() * 4,
           alpha: 1,
           decay: 0.02 + Math.random() * 0.02,
         });
       }
     }
 
-    function addFloatingText(text, x, y, color = '#facc15', size = 28) {
+    function addFloatingText(text, x, y, color = '#facc15', size = 26) {
       floatingTexts.push({
         text,
         x,
@@ -822,7 +930,7 @@
         color,
         size,
         alpha: 1,
-        vy: -2,
+        vy: -1.8,
       });
     }
 
@@ -835,13 +943,12 @@
       document.getElementById('game-hud').style.display = 'none';
       document.getElementById('question-banner').style.display = 'none';
 
-      // Título e Descrição baseados no desfecho
       const titleEl = document.getElementById('game-over-title');
       const descEl = document.getElementById('game-over-msg');
 
       if (reason === 'flechas') {
         titleEl.innerText = '🏹 Aljava Esgotada!';
-        descEl.innerText = 'Suas flechas acabaram! Você faturou as recompensas obtidas com seus acertos!';
+        descEl.innerText = 'Suas flechas acabaram! Você garantiu as recompensas obtidas com seus acertos!';
       } else if (reason === 'tempo') {
         titleEl.innerText = '⏱️ Tempo Esgotado!';
         descEl.innerText = 'O tempo da rodada acabou! Veja o tesouro conquistado pela sua pontaria!';
@@ -906,23 +1013,23 @@
     function update(dt) {
       if (!isGameRunning) return;
 
-      // 1. Atualizar Alvos Normais
+      // 1. Atualizar Alvos (Oscilação suave 100% circular)
       targets.forEach((t) => {
         if (!t.isAlive) return;
-        t.pulse = (t.pulse || 0) + dt * 3;
-        t.x = t.baseX + Math.sin(t.pulse + t.phase) * 35;
-        t.y = t.baseY + Math.cos((t.pulse * 0.7) + t.phase) * 20;
+        t.pulse = (t.pulse || 0) + dt * 2.5;
+        t.x = t.baseX + Math.sin(t.pulse + t.phase) * 18;
+        t.y = t.baseY + Math.cos((t.pulse * 0.8) + t.phase) * 14;
       });
 
       // 2. Alvo Bônus Relâmpago
       snitchTimer += dt;
-      if (snitchTimer > 14 && !goldenSnitch) {
+      if (snitchTimer > 15 && !goldenSnitch) {
         snitchTimer = 0;
         goldenSnitch = {
-          x: -50,
-          y: 120 + Math.random() * 80,
-          vx: 380,
-          radius: 26,
+          x: -40,
+          y: Math.max(90, canvasHeight * 0.18),
+          vx: Math.max(260, canvasWidth * 0.45),
+          radius: Math.min(24, canvasWidth * 0.05),
           pulse: 0,
         };
       }
@@ -930,9 +1037,9 @@
       if (goldenSnitch) {
         goldenSnitch.x += goldenSnitch.vx * dt;
         goldenSnitch.pulse += dt * 8;
-        goldenSnitch.y += Math.sin(goldenSnitch.pulse) * 2.5;
+        goldenSnitch.y += Math.sin(goldenSnitch.pulse) * 2;
 
-        if (goldenSnitch.x > CANVAS_WIDTH + 60) {
+        if (goldenSnitch.x > canvasWidth + 50) {
           goldenSnitch = null;
         }
       }
@@ -941,7 +1048,7 @@
       for (let i = arrows.length - 1; i >= 0; i--) {
         const arr = arrows[i];
         arr.trail.push({ x: arr.x, y: arr.y });
-        if (arr.trail.length > 8) arr.trail.shift();
+        if (arr.trail.length > 7) arr.trail.shift();
 
         arr.x += arr.vx;
         arr.y += arr.vy;
@@ -949,10 +1056,10 @@
         // Colisão com Alvo Dourado Relâmpago
         if (goldenSnitch) {
           const distSnitch = Math.hypot(arr.x - goldenSnitch.x, arr.y - goldenSnitch.y);
-          if (distSnitch < goldenSnitch.radius + 15) {
+          if (distSnitch < goldenSnitch.radius + 12) {
             playSound('snitch');
-            createExplosion(goldenSnitch.x, goldenSnitch.y, '#fde047', 40);
-            addFloatingText('⚡ RELÂMPAGO! +250 PTS!', goldenSnitch.x, goldenSnitch.y, '#fde047', 32);
+            createExplosion(goldenSnitch.x, goldenSnitch.y, '#fde047', 35);
+            addFloatingText('⚡ +250 PTS!', goldenSnitch.x, goldenSnitch.y, '#fde047', 28);
             score += 250;
             goldenSnitch = null;
             arr.isAlive = false;
@@ -967,7 +1074,7 @@
           if (!t.isAlive) continue;
 
           const dist = Math.hypot(arr.x - t.x, arr.y - t.y);
-          if (dist < t.radius + 10) {
+          if (dist < t.radius + 8) {
             arr.isAlive = false;
 
             if (t.isCorrect) {
@@ -980,20 +1087,20 @@
               combo++;
               if (combo > maxCombo) maxCombo = combo;
 
-              createExplosion(t.x, t.y, '#facc15', 35);
-              createExplosion(t.x, t.y, '#38bdf8', 20);
-              addFloatingText(`🎯 ACERTO! +${ptsEarned}`, t.x, t.y, '#4ade80', 32);
+              createExplosion(t.x, t.y, '#facc15', 30);
+              createExplosion(t.x, t.y, '#38bdf8', 18);
+              addFloatingText(`🎯 +${ptsEarned}`, t.x, t.y, '#4ade80', 28);
 
               updateHUD();
 
               setTimeout(() => {
                 currentQuestionIndex++;
                 if (currentQuestionIndex < currentQuestions.length) {
-                  spawnTargetsForQuestion(currentQuestions[currentQuestionIndex]);
+                  positionTargets(currentQuestions[currentQuestionIndex]);
                 } else {
                   endGameSession('completou');
                 }
-              }, 400);
+              }, 380);
 
             } else {
               // ERRO!
@@ -1002,20 +1109,19 @@
               misses++;
               combo = 1;
 
-              // No modo Difícil: penalidade de -1 flecha extra!
               if (selectedDifficulty === 'dificil' && remainingArrows !== Infinity && remainingArrows > 0) {
                 remainingArrows--;
-                addFloatingText('⚠️ ERRO! -1 FLECHA!', t.x, t.y, '#ef4444', 26);
+                addFloatingText('⚠️ -1 FLECHA!', t.x, t.y, '#ef4444', 24);
                 if (remainingArrows <= 0) {
                   updateHUD();
                   endGameSession('flechas');
                   break;
                 }
               } else {
-                addFloatingText('❌ OPS!', t.x, t.y, '#f87171', 28);
+                addFloatingText('❌ OPS!', t.x, t.y, '#f87171', 24);
               }
 
-              createExplosion(t.x, t.y, '#ef4444', 25);
+              createExplosion(t.x, t.y, '#ef4444', 22);
               updateHUD();
             }
             break;
@@ -1023,9 +1129,8 @@
         }
 
         // Fora da tela
-        if (arr.x < 0 || arr.x > CANVAS_WIDTH || arr.y < 0 || arr.y > CANVAS_HEIGHT) {
+        if (arr.x < 0 || arr.x > canvasWidth || arr.y < 0 || arr.y > canvasHeight) {
           arr.isAlive = false;
-          // Se for a última flecha e saiu da tela sem acertar
           if (remainingArrows === 0 && arrows.length === 1) {
             setTimeout(() => {
               if (isGameRunning) endGameSession('flechas');
@@ -1056,26 +1161,26 @@
       }
     }
 
-    // ─── RENDERIZAÇÃO GRÁFICA NO CANVAS ───────────────────────
+    // ─── RENDERIZAÇÃO GRÁFICA NO CANVAS (CÍRCULOS 100% PERFEITOS) ───
     function draw() {
-      ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+      ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-      // Fundo degradê
-      const bgGrad = ctx.createRadialGradient(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 80, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH / 1.1);
+      // Fundo degradê nobre
+      const bgGrad = ctx.createRadialGradient(canvasWidth / 2, canvasHeight / 2, 40, canvasWidth / 2, canvasHeight / 2, canvasWidth);
       bgGrad.addColorStop(0, '#101a33');
-      bgGrad.addColorStop(0.6, '#090e1f');
+      bgGrad.addColorStop(0.65, '#090e1f');
       bgGrad.addColorStop(1, '#04060d');
       ctx.fillStyle = bgGrad;
-      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-      // Linhas rúnicas / constelação mística no fundo
-      ctx.strokeStyle = 'rgba(212, 175, 55, 0.06)';
+      // Linhas rúnicas / aura na base
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.05)';
       ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.arc(CANVAS_WIDTH / 2, CANVAS_HEIGHT - 60, 450, 0, Math.PI * 2);
+      ctx.arc(bow.x, bow.y, Math.min(canvasWidth * 0.7, 350), 0, Math.PI * 2);
       ctx.stroke();
 
-      // Desenhar Alvos de Alternativas
+      // Desenhar Alvos de Alternativas (Círculos Perfeitos)
       targets.forEach((t) => {
         if (!t.isAlive) return;
 
@@ -1083,9 +1188,10 @@
         ctx.translate(t.x, t.y);
 
         ctx.shadowColor = 'rgba(212, 175, 55, 0.4)';
-        ctx.shadowBlur = 18;
+        ctx.shadowBlur = 14;
 
-        const targetGrad = ctx.createRadialGradient(0, 0, 10, 0, 0, t.radius);
+        // Círculo base
+        const targetGrad = ctx.createRadialGradient(0, 0, 8, 0, 0, t.radius);
         targetGrad.addColorStop(0, '#1e293b');
         targetGrad.addColorStop(0.7, '#0f172a');
         targetGrad.addColorStop(1, '#020617');
@@ -1094,32 +1200,36 @@
         ctx.arc(0, 0, t.radius, 0, Math.PI * 2);
         ctx.fill();
 
+        // Borda dourada
         ctx.strokeStyle = '#d4af37';
-        ctx.lineWidth = 3.5;
+        ctx.lineWidth = 3;
         ctx.stroke();
 
+        // Borda interna pontilhada
         ctx.strokeStyle = 'rgba(212, 175, 55, 0.4)';
-        ctx.lineWidth = 1.5;
-        ctx.setLineDash([4, 4]);
+        ctx.lineWidth = 1.2;
+        ctx.setLineDash([3, 3]);
         ctx.beginPath();
-        ctx.arc(0, 0, t.radius - 8, 0, Math.PI * 2);
+        ctx.arc(0, 0, t.radius - 6, 0, Math.PI * 2);
         ctx.stroke();
         ctx.setLineDash([]);
 
         ctx.shadowBlur = 0;
 
+        // Texto Nítido e Legível
         ctx.fillStyle = '#ffffff';
-        ctx.font = t.text.length > 12 ? 'bold 15px Plus Jakarta Sans' : 'bold 20px Plus Jakarta Sans';
+        const fontSize = t.text.length > 10 ? Math.floor(t.radius * 0.3) : Math.floor(t.radius * 0.38);
+        ctx.font = `bold ${Math.max(12, fontSize)}px Plus Jakarta Sans`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
 
         const words = t.text.split(' ');
-        if (words.length > 2 && t.text.length > 12) {
+        if (words.length > 2 && t.text.length > 11) {
           const mid = Math.ceil(words.length / 2);
           const line1 = words.slice(0, mid).join(' ');
           const line2 = words.slice(mid).join(' ');
-          ctx.fillText(line1, 0, -10);
-          ctx.fillText(line2, 0, 12);
+          ctx.fillText(line1, 0, -8);
+          ctx.fillText(line2, 0, 10);
         } else {
           ctx.fillText(t.text, 0, 0);
         }
@@ -1132,7 +1242,7 @@
         ctx.save();
         ctx.translate(goldenSnitch.x, goldenSnitch.y);
         ctx.shadowColor = '#facc15';
-        ctx.shadowBlur = 25;
+        ctx.shadowBlur = 20;
 
         const snitchGrad = ctx.createRadialGradient(0, 0, 2, 0, 0, goldenSnitch.radius);
         snitchGrad.addColorStop(0, '#fef08a');
@@ -1145,8 +1255,8 @@
 
         ctx.fillStyle = 'rgba(254, 240, 138, 0.7)';
         ctx.beginPath();
-        ctx.ellipse(-24, -4, 18, 6, Math.PI / 4, 0, Math.PI * 2);
-        ctx.ellipse(24, -4, 18, 6, -Math.PI / 4, 0, Math.PI * 2);
+        ctx.ellipse(-18, -3, 14, 5, Math.PI / 4, 0, Math.PI * 2);
+        ctx.ellipse(18, -3, 14, 5, -Math.PI / 4, 0, Math.PI * 2);
         ctx.fill();
 
         ctx.restore();
@@ -1156,7 +1266,7 @@
       arrows.forEach((arr) => {
         if (arr.trail.length > 1) {
           ctx.strokeStyle = 'rgba(212, 175, 55, 0.4)';
-          ctx.lineWidth = 3;
+          ctx.lineWidth = 2.5;
           ctx.beginPath();
           ctx.moveTo(arr.trail[0].x, arr.trail[0].y);
           for (let i = 1; i < arr.trail.length; i++) {
@@ -1170,18 +1280,18 @@
         ctx.rotate(arr.angle);
 
         ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 2.5;
         ctx.beginPath();
-        ctx.moveTo(-25, 0);
-        ctx.lineTo(15, 0);
+        ctx.moveTo(-20, 0);
+        ctx.lineTo(12, 0);
         ctx.stroke();
 
         ctx.fillStyle = '#fde047';
         ctx.beginPath();
-        ctx.moveTo(18, 0);
-        ctx.lineTo(6, -6);
-        ctx.lineTo(8, 0);
-        ctx.lineTo(6, 6);
+        ctx.moveTo(15, 0);
+        ctx.lineTo(5, -5);
+        ctx.lineTo(7, 0);
+        ctx.lineTo(5, 5);
         ctx.closePath();
         ctx.fill();
 
@@ -1217,40 +1327,44 @@
       ctx.translate(bow.x, bow.y);
       ctx.rotate(bow.angle + Math.PI / 2);
 
+      const bowRadius = Math.min(canvasWidth * 0.1, 42);
+
       ctx.strokeStyle = '#d4af37';
-      ctx.lineWidth = 6;
+      ctx.lineWidth = 5;
       ctx.beginPath();
-      ctx.arc(0, 0, 48, Math.PI * 0.15, Math.PI * 0.85);
+      ctx.arc(0, 0, bowRadius, Math.PI * 0.15, Math.PI * 0.85);
       ctx.stroke();
 
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.moveTo(-44, 18);
-      ctx.lineTo(0, 36);
-      ctx.lineTo(44, 18);
+      ctx.moveTo(-bowRadius * 0.9, bowRadius * 0.4);
+      ctx.lineTo(0, bowRadius * 0.75);
+      ctx.lineTo(bowRadius * 0.9, bowRadius * 0.4);
       ctx.stroke();
 
-      // Se ainda houver flechas na aljava, desenha a flecha engatilhada
       if (remainingArrows > 0 || remainingArrows === Infinity) {
         ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 2.5;
         ctx.beginPath();
-        ctx.moveTo(0, 36);
-        ctx.lineTo(0, -45);
+        ctx.moveTo(0, bowRadius * 0.75);
+        ctx.lineTo(0, -bowRadius * 0.9);
         ctx.stroke();
 
         ctx.fillStyle = '#fde047';
         ctx.beginPath();
-        ctx.moveTo(0, -52);
-        ctx.lineTo(-6, -42);
-        ctx.lineTo(6, -42);
+        ctx.moveTo(0, -bowRadius * 1.05);
+        ctx.lineTo(-5, -bowRadius * 0.85);
+        ctx.lineTo(5, -bowRadius * 0.85);
         ctx.closePath();
         ctx.fill();
       }
 
       ctx.restore();
     }
+
+    // Inicializar dimensões do Canvas no load
+    setTimeout(resizeCanvas, 50);
   </script>
 </body>
 </html>
