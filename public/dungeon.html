@@ -1083,13 +1083,17 @@
       }
     }
 
+    function getAuthToken() {
+      return localStorage.getItem('liraquest_token') || localStorage.getItem('token');
+    }
+
     /* ==========================================================================
        INICIALIZAÇÃO DO JOGO
        ========================================================================== */
     async function initGame() {
-      const token = localStorage.getItem('token');
+      const token = getAuthToken();
       if (!token) {
-        alert('Sessão expirada. Redirecionando para o login...');
+        alert('Sessão expirada ou usuário não conectado. Redirecionando para o painel...');
         window.location.href = '/index.html';
         return;
       }
@@ -1140,10 +1144,21 @@
           const conVal = heroAttributes.con || 10;
           maxHP = 30 + (conVal * 2);
           currentHP = maxHP;
+        } else {
+          try {
+            const storedUser = JSON.parse(localStorage.getItem('liraquest_user') || '{}');
+            document.getElementById('hud-hero-name').innerText = storedUser.name || 'Aventureiro';
+            document.getElementById('hud-hero-class').innerText = 'Herói do Lar';
+          } catch (e) {}
+          maxHP = 30 + (10 * 2);
+          currentHP = maxHP;
           updateHPBar();
         }
       } catch (err) {
         console.error('Erro ao carregar herói:', err);
+        maxHP = 30 + (10 * 2);
+        currentHP = maxHP;
+        updateHPBar();
       }
     }
 
@@ -1214,7 +1229,7 @@
        INICIAR EXPEDIÇÃO / MASMORRA
        ========================================================================== */
     async function startAdventure(adventureId) {
-      const token = localStorage.getItem('token');
+      const token = getAuthToken();
       try {
         const res = await fetch('/api/dungeon/start', {
           method: 'POST',
@@ -1436,7 +1451,7 @@
        FINALIZAÇÃO DA EXPEDIÇÃO & RESGATE / VITÓRIA
        ========================================================================== */
     async function finishDungeon(isVictory) {
-      const token = localStorage.getItem('token');
+      const token = getAuthToken();
 
       // Determinar o atributo que mais teve sucessos
       let bestAttr = 'int';
