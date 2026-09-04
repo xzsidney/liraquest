@@ -1036,6 +1036,7 @@
     let choicesLog = [];
     let attributeSuccessCount = { str: 0, agi: 0, con: 0, int: 0, cha: 0, luk: 0 };
     let totalBonusGold = 0;
+    let visitedStepsCount = 1;
     let isSoundEnabled = true;
 
     // Web Audio API para efeitos sonoros táteis e dinâmicos (Zero lag, zero mp3)
@@ -1294,6 +1295,7 @@
         if (detailData.success && detailData.adventure) {
           activeAdventure = detailData.adventure;
           currentSceneIndex = 0;
+          visitedStepsCount = 1;
           choicesLog = [];
           attributeSuccessCount = { str: 0, agi: 0, con: 0, int: 0, cha: 0, luk: 0 };
           totalBonusGold = 0;
@@ -1322,21 +1324,25 @@
       }
 
       const scene = activeAdventure.scenes[currentSceneIndex];
-      const totalScenes = activeAdventure.scenes.length;
 
-      // Progresso
-      document.getElementById('story-step-text').innerText = `Sala ${currentSceneIndex + 1} de ${totalScenes}`;
+      // Progresso dinâmico de etapas da jornada
+      if (scene.is_final_scene) {
+        document.getElementById('story-step-text').innerText = '👑 Desafio Final — O Baú do Tesouro';
+      } else {
+        document.getElementById('story-step-text').innerText = `Etapa ${visitedStepsCount} da Jornada`;
+      }
       const dotsContainer = document.getElementById('progress-dots');
       dotsContainer.innerHTML = '';
-      for (let i = 0; i < totalScenes; i++) {
+      const totalDots = 5;
+      for (let i = 1; i <= totalDots; i++) {
         const dot = document.createElement('div');
-        dot.className = 'step-dot' + (i === currentSceneIndex ? ' active' : (i < currentSceneIndex ? ' done' : ''));
+        dot.className = 'step-dot' + (i === visitedStepsCount ? ' active' : (i < visitedStepsCount ? ' done' : ''));
         dotsContainer.appendChild(dot);
       }
 
       // Detalhes da Cena
       document.getElementById('scene-icon').innerText = scene.scene_icon || '🏛️';
-      document.getElementById('scene-order-badge').innerText = `Capítulo ${scene.step_order || (currentSceneIndex + 1)}`;
+      document.getElementById('scene-order-badge').innerText = scene.is_final_scene ? '👑 Desafio Final' : `Ato ${visitedStepsCount}`;
       document.getElementById('scene-title').innerText = scene.title;
       document.getElementById('scene-text').innerText = scene.narrative_text;
 
@@ -1500,7 +1506,33 @@
         return;
       }
 
-      // 2. Avançar para a próxima cena ou vitória
+      // 2. Se a cena atual for marcada como final, concluir com vitória
+      const currentScene = activeAdventure?.scenes?.[currentSceneIndex];
+      if (currentScene?.is_final_scene) {
+        finishDungeon(true);
+        return;
+      }
+
+      visitedStepsCount++;
+
+      // 3. Ramificação RPG (Causa e Consequência)
+      if (lastRollOutcome && lastRollOutcome.action) {
+        const action = lastRollOutcome.action;
+        const targetCode = lastRollOutcome.isSuccess
+          ? action.success_scene_code
+          : action.failure_scene_code;
+
+        if (targetCode && activeAdventure?.scenes) {
+          const targetIndex = activeAdventure.scenes.findIndex(s => s.scene_code === targetCode);
+          if (targetIndex !== -1) {
+            currentSceneIndex = targetIndex;
+            renderScene();
+            return;
+          }
+        }
+      }
+
+      // 4. Sequência linear por fallback
       currentSceneIndex++;
       if (activeAdventure && currentSceneIndex < activeAdventure.scenes.length) {
         renderScene();

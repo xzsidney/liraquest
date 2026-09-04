@@ -204,3 +204,19 @@ A **Loja do Lar** é a ponte definitiva que transforma disciplina em benefícios
 * **Linguagem Visual Distinta:** O Terminal da Vida Real deve ser limpo, acolhedor, intuitivo e com foco em usabilidade. O Terminal do Avatar deve ser vibrante, épico, com clima de fantasia medieval/pixel art.
 * **Nunca Bloquear a Criança de Forma Frustrante:** O aplicativo não deve usar punições severas (como perder tudo ao errar). O foco é sempre o **reforço positivo** — cumprir deveres acelera a jornada; não cumprir apenas mantém o ritmo normal.
 * **Flexibilidade Total para os Pais:** Cada família tem sua dinâmica. A equipe deve projetar as ferramentas de forma que os pais possam criar suas próprias regras, tarefas customizadas e valores de recompensas com facilidade.
+
+---
+
+## 🕹️ 11. O Arcade Familiar & Livro-Jogo Interativo de Masmorras
+
+O **Arcade de Lira** é o centro de diversão acessível pelo Terminal do Avatar (`/avatar` -> Aba Arcade). Ele consome a Energia de Aventura acumulada pelas tarefas diárias cumpridas no mundo real e oferece três experiências completas:
+
+1. **O Arqueiro do Saber (Solo):** Mini-game arcade de precisão e arco e flecha com questões pedagógicas (primário à universidade).
+2. **⚔️ Duelo de Arqueiros (1v1 Família em Tempo Real):** Mini-game competitivo via WebSockets entre dois irmãos ou pais e filhos, com alvos flutuantes sincronizados e calibração educacional independente por série escolar.
+3. **📖 Aventuras em Quest (Livro-Jogo Interativo de Masmorra RPG):**
+   - **Mecânica Clássica de Livro-Jogo (Estilo Fighting Fantasy):** O herói escolhe uma masmorra e mergulha em capítulos narrativos imersivos. Cada cena apresenta uma situação descritiva e 3 opções táticas (ex: Físico/Força, Destreza/Agilidade, Raciocínio/Inteligência).
+   - **Dado D20 3D Autêntico & Resolução de Testes:** As ações são resolvidas rolando um icosaedro D20 vetorial, somando o modificador do atributo do personagem e comparando com a Classe de Dificuldade (CD).
+   - **Árvore de Decisões com Causa e Consequência:** Sucessos e Falhas não são meros textos:
+     - Se o herói obtém **Sucesso**, ele é direcionado para a cena de triunfo correspondente (ex: arromba a porta e surpreende os monstros desprevenidos), recebendo 3 novas escolhas táticas vantajosas.
+     - Se o herói sofre uma **Falha**, ele sofre dano no HP e é direcionado para a cena de consequência (ex: a porta não abre, o herói torce o pé e os guardas são alertados), ganhando 3 novas opções de sobrevivência e improviso.
+   - **Progressão e Resgate Final:** Ao alcançar o Ato Final sem esgotar seus Pontos de Vida (HP), o jogador abre o Baú Épico, conquistando Ouro Virtual, XP de Classe e +1 ponto de aprimoramento no atributo mais utilizado com sucesso durante a expedição. Em caso de derrota (HP zerado), os socorristas do clã resgatam o aventureiro, mantendo o aprendizado e a diversão familiar.

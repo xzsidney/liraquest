@@ -462,6 +462,8 @@ As 3 opções de ação disponíveis em cada cena para o herói escolher e testa
 | `failure_text` | `TEXT` | Não | Desfecho em caso de falha |
 | `failure_damage` | `INT` | Não | Dano infligido ao HP em caso de falha |
 | `bonus_gold` | `INT` | Não | Ouro extra encontrado caso supere com louvor |
+| `success_scene_code` | `VARCHAR(50)` | Sim | Código da cena de destino em caso de Sucesso (Árvore de Causa e Consequência) |
+| `failure_scene_code` | `VARCHAR(50)` | Sim | Código da cena de destino em caso de Falha (Árvore de Causa e Consequência) |
 | `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
 
 ### 🛡️ `family_dungeon_runs`

@@ -191,7 +191,7 @@ Endpoints do mini-game **Aventuras em Quest**, com carregamento de masmorras rel
 | Método | Rota | Autenticação | Descrição |
 |:---|:---|:---|:---|
 | `GET` | `/api/dungeon/adventures` | Pública | Lista todas as masmorras ativas do reino com títulos, dificuldades, custos e prêmios |
-| `GET` | `/api/dungeon/adventures/:id` | Pública | Retorna os dados completos da masmorra selecionada com suas 5 cenas ordenadas e as 3 opções de ação de cada cena |
+| `GET` | `/api/dungeon/adventures/:id` | Pública | Retorna os dados completos da masmorra selecionada com todas as suas cenas e ações contendo as ramificações de Causa e Consequência (`success_scene_code` e `failure_scene_code`) |
 | `POST` | `/api/dungeon/start` | JWT | Valida e consome 5 de Energia de Aventura (`UserProgress.adventure_energy`), inicializando a expedição na tabela `family_dungeon_runs` |
 | `POST` | `/api/dungeon/finish` | JWT | Finaliza a expedição (`is_victory`, `final_hp`, `primary_attribute_used`, `choices_summary`, `bonus_gold_collected`), creditando Ouro no Herói (`Character.gold`), XP na classe ativa (`CharacterClass.xp`), checando Level Up e aprimorando permanentemente (+1) o atributo mais utilizado na run em `CharacterAttribute` |
 

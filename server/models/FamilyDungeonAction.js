@@ -50,6 +50,14 @@ FamilyDungeonAction.init(
       allowNull: false,
       defaultValue: 0,
     },
+    success_scene_code: {
+      type: DataTypes.STRING(50),
+      allowNull: true, // Código da cena de destino em caso de sucesso
+    },
+    failure_scene_code: {
+      type: DataTypes.STRING(50),
+      allowNull: true, // Código da cena de destino em caso de falha
+    },
   },
   {
     sequelize,
