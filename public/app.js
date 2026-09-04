@@ -87,12 +87,28 @@ function navigateTo(route) {
 function initRouter() {
   // 1. Identificar rota da URL (suporta tanto /rota limpo quanto #rota residual antigo)
   const hashRoute = window.location.hash.replace('#', '').trim();
-  const pathRoute = window.location.pathname.replace(/^\/+|\/+$/g, '').trim();
+  let pathRoute = window.location.pathname.replace(/^\/+|\/+$/g, '').trim();
   
-  const route = hashRoute || pathRoute || 'home';
+  if (pathRoute === 'index.html' || pathRoute === '') {
+    pathRoute = '';
+  }
+
+  // Se veio com flag do Arcade salva e o usuário está autenticado, abre direto no Terminal do Avatar
+  const savedAvatarTab = localStorage.getItem('liraquest_avatar_tab');
+  let route = hashRoute || pathRoute;
+  if (!route) {
+    if (savedAvatarTab && state.token && state.user) {
+      route = 'avatar';
+    } else {
+      route = 'home';
+    }
+  } else if (route === 'index.html') {
+    route = savedAvatarTab && state.token && state.user ? 'avatar' : 'home';
+  }
+
   state.currentRoute = route;
 
-  // Normalizar a URL removendo qualquer '#' residual
+  // Normalizar a URL removendo qualquer '#' ou 'index.html' residual
   const targetPath = route === 'home' ? '/' : `/${route}`;
   if (window.location.hash || window.location.pathname !== targetPath) {
     window.history.replaceState({ route }, '', targetPath);
@@ -100,7 +116,8 @@ function initRouter() {
 
   // 2. Escutar navegação de Voltar/Avançar do navegador
   window.addEventListener('popstate', (event) => {
-    const currentPath = window.location.pathname.replace(/^\/+|\/+$/g, '').trim();
+    let currentPath = window.location.pathname.replace(/^\/+|\/+$/g, '').trim();
+    if (currentPath === 'index.html') currentPath = '';
     const r = event.state?.route || currentPath || 'home';
     state.currentRoute = r;
     renderRoute();
