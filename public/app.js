@@ -379,26 +379,6 @@ function handleLogout() {
   navigateTo('home');
 }
 
-async function quickLogin(role) {
-  const credentials = {
-    admin: { email: 'admin@liraquest.com', pass: 'admin123' },
-    parent: { email: 'pai@liraquest.com', pass: 'pai123' },
-    child: { email: 'filho@liraquest.com', pass: 'filho123' },
-  };
-
-  const cred = credentials[role];
-  if (!cred) return;
-
-  const emailInput = document.getElementById('login-email');
-  const passwordInput = document.getElementById('login-password');
-  if (emailInput && passwordInput) {
-    emailInput.value = cred.email;
-    passwordInput.value = cred.pass;
-  }
-
-  await handleLogin();
-}
-
 // ========================================================
 // 3. CATÁLOGO GLOBAL (CLASSES E ATRIBUTOS)
 // ========================================================

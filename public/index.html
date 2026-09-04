@@ -324,43 +324,6 @@
       border: 1px solid rgba(155, 17, 30, 0.45);
     }
 
-    /* Quick Login Bar */
-    .quick-login-box {
-      margin-top: 24px;
-      padding-top: 20px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      text-align: center;
-    }
-
-    .quick-login-box p {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-bottom: 12px;
-    }
-
-    .quick-login-buttons {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-    }
-
-    .btn-quick {
-      padding: 8px 6px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: #e2e8f0;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .btn-quick:hover {
-      background: rgba(128, 0, 32, 0.3);
-      border-color: var(--accent);
-      color: #ffffff;
-    }
 
     /* Home View Styles */
     .hero-section {
@@ -2358,15 +2321,6 @@
           </button>
         </form>
 
-        <!-- Teste Rápido com 1 Clique -->
-        <div class="quick-login-box">
-          <p>⚡ Login Rápido de Teste (1 Clique):</p>
-          <div class="quick-login-buttons">
-            <button class="btn-quick" onclick="quickLogin('admin')">👑 Admin</button>
-            <button class="btn-quick" onclick="quickLogin('parent')">🛡️ Pai</button>
-            <button class="btn-quick" onclick="quickLogin('child')">⚔️ Filho</button>
-          </div>
-        </div>
 
         <div style="margin-top: 20px; text-align: center;">
           <span style="font-size: 0.9rem; color: var(--text-muted);">Não tem uma conta?</span>
