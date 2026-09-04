@@ -772,22 +772,18 @@
       const speedMultiplier = selectedDifficulty === 'dificil' ? 1.3 : 1.0;
 
       if (isPortrait) {
-        // ── MODO RETRATO / CELULAR EM PÉ (UMA LINHA SÓ EM ARCO PANORÂMICO) ──
-        // Todas as 4 bolinhas ficam na mesma linha sem nenhuma atrás da outra!
-        // 100% de visão desobstruída para disparar instantaneamente sem esperar!
-        const padding = Math.max(16, canvasWidth * 0.05);
+        // ── MODO RETRATO / CELULAR EM PÉ (100% DENTRO DA TELA) ──
+        // Raio calibrado (~32px) para caber com margens seguras nas laterais
+        const targetRadius = Math.min(canvasWidth * 0.088, 33);
+        // Padding garante que o círculo mais à esquerda e à direita nunca cortem
+        const padding = targetRadius + Math.max(12, canvasWidth * 0.04);
         const availableWidth = canvasWidth - padding * 2;
         const step = numOptions > 1 ? availableWidth / (numOptions - 1) : 0;
-
-        // Raio calibrado para caber 4 alvos perfeitamente com separação física
-        const targetRadius = Math.min(canvasWidth * 0.108, 42);
-        // Base Y no terço superior, logo abaixo do banner da pergunta
-        const baseY = Math.max(180, canvasHeight * 0.35);
+        const baseY = Math.max(170, canvasHeight * 0.35);
 
         options.forEach((opt, idx) => {
           const baseX = padding + step * idx;
-          // Arco elegante: as duas do meio levemente elevadas (-14px)
-          const arcOffset = (idx === 1 || idx === 2) ? -14 : 10;
+          const arcOffset = (idx === 1 || idx === 2) ? -12 : 8;
           const targetY = baseY + arcOffset;
 
           targets.push({
@@ -806,16 +802,16 @@
         });
 
       } else {
-        // ── MODO PAISAGEM / PC / CELULAR DEITADO (LINHA SUAVE) ──
-        const padding = Math.min(canvasWidth * 0.12, 140);
+        // ── MODO PAISAGEM / PC / CELULAR DEITADO ──
+        const targetRadius = Math.min(canvasHeight * 0.10, 52);
+        const padding = targetRadius + Math.max(16, canvasWidth * 0.05);
         const availableWidth = canvasWidth - padding * 2;
         const step = numOptions > 1 ? availableWidth / (numOptions - 1) : 0;
-        const targetRadius = Math.min(canvasHeight * 0.11, 56);
-        const baseYLine = Math.max(170, canvasHeight * 0.35);
+        const baseYLine = Math.max(160, canvasHeight * 0.35);
 
         options.forEach((opt, idx) => {
           const baseX = padding + step * idx;
-          const baseY = baseYLine + (idx % 2 === 0 ? -18 : 18);
+          const baseY = baseYLine + (idx % 2 === 0 ? -16 : 16);
 
           targets.push({
             id: opt.id,
@@ -1234,20 +1230,24 @@
 
         ctx.shadowBlur = 0;
 
-        // Texto Nítido e Legível
+        // Texto Nítido e Legível com Auto-Fit dinâmico
         ctx.fillStyle = '#ffffff';
-        const fontSize = t.text.length > 10 ? Math.floor(t.radius * 0.3) : Math.floor(t.radius * 0.38);
-        ctx.font = `bold ${Math.max(12, fontSize)}px Plus Jakarta Sans`;
+        let fontSize = Math.floor(t.radius * 0.38);
+        ctx.font = `bold ${fontSize}px Plus Jakarta Sans`;
+        while (ctx.measureText(t.text).width > t.radius * 1.62 && fontSize > 9) {
+          fontSize--;
+          ctx.font = `bold ${fontSize}px Plus Jakarta Sans`;
+        }
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
 
         const words = t.text.split(' ');
-        if (words.length > 2 && t.text.length > 11) {
+        if (words.length > 1 && ctx.measureText(t.text).width > t.radius * 1.45 && t.text.length > 8) {
           const mid = Math.ceil(words.length / 2);
           const line1 = words.slice(0, mid).join(' ');
           const line2 = words.slice(mid).join(' ');
-          ctx.fillText(line1, 0, -8);
-          ctx.fillText(line2, 0, 10);
+          ctx.fillText(line1, 0, -fontSize * 0.6);
+          ctx.fillText(line2, 0, fontSize * 0.7);
         } else {
           ctx.fillText(t.text, 0, 0);
         }
