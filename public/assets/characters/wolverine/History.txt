@@ -1,0 +1,130 @@
+=================================================================================================
+                  --------------------| SANDER 71113 |-------------------
+                                  http://go.to/sander71113 
+                                    sander71113@yahoo.com
+
+============================
+Wolverine X ver. 1.0
+============================
+
+* January 11, 2005
+ - WinMugen Patch made by Winane, 
+   compiled all files in 1 rar file. ^^
+
+* January 3, 2002
+ - Final Release
+ - HyperBgs added (optional)
+ - Tech hit
+ - Fixes
+
+* December 28, 2002
+ - Prefinal Release
+ - Custom super addded
+ - Medium Level Ai
+ - Removed Hyper Bgs temporarily
+
+* December 26, 2002
+ - Speed Up Super
+
+* December 24, 2002
+ - Fatal Claw
+
+* December 11, 2002
+ - Weapon X
+
+* December 9, 2002
+ - Hard Ai
+ - Berserker Barrage X
+
+* December 4, 2002
+ - All Special attacks
+
+* November 19, 2002
+ - Basic and required stuff done.
+ - Basic attacks and chains (Proper Damage)
+ - All Throws (2 ground and 1 aerial)
+ - Advancing Guard
+ - Sounds
+
+---------------------------------------------------------------------------------------------
+ *** ABOUT ***
+ 
+ For bugs and comments suggestions whatever email me at:
+ 
+ EMAIL   :   sander71113@yahoo.com
+
+ WEB PAGE:   http://go.to/sander71113
+             http://sander71113.mgbr.net             
+                             
+===================================== END OF HISTORY.TXT =========================================
+
+[MISC DATA]:
+
+353 - 209 = 144
+
+X/144 = _/1000 --> 1000(X)/144
+
+STAND:
+LP = 27.77777778
+LK = 27.77777778
+MP = 55.55555555
+MK = 48.611
+HP = 138.88
+HK = 111.11 
+
+CROUCH:
+LP = 27.77777778
+LK = 34.72222222
+MP = 48.611
+MK = 62.5
+HP = 138.88
+HK = 118.05 
+fwdHP = 118.05
+
+JUMP:
+LP = 27.77777778
+LK = 34.72222222
+MP = 41.66666667
+MK = 55.5555556
+HP = 118.05
+HK = 118.05 
+fwdHP = 104.16667
+
+THROW
+MP = 111.1111
+HP = 111.1111
+
+6284|12|
+
+;Var
+;Var(1) = Basic Attack Switch
+;Var(2) = Throw Mash 
+;Var(3) = Dive Kick Saved Y Velocity, Adv Guard prevstate
+;Var(4) = Throw Limitter 1
+;Var(5) = Throw Limitter 2
+;Var(6) = Attack Mulset
+;Var(7) = Throw cancel
+;Var(8) = Jump Switch
+;Var(9) = AI
+;Var(10) = Launcher Limitter
+;Var(11) = Dizzy
+;Var(12) = Guard Crush
+;Var(13) = Barrage/tornado Mash
+;var(14) = Air Combo Var
+;Var(15) = Drill Claw Limit
+;Var(16) = Drill Claw switch
+;Var(17) = Screenbound Var
+;Var(18) = Berserker Barrage X Atmul
+;Var(19) = Speed Up
+;Var(20) = AI too
+;Var(21) = HSDM
+;Var(22) = Power Limit
+;Var(39) = Combo Var
+
+353-334
+
+
+DM: 312.5
+
+
+47111,204

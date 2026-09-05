@@ -1,0 +1,137 @@
+=============
+Spiderman v2.0
+98% completo
+Para Win, DOS e Linux M.U.G.E.N.
+=============
+Release #9  Novembro/18/2006
+
+Feito por: Erradicator
+
+
+
+**O QUE HÁ DE NOVO**: (Novembro/18/2006)
+- Muitos Bug fixes
+- web Throw melhorado
+- Ultimate web throw melhorado
+- Vários tempos de animação/game ticks revisados
+- Algumas mudanças específicas para os modos Symbiote e Captain Universe/Cosmic Spidey:
+   Captain Universo: Super Armor, 20% mais forte, 20% mais resistente, velocidades aéreas maiores (plana durante o pulo)
+   Simbionte: 10% mais forte, 10% mais resistente
+   Armoured: baixo nível de super armor
+- Custom stances para os modos Simbionte e Captain Universe/Cosmic Spidey
+- Varias novas paletas feitas por alguns bons amigos pela internet, obrigado a todos! ;)
+- Ajustes específicos para o Win/Linux Mugen (ainda compatível com DOS)
+- Black Cat helper melhorada (ela está menos inútil agora :p)
+- Intro storyboard arrumada para Win/Lin Mugen (não testado no DOS)
+- O super original "One for J.J." foi melhorado   , agora é uma espécie de "super web throw", mas ainda não está terminado...
+- Sparks e superBG MvsC2 de baixa qualidade para manter a compatibilidade com DOS (será removida em futuras versões)
+
+**O QUE HÁ DE NOVO**: (Julho/27/2003)
+- Ultimate web throw!! (ainda precisa de pequenos ajustes, mas funciona perfeitamente) :)
+- Intro storyline! Nada mais nada menos que um dos trailler´s do filme! :)
+- Mais paletas (incluindo a do Capitão universo, o uniforme da série unlimited e o do filme)
+- Ajustes para o Web throw
+- MvsC2 hit e guard sparks adicionados!!  MUITO obrigado à ER por ripá-los. :)
+- Alguns novos sons.
+- Super portrait de MvsC2.
+- Alguns bug fixes (como sempre...)
+- Efeitos de transparência em teias que estão se dissipando...
+- Versão alpha do novo super original "One for J.J." , por favor não usem, pois ele ainda não faz praticamente nada :p
+- Animação "Diagup fall", não existe em personagens da série Capcom VS, não me perguntem... ;)
+- Striker da Gata Negra! :)
+- Abilidades de paletas:
+Capitão Universo: super armor, 20% mais forte, 20% mais resistente
+Simbionte: 10% mais forte, 10% menos resistente, velocidades aéreas maiores
+Armored: baixo nível de super armor
+
+O QUE JÁ ESTÁ FEITO:
+-Todo standing, crouching, running, walking, jumping, guarding animations
+-Ataques básicos
+-2 starting intro's
+-2 poses de vitória + the "time over" win pose
+-Todas 3 provocações
+-Todos os air combos
+-super jump
+-Todos os combos..
+-air + ground throws
+-Algumas paletas originais
+-Win quotes
+-MvsC2 guard e hit sparks
+-Todos os bagulhos requeridos
+-"Target" system (localização do P2)
+-Super portraits
+-Intro
+-Final
+-Striker da Gata Negra (comando = y+b, requere meia barra de energia)
+-web ball  + cocoon
+-Spider Sting
+-Web Swing
+-Wall Cling
+-Web Throw
+-Crawler Assault
+-Maximum Spider
+-Ultimate web throw
+
+O que ainda falta:
+-As coisas originais que quero colocar nele
+-Refinamento para o Maximum spider
+
+==========================Movelist/Lista de golpes==========================
+
+Super Jump
+ D,U ou pressione três chutes
+
+Black Cat helper
+ soco médio + chute médio
+
+Web Ball
+ D,DF,F + soco
+
+Web Swing
+ D,DB,B + chute
+
+Spider Sting
+ F,D,DF + soco
+
+Web Throw
+ D,DB,B + soco
+
+Maximum Spider
+ D,DF,F + 2 socos
+
+Web Crawler assault
+ D,DF,F + 2 chutes
+
+Ultimate Web Throw
+ D,DB,B + 2 socos
+
+==================Mode select/Modos==================
+
+Segure start enquanto seleciona:
+
+Start + botão a = Captain Universe/Cosmic Spidey
+Start + botão b = Symbiote Spidey
+Start + botão c = Armoured Spidey
+==============================================================================
+
+CREDITOS + AGRADECIMENTOS ESPECIAIS:
+Agradeço à Deus em primeiro lugar.
+Testp, pelo seu Guile, de quem eu tirei a seta de localização do P2.
+Gorgeador, ele fez o final do Aranha, e me salvou o trabalho de fazer a versão MvsSF.
+Nobuyuki, o código para Win Quotes foi tirado do seu Wolverine e optimizado por mim.
+A ThunderGod por fazer o primeiro beta/alpha do Aranha, me dar permissão para continuá-lo e ser um amigo.
+ER, pelos sparks de Marvel versus Capcom 2. :)
+Elecbyte, eu acho que não preciso dizer por que...
+Capcom é claro.
+Shania Twain, Madonna e Frank Sinatra, trabalhei no Aranha ouvindo músicas deles...
+SES, pelo MCM.
+VirtuallTek pelo Fighter Factory.
+
+
+Orgulhosamente feito no Brasil!
+
+Antes de usar qualquer coisa deste personagem por favor entre em contato comigo, tanto para ripar quanto para programar este char custou MUITAS horas da minha vida :(
+
+Voçês sempre encontrarão a ultima versão em:
+Home Page: http://www.presstart.cjb.net
+Forum: http://pub92.ezboard.com/bpresstartmugen

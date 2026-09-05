@@ -1,0 +1,52 @@
+;---------------------------
+;   WOLVERINE X
+;    VER. 1.0
+; BY: SANDER 71113
+;---------------------------
+
+;General Information
+
+[Info]
+Name         ="Wolverine"
+DisplayName  ="Wolverine"
+Author       ="Sander71113"
+VersionDate  = 08,23,2004
+MugenVersion = 04,14,2001
+Pal.Defaults = 4, 1
+
+;Files for the player
+[Files]
+cmd       = wolverine.cmd    		;Hard Ai
+;cmd      = wolmedai.cmd     		;Medium level Ai
+;cmd      = wolnoai.cmd      		;Low level Ai
+cns       = wolverine.cns    		;Constants
+stcommon  = common1.cns      		;Common states (in data/)
+st        = wolverine.cns    		;States
+st2       = wolverinea.cns   		;State - 2
+st3       = wolverineb.cns   		;Gethits
+st4       = wolverinec.cns   		;Special Moves
+st5       = wolverined.cns   		;Super Moves
+;st5      = wolverinedx.cns             ;Super Moves "Without Hyper BGs"
+sprite    = wolverine.sff    		;Sprite
+anim      = wolverine.air    		;Animation
+sound     = logan.snd        		;Sound
+pal1      = pal1.act                    ;Palettes
+pal2      = pal2.act
+pal3      = pal3.act
+pal4      = pal4.act
+pal5      = pal5.act
+pal6      = pal6.act
+pal7      = pal7.act
+
+;Arcade mode
+[Arcade]
+;intro.storyboard = intro.def
+;ending.storyboard = neoending.def
+
+;NOTE:
+;PLS READ README.TXT, AND HISTORY.TXT...
+
+;Product of Sander71113
+;http://go.to/sander71113
+;http://sander71113.mgbr.net
+;sander71113@yahoo.com

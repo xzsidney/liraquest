@@ -1,0 +1,38 @@
+; Definition file for Spider-Man
+; Contains all the filenames needed for the character
+; Template from original kfm starting templates
+
+; Character information
+[Info]
+name = "Spider-Man"
+displayname = "Spider-Man"
+versiondate = 11,18,2006
+mugenversion=06,14,2003 ;04,14,2002/2001 Win, DOS & Linux Version of M.U.G.E.N character works on
+author = "Erradicator"
+pal.defaults = 1,2,3,4
+
+; Files for the character
+[Files]
+cmd     = spider.cmd     ;Command set
+cns     = spider.cns     ;Constants
+st      = spider.cns     ;States
+stcommon = common1.cns   ;Common states
+sprite  = spider.sff       ;Sprite
+anim    = spider.air     ;Animation
+sound   = spider.snd     ;Sound
+pal1    = 01spiderman.act  ;Palettes
+pal2    = 02spider2.act
+pal3    = comics.act
+pal4    = 04movie.act
+pal5    = 05unlimited.act
+pal6    = 06Scarlet_Spider.act
+pal7    = captainuniverse.act ;(cosmic Spidey)
+pal8    = 08symbiote.act
+pal9    = armoured.act
+pal10   = alternate.act
+pal11   = 11negative.act
+pal12   = 12Goblin.act
+
+[Arcade]
+intro.storyboard = intro.def
+ending.storyboard = ending.def

@@ -1,0 +1,18 @@
+[Info]
+name        = "Gambit"
+displayname = "Gambit"
+versiondate = 04,01,2001
+mugenversion= 04,01,2000
+author      = "Luvly Angel"
+pal.defaults= 1
+
+[Files]
+cmd      = gambit.cmd
+cns      = gambit.cns
+st       = gambit.cns
+stcommon = common1.cns
+sprite   = gambit.sff
+anim     = gambit.air
+sound    = gambit.snd
+pal1     = gambit01.act
+pal2     = gambit02.act

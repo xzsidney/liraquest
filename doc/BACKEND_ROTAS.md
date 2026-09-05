@@ -198,7 +198,7 @@ Endpoints do mini-game **Aventuras em Quest**, com carregamento de masmorras rel
 ---
 
 ## ⚔️ 13. Arena de Batalha 2D (Mini-Game Arcade RPG por Turnos)
-Rotas dedicadas ao Jogo 4 do Arcade (`/battle.html`): combate tático por turnos com sprites MUGEN clássicos (Capitão América vs Ciclope), sincronização com a ficha de atributos do herói e baralho tático de 4 habilidades (1 Ataque Básico + 3 Habilidades Equipadas).
+Rotas dedicadas ao Jogo 4 do Arcade (`/battle.html`): combate tático por turnos com sprites clássicos da era de ouro (Capitão América, Ciclope, Homem-Aranha, Wolverine e Gambit), sincronização com a ficha de atributos do herói, motor de efeitos especiais PixiJS em WebGL (feixes de luz radiantes estilo RPG Maker) e fila visual de turnos (CTB queue).
 
 | Método | Rota | Autenticação | Descrição |
 |:---|:---|:---|:---|

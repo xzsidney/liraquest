@@ -148,9 +148,11 @@ export const startBattle = async (req, res) => {
 
     // Se tiver menos de 3 habilidades equipadas, busca as do arquétipo para preencher os 3 slots
     if (equippedSkills.length < 3) {
-      const targetCodes = player_hero === 'cap'
-        ? ['skill_shield_slash', 'skill_stars_stripes', 'skill_charging_star']
-        : ['skill_optic_blast', 'skill_optic_sweep', 'skill_gene_splice'];
+      let targetCodes = ['skill_shield_slash', 'skill_stars_stripes', 'skill_charging_star'];
+      if (player_hero === 'cyclops') targetCodes = ['skill_optic_blast', 'skill_optic_sweep', 'skill_gene_splice'];
+      else if (player_hero === 'spiderman') targetCodes = ['skill_shield_slash', 'skill_stars_stripes', 'skill_charging_star'];
+      else if (player_hero === 'wolverine') targetCodes = ['skill_shield_slash', 'skill_stars_stripes', 'skill_charging_star'];
+      else if (player_hero === 'gambit') targetCodes = ['skill_shield_slash', 'skill_stars_stripes', 'skill_charging_star'];
 
       const fallbackSkills = await DefinitionSkill.findAll({
         where: { code: targetCodes },
@@ -160,30 +162,80 @@ export const startBattle = async (req, res) => {
       equippedSkills = fallbackSkills.slice(0, 3);
     }
 
-    // Montar o Deck Tático de 4 Ações (1 Básico + 3 Habilidades)
-    const isCap = player_hero === 'cap';
+    // Nomes e descrições temáticas por lutador
+    const HERO_THEMES = {
+      cap: {
+        basicName: 'Soco Direto',
+        basicDesc: 'Combo de socos nobres. Gera +15 MP.',
+        skills: [
+          { name: 'Shield Slash', icon: '🛡️', animId: 1, desc: 'Arremesso giratório do escudo com ricochete.' },
+          { name: 'Stars & Stripes', icon: '⭐', animId: 3, desc: 'Gancho ascendente com poeira estelar (Stun).' },
+          { name: 'Charging Star', icon: '⚡', animId: 4, desc: 'Investida rápida que quebra a postura inimiga.' },
+        ]
+      },
+      cyclops: {
+        basicName: 'Cyclone Kick',
+        basicDesc: 'Chute acrobático giratório. Gera +15 MP.',
+        skills: [
+          { name: 'Optic Blast', icon: '🔴', animId: 2, desc: 'Feixe laser óptico contínuo de alta intensidade.' },
+          { name: 'Optic Sweep', icon: '🔻', animId: 5, desc: 'Varredura rasteira de plasma que atrasa o turno.' },
+          { name: 'Gene Splice', icon: '✨', animId: 3, desc: 'Gancho aéreo ascendente energizado com plasma.' },
+        ]
+      },
+      spiderman: {
+        basicName: 'Combo Aranha',
+        basicDesc: 'Sequência veloz de socos e chutes ágeis. Gera +15 MP.',
+        skills: [
+          { name: 'Web Ball', icon: '🕸️', animId: 1, desc: 'Disparo concentrado de teia que imobiliza o alvo.' },
+          { name: 'Web Swing', icon: '🕷️', animId: 4, desc: 'Balanço acrobático na teia com voadora de impacto.' },
+          { name: 'Spider Sting', icon: '⚡', animId: 3, desc: 'Gancho duplo com salto acrobático perfurante.' },
+        ]
+      },
+      wolverine: {
+        basicName: 'Corte de Adamantium',
+        basicDesc: 'Golpe fulminante de garras. Gera +15 MP.',
+        skills: [
+          { name: 'Berserker Barrage', icon: '🐺', animId: 4, desc: 'Investida furiosa retalhando com faíscas incandescentes.' },
+          { name: 'Tornado Claw', icon: '🌪️', animId: 3, desc: 'Gancho ascendente giratório rasgando o ar.' },
+          { name: 'Drill Claw', icon: '⚔️', animId: 1, desc: 'Mergulho em parafuso cortante em alta velocidade.' },
+        ]
+      },
+      gambit: {
+        basicName: 'Golpe de Bastão Bo',
+        basicDesc: 'Ataque tático com bastão telescópico. Gera +15 MP.',
+        skills: [
+          { name: 'Kinetic Card', icon: '🃏', animId: 1, desc: 'Arremesso de cartas cinéticas carregadas com explosão mágica.' },
+          { name: 'Cajun Slash', icon: '💜', animId: 4, desc: 'Salto e golpe descendente com bastão energizado.' },
+          { name: 'Cajun Strike', icon: '✨', animId: 3, desc: 'Investida rápida seguida de descarga de energia cinética.' },
+        ]
+      }
+    };
+
+    const currentTheme = HERO_THEMES[player_hero] || HERO_THEMES.cap;
+
     const basicAction = {
       id: 'basic_attack',
-      name: isCap ? 'Soco Direto' : 'Cyclone Kick',
+      name: currentTheme.basicName,
       cost: 0,
       mp_gain: 15,
       fury_gain: 12,
       damage_multiplier: 1.0,
       animation_id: 100, // 100 = Ataque Físico Avançado
-      desc: isCap ? 'Combo de socos nobres. Gera +15 MP.' : 'Chute acrobático giratório. Gera +15 MP.',
+      desc: currentTheme.basicDesc,
+      icon: '👊',
     };
 
     const actionDeck = [
       basicAction,
-      ...equippedSkills.map((sk, idx) => ({
+      ...currentTheme.skills.map((sk, idx) => ({
         id: `skill_${idx + 1}`,
-        code: sk.code,
+        code: `skill_${player_hero}_${idx + 1}`,
         name: sk.name,
-        cost: sk.mana_cost || 15,
-        damage_multiplier: sk.damage_multiplier || 1.5,
-        animation_id: sk.animation_id || (idx + 1),
-        desc: sk.description || '',
-        icon: sk.icon || '⚔️',
+        cost: 15 + (idx * 5),
+        damage_multiplier: 1.4 + (idx * 0.3),
+        animation_id: sk.animId,
+        desc: sk.desc,
+        icon: sk.icon,
       })),
     ];
 

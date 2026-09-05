@@ -1,0 +1,327 @@
+;============================
+; Wolverine X's -2 States
+;============================
+
+[Statedef -2]
+
+[State -2, StopAI]
+type = VarSet
+triggerall = (var(59) > 0)
+trigger1 = (RoundState != 2)
+trigger2 = !Alive
+var(59) = -2
+IgnoreHitPause = 1
+
+[State -2, Simplifier]
+type = VarSet
+trigger1 = 1
+var(9) = (var(59) = 1)
+IgnoreHitPause = 1
+
+[State -2, Defense Up]
+type = DefenceMulSet
+trigger1 = Life <= 437
+value = ifelse(life < 262,.70,.80)
+
+;Get rid of trailing anims when hit
+[State -2, 3]
+type = AfterImageTime
+trigger1 = movetype = H
+time = 0
+
+;Sorrow edge' Throw limitter-------------------------------
+[State -2, throwa]
+type = VarSet
+trigger1 = HitDefAttr = SCA, NA, AP && MoveContact
+var(4) = 15
+ignorehitpause = 1 
+
+[State -2, throwb]
+type = VarAdd
+trigger1 = var(4) >= 1
+var(4) = -1
+ignorehitpause = 1 
+
+;Modified it a bit for special throws
+[State -2, throwa]
+type = VarSet
+trigger1 = MoveGuarded
+var(5) = 15
+ignorehitpause = 1 
+
+[State -2, throwb]
+type = VarAdd
+trigger1 = var(5) >= 1
+var(5) = -1
+ignorehitpause = 1
+
+;------------------------------------------------------------------
+:KOF COMBO ATTACK MULSET CODE
+[State -2, Varadd]
+type = Varadd
+trigger1 = hitcount > 0 && movehit 
+;trigger1 = HitDefAttr = SCA, NA
+var(6) = movehit 
+;ignorehitpause = 1 
+persistent = 0
+
+[State -2, AttackMulSet]
+type = Varset
+trigger1 = Var(6) > 0
+trigger1 = enemy, movetype != H
+var(6) = 0
+
+[State -2, AttackMulSet]
+type = AttackMulSet
+trigger1 = var(6) <= 0
+value = 1
+
+[State -2, AttackMulSet]
+type = AttackMulSet
+trigger1 = var(6) = [1,4]  
+value = .3
+
+[State -2, AttackMulSet]
+type = AttackMulSet
+trigger1 = var(6) = [5,8]  
+value = .2
+
+State -2, AttackMulSet]
+type = AttackMulSet
+trigger1 = var(6) > 8
+value = .1
+
+;------------------------------------------------------------------
+;==================================================================================
+; ------- DIZZY CODE --------
+;===============================================
+[State -2, reset Dizzy]
+type = VarSet
+trigger1 = RoundState = 0 || RoundState = 3 || (movetype = H &&  var(14) = 1 && stateno != 5250)
+ignorehitpause = 1
+var(11) = 0
+
+[State -2, reset Dizzy]
+type = VarSet
+trigger1 = var(11) <= 0 && var(14) = 1
+ignorehitpause = 1
+var(14) = 0
+
+[State -2, DIZZY CODE]
+type = VarAdd
+trigger1 = (var(11) = [1,999]) && movetype = H && gethitvar(hitcount) >= 20 
+var(11) = -(var(11) -5)
+ignorehitpause = 1 
+
+[State -2, DIZZY CODE]
+type = VarAdd
+trigger1 = (var(11) = [1,999]) && movetype = H && gethitvar(hitcount) >= 5 
+var(11) = ifelse(gethitvar(hitcount) >= 12,-50,-20)
+ignorehitpause = 1 
+
+[State -2, DIZZY CODE]
+type = VarAdd
+trigger1 = var(11) = [1,999]
+var(11) = -1
+ignorehitpause = 1 
+
+[State -2, DIZZY CODE]
+type = Varset
+trigger1 = var(11) > 1000
+var(11) = 1000
+ignorehitpause = 1 
+;------------------------------------------------------
+
+;==================================================================================
+; ------- GUARD CRUSH--------
+;===============================================
+
+[State -2, GUARD CRUSH CODE]
+type = VarAdd
+trigger1 = var(12) >= 1
+var(12) = -1
+ignorehitpause = 1 
+
+[State -2, GUARD CRUSH CODE]
+type = VarAdd
+trigger1 = var(12) >= 1 && movetype = H && enemy, hitdefattr = SCA, HA, HP
+var(12) = -10
+ignorehitpause = 1 
+
+;==================
+;STOP SOUNDS
+;==================
+;Stop channel 20's sound when button fwd is release
+[State -2, STPRUNSND]
+type = StopSnd
+trigger1 = stateno != 100
+channel = 20;running snd
+
+;===========================
+;Launcher Limit
+;===========================
+[State -2, Launcherlimit1]
+type = Varset
+trigger1 = (p2stateno = 5100 || p2stateno = 1160) && var(6) > 1
+var(10) = 1
+ignorehitpause = 1 
+
+[State -2, Launcherlimit2]
+type = Varset
+trigger1 = p2movetype != H
+var(10) = 0
+ignorehitpause = 1 
+
+;===========================
+;Speed Up Variable
+;===========================
+[State -2, SpeedUPVAR]
+type = Varadd
+trigger1 = var(19) >= 1
+var(19) = -1
+;ignorehitpause = 1 
+
+[State -2, hyperwin]
+type = Powerset
+trigger1 = var(19) >= 1
+value = var(22)
+
+;=================================
+;Remove Explod
+[State -2, RemoveExplod]
+type = RemoveExplod
+trigger1 = statetype != A 
+ID = 655
+
+[State -2, hyperwin]
+type = AssertSpecial
+trigger1 = NumExplod(770) = 1
+flag = NoBG
+flag2 = NoFG
+
+;============================
+;DEBUG DISPLAY
+;============================
+[State -2, DEBUG]
+trigger1 = 1
+type = DisplayToClipboard
+ignorehitpause = 1
+text = "AI: %d\nWolverine71113"
+params = var(9)
+
+;[State -2, DEBUG]
+;trigger1 = 1
+;type = DisplayToClipboard
+;ignorehitpause = 1
+;text = "juggle = %d P2dist = %f Y dist =%f \n Wolverine71113"
+;params = var(13) , p2dist x, (p2dist y)
+; - enemynear(0), const(size.height))
+;============================================================================
+
+[Statedef -3]
+;[State -3, 1];kill the corner push bug
+;type = VelSet
+;trigger1 = FrontEdgeDist < 10 && Vel x > 0.1
+;x = 0.1
+;============================================================================
+
+; Kamek and Luchini appear to have been the first ones to use the IsHomeTeam AI activation concept.
+[State -3, SetAI]
+type = VarSet
+triggerall = !RoundState
+triggerall = IsHomeTeam
+trigger1 = (TeamSide = 2)
+trigger2 = (MatchNo > 1)
+var(59) = 1
+
+[State -3, Unfair]
+type = VarSet
+trigger1 = !RoundState
+trigger1 = (var(59) != 1)
+trigger1 = NumPartner
+trigger1 = (ID > Partner,ID)
+trigger1 = (TeamSide = 2)
+var(59) = 1
+
+[State -3, AI Helper (Compatibly Partnered Version)]
+type = Helper
+trigger1 = !var(59)
+trigger1 = !NumHelper(9742)
+trigger1 = (RoundState = 2)
+trigger1 = Alive
+trigger1 = NumPartner
+trigger1 = Partner,SelfAnimExist(9741)
+HelperType = normal
+name = "AI Helper (Simul Version)"
+ID = 9742
+pos = 9999999,99999
+StateNo = 9742
+KeyCtrl = 1
+PauseMoveTime = 999999999
+SuperMoveTime = 999999999
+
+; If you want to use the Guard mode, Dummy mode, Distance, or Button jam dummy control
+; options in Training mode without activating the dummy's AI while working on your
+; character, then all you need to do is temporarily disable this controller.
+[State -3, AI Helper]
+type = Helper
+triggerall = !var(59)
+triggerall = !NumHelper(9741)
+triggerall = (RoundState = 2)
+triggerall = Alive
+trigger1 = !NumPartner
+trigger2 = !(Partner,SelfAnimExist(9741))
+HelperType = normal
+name = "AI Helper"
+ID = 9741
+pos = 9999999,99999
+StateNo = 9741
+KeyCtrl = 1
+PauseMoveTime = 999999999
+SuperMoveTime = 999999999
+
+[State -3, TurnBackOnAI]
+type = VarSet
+trigger1 = (var(59) = -2)
+trigger1 = (RoundState = 2)
+trigger1 = Alive
+var(59) = 1
+
+[State -3, XOR]
+type = VarSet
+triggerall = var(59)!=1
+triggerall = !var(57)
+triggerall = (var(58) = GameTime-1)
+trigger1 = (command = "a") ^^ (command = "a2")
+trigger2 = (command = "b") ^^ (command = "b2")
+trigger3 = (command = "c") ^^ (command = "c2")
+trigger4 = (command = "x") ^^ (command = "x2")
+trigger5 = (command = "y") ^^ (command = "y2")
+trigger6 = (command = "z") ^^ (command = "z2")
+trigger7 = (command = "s") ^^ (command = "s2")
+trigger8 = (command = "holda") ^^ (command = "holda2")
+trigger9 = (command = "holdb") ^^ (command = "holdb2")
+trigger10 = (command = "holdc") ^^ (command = "holdc2")
+trigger11 = (command = "holdx") ^^ (command = "holdx2")
+trigger12 = (command = "holdy") ^^ (command = "holdy2")
+trigger13 = (command = "holdz") ^^ (command = "holdz2")
+trigger14 = (command = "holds") ^^ (command = "holds2")
+trigger15 = (command = "holdfwd") ^^ (command = "holdfwd2")
+trigger16 = (command = "holdback") ^^ (command = "holdback2")
+trigger17 = (command = "holdup") ^^ (command = "holdup2")
+trigger18 = (command = "holddown") ^^ (command = "holddown2")
+trigger19 = (command = "recovery") ^^ (command = "recovery2")
+var(59) = 1
+
+[State -3, fiXOR]
+type = VarSet
+trigger1 = !HitPauseTime
+trigger2 = (var(58) < GameTime-1)
+var(57) = HitPauseTime
+IgnoreHitPause = 1
+
+[State -3, GameTimeVar]
+type = VarSet
+trigger1 = 1
+var(58) = GameTime
+IgnoreHitPause = 1

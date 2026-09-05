@@ -1,0 +1,1674 @@
+{
+  "idle": {
+    "durationPerFrame": 75,
+    "loop": true,
+    "frames": [
+      {
+        "body": "0-1.png",
+        "bodyAxis": {
+          "group": 0,
+          "image": 1,
+          "xaxis": 35,
+          "yaxis": 76,
+          "file": "0-1.png"
+        }
+      },
+      {
+        "body": "0-2.png",
+        "bodyAxis": {
+          "group": 0,
+          "image": 2,
+          "xaxis": 35,
+          "yaxis": 76,
+          "file": "0-2.png"
+        }
+      },
+      {
+        "body": "0-3.png",
+        "bodyAxis": {
+          "group": 0,
+          "image": 3,
+          "xaxis": 35,
+          "yaxis": 76,
+          "file": "0-3.png"
+        }
+      },
+      {
+        "body": "0-4.png",
+        "bodyAxis": {
+          "group": 0,
+          "image": 4,
+          "xaxis": 35,
+          "yaxis": 75,
+          "file": "0-4.png"
+        }
+      },
+      {
+        "body": "0-5.png",
+        "bodyAxis": {
+          "group": 0,
+          "image": 5,
+          "xaxis": 35,
+          "yaxis": 74,
+          "file": "0-5.png"
+        }
+      },
+      {
+        "body": "0-6.png",
+        "bodyAxis": {
+          "group": 0,
+          "image": 6,
+          "xaxis": 35,
+          "yaxis": 73,
+          "file": "0-6.png"
+        }
+      },
+      {
+        "body": "0-7.png",
+        "bodyAxis": {
+          "group": 0,
+          "image": 7,
+          "xaxis": 35,
+          "yaxis": 73,
+          "file": "0-7.png"
+        }
+      },
+      {
+        "body": "0-8.png",
+        "bodyAxis": {
+          "group": 0,
+          "image": 8,
+          "xaxis": 35,
+          "yaxis": 73,
+          "file": "0-8.png"
+        }
+      },
+      {
+        "body": "0-9.png",
+        "bodyAxis": {
+          "group": 0,
+          "image": 9,
+          "xaxis": 35,
+          "yaxis": 75,
+          "file": "0-9.png"
+        }
+      },
+      {
+        "body": "0-10.png",
+        "bodyAxis": {
+          "group": 0,
+          "image": 10,
+          "xaxis": 35,
+          "yaxis": 75,
+          "file": "0-10.png"
+        }
+      },
+      {
+        "body": "0-11.png",
+        "bodyAxis": {
+          "group": 0,
+          "image": 11,
+          "xaxis": 35,
+          "yaxis": 76,
+          "file": "0-11.png"
+        }
+      },
+      {
+        "body": "0-12.png",
+        "bodyAxis": {
+          "group": 0,
+          "image": 12,
+          "xaxis": 35,
+          "yaxis": 76,
+          "file": "0-12.png"
+        }
+      },
+      {
+        "body": "0-13.png",
+        "bodyAxis": {
+          "group": 0,
+          "image": 13,
+          "xaxis": 35,
+          "yaxis": 75,
+          "file": "0-13.png"
+        }
+      },
+      {
+        "body": "0-14.png",
+        "bodyAxis": {
+          "group": 0,
+          "image": 14,
+          "xaxis": 35,
+          "yaxis": 74,
+          "file": "0-14.png"
+        }
+      },
+      {
+        "body": "0-15.png",
+        "bodyAxis": {
+          "group": 0,
+          "image": 15,
+          "xaxis": 35,
+          "yaxis": 73,
+          "file": "0-15.png"
+        }
+      },
+      {
+        "body": "0-16.png",
+        "bodyAxis": {
+          "group": 0,
+          "image": 16,
+          "xaxis": 35,
+          "yaxis": 73,
+          "file": "0-16.png"
+        }
+      },
+      {
+        "body": "0-17.png",
+        "bodyAxis": {
+          "group": 0,
+          "image": 17,
+          "xaxis": 35,
+          "yaxis": 75,
+          "file": "0-17.png"
+        }
+      },
+      {
+        "body": "0-1.png",
+        "bodyAxis": {
+          "group": 0,
+          "image": 1,
+          "xaxis": 35,
+          "yaxis": 76,
+          "file": "0-1.png"
+        }
+      }
+    ]
+  },
+  "walk": {
+    "durationPerFrame": 70,
+    "loop": true,
+    "frames": [
+      {
+        "body": "20-1.png",
+        "bodyAxis": {
+          "group": 20,
+          "image": 1,
+          "xaxis": 39,
+          "yaxis": 78,
+          "file": "20-1.png"
+        }
+      },
+      {
+        "body": "20-2.png",
+        "bodyAxis": {
+          "group": 20,
+          "image": 2,
+          "xaxis": 42,
+          "yaxis": 79,
+          "file": "20-2.png"
+        }
+      },
+      {
+        "body": "20-3.png",
+        "bodyAxis": {
+          "group": 20,
+          "image": 3,
+          "xaxis": 43,
+          "yaxis": 81,
+          "file": "20-3.png"
+        }
+      },
+      {
+        "body": "20-4.png",
+        "bodyAxis": {
+          "group": 20,
+          "image": 4,
+          "xaxis": 36,
+          "yaxis": 84,
+          "file": "20-4.png"
+        }
+      },
+      {
+        "body": "20-5.png",
+        "bodyAxis": {
+          "group": 20,
+          "image": 5,
+          "xaxis": 18,
+          "yaxis": 84,
+          "file": "20-5.png"
+        }
+      },
+      {
+        "body": "20-6.png",
+        "bodyAxis": {
+          "group": 20,
+          "image": 6,
+          "xaxis": 26,
+          "yaxis": 84,
+          "file": "20-6.png"
+        }
+      },
+      {
+        "body": "20-7.png",
+        "bodyAxis": {
+          "group": 20,
+          "image": 7,
+          "xaxis": 31,
+          "yaxis": 84,
+          "file": "20-7.png"
+        }
+      },
+      {
+        "body": "20-8.png",
+        "bodyAxis": {
+          "group": 20,
+          "image": 8,
+          "xaxis": 35,
+          "yaxis": 81,
+          "file": "20-8.png"
+        }
+      },
+      {
+        "body": "20-9.png",
+        "bodyAxis": {
+          "group": 20,
+          "image": 9,
+          "xaxis": 36,
+          "yaxis": 81,
+          "file": "20-9.png"
+        }
+      },
+      {
+        "body": "20-10.png",
+        "bodyAxis": {
+          "group": 20,
+          "image": 10,
+          "xaxis": 41,
+          "yaxis": 80,
+          "file": "20-10.png"
+        }
+      },
+      {
+        "body": "20-11.png",
+        "bodyAxis": {
+          "group": 20,
+          "image": 11,
+          "xaxis": 42,
+          "yaxis": 82,
+          "file": "20-11.png"
+        }
+      },
+      {
+        "body": "20-12.png",
+        "bodyAxis": {
+          "group": 20,
+          "image": 12,
+          "xaxis": 36,
+          "yaxis": 82,
+          "file": "20-12.png"
+        }
+      },
+      {
+        "body": "20-13.png",
+        "bodyAxis": {
+          "group": 20,
+          "image": 13,
+          "xaxis": 18,
+          "yaxis": 83,
+          "file": "20-13.png"
+        }
+      },
+      {
+        "body": "20-14.png",
+        "bodyAxis": {
+          "group": 20,
+          "image": 14,
+          "xaxis": 26,
+          "yaxis": 83,
+          "file": "20-14.png"
+        }
+      },
+      {
+        "body": "20-15.png",
+        "bodyAxis": {
+          "group": 20,
+          "image": 15,
+          "xaxis": 29,
+          "yaxis": 81,
+          "file": "20-15.png"
+        }
+      },
+      {
+        "body": "20-16.png",
+        "bodyAxis": {
+          "group": 20,
+          "image": 16,
+          "xaxis": 32,
+          "yaxis": 79,
+          "file": "20-16.png"
+        }
+      },
+      {
+        "body": "20-1.png",
+        "bodyAxis": {
+          "group": 20,
+          "image": 1,
+          "xaxis": 39,
+          "yaxis": 78,
+          "file": "20-1.png"
+        }
+      }
+    ]
+  },
+  "attack": {
+    "durationPerFrame": 70,
+    "loop": false,
+    "frames": [
+      {
+        "body": "0-1.png",
+        "bodyAxis": {
+          "group": 0,
+          "image": 1,
+          "xaxis": 35,
+          "yaxis": 76,
+          "file": "0-1.png"
+        }
+      },
+      {
+        "body": "200-1.png",
+        "bodyAxis": {
+          "group": 200,
+          "image": 1,
+          "xaxis": 34,
+          "yaxis": 90,
+          "file": "200-1.png"
+        }
+      },
+      {
+        "body": "200-2.png",
+        "bodyAxis": {
+          "group": 200,
+          "image": 2,
+          "xaxis": 34,
+          "yaxis": 85,
+          "file": "200-2.png"
+        }
+      },
+      {
+        "body": "200-3.png",
+        "bodyAxis": {
+          "group": 200,
+          "image": 3,
+          "xaxis": 34,
+          "yaxis": 87,
+          "file": "200-3.png"
+        }
+      },
+      {
+        "body": "200-4.png",
+        "bodyAxis": {
+          "group": 200,
+          "image": 4,
+          "xaxis": 34,
+          "yaxis": 82,
+          "file": "200-4.png"
+        }
+      },
+      {
+        "body": "200-5.png",
+        "bodyAxis": {
+          "group": 200,
+          "image": 5,
+          "xaxis": 35,
+          "yaxis": 78,
+          "file": "200-5.png"
+        }
+      }
+    ]
+  },
+  "berserker_barrage": {
+    "durationPerFrame": 70,
+    "loop": false,
+    "frames": [
+      {
+        "body": "11-1.png",
+        "bodyAxis": {
+          "group": 11,
+          "image": 1,
+          "xaxis": 35,
+          "yaxis": 49,
+          "file": "11-1.png"
+        }
+      },
+      {
+        "body": "240-1.png",
+        "bodyAxis": {
+          "group": 240,
+          "image": 1,
+          "xaxis": 29,
+          "yaxis": 94,
+          "file": "240-1.png"
+        }
+      },
+      {
+        "body": "100-2.png",
+        "bodyAxis": {
+          "group": 100,
+          "image": 2,
+          "xaxis": 26,
+          "yaxis": 67,
+          "file": "100-2.png"
+        }
+      },
+      {
+        "body": "100-3.png",
+        "bodyAxis": {
+          "group": 100,
+          "image": 3,
+          "xaxis": 52,
+          "yaxis": 87,
+          "file": "100-3.png"
+        }
+      },
+      {
+        "body": "100-4.png",
+        "bodyAxis": {
+          "group": 100,
+          "image": 4,
+          "xaxis": 55,
+          "yaxis": 80,
+          "file": "100-4.png"
+        }
+      },
+      {
+        "body": "240-1.png",
+        "bodyAxis": {
+          "group": 240,
+          "image": 1,
+          "xaxis": 29,
+          "yaxis": 94,
+          "file": "240-1.png"
+        }
+      },
+      {
+        "body": "240-2.png",
+        "bodyAxis": {
+          "group": 240,
+          "image": 2,
+          "xaxis": 34,
+          "yaxis": 130,
+          "file": "240-2.png"
+        }
+      },
+      {
+        "body": "240-3.png",
+        "bodyAxis": {
+          "group": 240,
+          "image": 3,
+          "xaxis": 22,
+          "yaxis": 128,
+          "file": "240-3.png"
+        }
+      },
+      {
+        "body": "240-4.png",
+        "bodyAxis": {
+          "group": 240,
+          "image": 4,
+          "xaxis": 21,
+          "yaxis": 129,
+          "file": "240-4.png"
+        }
+      },
+      {
+        "body": "240-5.png",
+        "bodyAxis": {
+          "group": 240,
+          "image": 5,
+          "xaxis": 32,
+          "yaxis": 113,
+          "file": "240-5.png"
+        }
+      },
+      {
+        "body": "10-2.png",
+        "bodyAxis": {
+          "group": 10,
+          "image": 2,
+          "xaxis": 35,
+          "yaxis": 45,
+          "file": "10-2.png"
+        }
+      },
+      {
+        "body": "11-1.png",
+        "bodyAxis": {
+          "group": 11,
+          "image": 1,
+          "xaxis": 35,
+          "yaxis": 49,
+          "file": "11-1.png"
+        }
+      },
+      {
+        "body": "12-1.png",
+        "bodyAxis": {
+          "group": 12,
+          "image": 1,
+          "xaxis": 33,
+          "yaxis": 57,
+          "file": "12-1.png"
+        }
+      },
+      {
+        "body": "12-2.png",
+        "bodyAxis": {
+          "group": 12,
+          "image": 2,
+          "xaxis": 34,
+          "yaxis": 71,
+          "file": "12-2.png"
+        }
+      }
+    ]
+  },
+  "tornado_claw": {
+    "durationPerFrame": 70,
+    "loop": false,
+    "frames": [
+      {
+        "body": "2120-1.png",
+        "bodyAxis": {
+          "group": 2120,
+          "image": 1,
+          "xaxis": 34,
+          "yaxis": 147,
+          "file": "2120-1.png"
+        }
+      },
+      {
+        "body": "2120-2.png",
+        "bodyAxis": {
+          "group": 2120,
+          "image": 2,
+          "xaxis": 28,
+          "yaxis": 147,
+          "file": "2120-2.png"
+        }
+      },
+      {
+        "body": "2120-3.png",
+        "bodyAxis": {
+          "group": 2120,
+          "image": 3,
+          "xaxis": 19,
+          "yaxis": 145,
+          "file": "2120-3.png"
+        }
+      },
+      {
+        "body": "2120-4.png",
+        "bodyAxis": {
+          "group": 2120,
+          "image": 4,
+          "xaxis": 28,
+          "yaxis": 144,
+          "file": "2120-4.png"
+        }
+      },
+      {
+        "body": "2120-5.png",
+        "bodyAxis": {
+          "group": 2120,
+          "image": 5,
+          "xaxis": 49,
+          "yaxis": 140,
+          "file": "2120-5.png"
+        }
+      },
+      {
+        "body": "2120-6.png",
+        "bodyAxis": {
+          "group": 2120,
+          "image": 6,
+          "xaxis": 55,
+          "yaxis": 142,
+          "file": "2120-6.png"
+        }
+      },
+      {
+        "body": "2120-1.png",
+        "bodyAxis": {
+          "group": 2120,
+          "image": 1,
+          "xaxis": 34,
+          "yaxis": 147,
+          "file": "2120-1.png"
+        }
+      },
+      {
+        "body": "2120-2.png",
+        "bodyAxis": {
+          "group": 2120,
+          "image": 2,
+          "xaxis": 28,
+          "yaxis": 147,
+          "file": "2120-2.png"
+        }
+      },
+      {
+        "body": "2120-3.png",
+        "bodyAxis": {
+          "group": 2120,
+          "image": 3,
+          "xaxis": 19,
+          "yaxis": 145,
+          "file": "2120-3.png"
+        }
+      },
+      {
+        "body": "2120-4.png",
+        "bodyAxis": {
+          "group": 2120,
+          "image": 4,
+          "xaxis": 28,
+          "yaxis": 144,
+          "file": "2120-4.png"
+        }
+      },
+      {
+        "body": "2120-5.png",
+        "bodyAxis": {
+          "group": 2120,
+          "image": 5,
+          "xaxis": 49,
+          "yaxis": 140,
+          "file": "2120-5.png"
+        }
+      },
+      {
+        "body": "2120-6.png",
+        "bodyAxis": {
+          "group": 2120,
+          "image": 6,
+          "xaxis": 55,
+          "yaxis": 142,
+          "file": "2120-6.png"
+        }
+      },
+      {
+        "body": "2120-1.png",
+        "bodyAxis": {
+          "group": 2120,
+          "image": 1,
+          "xaxis": 34,
+          "yaxis": 147,
+          "file": "2120-1.png"
+        }
+      },
+      {
+        "body": "2120-2.png",
+        "bodyAxis": {
+          "group": 2120,
+          "image": 2,
+          "xaxis": 28,
+          "yaxis": 147,
+          "file": "2120-2.png"
+        }
+      },
+      {
+        "body": "2120-3.png",
+        "bodyAxis": {
+          "group": 2120,
+          "image": 3,
+          "xaxis": 19,
+          "yaxis": 145,
+          "file": "2120-3.png"
+        }
+      },
+      {
+        "body": "2120-4.png",
+        "bodyAxis": {
+          "group": 2120,
+          "image": 4,
+          "xaxis": 28,
+          "yaxis": 144,
+          "file": "2120-4.png"
+        }
+      },
+      {
+        "body": "2120-5.png",
+        "bodyAxis": {
+          "group": 2120,
+          "image": 5,
+          "xaxis": 49,
+          "yaxis": 140,
+          "file": "2120-5.png"
+        }
+      },
+      {
+        "body": "2120-6.png",
+        "bodyAxis": {
+          "group": 2120,
+          "image": 6,
+          "xaxis": 55,
+          "yaxis": 142,
+          "file": "2120-6.png"
+        }
+      }
+    ]
+  },
+  "drill_claw": {
+    "durationPerFrame": 65,
+    "loop": false,
+    "frames": [
+      {
+        "body": "10-1.png",
+        "bodyAxis": {
+          "group": 10,
+          "image": 1,
+          "xaxis": 36,
+          "yaxis": 75,
+          "file": "10-1.png"
+        }
+      },
+      {
+        "body": "10-2.png",
+        "bodyAxis": {
+          "group": 10,
+          "image": 2,
+          "xaxis": 35,
+          "yaxis": 45,
+          "file": "10-2.png"
+        }
+      }
+    ]
+  },
+  "hyper": {
+    "durationPerFrame": 60,
+    "loop": false,
+    "frames": [
+      {
+        "body": "200-1.png",
+        "bodyAxis": {
+          "group": 200,
+          "image": 1,
+          "xaxis": 34,
+          "yaxis": 90,
+          "file": "200-1.png"
+        }
+      },
+      {
+        "body": "200-1.png",
+        "bodyAxis": {
+          "group": 200,
+          "image": 1,
+          "xaxis": 34,
+          "yaxis": 90,
+          "file": "200-1.png"
+        }
+      },
+      {
+        "body": "200-2.png",
+        "bodyAxis": {
+          "group": 200,
+          "image": 2,
+          "xaxis": 34,
+          "yaxis": 85,
+          "file": "200-2.png"
+        }
+      },
+      {
+        "body": "200-3.png",
+        "bodyAxis": {
+          "group": 200,
+          "image": 3,
+          "xaxis": 34,
+          "yaxis": 87,
+          "file": "200-3.png"
+        }
+      },
+      {
+        "body": "200-4.png",
+        "bodyAxis": {
+          "group": 200,
+          "image": 4,
+          "xaxis": 34,
+          "yaxis": 82,
+          "file": "200-4.png"
+        }
+      },
+      {
+        "body": "200-5.png",
+        "bodyAxis": {
+          "group": 200,
+          "image": 5,
+          "xaxis": 35,
+          "yaxis": 78,
+          "file": "200-5.png"
+        }
+      },
+      {
+        "body": "220-1.png",
+        "bodyAxis": {
+          "group": 220,
+          "image": 1,
+          "xaxis": 32,
+          "yaxis": 74,
+          "file": "220-1.png"
+        }
+      },
+      {
+        "body": "220-2.png",
+        "bodyAxis": {
+          "group": 220,
+          "image": 2,
+          "xaxis": 32,
+          "yaxis": 73,
+          "file": "220-2.png"
+        }
+      },
+      {
+        "body": "220-3.png",
+        "bodyAxis": {
+          "group": 220,
+          "image": 3,
+          "xaxis": 33,
+          "yaxis": 70,
+          "file": "220-3.png"
+        }
+      },
+      {
+        "body": "220-4.png",
+        "bodyAxis": {
+          "group": 220,
+          "image": 4,
+          "xaxis": 32,
+          "yaxis": 79,
+          "file": "220-4.png"
+        }
+      },
+      {
+        "body": "220-5.png",
+        "bodyAxis": {
+          "group": 220,
+          "image": 5,
+          "xaxis": 32,
+          "yaxis": 82,
+          "file": "220-5.png"
+        }
+      },
+      {
+        "body": "220-6.png",
+        "bodyAxis": {
+          "group": 220,
+          "image": 6,
+          "xaxis": 32,
+          "yaxis": 79,
+          "file": "220-6.png"
+        }
+      },
+      {
+        "body": "225-1.png",
+        "bodyAxis": {
+          "group": 225,
+          "image": 1,
+          "xaxis": 32,
+          "yaxis": 69,
+          "file": "225-1.png"
+        }
+      },
+      {
+        "body": "225-2.png",
+        "bodyAxis": {
+          "group": 225,
+          "image": 2,
+          "xaxis": 34,
+          "yaxis": 74,
+          "file": "225-2.png"
+        }
+      },
+      {
+        "body": "225-3.png",
+        "bodyAxis": {
+          "group": 225,
+          "image": 3,
+          "xaxis": 34,
+          "yaxis": 87,
+          "file": "225-3.png"
+        }
+      },
+      {
+        "body": "225-4.png",
+        "bodyAxis": {
+          "group": 225,
+          "image": 4,
+          "xaxis": 40,
+          "yaxis": 73,
+          "file": "225-4.png"
+        }
+      },
+      {
+        "body": "225-5.png",
+        "bodyAxis": {
+          "group": 225,
+          "image": 5,
+          "xaxis": 34,
+          "yaxis": 73,
+          "file": "225-5.png"
+        }
+      },
+      {
+        "body": "225-6.png",
+        "bodyAxis": {
+          "group": 225,
+          "image": 6,
+          "xaxis": 38,
+          "yaxis": 74,
+          "file": "225-6.png"
+        }
+      },
+      {
+        "body": "210-1.png",
+        "bodyAxis": {
+          "group": 210,
+          "image": 1,
+          "xaxis": 27,
+          "yaxis": 91,
+          "file": "210-1.png"
+        }
+      },
+      {
+        "body": "210-2.png",
+        "bodyAxis": {
+          "group": 210,
+          "image": 2,
+          "xaxis": 21,
+          "yaxis": 89,
+          "file": "210-2.png"
+        }
+      },
+      {
+        "body": "210-3.png",
+        "bodyAxis": {
+          "group": 210,
+          "image": 3,
+          "xaxis": 12,
+          "yaxis": 96,
+          "file": "210-3.png"
+        }
+      },
+      {
+        "body": "210-4.png",
+        "bodyAxis": {
+          "group": 210,
+          "image": 4,
+          "xaxis": 10,
+          "yaxis": 96,
+          "file": "210-4.png"
+        }
+      },
+      {
+        "body": "210-5.png",
+        "bodyAxis": {
+          "group": 210,
+          "image": 5,
+          "xaxis": 5,
+          "yaxis": 89,
+          "file": "210-5.png"
+        }
+      },
+      {
+        "body": "600-1.png",
+        "bodyAxis": {
+          "group": 600,
+          "image": 1,
+          "xaxis": 54,
+          "yaxis": 100,
+          "file": "600-1.png"
+        }
+      },
+      {
+        "body": "600-2.png",
+        "bodyAxis": {
+          "group": 600,
+          "image": 2,
+          "xaxis": 77,
+          "yaxis": 105,
+          "file": "600-2.png"
+        }
+      },
+      {
+        "body": "600-3.png",
+        "bodyAxis": {
+          "group": 600,
+          "image": 3,
+          "xaxis": 70,
+          "yaxis": 104,
+          "file": "600-3.png"
+        }
+      },
+      {
+        "body": "610-2.png",
+        "bodyAxis": {
+          "group": 610,
+          "image": 2,
+          "xaxis": 48,
+          "yaxis": 118,
+          "file": "610-2.png"
+        }
+      },
+      {
+        "body": "610-3.png",
+        "bodyAxis": {
+          "group": 610,
+          "image": 3,
+          "xaxis": 48,
+          "yaxis": 114,
+          "file": "610-3.png"
+        }
+      },
+      {
+        "body": "620-1.png",
+        "bodyAxis": {
+          "group": 620,
+          "image": 1,
+          "xaxis": 82,
+          "yaxis": 98,
+          "file": "620-1.png"
+        }
+      },
+      {
+        "body": "620-2.png",
+        "bodyAxis": {
+          "group": 620,
+          "image": 2,
+          "xaxis": 63,
+          "yaxis": 95,
+          "file": "620-2.png"
+        }
+      },
+      {
+        "body": "620-3.png",
+        "bodyAxis": {
+          "group": 620,
+          "image": 3,
+          "xaxis": 56,
+          "yaxis": 93,
+          "file": "620-3.png"
+        }
+      },
+      {
+        "body": "620-4.png",
+        "bodyAxis": {
+          "group": 620,
+          "image": 4,
+          "xaxis": 69,
+          "yaxis": 93,
+          "file": "620-4.png"
+        }
+      },
+      {
+        "body": "620-5.png",
+        "bodyAxis": {
+          "group": 620,
+          "image": 5,
+          "xaxis": 61,
+          "yaxis": 93,
+          "file": "620-5.png"
+        }
+      },
+      {
+        "body": "630-1.png",
+        "bodyAxis": {
+          "group": 630,
+          "image": 1,
+          "xaxis": 75,
+          "yaxis": 97,
+          "file": "630-1.png"
+        }
+      },
+      {
+        "body": "630-2.png",
+        "bodyAxis": {
+          "group": 630,
+          "image": 2,
+          "xaxis": 78,
+          "yaxis": 95,
+          "file": "630-2.png"
+        }
+      },
+      {
+        "body": "630-3.png",
+        "bodyAxis": {
+          "group": 630,
+          "image": 3,
+          "xaxis": 68,
+          "yaxis": 91,
+          "file": "630-3.png"
+        }
+      },
+      {
+        "body": "630-4.png",
+        "bodyAxis": {
+          "group": 630,
+          "image": 4,
+          "xaxis": 78,
+          "yaxis": 93,
+          "file": "630-4.png"
+        }
+      },
+      {
+        "body": "630-5.png",
+        "bodyAxis": {
+          "group": 630,
+          "image": 5,
+          "xaxis": 66,
+          "yaxis": 92,
+          "file": "630-5.png"
+        }
+      },
+      {
+        "body": "640-2.png",
+        "bodyAxis": {
+          "group": 640,
+          "image": 2,
+          "xaxis": 26,
+          "yaxis": 116,
+          "file": "640-2.png"
+        }
+      },
+      {
+        "body": "640-3.png",
+        "bodyAxis": {
+          "group": 640,
+          "image": 3,
+          "xaxis": 25,
+          "yaxis": 133,
+          "file": "640-3.png"
+        }
+      },
+      {
+        "body": "640-4.png",
+        "bodyAxis": {
+          "group": 640,
+          "image": 4,
+          "xaxis": 29,
+          "yaxis": 132,
+          "file": "640-4.png"
+        }
+      },
+      {
+        "body": "640-5.png",
+        "bodyAxis": {
+          "group": 640,
+          "image": 5,
+          "xaxis": 28,
+          "yaxis": 100,
+          "file": "640-5.png"
+        }
+      },
+      {
+        "body": "650-1.png",
+        "bodyAxis": {
+          "group": 650,
+          "image": 1,
+          "xaxis": 44,
+          "yaxis": 101,
+          "file": "650-1.png"
+        }
+      },
+      {
+        "body": "650-2.png",
+        "bodyAxis": {
+          "group": 650,
+          "image": 2,
+          "xaxis": 40,
+          "yaxis": 76,
+          "file": "650-2.png"
+        }
+      },
+      {
+        "body": "650-3.png",
+        "bodyAxis": {
+          "group": 650,
+          "image": 3,
+          "xaxis": 27,
+          "yaxis": 79,
+          "file": "650-3.png"
+        }
+      },
+      {
+        "body": "650-4.png",
+        "bodyAxis": {
+          "group": 650,
+          "image": 4,
+          "xaxis": 30,
+          "yaxis": 92,
+          "file": "650-4.png"
+        }
+      },
+      {
+        "body": "650-5.png",
+        "bodyAxis": {
+          "group": 650,
+          "image": 5,
+          "xaxis": 28,
+          "yaxis": 110,
+          "file": "650-5.png"
+        }
+      },
+      {
+        "body": "650-6.png",
+        "bodyAxis": {
+          "group": 650,
+          "image": 6,
+          "xaxis": 24,
+          "yaxis": 119,
+          "file": "650-6.png"
+        }
+      }
+    ]
+  },
+  "berserker_charge": {
+    "durationPerFrame": 65,
+    "loop": false,
+    "frames": [
+      {
+        "body": "11-1.png",
+        "bodyAxis": {
+          "group": 11,
+          "image": 1,
+          "xaxis": 35,
+          "yaxis": 49,
+          "file": "11-1.png"
+        }
+      },
+      {
+        "body": "240-1.png",
+        "bodyAxis": {
+          "group": 240,
+          "image": 1,
+          "xaxis": 29,
+          "yaxis": 94,
+          "file": "240-1.png"
+        }
+      },
+      {
+        "body": "100-2.png",
+        "bodyAxis": {
+          "group": 100,
+          "image": 2,
+          "xaxis": 26,
+          "yaxis": 67,
+          "file": "100-2.png"
+        }
+      },
+      {
+        "body": "100-3.png",
+        "bodyAxis": {
+          "group": 100,
+          "image": 3,
+          "xaxis": 52,
+          "yaxis": 87,
+          "file": "100-3.png"
+        }
+      },
+      {
+        "body": "100-4.png",
+        "bodyAxis": {
+          "group": 100,
+          "image": 4,
+          "xaxis": 55,
+          "yaxis": 80,
+          "file": "100-4.png"
+        }
+      },
+      {
+        "body": "240-1.png",
+        "bodyAxis": {
+          "group": 240,
+          "image": 1,
+          "xaxis": 29,
+          "yaxis": 94,
+          "file": "240-1.png"
+        }
+      },
+      {
+        "body": "240-2.png",
+        "bodyAxis": {
+          "group": 240,
+          "image": 2,
+          "xaxis": 34,
+          "yaxis": 130,
+          "file": "240-2.png"
+        }
+      },
+      {
+        "body": "240-3.png",
+        "bodyAxis": {
+          "group": 240,
+          "image": 3,
+          "xaxis": 22,
+          "yaxis": 128,
+          "file": "240-3.png"
+        }
+      },
+      {
+        "body": "240-4.png",
+        "bodyAxis": {
+          "group": 240,
+          "image": 4,
+          "xaxis": 21,
+          "yaxis": 129,
+          "file": "240-4.png"
+        }
+      },
+      {
+        "body": "240-5.png",
+        "bodyAxis": {
+          "group": 240,
+          "image": 5,
+          "xaxis": 32,
+          "yaxis": 113,
+          "file": "240-5.png"
+        }
+      }
+    ]
+  },
+  "guard": {
+    "durationPerFrame": 120,
+    "loop": false,
+    "frames": [
+      {
+        "body": "120-1.png",
+        "bodyAxis": {
+          "group": 120,
+          "image": 1,
+          "xaxis": 54,
+          "yaxis": 85,
+          "file": "120-1.png"
+        }
+      }
+    ]
+  },
+  "hit": {
+    "durationPerFrame": 70,
+    "loop": false,
+    "frames": [
+      {
+        "body": "5000-1.png",
+        "bodyAxis": {
+          "group": 5000,
+          "image": 1,
+          "xaxis": 72,
+          "yaxis": 85,
+          "file": "5000-1.png"
+        }
+      },
+      {
+        "body": "5000-2.png",
+        "bodyAxis": {
+          "group": 5000,
+          "image": 2,
+          "xaxis": 48,
+          "yaxis": 84,
+          "file": "5000-2.png"
+        }
+      },
+      {
+        "body": "5000-3.png",
+        "bodyAxis": {
+          "group": 5000,
+          "image": 3,
+          "xaxis": 50,
+          "yaxis": 86,
+          "file": "5000-3.png"
+        }
+      },
+      {
+        "body": "5000-2.png",
+        "bodyAxis": {
+          "group": 5000,
+          "image": 2,
+          "xaxis": 48,
+          "yaxis": 84,
+          "file": "5000-2.png"
+        }
+      },
+      {
+        "body": "5000-3.png",
+        "bodyAxis": {
+          "group": 5000,
+          "image": 3,
+          "xaxis": 50,
+          "yaxis": 86,
+          "file": "5000-3.png"
+        }
+      },
+      {
+        "body": "5000-2.png",
+        "bodyAxis": {
+          "group": 5000,
+          "image": 2,
+          "xaxis": 48,
+          "yaxis": 84,
+          "file": "5000-2.png"
+        }
+      },
+      {
+        "body": "5000-3.png",
+        "bodyAxis": {
+          "group": 5000,
+          "image": 3,
+          "xaxis": 50,
+          "yaxis": 86,
+          "file": "5000-3.png"
+        }
+      },
+      {
+        "body": "5000-2.png",
+        "bodyAxis": {
+          "group": 5000,
+          "image": 2,
+          "xaxis": 48,
+          "yaxis": 84,
+          "file": "5000-2.png"
+        }
+      },
+      {
+        "body": "5000-3.png",
+        "bodyAxis": {
+          "group": 5000,
+          "image": 3,
+          "xaxis": 50,
+          "yaxis": 86,
+          "file": "5000-3.png"
+        }
+      },
+      {
+        "body": "5000-2.png",
+        "bodyAxis": {
+          "group": 5000,
+          "image": 2,
+          "xaxis": 48,
+          "yaxis": 84,
+          "file": "5000-2.png"
+        }
+      },
+      {
+        "body": "5000-3.png",
+        "bodyAxis": {
+          "group": 5000,
+          "image": 3,
+          "xaxis": 50,
+          "yaxis": 86,
+          "file": "5000-3.png"
+        }
+      },
+      {
+        "body": "5000-2.png",
+        "bodyAxis": {
+          "group": 5000,
+          "image": 2,
+          "xaxis": 48,
+          "yaxis": 84,
+          "file": "5000-2.png"
+        }
+      },
+      {
+        "body": "5000-3.png",
+        "bodyAxis": {
+          "group": 5000,
+          "image": 3,
+          "xaxis": 50,
+          "yaxis": 86,
+          "file": "5000-3.png"
+        }
+      }
+    ]
+  },
+  "victory": {
+    "durationPerFrame": 100,
+    "loop": false,
+    "frames": [
+      {
+        "body": "180-1.png",
+        "bodyAxis": {
+          "group": 180,
+          "image": 1,
+          "xaxis": 42,
+          "yaxis": 85,
+          "file": "180-1.png"
+        }
+      },
+      {
+        "body": "180-2.png",
+        "bodyAxis": {
+          "group": 180,
+          "image": 2,
+          "xaxis": 30,
+          "yaxis": 88,
+          "file": "180-2.png"
+        }
+      },
+      {
+        "body": "180-3.png",
+        "bodyAxis": {
+          "group": 180,
+          "image": 3,
+          "xaxis": 23,
+          "yaxis": 98,
+          "file": "180-3.png"
+        }
+      },
+      {
+        "body": "180-4.png",
+        "bodyAxis": {
+          "group": 180,
+          "image": 4,
+          "xaxis": 32,
+          "yaxis": 103,
+          "file": "180-4.png"
+        }
+      },
+      {
+        "body": "180-5.png",
+        "bodyAxis": {
+          "group": 180,
+          "image": 5,
+          "xaxis": 41,
+          "yaxis": 104,
+          "file": "180-5.png"
+        }
+      },
+      {
+        "body": "180-6.png",
+        "bodyAxis": {
+          "group": 180,
+          "image": 6,
+          "xaxis": 41,
+          "yaxis": 105,
+          "file": "180-6.png"
+        }
+      },
+      {
+        "body": "180-7.png",
+        "bodyAxis": {
+          "group": 180,
+          "image": 7,
+          "xaxis": 41,
+          "yaxis": 106,
+          "file": "180-7.png"
+        }
+      },
+      {
+        "body": "180-8.png",
+        "bodyAxis": {
+          "group": 180,
+          "image": 8,
+          "xaxis": 41,
+          "yaxis": 104,
+          "file": "180-8.png"
+        }
+      },
+      {
+        "body": "180-9.png",
+        "bodyAxis": {
+          "group": 180,
+          "image": 9,
+          "xaxis": 42,
+          "yaxis": 105,
+          "file": "180-9.png"
+        }
+      }
+    ]
+  },
+  "defeat": {
+    "durationPerFrame": 150,
+    "loop": false,
+    "frames": [
+      {
+        "body": "170-1.png",
+        "bodyAxis": {
+          "group": 170,
+          "image": 1,
+          "xaxis": 38,
+          "yaxis": 93,
+          "file": "170-1.png"
+        }
+      },
+      {
+        "body": "170-2.png",
+        "bodyAxis": {
+          "group": 170,
+          "image": 2,
+          "xaxis": 37,
+          "yaxis": 104,
+          "file": "170-2.png"
+        }
+      },
+      {
+        "body": "170-3.png",
+        "bodyAxis": {
+          "group": 170,
+          "image": 3,
+          "xaxis": 40,
+          "yaxis": 104,
+          "file": "170-3.png"
+        }
+      },
+      {
+        "body": "170-4.png",
+        "bodyAxis": {
+          "group": 170,
+          "image": 4,
+          "xaxis": 40,
+          "yaxis": 102,
+          "file": "170-4.png"
+        }
+      }
+    ]
+  }
+}
