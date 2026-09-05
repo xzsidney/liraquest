@@ -1030,19 +1030,21 @@
 
     function gameLoop(now) {
       requestAnimationFrame(gameLoop);
-      const dt = Math.min(32, now - lastTime) / 16.66;
-      lastTime = now;
+      const currentNow = now || performance.now();
+      const dt = Math.min(32, currentNow - lastTime) / 16.66;
+      lastTime = currentNow;
 
       if (!gameState.active || gameState.gameOver || gameState.victory) {
         render();
         return;
       }
 
-      update(dt);
+      update(dt, currentNow);
       render();
     }
 
-    function update(dt) {
+    function update(dt, now) {
+      const currentTime = now || performance.now();
       const p = gameState.player;
       const meta = HERO_META[p.heroKey];
 
@@ -1141,7 +1143,7 @@
         } else if (en.type === 'flyer') {
           en.x += en.vx * dt;
           if (en.x <= en.minX || en.x + en.w >= en.maxX) en.vx *= -1;
-          en.y = en.baseY + Math.sin(now * 0.005 + en.minX) * 25;
+          en.y = en.baseY + Math.sin(currentTime * 0.005 + en.minX) * 25;
         }
 
         // Colisão com Jogador
