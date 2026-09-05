@@ -254,3 +254,17 @@ O **Arcade de Lira** é o centro de diversão acessível pelo Terminal do Avatar
    - **Calibração Rápida via Teclado e Mouse:** Ajuste pixel a pixel do ponto pivô (`bodyAxis.xaxis`, `bodyAxis.yaxis`, `shieldAxis.xaxis`, `shieldAxis.yaxis`) usando as setas direcionais (`←` `↑` `→` `↓`) ou `Shift + Setas` para saltos de 5px.
    - **Manipulação Completa de Sequências:** Permite duplicar frames, adicionar novos frames a partir de qualquer sprite PNG disponível na pasta do personagem, reordenar, alterar durações (`durationPerFrame`) e criar novas animações com 1 clique.
    - **Persistência Segura:** Salva as configurações diretamente no `manifest.json` com criação automática de backup de segurança (`manifest.backup.json`).
+6. **🚀 Modo Aventura 2D em Plataforma (`/adventure.html`):**
+   - Jogo de ação e plataforma clássico em rolagem lateral (*Side-Scrolling Platformer*) no estilo Sonic, Super Mario e Mega Man X.
+   - **Seleção de Avatar:** O jogador escolhe qualquer um dos 5 heróis lendários (Capitão América, Ciclope, Homem-Aranha, Wolverine e Gambit) para entrar na masmorra.
+   - **Habilidades Exclusivas de Navegação & Combate:**
+     - 🕷️ **Homem-Aranha:** Pulo duplo acrobático no ar + disparo de teia (`Web Ball`) para imobilizar inimigos.
+     - 🐺 **Wolverine:** Garras afiadas em alta velocidade + corrida veloz e investida furiosa frontal (*Berserker Dash*).
+     - 🛡️ **Capitão América:** Arremesso de escudo (*Shield Slash*) que atinge inimigos e retorna para as mãos.
+     - 🔴 **Ciclope:** Rajada de feixe laser óptico (*Optic Blast*) que varre fileiras inteiras de criaturas.
+     - 🃏 **Gambit:** Disparo triplo em leque de cartas cinéticas explosivas (*Kinetic Cards*).
+   - **Física 2D Suave & Parallax:** Gravidade calibrada, atrito, impulsos de pulo, plataformas flutuantes de pedra e abismos mortais, acompanhados por câmera dinâmica e fundo noturno com 3 camadas de paralaxe (lua, montanhas distantes e castelo).
+   - **Inimigos & Confronto de Chefe:** Slimes terrestres patrulheiros, drones voadores com oscilação senoidal e o confronto final contra o colossal *Sentinela das Sombras* com barra de vida no topo da tela.
+   - **Mecânica de Pulo Esmagador:** O jogador pode derrotar inimigos atacando com suas armas/projéteis ou pulando diretamente sobre a cabeça deles (estilo Mario/Sonic).
+   - **Coletáveis & Economia:** Moedas de ouro giratórias, gemas de XP e fatias de pizza de cura. Vitórias concedem +50 Ouro base (+ moedas coletadas na fase) e +80 XP para a evolução do herói na família.
+

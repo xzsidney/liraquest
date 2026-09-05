@@ -207,3 +207,9 @@ Rotas dedicadas ao Jogo 4 do Arcade (`/battle.html`): combate tático por turnos
 | `GET` | `/api/battle/manifest/:hero` | Pública | Retorna o arquivo `manifest.json` do personagem e a lista completa de sprites PNG disponíveis na pasta para o Visualizador e Editor 2D (`/animator.html`). |
 | `POST` | `/api/battle/manifest/:hero` | Pública | Salva as alterações de eixos (`bodyAxis`, `shieldAxis`), durações e sequências de frames no `manifest.json` do herói com backup automático (`manifest.backup.json`). |
 
+---
+
+## 🚀 14. Aventura 2D em Plataforma (Mini-Game Arcade Side-Scrolling)
+Página dedicada ao Jogo 5 do Arcade (`/adventure.html`): jogo de ação e aventura de plataforma clássico em rolagem lateral com os 5 heróis (Capitão América, Ciclope, Homem-Aranha, Wolverine e Gambit). Utiliza a rota `/api/battle/finish` para premiar o jogador com ouro coletado (+ bônus de fase) e XP de aventura para evolução na família.
+
+

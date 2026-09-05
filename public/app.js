@@ -949,10 +949,16 @@ function openBattleArena() {
   window.location.href = '/battle.html';
 }
 
+function openAdventureGameArena() {
+  try { localStorage.setItem('liraquest_avatar_tab', 'arcade'); } catch (e) {}
+  window.location.href = '/adventure.html';
+}
+
 window.openChameleonGameArena = openChameleonGameArena;
 window.openArcherGameArena = openArcherGameArena;
 window.openDungeonGameArena = openDungeonGameArena;
 window.openBattleArena = openBattleArena;
+window.openAdventureGameArena = openAdventureGameArena;
 
 function closeChameleonGameArena() {
   if (chameleonGameInstance) {
