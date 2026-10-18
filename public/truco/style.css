@@ -1308,3 +1308,304 @@ html, body {
 .felt-table.mode-1v1 .side-player-zone {
   display: none !important;
 }
+
+/* ==========================================================================
+   TELA DE ABERTURA / INICIAL (START SCREEN)
+   ========================================================================== */
+.start-screen-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 50% 25%, #185a36 0%, #0d381e 45%, #051a0d 100%);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 24px 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  transform: scale(1.05);
+  overflow-y: auto;
+}
+
+.start-screen-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1);
+}
+
+.start-screen-content {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.start-badge-lira {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  background: rgba(128, 0, 32, 0.45);
+  border: 1px solid rgba(245, 176, 39, 0.5);
+  border-radius: 20px;
+  color: var(--gold);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+/* Leque de 4 cartas de Manilhas no topo */
+.start-cards-fan {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 64px;
+  margin-bottom: 8px;
+  position: relative;
+  width: 160px;
+}
+
+.fan-card {
+  width: 38px;
+  height: 52px;
+  background: #fff;
+  border-radius: 6px;
+  border: 2px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  font-weight: bold;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+  transition: transform 0.3s ease;
+  position: absolute;
+}
+
+.fan-card.picafumo {
+  color: #d90429;
+  transform: rotate(-22deg) translateX(-42px);
+}
+.fan-card.espadilha {
+  color: #1a1a1a;
+  transform: rotate(-8deg) translateX(-14px);
+}
+.fan-card.copeta {
+  color: #d90429;
+  transform: rotate(8deg) translateX(14px);
+}
+.fan-card.zap {
+  color: #1a1a1a;
+  transform: rotate(22deg) translateX(42px);
+  border-color: var(--gold);
+  box-shadow: 0 0 12px var(--gold-glow);
+}
+
+.start-title {
+  font-size: 2.3rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  line-height: 1.05;
+  color: #fff;
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.8), 0 0 25px rgba(245, 176, 39, 0.3);
+  margin-bottom: 4px;
+}
+
+.start-title span {
+  color: var(--gold);
+  background: linear-gradient(180deg, #ffd166 0%, #f5b027 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.start-subtitle {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.75);
+  margin-bottom: 20px;
+  letter-spacing: 0.5px;
+}
+
+/* Seletor de Modo na Tela Inicial */
+.start-mode-selection {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.start-mode-card {
+  width: 100%;
+  background: rgba(8, 38, 20, 0.75);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  color: #fff;
+  text-align: left;
+  backdrop-filter: blur(8px);
+}
+
+.start-mode-card:hover {
+  background: rgba(14, 56, 32, 0.9);
+  border-color: rgba(245, 176, 39, 0.5);
+}
+
+.start-mode-card.active {
+  background: linear-gradient(135deg, rgba(24, 90, 54, 0.9) 0%, rgba(13, 56, 30, 0.95) 100%);
+  border-color: var(--gold);
+  box-shadow: 0 4px 20px rgba(245, 176, 39, 0.25), inset 0 0 15px rgba(245, 176, 39, 0.1);
+}
+
+.start-mode-card .mode-icon {
+  font-size: 1.6rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.start-mode-card.active .mode-icon {
+  background: rgba(245, 176, 39, 0.2);
+}
+
+.start-mode-card .mode-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.start-mode-card .mode-info strong {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.start-mode-card.active .mode-info strong {
+  color: var(--gold);
+}
+
+.start-mode-card .mode-info span {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.start-mode-card .mode-radio-check {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: transparent;
+  transition: all 0.2s ease;
+}
+
+.start-mode-card.active .mode-radio-check {
+  border-color: var(--gold);
+  background: var(--gold);
+  color: #092816;
+  font-weight: bold;
+}
+
+/* Botão Grandioso de Jogar Agora */
+.btn-play-game {
+  width: 100%;
+  padding: 16px 20px;
+  background: linear-gradient(180deg, #ffaa2b 0%, #e85d04 100%);
+  border: 2px solid #ffd166;
+  border-radius: 14px;
+  color: #fff;
+  font-size: 1.25rem;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  box-shadow: 0 8px 25px rgba(232, 93, 4, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  margin-bottom: 22px;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  animation: pulsePlayBtn 2.2s infinite ease-in-out;
+}
+
+.btn-play-game:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(232, 93, 4, 0.65);
+}
+
+.btn-play-game:active {
+  transform: translateY(2px) scale(0.98);
+}
+
+@keyframes pulsePlayBtn {
+  0%, 100% {
+    box-shadow: 0 8px 25px rgba(232, 93, 4, 0.5);
+  }
+  50% {
+    box-shadow: 0 10px 35px rgba(255, 170, 43, 0.75);
+  }
+}
+
+/* Ações do Rodapé da Tela Inicial */
+.start-footer-actions {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.start-footer-btn {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.start-footer-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #fff;
+}
+
+.start-footer-btn.back-lira {
+  color: var(--gold);
+  border-color: rgba(245, 176, 39, 0.35);
+  background: rgba(128, 0, 32, 0.3);
+}
+
+.start-footer-btn.back-lira:hover {
+  background: rgba(128, 0, 32, 0.5);
+  border-color: var(--gold);
+}

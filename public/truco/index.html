@@ -12,6 +12,59 @@
 </head>
 <body>
   <div class="mobile-viewport-container">
+    <!-- ================= TELA DE ABERTURA / INICIAL (START SCREEN) ================= -->
+    <div class="start-screen-overlay active" id="start-screen">
+      <div class="start-screen-content">
+        <div class="start-badge-lira">🏰 LiraQuest Arcade</div>
+        
+        <div class="start-cards-fan">
+          <span class="fan-card picafumo">♦</span>
+          <span class="fan-card espadilha">♠</span>
+          <span class="fan-card copeta">♥</span>
+          <span class="fan-card zap">♣</span>
+        </div>
+
+        <h1 class="start-title">TRUCO<br><span>PAULISTA</span></h1>
+        <p class="start-subtitle">Mão de 11 • Manilhas • IA Cooperativa</p>
+
+        <!-- SELEÇÃO DE MODO DE JOGO -->
+        <div class="start-mode-selection">
+          <button class="start-mode-card active" id="start-mode-4p" type="button">
+            <div class="mode-icon">👥</div>
+            <div class="mode-info">
+              <strong>2 vs 2 (Duplas)</strong>
+              <span>Você + Tião contra Zé e Tonho</span>
+            </div>
+            <div class="mode-radio-check">✓</div>
+          </button>
+
+          <button class="start-mode-card" id="start-mode-1v1" type="button">
+            <div class="mode-icon">👤</div>
+            <div class="mode-info">
+              <strong>1 vs 1 (Mano a Mano)</strong>
+              <span>Duelo Rápido contra o Zé Truqueiro</span>
+            </div>
+            <div class="mode-radio-check">✓</div>
+          </button>
+        </div>
+
+        <!-- BOTÃO GIGANTE DE INICIAR -->
+        <button class="btn-play-game" id="btn-start-play">
+          <span class="btn-play-icon">🎴</span>
+          <span class="btn-play-text">JOGAR AGORA</span>
+        </button>
+
+        <!-- AÇÕES COMPLEMENTARES -->
+        <div class="start-footer-actions">
+          <button class="start-footer-btn" id="btn-start-rules">📖 Como Jogar</button>
+          <button class="start-footer-btn" id="btn-start-sound">
+            <span id="start-mute-icon">🔊</span> Som Ativo
+          </button>
+          <a href="/" class="start-footer-btn back-lira">🏰 Voltar ao LiraQuest</a>
+        </div>
+      </div>
+    </div>
+
     <!-- MESA DE FELTRO VERDE (OCUPA A TELA INTEIRA NO CELULAR) -->
     <main class="felt-table" id="felt-table">
 
@@ -200,6 +253,7 @@
             <span id="mute-icon">🔊</span> Som Ativado
           </button>
           <button class="sheet-action-btn danger" id="btn-restart">🔄 Nova Partida</button>
+          <button class="sheet-action-btn" id="btn-return-lobby" style="margin-top: 4px;">🏠 Tela Inicial / Trocar Modo</button>
           <a href="/" class="sheet-action-btn" style="text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; color: #f5b027; border: 1px solid rgba(245, 176, 39, 0.4); margin-top: 8px;">🏰 Voltar ao LiraQuest</a>
         </div>
       </div>
@@ -878,7 +932,68 @@
         });
       }
 
-      game.startNewGame();
+      // =========================================================================
+      // CONTROLE DA TELA INICIAL (START SCREEN)
+      // =========================================================================
+      const startScreen = document.getElementById('start-screen');
+      const startMode4p = document.getElementById('start-mode-4p');
+      const startMode1v1 = document.getElementById('start-mode-1v1');
+      const btnStartPlay = document.getElementById('btn-start-play');
+      const btnStartRules = document.getElementById('btn-start-rules');
+      const btnStartSound = document.getElementById('btn-start-sound');
+      const startMuteIcon = document.getElementById('start-mute-icon');
+      const btnReturnLobby = document.getElementById('btn-return-lobby');
+
+      let selectedGameMode = '4p';
+
+      const updateStartModeUI = () => {
+        if (selectedGameMode === '4p') {
+          startMode4p.classList.add('active');
+          startMode1v1.classList.remove('active');
+        } else {
+          startMode4p.classList.remove('active');
+          startMode1v1.classList.add('active');
+        }
+      };
+
+      startMode4p.addEventListener('click', () => {
+        window.trucoAudio.playClick();
+        selectedGameMode = '4p';
+        updateStartModeUI();
+      });
+
+      startMode1v1.addEventListener('click', () => {
+        window.trucoAudio.playClick();
+        selectedGameMode = '1v1';
+        updateStartModeUI();
+      });
+
+      btnStartPlay.addEventListener('click', () => {
+        window.trucoAudio.playClick();
+        startScreen.classList.remove('active');
+        game.setGameMode(selectedGameMode);
+        game.startNewGame();
+      });
+
+      btnStartRules.addEventListener('click', () => {
+        window.trucoAudio.playClick();
+        rulesModal.classList.add('active');
+      });
+
+      btnStartSound.addEventListener('click', () => {
+        const isMuted = window.trucoAudio.toggleMute();
+        const icon = isMuted ? '🔇' : '🔊';
+        if (muteIcon) muteIcon.textContent = icon;
+        if (startMuteIcon) startMuteIcon.textContent = icon;
+        btnStartSound.innerHTML = `<span id="start-mute-icon">${icon}</span> Som ${isMuted ? 'Mudo' : 'Ativo'}`;
+        btnMute.innerHTML = `<span id="mute-icon">${icon}</span> Som ${isMuted ? 'Mudo' : 'Ativado'}`;
+      });
+
+      btnReturnLobby.addEventListener('click', () => {
+        window.trucoAudio.playClick();
+        mobileMenuModal.classList.remove('active');
+        startScreen.classList.add('active');
+      });
     });
   </script>
 </body>
