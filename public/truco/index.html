@@ -108,6 +108,7 @@
       <div class="mobile-top-right">
         <!-- Ícones: Emojis, Chat, Menu -->
         <div class="top-action-icons">
+          <button class="top-icon-btn" id="btn-signals" title="Sinais Tradicionais (Zap, Copeta...)">🤫</button>
           <button class="top-icon-btn" id="btn-reactions" title="Enviar Reação">😊</button>
           <button class="top-icon-btn" id="btn-toggle-chat" title="Mural de Frases">💬</button>
           <button class="top-icon-btn" id="btn-menu" title="Menu e Opções">☰</button>
@@ -241,6 +242,58 @@
         <button class="reaction-item" data-emoji="🍺">🍺</button>
         <button class="reaction-item" data-emoji="😱">😱</button>
         <button class="reaction-item" data-emoji="😎">😎</button>
+      </div>
+
+      <!-- POPUP DE SINAIS TRADICIONAIS (QUANDO CLICADO EM 🤫) -->
+      <div class="signal-bar-popup" id="signal-picker">
+        <div class="signal-popup-header">
+          <span class="signal-popup-title">🤫 SINAIS DO TRUCO</span>
+          <span class="signal-popup-sub">Passe o sinal pro parceiro Tião</span>
+        </div>
+        <div class="signal-grid">
+          <button class="signal-item" data-signal="zap" title="Zap (4 de Paus) - Piscar olho">
+            <span class="signal-emoji">😉</span>
+            <div class="signal-meta">
+              <span class="signal-name">Zap (♣)</span>
+              <span class="signal-action">Piscar olho</span>
+            </div>
+          </button>
+          <button class="signal-item" data-signal="copeta" title="Copeta (7 de Copas) - Fazer biquinho">
+            <span class="signal-emoji">😚</span>
+            <div class="signal-meta">
+              <span class="signal-name">Copeta (♥)</span>
+              <span class="signal-action">Biquinho</span>
+            </div>
+          </button>
+          <button class="signal-item" data-signal="espadilha" title="Espadilha (7 de Espadas) - Erguer sobrancelha">
+            <span class="signal-emoji">🤨</span>
+            <div class="signal-meta">
+              <span class="signal-name">Espadilha (♠)</span>
+              <span class="signal-action">Sobrancelha</span>
+            </div>
+          </button>
+          <button class="signal-item" data-signal="picafumo" title="Picafumo (7 de Ouros) - Coçar orelha">
+            <span class="signal-emoji">🤔</span>
+            <div class="signal-meta">
+              <span class="signal-name">Picafumo (♦)</span>
+              <span class="signal-action">Coçar orelha</span>
+            </div>
+          </button>
+          <button class="signal-item" data-signal="tres" title="Carta 3 - Sorriso maroto">
+            <span class="signal-emoji">😁</span>
+            <div class="signal-meta">
+              <span class="signal-name">Três (3)</span>
+              <span class="signal-action">Sorriso</span>
+            </div>
+          </button>
+          <button class="signal-item" data-signal="lixo" title="Mão Podre - Bocejo">
+            <span class="signal-emoji">🥱</span>
+            <div class="signal-meta">
+              <span class="signal-name">Mão Podre</span>
+              <span class="signal-action">Bocejo</span>
+            </div>
+          </button>
+        </div>
       </div>
 
     </main>
@@ -861,6 +914,39 @@
         addChatMessage(name, text, type);
       };
 
+      // Sinais Tradicionais e Frases de Boteco (Etapa 4)
+      const signalBadgeTimeouts = {};
+
+      game.onBotSignal = (botId, signalKey, emoji, phrase) => {
+        const badge = document.getElementById(`badge-${botId}`);
+        if (badge) {
+          badge.textContent = emoji;
+          badge.classList.add('signaling');
+          if (signalBadgeTimeouts[botId]) clearTimeout(signalBadgeTimeouts[botId]);
+          signalBadgeTimeouts[botId] = setTimeout(() => {
+            badge.classList.remove('signaling');
+            badge.textContent = '😐';
+          }, 3800);
+        }
+      };
+
+      game.onPlayerSignal = (signalKey, emoji, phrase) => {
+        const playerBadge = document.getElementById('badge-player');
+        if (playerBadge) {
+          playerBadge.textContent = emoji;
+          playerBadge.classList.add('signaling');
+          if (signalBadgeTimeouts['player']) clearTimeout(signalBadgeTimeouts['player']);
+          signalBadgeTimeouts['player'] = setTimeout(() => {
+            playerBadge.classList.remove('signaling');
+            playerBadge.textContent = '😐';
+          }, 3800);
+        }
+
+        // Mostra no balão de fala do jogador / chat
+        addChatMessage('Você (Sinal)', `[${emoji}] "${phrase}"`, 'partner');
+        game.onMessage(`🤫 Você passou o sinal: [${emoji}] "${phrase}"`, 'info');
+      };
+
       game.onMessage = (msg, type = "info") => {
         tickerText.textContent = msg;
         tableTicker.className = `table-ticker show ${type}`;
@@ -950,10 +1036,39 @@
       btnQuickTab.addEventListener('click', openMenu);
       btnCloseMenu.addEventListener('click', closeMenu);
 
+      // Sinais Tradicionais (🤫)
+      const btnSignals = document.getElementById('btn-signals');
+      const signalPicker = document.getElementById('signal-picker');
+
+      if (btnSignals && signalPicker) {
+        btnSignals.addEventListener('click', (e) => {
+          e.stopPropagation();
+          window.trucoAudio.playClick();
+          reactionPicker.classList.remove('active');
+          signalPicker.classList.toggle('active');
+        });
+
+        document.querySelectorAll('.signal-item').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const signalType = btn.getAttribute('data-signal');
+            window.trucoAudio.playCardPlay(false);
+            signalPicker.classList.remove('active');
+            game.playerSendSignal(signalType);
+          });
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!signalPicker.contains(e.target) && e.target !== btnSignals) {
+            signalPicker.classList.remove('active');
+          }
+        });
+      }
+
       // Reações e Emojis
       btnReactions.addEventListener('click', (e) => {
         e.stopPropagation();
         window.trucoAudio.playClick();
+        if (signalPicker) signalPicker.classList.remove('active');
         reactionPicker.classList.toggle('active');
       });
 

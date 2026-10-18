@@ -24,6 +24,102 @@ const MANILHA_SEQUENCE = {
   '2': '3', '3': '4'
 };
 
+// =============================================================================
+// SINAIS CORPORAIS E FRASES EM CÓDIGO TRADICIONAIS (ETAPA 4 - PVE & BOTECO)
+// =============================================================================
+const BOT_SIGNALS = {
+  zap: {
+    emoji: '😉',
+    name: 'Zap (Paus)',
+    action: 'Piscar olho esquerdo',
+    botPhrases: [
+      "O tempo fechou por aqui...",
+      "O gato miou alto agora!",
+      "Tô sentindo um vento forte soprando..."
+    ],
+    playerPhrases: [
+      "O tempo fechou de repente por aqui...",
+      "O gato miou alto, hein parceiro!",
+      "Tô sentindo a brisa forte..."
+    ]
+  },
+  copeta: {
+    emoji: '😚',
+    name: 'Copeta (Copas)',
+    action: 'Fazer biquinho',
+    botPhrases: [
+      "Esse café tá quente demais!",
+      "O coração tá batendo acelerado...",
+      "O doce tá bem no ponto!"
+    ],
+    playerPhrases: [
+      "Esse café tá pelando de quente!",
+      "Coração tá batendo acelerado nessa mão!",
+      "O doce tá no ponto..."
+    ]
+  },
+  espadilha: {
+    emoji: '🤨',
+    name: 'Espadilha (Espadas)',
+    action: 'Erguer sobrancelha',
+    botPhrases: [
+      "O corte tá afiado hoje...",
+      "A faca tá bem amolada!",
+      "Tem espinho nessa roseira..."
+    ],
+    playerPhrases: [
+      "O corte tá afiado por aqui...",
+      "A faca tá nos trinques hoje!",
+      "Espinho afiado nessa mão..."
+    ]
+  },
+  picafumo: {
+    emoji: '🤔',
+    name: 'Picafumo (Ouros)',
+    action: 'Coçar orelha / queixo',
+    botPhrases: [
+      "Coceira braba nessa orelha...",
+      "Ouro de tolo não brilha!",
+      "Fumo bom a gente pica devagar..."
+    ],
+    playerPhrases: [
+      "Que coceira chata nessa orelha...",
+      "Esse fumo tá bem picadinho...",
+      "Ouro puro não perde o brilho!"
+    ]
+  },
+  tres: {
+    emoji: '😁',
+    name: 'Três (3)',
+    action: 'Sorriso maroto',
+    botPhrases: [
+      "O vento tá soprando a favor...",
+      "Dente quebrado também morde!",
+      "Tô rindo à toa nessa mão..."
+    ],
+    playerPhrases: [
+      "O vento tá soprando a nosso favor, parceiro!",
+      "Tô achando essa mão engraçada...",
+      "Dente afiado pra morder!"
+    ]
+  },
+  lixo: {
+    emoji: '🥱',
+    name: 'Mão Podre (Lixo)',
+    action: 'Bocejo descarado',
+    botPhrases: [
+      "Devagar quase parando esse boteco...",
+      "Deu uma canseira danada agora...",
+      "Tá fraco esse movimento hoje..."
+    ],
+    playerPhrases: [
+      "Que canseira braba... devagar esse boteco.",
+      "Tô precisando de um café forte pra acordar...",
+      "Vento fraco demais..."
+    ]
+  }
+};
+
 const BOT_QUOTES = {
   truco: [
     "TRUUUUCO, MARRECO! Quero ver peito!",
@@ -191,6 +287,50 @@ const BOT_QUOTES = {
     "Dessa vez o blefe não colou... mas valeu a tentativa!",
     "Peitou bonito! Tava só com lixo mesmo!",
     "O malandro também erra o tiro de vez em quando!"
+  ],
+  partnerSignalReplyTrueZap: [
+    "Recebido alto e claro, parceiro! Se o Zap tá na tua mão, eu puxo a primeira no peito!",
+    "O homem tá armado com a caneta de ouro! Pode deixar que eu dou cobertura!",
+    "Piscadela de ouro! Essa mão não escapa de nós!"
+  ],
+  partnerSignalReplyTrueCopeta: [
+    "Biquinho registrado! A Copeta é garantia de sucesso!",
+    "Coração quente! Pode deixar que a gente fatura essa mão!",
+    "Lindo sinal, parceiro! Tamo firme no jogo!"
+  ],
+  partnerSignalReplyTrueEspadilha: [
+    "Sobrancelha empinada! Espadilha na manga, vamo pra cima!",
+    "A faca tá amolada! Deixa que eu empurro a primeira!"
+  ],
+  partnerSignalReplyTruePicafumo: [
+    "Coçou a orelha, o Picafumo tá pronto! Bota pra moer!",
+    "Ouro na mão! Tamo bem servido nessa vaza!"
+  ],
+  partnerSignalReplyTrueTres: [
+    "Sorrisinho maroto! Com o 3 na mão a gente aperta eles!",
+    "Dente afiado! Manda bala!"
+  ],
+  partnerSignalReplyTrueLixo: [
+    "Fica tranquilo, parceiro! Guarda o choro que eu tento puxar no braço!",
+    "Canseira registrada! Descansa que eu assumo a bronca!",
+    "Segura o lixo na maciota que eu resolvo!"
+  ],
+  partnerSignalReplyBluff: [
+    "Blefando até pra mim, parceiro? Hahaha, essa malandragem é de primeira!",
+    "Piscando sem ter o bicho? Se colar colou, tamo junto!",
+    "Ih, fingiu o sinal na cara dura! Malandro de boteco é assim mesmo!"
+  ],
+  enemyInterceptAlert: [
+    "Tô de olho nesses sinais aí do outro lado! Aqui ninguém é bobo não!",
+    "Piscou pra quê? Tá achando que eu não vi essa cara?",
+    "Fez biquinho pro garçom ou pro parceiro? Sei bem o que é isso!",
+    "Coçando a orelha desse jeito... não vem com historinha que aqui tem malandro velho!"
+  ],
+  enemyPartnerAck: [
+    "Entendido o recado, parceiro!",
+    "Tô na cobertura, deixa vir!",
+    "Vi o sinal, pode deixar comigo!",
+    "Copiado e anotado!"
   ]
 };
 
@@ -254,6 +394,11 @@ class TrucoGame {
     this.camaDeGato = { us: false, them: false, armador: null, baitPlayed: false };
     this.casalMaior = { us: false, them: false };
     this.activeBluff = { isBluff: false, botId: null, caught: false };
+
+    // Sinais Tradicionais e Frases de Boteco (Etapa 4)
+    this.signalTimeouts = [];
+    this.onBotSignal = null;
+    this.onPlayerSignal = null;
 
     // Callbacks de Eventos
     this.onStateChange = null;
@@ -410,7 +555,164 @@ class TrucoGame {
     }
   }
 
+  // ===========================================================================
+  // MÉTODOS DE SINAIS CORPORAIS E FRASES EM CÓDIGO (ETAPA 4)
+  // ===========================================================================
+  clearSignalTimeouts() {
+    if (this.signalTimeouts && this.signalTimeouts.length > 0) {
+      this.signalTimeouts.forEach(t => clearTimeout(t));
+      this.signalTimeouts = [];
+    }
+  }
+
+  getBestSignalForHand(cards) {
+    if (!cards || cards.length === 0) return null;
+    const activeCards = cards.filter(c => !c.played);
+    if (activeCards.length === 0) return null;
+
+    // 1. Zap (Paus)
+    if (activeCards.some(c => c.isManilha && c.manilhaRank === 4)) return 'zap';
+    // 2. Copeta (Copas)
+    if (activeCards.some(c => c.isManilha && c.manilhaRank === 3)) return 'copeta';
+    // 3. Espadilha (Espadas)
+    if (activeCards.some(c => c.isManilha && c.manilhaRank === 2)) return 'espadilha';
+    // 4. Picafumo (Ouros)
+    if (activeCards.some(c => c.isManilha && c.manilhaRank === 1)) return 'picafumo';
+    // 5. Três (Carta 3 não-manilha)
+    if (activeCards.some(c => !c.isManilha && c.power === 10)) return 'tres';
+    // 6. Lixo (Todas cartas fracas, power <= 6)
+    if (activeCards.every(c => !c.isManilha && c.power <= 6)) return 'lixo';
+
+    return null;
+  }
+
+  botSendSignal(botId, signalKey) {
+    const signalObj = BOT_SIGNALS[signalKey];
+    if (!signalObj) return;
+
+    const phrase = this.pickRandom(signalObj.botPhrases);
+    if (this.onBotSignal) {
+      this.onBotSignal(botId, signalKey, signalObj.emoji, phrase);
+    }
+    this.botSay(botId, phrase);
+  }
+
+  scheduleHandSignals() {
+    this.clearSignalTimeouts();
+    if (this.gameMode !== '4p' || this.isMaoDe11 || this.isMaoDeFerro) return;
+
+    // 1. SINAIS ENTRE ADVERSÁRIOS (Mecânica de Intercepção PvE)
+    const leftSignal = this.getBestSignalForHand(this.hands['bot_left']);
+    const rightSignal = this.getBestSignalForHand(this.hands['bot_right']);
+
+    let chosenEnemy = null;
+    let chosenSignal = null;
+    let partnerEnemy = null;
+
+    const signalPriority = { zap: 6, copeta: 5, espadilha: 4, picafumo: 3, tres: 2, lixo: 1 };
+    const leftPri = leftSignal ? (signalPriority[leftSignal] || 0) : 0;
+    const rightPri = rightSignal ? (signalPriority[rightSignal] || 0) : 0;
+
+    if (leftPri > 0 || rightPri > 0) {
+      if (leftPri >= rightPri) {
+        chosenEnemy = 'bot_left';
+        chosenSignal = leftSignal;
+        partnerEnemy = 'bot_right';
+      } else {
+        chosenEnemy = 'bot_right';
+        chosenSignal = rightSignal;
+        partnerEnemy = 'bot_left';
+      }
+    }
+
+    if (chosenEnemy && chosenSignal && Math.random() < 0.72) {
+      const tEnemy = setTimeout(() => {
+        if (this.isGameOver || this.roundNumber > 1) return;
+        this.botSendSignal(chosenEnemy, chosenSignal);
+
+        // O parceiro adversário pode responder confirmando o sinal
+        if (Math.random() < 0.5) {
+          const tAck = setTimeout(() => {
+            if (this.isGameOver || this.roundNumber > 1) return;
+            this.botSay(partnerEnemy, this.pickRandom(BOT_QUOTES.enemyPartnerAck));
+          }, 1600);
+          this.signalTimeouts.push(tAck);
+        }
+      }, 1200 + Math.random() * 800);
+      this.signalTimeouts.push(tEnemy);
+    }
+
+    // 2. SINAL DO TIÃO (PARCEIRO) PARA O JOGADOR HUMANO
+    const tiaoSignal = this.getBestSignalForHand(this.hands['bot_partner']);
+    if (tiaoSignal && Math.random() < 0.85) {
+      const tTiao = setTimeout(() => {
+        if (this.isGameOver || this.roundNumber > 1) return;
+        this.botSendSignal('bot_partner', tiaoSignal);
+      }, 2300 + Math.random() * 900);
+      this.signalTimeouts.push(tTiao);
+    }
+  }
+
+  playerSendSignal(signalType) {
+    const signalObj = BOT_SIGNALS[signalType];
+    if (!signalObj) return;
+
+    const playerPhrase = this.pickRandom(signalObj.playerPhrases);
+
+    if (this.onPlayerSignal) {
+      this.onPlayerSignal(signalType, signalObj.emoji, playerPhrase);
+    }
+
+    // Se estiver no modo 4p, Tião avalia a veracidade e responde
+    if (this.gameMode === '4p') {
+      const playerHand = this.hands['player'] || [];
+      let isTrue = false;
+
+      if (signalType === 'zap') {
+        isTrue = playerHand.some(c => !c.played && c.isManilha && c.manilhaRank === 4);
+      } else if (signalType === 'copeta') {
+        isTrue = playerHand.some(c => !c.played && c.isManilha && c.manilhaRank === 3);
+      } else if (signalType === 'espadilha') {
+        isTrue = playerHand.some(c => !c.played && c.isManilha && c.manilhaRank === 2);
+      } else if (signalType === 'picafumo') {
+        isTrue = playerHand.some(c => !c.played && c.isManilha && c.manilhaRank === 1);
+      } else if (signalType === 'tres') {
+        isTrue = playerHand.some(c => !c.played && !c.isManilha && c.power === 10);
+      } else if (signalType === 'lixo') {
+        isTrue = playerHand.filter(c => !c.played).every(c => !c.isManilha && c.power <= 6);
+      }
+
+      const tTiaoReply = setTimeout(() => {
+        if (this.isGameOver) return;
+        let replyQuote = "";
+        if (isTrue) {
+          if (signalType === 'zap') replyQuote = this.pickRandom(BOT_QUOTES.partnerSignalReplyTrueZap);
+          else if (signalType === 'copeta') replyQuote = this.pickRandom(BOT_QUOTES.partnerSignalReplyTrueCopeta);
+          else if (signalType === 'espadilha') replyQuote = this.pickRandom(BOT_QUOTES.partnerSignalReplyTrueEspadilha);
+          else if (signalType === 'picafumo') replyQuote = this.pickRandom(BOT_QUOTES.partnerSignalReplyTruePicafumo);
+          else if (signalType === 'tres') replyQuote = this.pickRandom(BOT_QUOTES.partnerSignalReplyTrueTres);
+          else if (signalType === 'lixo') replyQuote = this.pickRandom(BOT_QUOTES.partnerSignalReplyTrueLixo);
+        } else {
+          replyQuote = this.pickRandom(BOT_QUOTES.partnerSignalReplyBluff);
+        }
+        this.botSay('bot_partner', replyQuote);
+      }, 1000);
+      this.signalTimeouts.push(tTiaoReply);
+
+      // Com 25% de chance um adversário desconfia e alerta a mesa
+      if (Math.random() < 0.25) {
+        const enemyBot = Math.random() < 0.5 ? 'bot_left' : 'bot_right';
+        const tEnemyAlert = setTimeout(() => {
+          if (this.isGameOver) return;
+          this.botSay(enemyBot, this.pickRandom(BOT_QUOTES.enemyInterceptAlert));
+        }, 2200);
+        this.signalTimeouts.push(tEnemyAlert);
+      }
+    }
+  }
+
   startNewGame() {
+    this.clearSignalTimeouts();
     this.playerScore = 0;
     this.botScore = 0;
     this.handNumber = 0;
@@ -425,6 +727,7 @@ class TrucoGame {
 
   startNewHand() {
     if (this.isGameOver) return;
+    this.clearSignalTimeouts();
 
     this.handNumber++;
     // Alterna o pé/primeiro a jogar a cada mão inteira
@@ -519,6 +822,7 @@ class TrucoGame {
     const starterName = this.getPlayer(this.currentTurnPlayerId).name;
     this.notifyMessage(`Mão ${this.handNumber} iniciada! Vira: ${this.viraCard.value} ${this.viraCard.suitSymbol} -> MANILHA: ${this.manilhaValue}! (${starterName} abre a mão)`, "info");
     this.emitState();
+    this.scheduleHandSignals();
     this.startTrick();
   }
 
@@ -1137,6 +1441,7 @@ class TrucoGame {
   }
 
   finishHand(winnerTeam) {
+    this.clearSignalTimeouts();
     if (winnerTeam === 'us') {
       this.playerScore += this.betValue;
       window.trucoAudio.playRoundWin();

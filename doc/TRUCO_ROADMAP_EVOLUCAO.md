@@ -110,21 +110,24 @@ Este documento estabelece o planejamento detalhado para a evolução do minigame
 
 ---
 
-### 👁️ ETAPA 4: Sistema de Sinais Corporais & Frases em Código (PvE)
-**Objetivo:** Criar uma mecânica inédita no mercado de jogos digitais, onde robôs conspiram e passam sinais autênticos.
+### 👁️ ETAPA 4: Sistema de Sinais Corporais & Frases em Código (PvE & Boteco) - ✅ CONCLUÍDA
+**Objetivo:** Criar uma mecânica inédita no mercado de jogos digitais, onde robôs conspiram e passam sinais autênticos do Truco Paulista, permitindo intercepção e cooperação táctica.
 
 | Sinal Físico Tradicional | Manilha Correspondente | Expressão no Avatar | Frase em Código |
 | :--- | :--- | :--- | :--- |
-| **Piscar olho esquerdo** | ♣ **ZAP** (Paus) | `😉` piscando por 1.8s | *"Tempo fechou por aqui..."* |
-| **Bico com os lábios** | ♥ **COPETA** (Copas) | `😚` / `😋` por 1.8s | *"Esse café tá quente demais!"* |
-| **Erguer uma sobrancelha** | ♠ **ESPADILHA** (Espadas) | `🤨` por 1.8s | *"Hum... jogo interessante..."* |
-| **Coçar o queixo/orelha** | ♦ **PICAFUMO** (Ouros) | `🤔` por 1.8s | *"Coceira braba na orelha..."* |
-| **Sorriso de canto** | 🃏 **Carta 3 (Seca)** | `😁` por 1.8s | *"A maré tá virando!"* |
-| **Bocejo / Olhar pro teto** | 🗑️ **Só Lixo (Podre)** | `🥱` / `🙄` por 1.8s | *"Hoje tá devagar esse boteco..."* |
+| **Piscar olho esquerdo** | ♣ **ZAP** (Paus) | `😉` pulsante por ~3.8s | *"O tempo fechou por aqui..."* / *"O gato miou alto agora!"* |
+| **Bico com os lábios** | ♥ **COPETA** (Copas) | `😚` pulsante por ~3.8s | *"Esse café tá quente demais!"* / *"Coração tá batendo acelerado!"* |
+| **Erguer uma sobrancelha** | ♠ **ESPADILHA** (Espadas) | `🤨` pulsante por ~3.8s | *"O corte tá afiado hoje..."* / *"A faca tá bem amolada!"* |
+| **Coçar o queixo/orelha** | ♦ **PICAFUMO** (Ouros) | `🤔` pulsante por ~3.8s | *"Coceira braba nessa orelha..."* / *"Ouro de tolo não brilha!"* |
+| **Sorriso de canto** | 🃏 **Carta 3 (Seca)** | `😁` pulsante por ~3.8s | *"O vento tá soprando a favor..."* / *"Dente quebrado também morde!"* |
+| **Bocejo / Olhar pro teto** | 🗑️ **Só Lixo (Podre)** | `🥱` pulsante por ~3.8s | *"Devagar quase parando esse boteco..."* / *"Deu uma canseira danada agora..."* |
 
-* **Mecânica de Interceptação:**
-  - O jogador humano que estiver observando o avatar dos adversários pode antecipar manilhas antes da jogada.
-  - O parceiro Tião piscará para o jogador humano para indicar a força da sua mão sem abrir as cartas.
+* **Mecânica de Interceptação PvE Implementada:**
+  - **Adversários Conspirando:** Zé Truqueiro (`bot_left`) e Tonho (`bot_right`) avaliam suas cartas e passam sinais entre si no início da mão com 72% de probabilidade. O jogador atento aos avatares pode deduzir se eles possuem Zap, Copeta ou lixo antes de jogarem!
+  - **Confirmação do Parceiro Inimigo:** O parceiro adversário responde em 50% dos casos confirmando o recebimento (*"Entendido o recado, parceiro!"* / *"Tô na cobertura!"*).
+  - **Sinais do Tião para o Jogador:** Tião (`bot_partner`) envia sinais no seu avatar para revelar sua maior manilha ou alertar sobre mão podre sem expor suas cartas de forma artificial.
+  - **Menu Flutuante de Sinais do Jogador (`🤫`):** Botão discreto no cabeçalho superior que abre popover com os 6 sinais do Truco Paulista. O jogador pode passar sinais para o Tião, que valida a veracidade da mão (elogia e arma a primeira vaza se verdadeiro, ou ri da malandragem se for blefe).
+  - **Desconfiança dos Bots (25%):** Adversários atentos podem pegar o jogador passando sinal e alertar a mesa (*"Tô de olho nesses sinais aí do outro lado! Aqui ninguém é bobo não!"*).
 
 ---
 

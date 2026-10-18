@@ -281,6 +281,12 @@ O **Arcade de Lira** é o centro de diversão acessível pelo Terminal do Avatar
      - **2 vs 2 em Duplas (4 Jogadores):** Sul (Você) + Norte (Tião, IA parceira) contra Leste (Tonho) e Oeste (Zé Truqueiro).
      - **1 vs 1 (Mano a Mano):** Duelo rápido individual contra a IA.
      - **Regras Oficiais:** Carta Vira e Manilhas dinâmicas (4 ➔ 5 ➔ 6 ➔ 7 ➔ Q ➔ J ➔ K ➔ A ➔ 2 ➔ 3 ➔ 4) com hierarquia clássica de naipes (♣ Zap > ♥ Copeta > ♠ Espadilha > ♦ Picafumo), Mão de 11 com revelação mútua de cartas da dupla e Mão de Ferro no escuro.
+   - **Integração com Economia do LiraQuest (Etapa 1 - Concluída):** Autenticação via JWT, premiação em Ouro e XP para a família em vitórias e subida de nível de heróis com persistência no MySQL.
+   - **IA Tática Posicional de Boteco (Etapa 2 - Concluída):** Papéis dinâmicos de mesa (Mão, Meio, Para-Pé e Pé) com IA econômica, poupando munição pesada quando a dupla já vence a vaza e forçando amarração na 2ª vaza para vitória por Canga.
+   - **Malandragem & Macetes Avançados (Etapa 3 - Concluída):** Cama de Gato na 1ª vaza (armadilha com zap engatilhado na volta), Casal Maior (gerenciamento tático de Zap + Copeta na mesma dupla evitando encavalar manilhas), Chamar Sangue (provocações com 3/2 para sangrar manilhas inimigas) e Blefes contextuais na 3ª vaza com diálogos autênticos de vitória ou desmascaramento.
+   - **Sistema de Sinais Corporais & Frases em Código (Etapa 4 - Concluída):**
+     - Mecânica inédita de **Intercepção PvE**: Adversários (Zé e Tonho) passam sinais entre si no início da mão (😉 Zap, 😚 Copeta, 🤨 Espadilha, 🤔 Picafumo, 😁 Três, 🥱 Lixo) com frases tradicionais de boteco (*"O tempo fechou por aqui..."*, *"Esse café tá quente!"*, *"O corte tá afiado!"*). O jogador atento pode deduzir as manilhas adversárias observando os avatares!
+     - **Parceria Tática com Tião:** Tião pisca sinais para o jogador e reage ativamente quando o jogador envia sinais pelo menu `🤫`, validando a mão ou rindo de blefes pro parceiro.
    - **Tecnologia & Áudio:** 100% autônomo em HTML5/CSS3/Vanilla JS e áudio procedural via Web Audio API. Possui botão de retorno integrado ao LiraQuest no menu de opções.
-   - **Plano de Evolução Arquitetural & IA:** Consulte o planejamento detalhado em [TRUCO_ROADMAP_EVOLUCAO.md](file:///e:/11_Games/LiraQuest/doc/TRUCO_ROADMAP_EVOLUCAO.md) cobrindo autenticação Node.js, motor de sinais corporais e macetes clássicos (Cama de Gato, Casal Maior, Fazer a Primeira) e Multiplayer Familiar via WebSockets.
+   - **Plano de Evolução Arquitetural & IA:** Consulte o planejamento detalhado em [TRUCO_ROADMAP_EVOLUCAO.md](file:///e:/11_Games/LiraQuest/doc/TRUCO_ROADMAP_EVOLUCAO.md) cobrindo o roadmap completo rumo ao Multiplayer Familiar via WebSockets (Etapa 5).
 
