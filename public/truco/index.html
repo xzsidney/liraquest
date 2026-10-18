@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0e3820">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Truco Paulista Mobile - LiraQuest</title>
+  <base href="/truco/">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="mobile-viewport-container">
+    <!-- MESA DE FELTRO VERDE (OCUPA A TELA INTEIRA NO CELULAR) -->
+    <main class="felt-table" id="felt-table">
+
+      <!-- ================= TOPO ESQUERDO: PLACAR FLUTUANTE ================= -->
+      <div class="mobile-score-box" id="mobile-score-box">
+        <div class="score-header-bar">
+          <span class="score-flip-icon">🎴</span>
+        </div>
+        <div class="score-team-row us">
+          <span class="team-label" id="score-name-us">nós</span>
+          <div class="vaza-dots" id="dots-us">
+            <span class="dot" id="dot-us-1"></span>
+            <span class="dot" id="dot-us-2"></span>
+            <span class="dot" id="dot-us-3"></span>
+          </div>
+          <span class="team-score" id="score-num-us">0</span>
+        </div>
+        <div class="score-team-row them">
+          <span class="team-label" id="score-name-them">eles</span>
+          <div class="vaza-dots" id="dots-them">
+            <span class="dot" id="dot-them-1"></span>
+            <span class="dot" id="dot-them-2"></span>
+            <span class="dot" id="dot-them-3"></span>
+          </div>
+          <span class="team-score" id="score-num-them">0</span>
+          <span class="bet-val-tag" id="score-hand-val">1</span>
+        </div>
+      </div>
+
+      <!-- ================= TOPO DIREITO: ÍCONES + PLACA MANILHAS + DECK & VIRA ================= -->
+      <div class="mobile-top-right">
+        <!-- Ícones: Emojis, Chat, Menu -->
+        <div class="top-action-icons">
+          <button class="top-icon-btn" id="btn-reactions" title="Enviar Reação">😊</button>
+          <button class="top-icon-btn" id="btn-toggle-chat" title="Mural de Frases">💬</button>
+          <button class="top-icon-btn" id="btn-menu" title="Menu e Opções">☰</button>
+        </div>
+
+        <!-- Plaquinha branca de Manilhas (idêntica ao screenshot) -->
+        <div class="manilhas-plaque" id="manilhas-plaque">
+          <div class="manilhas-title">MANILHAS</div>
+          <div class="manilhas-cards-row" id="manilhas-cards-row">
+            <span class="m-card is-red">K♦</span>
+            <span class="m-card is-black">K♠</span>
+            <span class="m-card is-red">K♥</span>
+            <span class="m-card is-black">K♣</span>
+          </div>
+          <div class="manilhas-arrow">♦ → ♠ → ♥ → ♣</div>
+        </div>
+
+        <!-- Monte de cartas (deck) com a carta Vira inclinada embaixo -->
+        <div class="deck-vira-wrapper">
+          <div class="deck-stack">
+            <div class="card-back-blue deck-top-card"></div>
+          </div>
+          <div class="vira-angled-slot" id="vira-card-slot">
+            <!-- Carta Vira renderizada com tilt de 14deg -->
+          </div>
+        </div>
+      </div>
+
+      <!-- TICKER TOAST DISCRETO NO TOPO (MENSAGENS DO JOGO) -->
+      <div class="table-ticker" id="table-ticker">
+        <span class="ticker-text" id="ticker-text">Mão iniciada!</span>
+      </div>
+
+      <!-- ================= JOGADORES ================= -->
+
+      <!-- NORTE: PARCEIRO (TIÃO) -->
+      <section class="player-station station-north" id="station-bot_partner">
+        <div class="avatar-ring ring-purple" id="avatar-bot_partner">
+          <span class="avatar-icon">🤖</span>
+          <span class="emoji-reaction-badge" id="badge-bot_partner">😐</span>
+        </div>
+        <div class="speech-bubble" id="speech-bot_partner"></div>
+        <div class="bot-mini-cards" id="cards-bot_partner"></div>
+      </section>
+
+      <!-- OESTE: ADVERSÁRIO 1 (ZÉ TRUQUEIRO) -->
+      <section class="player-station station-west side-player-zone" id="station-bot_left">
+        <div class="bot-cards-stack-side" id="cards-bot_left"></div>
+        <div class="avatar-ring ring-purple" id="avatar-bot_left">
+          <span class="avatar-icon">👾</span>
+          <span class="emoji-reaction-badge" id="badge-bot_left">😐</span>
+        </div>
+        <div class="speech-bubble" id="speech-bot_left"></div>
+      </section>
+
+      <!-- LESTE: ADVERSÁRIO 2 (TONHO) -->
+      <section class="player-station station-east side-player-zone" id="station-bot_right">
+        <div class="bot-cards-stack-side" id="cards-bot_right"></div>
+        <div class="avatar-ring ring-purple" id="avatar-bot_right">
+          <span class="avatar-icon">🤠</span>
+          <span class="emoji-reaction-badge" id="badge-bot_right">😐</span>
+        </div>
+        <div class="speech-bubble" id="speech-bot_right"></div>
+      </section>
+
+      <!-- ================= CENTRO DA MESA: CARTAS JOGADAS (VAZA) ================= -->
+      <div class="trick-center-area">
+        <!-- Carta do Oeste (Zé) -->
+        <div class="played-slot slot-west them" id="slot-bot_left">
+          <div id="played-card-bot_left"></div>
+        </div>
+
+        <!-- Carta do Norte (Tião) -->
+        <div class="played-slot slot-north us" id="slot-bot_partner">
+          <div id="played-card-bot_partner"></div>
+        </div>
+
+        <!-- Carta do Leste (Tonho) -->
+        <div class="played-slot slot-east them" id="slot-bot_right">
+          <div id="played-card-bot_right"></div>
+        </div>
+
+        <!-- Carta do Sul (Você) -->
+        <div class="played-slot slot-south us" id="slot-player">
+          <div id="played-card-player"></div>
+        </div>
+      </div>
+
+      <!-- ================= PARTE INFERIOR: VOCÊ E SUAS CARTAS ================= -->
+      <section class="player-station station-south" id="station-player">
+        
+        <!-- BOTÃO GRANDE LARANJA TRUCO (ACIMA DO AVATAR NO CANTO ESQUERDO) -->
+        <button class="btn-orange-truco" id="btn-truco-action" title="Pedir Truco / Aumentar">
+          <div class="truco-icon-hand">🫱🎴</div>
+          <span class="truco-btn-txt" id="btn-truco-text">TRUCO</span>
+        </button>
+
+        <!-- AVATAR DO JOGADOR HUMANO COM ANEL VERDE (CANTO INFERIOR ESQUERDO) -->
+        <div class="player-avatar-corner">
+          <div class="avatar-ring ring-green" id="avatar-player">
+            <span class="avatar-icon">🧑</span>
+            <span class="emoji-reaction-badge" id="badge-player">😐</span>
+          </div>
+        </div>
+
+        <!-- CONTROLE DE CARTA ABERTA / COBERTA -->
+        <button class="btn-covered-pill" id="btn-toggle-covered" title="Alternar jogar aberta ou coberta">
+          👁️ Aberta
+        </button>
+
+        <!-- MÃO DO JOGADOR HUMANO (CARTAS GRANDES E CLARAS) -->
+        <div class="player-hand mobile-hand" id="player-hand"></div>
+      </section>
+
+      <!-- ABA INFERIOR DIREITA DISCRETA (MENU RÁPIDO) -->
+      <button class="bottom-tab-arrow" id="btn-quick-tab" title="Abrir Opções">
+        <span>▲</span>
+      </button>
+
+      <!-- BARRA DE REAÇÃO FLUTUANTE (QUANDO CLICADO EM 😊) -->
+      <div class="reaction-bar-popup" id="reaction-picker">
+        <button class="reaction-item" data-emoji="😂">😂</button>
+        <button class="reaction-item" data-emoji="😡">😡</button>
+        <button class="reaction-item" data-emoji="🤫">🤫</button>
+        <button class="reaction-item" data-emoji="🔥">🔥</button>
+        <button class="reaction-item" data-emoji="👏">👏</button>
+        <button class="reaction-item" data-emoji="🍺">🍺</button>
+        <button class="reaction-item" data-emoji="😱">😱</button>
+        <button class="reaction-item" data-emoji="😎">😎</button>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ================= MODAL DE MENU MOBILE ================= -->
+  <div class="mobile-sheet-overlay" id="mobile-menu-modal">
+    <div class="mobile-sheet-content">
+      <div class="sheet-header">
+        <h3>⚙️ Opções do Jogo</h3>
+        <button class="btn-close-sheet" id="btn-close-menu">&times;</button>
+      </div>
+      <div class="sheet-body">
+        <div class="sheet-section">
+          <label class="sheet-label">Modo de Jogo:</label>
+          <div class="mode-selector-mobile">
+            <button class="mode-btn active" id="btn-mode-4p">👥 2 vs 2 (Duplas)</button>
+            <button class="mode-btn" id="btn-mode-1v1">👤 1 vs 1</button>
+          </div>
+        </div>
+        <div class="sheet-actions-list">
+          <button class="sheet-action-btn" id="btn-rules">📖 Regras do Jogo</button>
+          <button class="sheet-action-btn" id="btn-mute">
+            <span id="mute-icon">🔊</span> Som Ativado
+          </button>
+          <button class="sheet-action-btn danger" id="btn-restart">🔄 Nova Partida</button>
+          <a href="/" class="sheet-action-btn" style="text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; color: #f5b027; border: 1px solid rgba(245, 176, 39, 0.4); margin-top: 8px;">🏰 Voltar ao LiraQuest</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MURAL DE FRASES FLUTUANTE (DRAWER) ================= -->
+  <aside class="chat-drawer" id="chat-drawer">
+    <div class="chat-drawer-header">
+      <span>💬 Mural de Frases da Mesa</span>
+      <button class="btn-close-drawer" id="btn-close-chat">&times;</button>
+    </div>
+    <div class="chat-log-box" id="chat-log">
+      <div class="chat-msg system">Partida pronta! Bom jogo a todos.</div>
+    </div>
+  </aside>
+
+  <!-- ================= MODAL DE DECISÃO: RESPOSTA AO TRUCO ================= -->
+  <div class="decision-overlay" id="truco-modal">
+    <div class="decision-box truco-box">
+      <h2 id="truco-modal-title">TRUUUCO!</h2>
+      <p id="truco-modal-desc">A dupla adversária pediu Truco! O que sua dupla decide?</p>
+
+      <div class="decision-hand-preview">
+        <span class="preview-mini-title">🃏 Suas Cartas Disponíveis:</span>
+        <div class="decision-cards-row" id="truco-cards-player"></div>
+      </div>
+
+      <div class="decision-actions">
+        <button class="btn-action btn-accept" id="btn-modal-accept">✅ Aceitar</button>
+        <button class="btn-action btn-refuse" id="btn-modal-refuse">❌ Correr</button>
+        <button class="btn-action btn-raise" id="btn-modal-raise">🔥 Pedir Seis!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL DE DECISÃO: MÃO DE 11 ================= -->
+  <div class="decision-overlay" id="mao11-modal">
+    <div class="decision-box mao11-box">
+      <div class="mao11-badge">⭐ MÃO DE 11</div>
+      <h2>ANÁLISE DAS CARTAS DA DUPLA</h2>
+      <p id="mao11-modal-desc">Nossa dupla atingiu 11 pontos! Suas cartas e as do seu parceiro foram reveladas. Desejam jogar valendo 3 pontos ou correr entregando 1 ponto?</p>
+
+      <div class="mao11-hands-grid">
+        <div class="mao11-hand-column">
+          <span class="mao11-column-label">👤 Suas Cartas</span>
+          <div class="mao11-cards-container" id="mao11-cards-player"></div>
+        </div>
+        <div class="mao11-hand-column" id="mao11-col-partner">
+          <span class="mao11-column-label">🤝 Cartas do Tião (Parceiro)</span>
+          <div class="mao11-cards-container" id="mao11-cards-partner"></div>
+        </div>
+      </div>
+
+      <div class="mao11-advice-bubble" id="mao11-advice-box">
+        <span class="advice-speaker">🗣️ Tião (Parceiro):</span>
+        <span class="advice-quote" id="mao11-advice-text">"Tô avaliando nossas chances..."</span>
+      </div>
+
+      <div class="decision-actions mao11-actions">
+        <button class="btn-action btn-accept btn-mao11-play" id="btn-mao11-accept">🃏 JOGAR A MÃO (VALE 3)</button>
+        <button class="btn-action btn-refuse btn-mao11-fold" id="btn-mao11-refuse">🏳️ CORRER (DÁ 1 PONTO)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL DE REGRAS ================= -->
+  <div class="rules-modal" id="rules-modal">
+    <div class="rules-content">
+      <h2>
+        <span>Regras do Truco Paulista</span>
+        <button class="btn-close" id="btn-close-rules">&times;</button>
+      </h2>
+      <div class="rules-body">
+        <h3>👥 Modo 4 Jogadores (2 vs 2 em Duplas)</h3>
+        <ul>
+          <li><strong>Equipes:</strong> <strong>Nós</strong> (Você no Sul + Tião no Norte) contra <strong>Eles</strong> (Tonho no Leste + Zé no Oeste).</li>
+          <li><strong>Sentido de Jogo:</strong> Anti-horário (Você ➔ Tonho ➔ Tião ➔ Zé ➔ Você...).</li>
+          <li><strong>Vaza de 4 cartas:</strong> Cada jogador coloca 1 carta na mesa. A dupla que jogar a carta mais alta ganha a vaza.</li>
+          <li><strong>Empate entre parceiros da mesma dupla:</strong> Se a maior carta for empatada entre Você e Tião, a própria dupla leva a vaza!</li>
+          <li><strong>Empate entre adversários:</strong> Ocorre a clássica CANGA. As regras de canga decidem quem leva a mão.</li>
+        </ul>
+
+        <h3>🃏 A Carta Vira e as Manilhas</h3>
+        <p>A carta <strong>Vira</strong> fica virada na mesa. A carta seguinte na sequência torna-se a <strong>Manilha</strong>:</p>
+        <p style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px; margin: 8px 0; font-family: monospace; text-align: center;">
+          4 ➔ 5 ➔ 6 ➔ 7 ➔ Q ➔ J ➔ K ➔ A ➔ 2 ➔ 3 ➔ 4
+        </p>
+
+        <h3>👑 Força dos Naipes das Manilhas</h3>
+        <table class="manilha-rank-table">
+          <thead>
+            <tr><th>Força</th><th>Naipe</th><th>Nome Clássico</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>1º (Mais forte)</td><td>♣ Paus</td><td><strong>ZAP</strong> (Gato)</td></tr>
+            <tr><td>2º</td><td>♥ Copas</td><td><strong>COPETA</strong></td></tr>
+            <tr><td>3º</td><td>♠ Espadas</td><td><strong>ESPADILHA</strong></td></tr>
+            <tr><td>4º</td><td>♦ Ouros</td><td><strong>PICAFUMO</strong></td></tr>
+          </tbody>
+        </table>
+
+        <h3>📊 Cartas Comuns</h3>
+        <p>4 &lt; 5 &lt; 6 &lt; 7 &lt; Q &lt; J &lt; K &lt; A &lt; 2 &lt; 3</p>
+
+        <h3>⭐ Mão de 11 em Duplas</h3>
+        <p>Quando uma dupla atinge 11 pontos, <strong>os parceiros olham as cartas um do outro</strong> para avaliar a força combinada e decidir se jogam a mão (vale 3) ou correm (entregam 1 ponto).</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="audio.js"></script>
+  <script src="game.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const game = new TrucoGame();
+
+      // Elementos do DOM
+      const feltTable = document.getElementById('felt-table');
+      const scoreNameUs = document.getElementById('score-name-us');
+      const scoreNameThem = document.getElementById('score-name-them');
+      const scoreNumUs = document.getElementById('score-num-us');
+      const scoreNumThem = document.getElementById('score-num-them');
+      const scoreHandVal = document.getElementById('score-hand-val');
+
+      const btnMode4p = document.getElementById('btn-mode-4p');
+      const btnMode1v1 = document.getElementById('btn-mode-1v1');
+
+      const stationNorth = document.getElementById('station-bot_partner');
+      const stationWest = document.getElementById('station-bot_left');
+      const stationEast = document.getElementById('station-bot_right');
+      const stationSouth = document.getElementById('station-player');
+
+      const cardsPartnerEl = document.getElementById('cards-bot_partner');
+      const cardsWestEl = document.getElementById('cards-bot_left');
+      const cardsEastEl = document.getElementById('cards-bot_right');
+      const playerHandEl = document.getElementById('player-hand');
+
+      const viraCardSlot = document.getElementById('vira-card-slot');
+      const manilhasCardsRow = document.getElementById('manilhas-cards-row');
+      const chatLog = document.getElementById('chat-log');
+
+      const btnTrucoAction = document.getElementById('btn-truco-action');
+      const btnTrucoText = document.getElementById('btn-truco-text');
+      const btnToggleCovered = document.getElementById('btn-toggle-covered');
+      const tableTicker = document.getElementById('table-ticker');
+      const tickerText = document.getElementById('ticker-text');
+
+      // Modais
+      const trucoModal = document.getElementById('truco-modal');
+      const trucoModalTitle = document.getElementById('truco-modal-title');
+      const trucoModalDesc = document.getElementById('truco-modal-desc');
+      const btnModalAccept = document.getElementById('btn-modal-accept');
+      const btnModalRefuse = document.getElementById('btn-modal-refuse');
+      const btnModalRaise = document.getElementById('btn-modal-raise');
+
+      const mao11Modal = document.getElementById('mao11-modal');
+      const btnMao11Accept = document.getElementById('btn-mao11-accept');
+      const btnMao11Refuse = document.getElementById('btn-mao11-refuse');
+
+      const rulesModal = document.getElementById('rules-modal');
+      const btnRules = document.getElementById('btn-rules');
+      const btnCloseRules = document.getElementById('btn-close-rules');
+      const btnMute = document.getElementById('btn-mute');
+      const muteIcon = document.getElementById('mute-icon');
+      const btnRestart = document.getElementById('btn-restart');
+
+      // Menu Mobile & Reações
+      const btnMenu = document.getElementById('btn-menu');
+      const btnQuickTab = document.getElementById('btn-quick-tab');
+      const mobileMenuModal = document.getElementById('mobile-menu-modal');
+      const btnCloseMenu = document.getElementById('btn-close-menu');
+      const btnReactions = document.getElementById('btn-reactions');
+      const reactionPicker = document.getElementById('reaction-picker');
+
+      let playNextCovered = false;
+      const speechTimeouts = {};
+      let tickerTimeout = null;
+
+      function addChatMessage(author, text, type = 'system') {
+        const msgEl = document.createElement('div');
+        msgEl.className = `chat-msg ${type}`;
+        if (author) {
+          msgEl.innerHTML = `<span class="chat-author">${author}:</span> ${text}`;
+        } else {
+          msgEl.textContent = text;
+        }
+        chatLog.appendChild(msgEl);
+        chatLog.scrollTop = chatLog.scrollHeight;
+      }
+
+      function updateManilhasPlaque(val) {
+        if (!manilhasCardsRow || !val) return;
+        manilhasCardsRow.innerHTML = `
+          <span class="m-card is-red">${val}♦</span>
+          <span class="m-card is-black">${val}♠</span>
+          <span class="m-card is-red">${val}♥</span>
+          <span class="m-card is-black">${val}♣</span>
+        `;
+      }
+
+      function renderCard(card, isInteractive = false, onCardClick = null, isMini = false) {
+        if (!card) return '';
+
+        const cardEl = document.createElement('div');
+        cardEl.className = `truco-card is-${card.color}`;
+        if (isMini) {
+          cardEl.classList.add('is-mini');
+        }
+
+        if (card.isManilha) cardEl.classList.add('is-manilha');
+        if (card.played) cardEl.classList.add('played');
+        if (card.covered) cardEl.classList.add('is-covered');
+
+        if (card.covered) {
+          cardEl.className = `truco-card is-covered ${isMini ? 'is-mini' : ''}`;
+          return cardEl;
+        }
+
+        let manilhaTagHtml = '';
+        if (card.isManilha && card.manilhaName) {
+          const fontSize = isMini ? '0.42rem' : '0.52rem';
+          manilhaTagHtml = `<div class="manilha-tag" style="font-size: ${fontSize}">★ ${card.manilhaName}</div>`;
+        }
+
+        const valSize = isMini ? '0.78rem' : '1.15rem';
+        const suitSize = isMini ? '0.65rem' : '0.95rem';
+        const centerSize = isMini ? '1.25rem' : '1.85rem';
+
+        cardEl.innerHTML = `
+          ${manilhaTagHtml}
+          <div class="card-corner top">
+            <span class="card-value" style="font-size: ${valSize}">${card.value}</span>
+            <span class="card-suit" style="font-size: ${suitSize}">${card.suitSymbol}</span>
+          </div>
+          <div class="card-center" style="font-size: ${centerSize}">${card.suitSymbol}</div>
+          <div class="card-corner bottom">
+            <span class="card-value" style="font-size: ${valSize}">${card.value}</span>
+            <span class="card-suit" style="font-size: ${suitSize}">${card.suitSymbol}</span>
+          </div>
+        `;
+
+        if (isInteractive && !card.played && onCardClick) {
+          cardEl.addEventListener('click', onCardClick);
+        }
+
+        return cardEl;
+      }
+
+      function updateCoveredBtn() {
+        if (playNextCovered) {
+          btnToggleCovered.classList.add('active');
+          btnToggleCovered.innerHTML = '🙈 Coberta (On)';
+        } else {
+          btnToggleCovered.classList.remove('active');
+          btnToggleCovered.innerHTML = '👁️ Aberta';
+        }
+      }
+
+      game.onStateChange = (state) => {
+        if (state.gameMode === '4p') {
+          feltTable.classList.remove('mode-1v1');
+          btnMode4p.classList.add('active');
+          btnMode1v1.classList.remove('active');
+          scoreNameUs.textContent = "nós";
+          scoreNameThem.textContent = "eles";
+          const avPartner = document.getElementById('avatar-bot_partner');
+          if (avPartner) avPartner.querySelector('.avatar-icon').textContent = '🤖';
+        } else {
+          feltTable.classList.add('mode-1v1');
+          btnMode4p.classList.remove('active');
+          btnMode1v1.classList.add('active');
+          scoreNameUs.textContent = "você";
+          scoreNameThem.textContent = "zé";
+          const avPartner = document.getElementById('avatar-bot_partner');
+          if (avPartner) avPartner.querySelector('.avatar-icon').textContent = '👾';
+        }
+
+        // Placar
+        scoreNumUs.textContent = state.playerScore;
+        scoreNumThem.textContent = state.botScore;
+        if (scoreHandVal) {
+          scoreHandVal.textContent = state.betValue;
+        }
+
+        // Vaza Dots no Placar (nós e eles)
+        for (let r = 1; r <= 3; r++) {
+          const dotUs = document.getElementById(`dot-us-${r}`);
+          const dotThem = document.getElementById(`dot-them-${r}`);
+          if (dotUs) dotUs.className = 'dot';
+          if (dotThem) dotThem.className = 'dot';
+
+          const trick = state.tricks[r - 1];
+          if (trick) {
+            if (trick.winnerTeam === 'us') {
+              if (dotUs) { dotUs.className = 'dot won'; dotUs.textContent = '✔️'; }
+              if (dotThem) { dotThem.className = 'dot lost'; dotThem.textContent = '❌'; }
+            } else if (trick.winnerTeam === 'them') {
+              if (dotUs) { dotUs.className = 'dot lost'; dotUs.textContent = '❌'; }
+              if (dotThem) { dotThem.className = 'dot won'; dotThem.textContent = '✔️'; }
+            } else if (trick.winnerTeam === 'draw') {
+              if (dotUs) { dotUs.className = 'dot draw'; dotUs.textContent = '🟡'; }
+              if (dotThem) { dotThem.className = 'dot draw'; dotThem.textContent = '🟡'; }
+            }
+          } else {
+            if (dotUs) dotUs.textContent = '';
+            if (dotThem) dotThem.textContent = '';
+          }
+        }
+
+        // Atualiza a Plaquinha de Manilhas
+        if (state.manilhaValue) {
+          updateManilhasPlaque(state.manilhaValue);
+        }
+
+        // Vez ativa
+        [stationSouth, stationNorth, stationWest, stationEast].forEach(s => {
+          if (s) s.classList.remove('active-turn');
+        });
+        const activeStation = document.getElementById(`station-${state.currentTurnPlayerId}`);
+        if (activeStation) activeStation.classList.add('active-turn');
+
+        // Cartas dos Bots (Mostra cartas azuis de costas como no screenshot)
+        if (cardsPartnerEl) {
+          cardsPartnerEl.innerHTML = '';
+          const partnerHand = state.hands['bot_partner'] || [];
+          partnerHand.forEach(c => {
+            if (!c.played) {
+              if (state.isMaoDe11 && state.maoDe11Team === 'us') {
+                cardsPartnerEl.appendChild(renderCard(c, false, null, true));
+              } else {
+                const back = document.createElement('div');
+                back.className = 'card-back-blue mini-back';
+                cardsPartnerEl.appendChild(back);
+              }
+            }
+          });
+        }
+
+        if (cardsWestEl) {
+          cardsWestEl.innerHTML = '';
+          const westHand = state.hands['bot_left'] || [];
+          westHand.forEach(c => {
+            if (!c.played) {
+              const back = document.createElement('div');
+              back.className = 'card-back-blue side-card-landscape';
+              cardsWestEl.appendChild(back);
+            }
+          });
+        }
+
+        if (cardsEastEl) {
+          cardsEastEl.innerHTML = '';
+          const eastHand = state.hands['bot_right'] || [];
+          eastHand.forEach(c => {
+            if (!c.played) {
+              const back = document.createElement('div');
+              back.className = 'card-back-blue side-card-landscape';
+              cardsEastEl.appendChild(back);
+            }
+          });
+        }
+
+        // Carta Vira (Inclinada na mesa ao lado do Deck)
+        viraCardSlot.innerHTML = '';
+        if (state.viraCard) {
+          const viraEl = renderCard(state.viraCard, false, null, true);
+          viraCardSlot.appendChild(viraEl);
+        }
+
+        // Cartas jogadas no centro da mesa (Vaza)
+        const currentTrick = state.tricks[state.roundNumber - 1];
+        const allSlotIds = ['player', 'bot_partner', 'bot_left', 'bot_right'];
+        allSlotIds.forEach(id => {
+          const slotEl = document.getElementById(`played-card-${id}`);
+          if (slotEl) slotEl.innerHTML = '';
+        });
+
+        if (currentTrick && currentTrick.plays) {
+          currentTrick.plays.forEach(p => {
+            const slotEl = document.getElementById(`played-card-${p.playerId}`);
+            if (slotEl && p.card) {
+              slotEl.appendChild(renderCard(p.card));
+            }
+          });
+        }
+
+        // Mão do Jogador Humano
+        playerHandEl.innerHTML = '';
+        const myHand = state.hands['player'] || [];
+        myHand.forEach((card, idx) => {
+          if (!card.played) {
+            if (state.isMaoDeFerro) {
+              const ironCard = document.createElement('div');
+              ironCard.className = 'card-back-blue';
+              ironCard.style.width = 'var(--card-width)';
+              ironCard.style.height = 'var(--card-height)';
+              ironCard.style.cursor = 'pointer';
+              ironCard.title = "Jogar carta no escuro";
+              ironCard.addEventListener('click', () => {
+                if (state.currentTurnPlayerId !== 'player' || state.resolvingTrick || state.betState !== 'none') return;
+                game.playerPlayCard(idx, false);
+              });
+              playerHandEl.appendChild(ironCard);
+            } else {
+              const cEl = renderCard(card, true, () => {
+                if (state.currentTurnPlayerId !== 'player' || state.resolvingTrick || state.betState !== 'none') return;
+                game.playerPlayCard(idx, playNextCovered);
+                if (playNextCovered) {
+                  playNextCovered = false;
+                  updateCoveredBtn();
+                }
+              });
+              playerHandEl.appendChild(cEl);
+            }
+          }
+        });
+
+        // Botão Laranja de TRUCO (Canto inferior esquerdo)
+        if (state.isMaoDe11 || state.isMaoDeFerro || state.isGameOver || state.betState !== 'none' || state.lastBettorTeam === 'us') {
+          btnTrucoAction.disabled = true;
+          if (state.lastBettorTeam === 'us') {
+            btnTrucoText.textContent = 'AGUARDE...';
+          } else if (state.isMaoDe11) {
+            btnTrucoText.textContent = 'MÃO 11';
+          } else {
+            btnTrucoText.textContent = 'TRUCO';
+          }
+        } else {
+          btnTrucoAction.disabled = false;
+          if (state.nextBetValue) {
+            const label = state.nextBetValue === 3 ? 'TRUCO' : state.nextBetLabel.toUpperCase();
+            btnTrucoText.textContent = label;
+          } else {
+            btnTrucoAction.disabled = true;
+            btnTrucoText.textContent = 'TRUCO';
+          }
+        }
+
+        if (state.roundNumber === 1 || state.isMaoDeFerro || state.isGameOver) {
+          btnToggleCovered.disabled = true;
+          playNextCovered = false;
+          updateCoveredBtn();
+        } else {
+          btnToggleCovered.disabled = false;
+        }
+
+        // Modais de Decisão
+        if (state.betState === 'waiting_player') {
+          trucoModalTitle.textContent = `${state.nextBetLabel}!`;
+          const caller = state.players.find(p => p.id === state.lastBettorPlayerId);
+          const callerName = caller ? caller.name : "A dupla adversária";
+          trucoModalDesc.textContent = `${callerName} aumentou para ${state.nextBetValue} pontos! Qual sua resposta?`;
+
+          const trucoPlayerCardsEl = document.getElementById('truco-cards-player');
+          if (trucoPlayerCardsEl) {
+            trucoPlayerCardsEl.innerHTML = '';
+            const playerAvailableHand = (state.hands['player'] || []).filter(c => !c.played);
+            playerAvailableHand.forEach(c => {
+              trucoPlayerCardsEl.appendChild(renderCard(c, false));
+            });
+          }
+
+          if (state.nextBetValue < 12) {
+            btnModalRaise.style.display = 'inline-block';
+            const raiseVal = state.nextBetValue === 3 ? 6 : (state.nextBetValue === 6 ? 9 : 12);
+            btnModalRaise.textContent = `🔥 Pedir ${game.getBetLabel(raiseVal)}!`;
+          } else {
+            btnModalRaise.style.display = 'none';
+          }
+          trucoModal.classList.add('active');
+        } else {
+          trucoModal.classList.remove('active');
+        }
+
+        if (state.betState === 'player_deciding_mao11') {
+          const mao11PlayerCardsEl = document.getElementById('mao11-cards-player');
+          if (mao11PlayerCardsEl) {
+            mao11PlayerCardsEl.innerHTML = '';
+            const playerAvailableHand = (state.hands['player'] || []).filter(c => !c.played);
+            playerAvailableHand.forEach(c => {
+              mao11PlayerCardsEl.appendChild(renderCard(c, false));
+            });
+          }
+
+          const mao11PartnerCardsEl = document.getElementById('mao11-cards-partner');
+          const mao11PartnerCol = document.getElementById('mao11-col-partner');
+          if (mao11PartnerCardsEl) {
+            mao11PartnerCardsEl.innerHTML = '';
+            if (state.gameMode === '4p') {
+              if (mao11PartnerCol) mao11PartnerCol.style.display = 'flex';
+              const pHand = (state.hands['bot_partner'] || []).filter(c => !c.played);
+              pHand.forEach(c => {
+                mao11PartnerCardsEl.appendChild(renderCard(c, false));
+              });
+            } else {
+              if (mao11PartnerCol) mao11PartnerCol.style.display = 'none';
+            }
+          }
+
+          const mao11AdviceText = document.getElementById('mao11-advice-text');
+          if (mao11AdviceText) {
+            if (state.lastPartnerAdvice) {
+              mao11AdviceText.textContent = `"${state.lastPartnerAdvice}"`;
+            } else if (state.gameMode === '4p') {
+              mao11AdviceText.textContent = '"Avaliando nossa mão conjunta..."';
+            } else {
+              mao11AdviceText.textContent = '"Analise suas cartas com calma!"';
+            }
+          }
+
+          mao11Modal.classList.add('active');
+        } else {
+          mao11Modal.classList.remove('active');
+        }
+      };
+
+      game.onBotSpeech = (botId, text) => {
+        const bubble = document.getElementById(`speech-${botId}`);
+        if (bubble) {
+          bubble.textContent = text;
+          bubble.classList.add('visible');
+
+          if (speechTimeouts[botId]) clearTimeout(speechTimeouts[botId]);
+          speechTimeouts[botId] = setTimeout(() => {
+            bubble.classList.remove('visible');
+          }, 4200);
+        }
+
+        const botObj = game.getPlayer(botId);
+        const type = botObj ? (botObj.team === 'us' ? 'partner' : 'enemy') : 'system';
+        const name = botObj ? botObj.name : 'Mesa';
+        addChatMessage(name, text, type);
+      };
+
+      game.onMessage = (msg, type = "info") => {
+        tickerText.textContent = msg;
+        tableTicker.className = `table-ticker show ${type}`;
+        if (tickerTimeout) clearTimeout(tickerTimeout);
+        tickerTimeout = setTimeout(() => {
+          tableTicker.classList.remove('show');
+        }, 2600);
+
+        addChatMessage(null, msg, 'system');
+      };
+
+      // Interações de Botões
+      btnToggleCovered.addEventListener('click', () => {
+        window.trucoAudio.playClick();
+        playNextCovered = !playNextCovered;
+        updateCoveredBtn();
+      });
+
+      btnTrucoAction.addEventListener('click', () => {
+        game.playerInitiateTruco();
+      });
+
+      btnModalAccept.addEventListener('click', () => {
+        game.playerRespondToTruco('accept');
+      });
+      btnModalRefuse.addEventListener('click', () => {
+        game.playerRespondToTruco('refuse');
+      });
+      btnModalRaise.addEventListener('click', () => {
+        game.playerRespondToTruco('raise');
+      });
+
+      btnMao11Accept.addEventListener('click', () => {
+        game.playerDecideMao11(true);
+      });
+      btnMao11Refuse.addEventListener('click', () => {
+        game.playerDecideMao11(false);
+      });
+
+      btnMode4p.addEventListener('click', () => {
+        window.trucoAudio.playClick();
+        game.setGameMode('4p');
+        mobileMenuModal.classList.remove('active');
+      });
+
+      btnMode1v1.addEventListener('click', () => {
+        window.trucoAudio.playClick();
+        game.setGameMode('1v1');
+        mobileMenuModal.classList.remove('active');
+      });
+
+      btnRules.addEventListener('click', () => {
+        window.trucoAudio.playClick();
+        rulesModal.classList.add('active');
+        mobileMenuModal.classList.remove('active');
+      });
+      btnCloseRules.addEventListener('click', () => {
+        window.trucoAudio.playClick();
+        rulesModal.classList.remove('active');
+      });
+
+      btnMute.addEventListener('click', () => {
+        const isMuted = window.trucoAudio.toggleMute();
+        muteIcon.textContent = isMuted ? '🔇' : '🔊';
+        btnMute.innerHTML = `<span id="mute-icon">${isMuted ? '🔇' : '🔊'}</span> Som ${isMuted ? 'Mudo' : 'Ativado'}`;
+      });
+
+      btnRestart.addEventListener('click', () => {
+        window.trucoAudio.playClick();
+        mobileMenuModal.classList.remove('active');
+        if (confirm("Deseja reiniciar a partida do zero?")) {
+          game.startNewGame();
+        }
+      });
+
+      // Menu Sheet Mobile
+      const openMenu = () => {
+        window.trucoAudio.playClick();
+        mobileMenuModal.classList.add('active');
+      };
+      const closeMenu = () => {
+        window.trucoAudio.playClick();
+        mobileMenuModal.classList.remove('active');
+      };
+
+      btnMenu.addEventListener('click', openMenu);
+      btnQuickTab.addEventListener('click', openMenu);
+      btnCloseMenu.addEventListener('click', closeMenu);
+
+      // Reações e Emojis
+      btnReactions.addEventListener('click', (e) => {
+        e.stopPropagation();
+        window.trucoAudio.playClick();
+        reactionPicker.classList.toggle('active');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!reactionPicker.contains(e.target) && e.target !== btnReactions) {
+          reactionPicker.classList.remove('active');
+        }
+      });
+
+      document.querySelectorAll('.reaction-item').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const emoji = btn.getAttribute('data-emoji');
+          const playerBadge = document.getElementById('badge-player');
+          if (playerBadge) playerBadge.textContent = emoji;
+          reactionPicker.classList.remove('active');
+          window.trucoAudio.playCardPlay(false);
+
+          // Mostra balão de fala do jogador
+          addChatMessage('Você', emoji, 'partner');
+          
+          // Bots podem responder com probabilidade
+          setTimeout(() => {
+            const botReactions = ['bot_left', 'bot_right', 'bot_partner'];
+            const randomBot = botReactions[Math.floor(Math.random() * botReactions.length)];
+            const randomEmoji = ['😂', '😎', '😐', '🔥', '🤫'][Math.floor(Math.random() * 5)];
+            const badgeBot = document.getElementById(`badge-${randomBot}`);
+            if (badgeBot) badgeBot.textContent = randomEmoji;
+          }, 800);
+        });
+      });
+
+      // Drawer de Chat
+      const btnToggleChat = document.getElementById('btn-toggle-chat');
+      const btnCloseChat = document.getElementById('btn-close-chat');
+      const chatDrawer = document.getElementById('chat-drawer');
+
+      if (btnToggleChat && chatDrawer) {
+        btnToggleChat.addEventListener('click', () => {
+          window.trucoAudio.playClick();
+          chatDrawer.classList.toggle('active');
+        });
+      }
+      if (btnCloseChat && chatDrawer) {
+        btnCloseChat.addEventListener('click', () => {
+          window.trucoAudio.playClick();
+          chatDrawer.classList.remove('active');
+        });
+      }
+
+      game.startNewGame();
+    });
+  </script>
+</body>
+</html>

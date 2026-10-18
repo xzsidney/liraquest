@@ -497,6 +497,12 @@ Histórico e estado das sessões de combate da Arena 2D e Raids Familiares.
 | `battle_log` | `JSON` | Sim | Histórico de turnos, danos, bloqueios e golpes especiais executados |
 | `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
 
+---
+
+## 🃏 Módulo de Mini-Game de Truco Paulista (`/truco`)
+- **Status do Banco de Dados:** O módulo de Truco Paulista roda atualmente de forma *client-side standalone* em JavaScript/HTML5 e Web Audio API, sem persistência ou tabelas SQL no momento. Toda a lógica de jogo, regras oficiais, bots cooperativos e placar são resolvidos localmente na sessão do navegador. Caso no futuro haja integração com o saldo de Ouro/Fichas da família ou partidas multiplayer via WebSocket, as tabelas com prefixo `family_truco_*` serão documentadas nesta seção.
+
+
 
 
 

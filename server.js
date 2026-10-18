@@ -124,6 +124,12 @@ app.get(['/testeBD', '/api/testeBD'], async (req, res) => {
 });
 
 
+// Módulo Independente: Jogo de Truco Paulista (https://liraquest.com.br/truco)
+app.use('/truco', express.static(path.join(__dirname, 'public', 'truco')));
+app.get(['/truco', '/truco/*'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'truco', 'index.html'));
+});
+
 // Fallback para SPA (Single Page Application)
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));

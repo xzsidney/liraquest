@@ -1,0 +1,1310 @@
+/* ==========================================================================
+   TRUCO PAULISTA MOBILE - TELA COMPLETA EM MODO RETRATO (CELULAR)
+   Design idêntico ao jogo mobile de Truco (Feltro Verde, Botão Laranja,
+   Placa de Manilhas, Vira Inclinado, Placar Compacto com Dots, Avatares)
+   ========================================================================== */
+
+:root {
+  --felt-base: #114227;
+  --felt-dark: #092816;
+  --felt-light: #185a36;
+  --gold: #f5b027;
+  --gold-glow: rgba(245, 176, 39, 0.45);
+  
+  --card-width: 74px;
+  --card-height: 106px;
+  --card-mini-w: 42px;
+  --card-mini-h: 58px;
+
+  --blue-deck: #2b6cb0;
+  --orange-truco-top: #ffaa2b;
+  --orange-truco-bot: #e85d04;
+  --purple-ring: #9d4edd;
+  --green-ring: #38b000;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  background: #040d07;
+  color: #fff;
+}
+
+/* ==========================================================================
+   CONTAINER DO DISPOSITIVO (RESPONSIVO: 100% NO CELULAR / MOLDURA NO DESKTOP)
+   ========================================================================== */
+.mobile-viewport-container {
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
+  background: #092816;
+}
+
+@media (max-width: 520px) {
+  .mobile-viewport-container {
+    max-width: 100vw;
+    box-shadow: none;
+  }
+}
+
+/* ==========================================================================
+   MESA DE FELTRO VERDE (BORDA A BORDA)
+   ========================================================================== */
+.felt-table {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background: 
+    radial-gradient(circle at 50% 42%, #1b633b 0%, #104526 50%, #082414 100%);
+}
+
+/* Textura suave de feltro */
+.felt-table::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: 
+    repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.02) 0, rgba(0, 0, 0, 0.02) 2px, transparent 2px, transparent 4px),
+    radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   TOPO ESQUERDO: PLACAR FLUTUANTE COMPACTO COM PONTOS (DOTS) DE VAZA
+   ========================================================================== */
+.mobile-score-box {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 25;
+  background: rgba(14, 20, 16, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  padding: 5px 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+  min-width: 110px;
+  backdrop-filter: blur(4px);
+}
+
+.score-header-bar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 2px;
+}
+
+.score-flip-icon {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.score-team-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 3px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: lowercase;
+}
+
+.team-label {
+  width: 26px;
+  color: #ccc;
+  letter-spacing: 0.5px;
+}
+
+.score-team-row.us .team-label { color: #64dfdf; }
+.score-team-row.them .team-label { color: #ff758f; }
+
+.vaza-dots {
+  display: flex;
+  gap: 3px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #505c56;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.55rem;
+  line-height: 1;
+  transition: all 0.25s ease;
+}
+
+.dot.won {
+  background: #2a9d8f;
+  border-color: #64dfdf;
+  box-shadow: 0 0 6px #2a9d8f;
+}
+
+.dot.lost {
+  background: #e63946;
+  border-color: #ff758f;
+  box-shadow: 0 0 6px #e63946;
+}
+
+.dot.draw {
+  background: #f5b027;
+  border-color: #fff;
+  box-shadow: 0 0 6px #f5b027;
+}
+
+.team-score {
+  font-size: 0.95rem;
+  font-weight: 900;
+  min-width: 14px;
+  text-align: right;
+  color: #fff;
+}
+
+.bet-val-tag {
+  color: #55ff99;
+  font-size: 0.72rem;
+  font-weight: 900;
+  margin-left: 2px;
+}
+
+/* ==========================================================================
+   TOPO DIREITO: ÍCONES + PLACA DE MANILHAS + DECK E VIRA INCLINADO
+   ========================================================================== */
+.mobile-top-right {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.top-action-icons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.top-icon-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(14, 20, 16, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.top-icon-btn:active {
+  transform: scale(0.92);
+  background: rgba(40, 50, 45, 0.95);
+}
+
+/* Plaquinha Branca de Manilhas */
+.manilhas-plaque {
+  background: #ffffff;
+  border-radius: 6px;
+  padding: 3px 8px 4px 8px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid #ddd;
+}
+
+.manilhas-title {
+  font-size: 0.62rem;
+  font-weight: 900;
+  color: #4a4a4a;
+  letter-spacing: 1px;
+}
+
+.manilhas-cards-row {
+  display: flex;
+  gap: 5px;
+  font-weight: 900;
+  font-size: 0.98rem;
+  line-height: 1.1;
+  margin-top: 1px;
+}
+
+.m-card.is-red { color: #d90429; }
+.m-card.is-black { color: #111111; }
+
+.manilhas-arrow {
+  font-size: 0.58rem;
+  color: #777;
+  margin-top: 1px;
+  letter-spacing: 0.5px;
+}
+
+/* Monte de Cartas (Deck) + Carta Vira Inclinada */
+.deck-vira-wrapper {
+  position: relative;
+  width: 88px;
+  height: 80px;
+  margin-top: 2px;
+}
+
+.deck-stack {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+}
+
+.deck-top-card {
+  width: 44px;
+  height: 62px;
+  box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.vira-angled-slot {
+  position: absolute;
+  top: 4px;
+  left: 22px;
+  z-index: 3;
+  transform: rotate(14deg);
+  transform-origin: center center;
+}
+
+.vira-angled-slot .truco-card {
+  box-shadow: -2px 4px 12px rgba(0, 0, 0, 0.55);
+}
+
+/* ==========================================================================
+   CARTAS AZUIS COM PADRÃO GEOMÉTRICO (VERSO IDÊNTICO AO SCREENSHOT)
+   ========================================================================== */
+.card-back-blue {
+  background-color: #2b6cb0;
+  background-image: 
+    radial-gradient(#5a9fd8 18%, transparent 19%),
+    radial-gradient(#5a9fd8 18%, transparent 19%);
+  background-size: 10px 10px;
+  background-position: 0 0, 5px 5px;
+  border: 1.5px solid #ffffff;
+  border-radius: 6px;
+  position: relative;
+}
+
+.card-back-blue::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 2px; right: 2px; bottom: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.mini-back {
+  width: var(--card-mini-w);
+  height: var(--card-mini-h);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* ==========================================================================
+   AVATARES COM ANEL LUMINOSO (ROXO PARA BOTS / VERDE PARA O PLAYER)
+   ========================================================================== */
+.avatar-ring {
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ring-purple {
+  width: 46px;
+  height: 46px;
+  border: 2.5px solid #9d4edd;
+  background: #241432;
+  box-shadow: 0 0 12px rgba(157, 78, 221, 0.6);
+  font-size: 1.35rem;
+}
+
+.ring-green {
+  width: 52px;
+  height: 52px;
+  border: 3px solid #38b000;
+  background: #10281b;
+  box-shadow: 0 0 14px rgba(56, 176, 0, 0.65);
+  font-size: 1.6rem;
+}
+
+.emoji-reaction-badge {
+  position: absolute;
+  bottom: -3px;
+  right: -5px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ffd166;
+  border: 1px solid #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  line-height: 1;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+/* Indicador de Vez Ativa */
+.player-station.active-turn .avatar-ring {
+  transform: scale(1.12);
+  box-shadow: 0 0 18px var(--gold), 0 0 26px var(--gold-glow);
+  border-color: var(--gold);
+}
+
+/* ==========================================================================
+   POSIÇÕES DOS 4 JOGADORES (FORMATO RETRATO MOBILE)
+   ========================================================================== */
+
+/* Norte (Tião) */
+.station-north {
+  position: absolute;
+  top: 13%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  z-index: 10;
+}
+
+.station-north .bot-mini-cards {
+  display: flex;
+  gap: 3px;
+}
+
+/* Oeste (Zé) */
+.station-west {
+  position: absolute;
+  top: 42%;
+  left: 6px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 12;
+}
+
+.station-west .avatar-ring {
+  margin-left: 0;
+}
+
+/* Leste (Tonho) */
+.station-east {
+  position: absolute;
+  top: 42%;
+  right: 6px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 12;
+}
+
+.station-east .avatar-ring {
+  margin-right: 0;
+}
+
+/* Cartas deitadas (landscape) para os jogadores laterais Oeste e Leste */
+.side-card-landscape {
+  width: 50px;
+  height: 34px;
+  border-radius: 5px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+  flex-shrink: 0;
+  display: block;
+}
+
+/* Empilhamento vertical de cartas nas laterais (Oeste e Leste) - Idêntico à imagem de referência */
+.bot-cards-stack-side {
+  display: flex;
+  flex-direction: column !important;
+  align-items: center;
+  gap: 4px;
+  height: 110px;
+  justify-content: flex-start;
+  margin-bottom: 6px;
+}
+
+.bot-cards-stack-side .mini-back,
+.bot-cards-stack-side .side-card-landscape {
+  width: 50px;
+  height: 34px;
+  border-radius: 5px;
+}
+
+/* Sul (Você) */
+.station-south {
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: flex-end;
+}
+
+.player-avatar-corner {
+  position: absolute;
+  bottom: 10px;
+  left: 14px;
+  z-index: 25;
+}
+
+/* Balões de Fala */
+.speech-bubble {
+  position: absolute;
+  background: #ffffff;
+  color: #111;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.72rem;
+  max-width: 150px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transform: scale(0.85);
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  pointer-events: none;
+  z-index: 40;
+  text-align: center;
+}
+
+.speech-bubble.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.station-north .speech-bubble { top: 52px; }
+.station-west .speech-bubble  { left: 60px; bottom: 4px; }
+.station-east .speech-bubble  { right: 60px; bottom: 4px; }
+
+/* ==========================================================================
+   BOTÃO GRANDE LARANJA DE TRUCO (CANTO INFERIOR ESQUERDO, ACIMA DO AVATAR)
+   ========================================================================== */
+.btn-orange-truco {
+  position: absolute;
+  bottom: 74px;
+  left: 12px;
+  width: 82px;
+  height: 58px;
+  background: linear-gradient(180deg, var(--orange-truco-top) 0%, var(--orange-truco-bot) 100%);
+  border: 2px solid #ffbe0b;
+  border-bottom: 4px solid #b84300;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 5px 14px rgba(232, 93, 4, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  z-index: 25;
+  transition: transform 0.1s ease, filter 0.2s ease;
+}
+
+.btn-orange-truco:active {
+  transform: translateY(2px);
+  border-bottom-width: 2px;
+}
+
+.btn-orange-truco:disabled {
+  opacity: 0.55;
+  filter: grayscale(35%);
+  cursor: not-allowed;
+}
+
+.truco-icon-hand {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.truco-btn-txt {
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  margin-top: 1px;
+}
+
+/* ==========================================================================
+   MÃO DO JOGADOR HUMANO (CARTAS GRANDES E CLARAS)
+   ========================================================================== */
+.player-hand.mobile-hand {
+  position: absolute;
+  bottom: 8px;
+  left: 104px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: flex-end;
+  z-index: 22;
+}
+
+/* Alternador de Carta Aberta/Coberta */
+.btn-covered-pill {
+  position: absolute;
+  bottom: 140px;
+  left: 12px;
+  width: 82px;
+  text-align: center;
+  background: rgba(14, 20, 16, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ddd;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 3px 6px;
+  border-radius: 12px;
+  cursor: pointer;
+  z-index: 25;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-covered-pill.active {
+  background: var(--gold);
+  color: #111;
+  border-color: #fff;
+}
+
+/* ==========================================================================
+   CARTAS DO TRUCO (DESIGN REALISTA, CLARO E TOUCH-FRIENDLY)
+   ========================================================================== */
+.truco-card {
+  width: var(--card-width);
+  height: var(--card-height);
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1.5px solid #dcdcdc;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 4px 6px;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  flex-shrink: 0;
+}
+
+.truco-card.is-red   { color: #d90429; }
+.truco-card.is-black { color: #111111; }
+
+.truco-card:hover, .truco-card:active {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+}
+
+.truco-card.is-manilha {
+  border: 2px solid var(--gold);
+  box-shadow: 0 4px 14px var(--gold-glow);
+}
+
+.manilha-tag {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #f5b027, #b27300);
+  color: #fff;
+  font-size: 0.52rem;
+  font-weight: 900;
+  padding: 1px 5px;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  white-space: nowrap;
+}
+
+.card-corner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+}
+
+.card-corner.bottom { transform: rotate(180deg); }
+
+.card-value {
+  font-size: 1.15rem;
+  font-weight: 900;
+}
+
+.card-suit { font-size: 0.95rem; }
+
+.card-center {
+  align-self: center;
+  font-size: 1.85rem;
+  line-height: 1;
+}
+
+/* Versão Mini das Cartas */
+.truco-card.is-mini {
+  width: var(--card-mini-w);
+  height: var(--card-mini-h);
+  padding: 2px 4px;
+}
+
+.truco-card.is-covered {
+  background-color: #2b6cb0;
+  background-image: 
+    radial-gradient(#5a9fd8 18%, transparent 19%),
+    radial-gradient(#5a9fd8 18%, transparent 19%);
+  background-size: 8px 8px;
+  background-position: 0 0, 4px 4px;
+  border: 1.5px solid #ffffff;
+}
+
+.truco-card.is-covered .card-corner,
+.truco-card.is-covered .card-center,
+.truco-card.is-covered .manilha-tag {
+  display: none;
+}
+
+/* ==========================================================================
+   CENTRO DA MESA: CARTAS JOGADAS NA VAZA (EM FRENTE A CADA JOGADOR)
+   ========================================================================== */
+.trick-center-area {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 15;
+}
+
+.played-slot {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.played-slot:not(:has(.truco-card)) {
+  display: none;
+}
+
+.played-slot .truco-card {
+  cursor: default;
+}
+
+.played-slot .truco-card:hover,
+.played-slot .truco-card:active {
+  transform: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+}
+
+/* Posições em frente a cada jogador - Exatamente como no modelo */
+
+/* Carta jogada pelo Norte (Tião - em frente às cartas do parceiro, em pé) */
+.slot-north {
+  top: calc(13% + 124px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Carta jogada pelo Sul (Você - em frente à mão do jogador, em pé) */
+.slot-south {
+  bottom: 132px;
+  left: 48%;
+  transform: translateX(-50%);
+}
+
+/* Carta jogada pelo Oeste (Zé - em frente ao bonequinho do Zé, deitada) */
+.slot-west {
+  top: calc(42% + 58px);
+  left: 114px;
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+/* Carta jogada pelo Leste (Tonho - em frente ao bonequinho do Tonho, deitada) */
+.slot-east {
+  top: calc(42% + 58px);
+  left: calc(100% - 114px);
+  transform: translate(-50%, -50%) rotate(-90deg);
+}
+
+/* ==========================================================================
+   ABA RÁPIDA / BOTÃO INFERIOR DIREITO
+   ========================================================================== */
+.bottom-tab-arrow {
+  position: absolute;
+  bottom: 0;
+  right: 10px;
+  width: 32px;
+  height: 28px;
+  background: rgba(14, 20, 16, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  color: #aaa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  cursor: pointer;
+  z-index: 25;
+}
+
+/* ==========================================================================
+   BARRA DE REAÇÃO FLUTUANTE (EMOJIS)
+   ========================================================================== */
+.reaction-bar-popup {
+  position: absolute;
+  top: 50px;
+  right: 10px;
+  background: rgba(16, 24, 19, 0.95);
+  border: 1.5px solid var(--gold);
+  border-radius: 20px;
+  padding: 4px 8px;
+  display: flex;
+  gap: 6px;
+  z-index: 50;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-8px);
+  transition: all 0.2s ease;
+}
+
+.reaction-bar-popup.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.reaction-item {
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.reaction-item:active { transform: scale(1.3); }
+
+/* ==========================================================================
+   TICKER TOAST NO TOPO (MENSAGENS DO JOGO)
+   ========================================================================== */
+.table-ticker {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: rgba(10, 15, 20, 0.94);
+  border: 1.5px solid var(--gold);
+  border-radius: 12px;
+  padding: 4px 12px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+  z-index: 45;
+  pointer-events: none;
+  opacity: 0;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.table-ticker.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.ticker-text {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.table-ticker.win .ticker-text { color: #64dfdf; }
+.table-ticker.loss .ticker-text { color: #ff758f; }
+.table-ticker.warning .ticker-text { color: var(--gold); }
+
+/* ==========================================================================
+   MODAL / BOTTOM SHEET DO MENU MOBILE (OPÇÕES)
+   ========================================================================== */
+.mobile-sheet-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 80;
+  display: flex;
+  align-items: flex-end;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.mobile-sheet-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.mobile-sheet-content {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  background: linear-gradient(180deg, #1d2b22 0%, #0d1712 100%);
+  border-top: 2px solid var(--gold);
+  border-radius: 18px 18px 0 0;
+  padding: 16px 20px 24px 20px;
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.9);
+  transform: translateY(100%);
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.mobile-sheet-overlay.active .mobile-sheet-content {
+  transform: translateY(0);
+}
+
+.sheet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+.sheet-header h3 {
+  font-size: 1.1rem;
+  color: var(--gold);
+}
+
+.btn-close-sheet {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.sheet-section {
+  margin-bottom: 14px;
+}
+
+.sheet-label {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #ccc;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.mode-selector-mobile {
+  display: flex;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 8px;
+  padding: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.mode-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #888;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.mode-btn.active {
+  background: var(--gold);
+  color: #111;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.sheet-actions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sheet-action-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background 0.15s ease;
+}
+
+.sheet-action-btn:active {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.sheet-action-btn.danger {
+  color: #ff758f;
+  border-color: rgba(230, 57, 70, 0.4);
+}
+
+/* ==========================================================================
+   MURAL DE FRASES FLUTUANTE (DRAWER)
+   ========================================================================== */
+.chat-drawer {
+  position: fixed;
+  top: 50px;
+  right: -320px;
+  width: 280px;
+  height: 380px;
+  background: rgba(14, 20, 16, 0.96);
+  border: 1.5px solid var(--gold);
+  border-radius: 14px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  z-index: 70;
+  transition: right 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  padding: 10px;
+  backdrop-filter: blur(6px);
+}
+
+.chat-drawer.active {
+  right: 12px;
+}
+
+.chat-drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  padding-bottom: 6px;
+  margin-bottom: 6px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--gold);
+}
+
+.btn-close-drawer {
+  background: none;
+  border: none;
+  color: #bbb;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.chat-log-box {
+  flex: 1;
+  background: #08100b;
+  border-radius: 6px;
+  padding: 8px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 0.74rem;
+}
+
+.chat-msg {
+  line-height: 1.35;
+  border-radius: 4px;
+  padding: 3px 5px;
+}
+
+.chat-msg.partner { color: #64dfdf; background: rgba(42, 157, 143, 0.15); }
+.chat-msg.enemy   { color: #ff758f; background: rgba(230, 57, 70, 0.15); }
+.chat-msg.system  { color: var(--gold); font-style: italic; }
+
+/* ==========================================================================
+   MODAIS DE DECISÃO (TRUCO / MÃO DE 11 / REGRAS)
+   ========================================================================== */
+.decision-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 85;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.decision-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.decision-box {
+  background: linear-gradient(180deg, #1d2b22 0%, #0d1712 100%);
+  border: 2.5px solid var(--gold);
+  border-radius: 14px;
+  padding: 16px 18px;
+  max-width: 440px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.95), 0 0 20px rgba(245, 176, 39, 0.25);
+}
+
+.decision-box h2 {
+  color: var(--gold);
+  font-size: 1.25rem;
+  margin-bottom: 4px;
+}
+
+.decision-box p {
+  color: #ddd;
+  font-size: 0.82rem;
+  margin-bottom: 10px;
+  line-height: 1.35;
+}
+
+.decision-hand-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.preview-mini-title {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #aaa;
+}
+
+.decision-cards-row {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+
+.decision-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-action {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 800;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.btn-action:active { transform: scale(0.95); }
+
+.btn-accept { background: #2a9d8f; color: #fff; }
+.btn-refuse { background: #e63946; color: #fff; }
+.btn-raise  { background: linear-gradient(135deg, #f5b027, #cf8a0c); color: #111; font-weight: 900; }
+
+/* Modal Mão de 11 */
+.mao11-box {
+  max-width: 460px;
+  width: 92%;
+  padding: 14px 16px;
+}
+
+.mao11-badge {
+  display: inline-block;
+  background: #c92a2a;
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 900;
+  padding: 2px 8px;
+  border-radius: 10px;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.mao11-hands-grid {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.mao11-hand-column {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(245, 176, 39, 0.35);
+  border-radius: 8px;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.mao11-column-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--gold);
+}
+
+.mao11-cards-container {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+}
+
+.mao11-advice-bubble {
+  background: rgba(42, 157, 143, 0.18);
+  border: 1px solid #2a9d8f;
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 0.78rem;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.advice-speaker {
+  font-weight: 900;
+  color: #64dfdf;
+}
+
+.advice-quote {
+  font-style: italic;
+  color: #fff;
+}
+
+.btn-mao11-play {
+  background: linear-gradient(135deg, #2a9d8f, #1b635a);
+  color: #fff;
+  font-size: 0.85rem;
+  padding: 9px 16px;
+}
+
+.btn-mao11-fold {
+  background: linear-gradient(135deg, #e63946, #9b1d27);
+  color: #fff;
+  font-size: 0.85rem;
+  padding: 9px 16px;
+}
+
+/* Modal de Regras */
+.rules-modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.rules-modal.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.rules-content {
+  background: #14221a;
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  padding: 16px;
+  max-width: 440px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  color: #ddd;
+}
+
+.rules-content h2 {
+  color: var(--gold);
+  font-size: 1.15rem;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+
+.rules-body h3 {
+  color: #64dfdf;
+  margin: 10px 0 3px 0;
+  font-size: 0.9rem;
+}
+
+.rules-body ul {
+  padding-left: 16px;
+  line-height: 1.35;
+  font-size: 0.82rem;
+}
+
+.manilha-rank-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 6px 0;
+}
+
+.manilha-rank-table th, .manilha-rank-table td {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 4px 6px;
+  text-align: left;
+  font-size: 0.78rem;
+}
+
+.manilha-rank-table th {
+  background: #09140e;
+  color: var(--gold);
+}
+
+/* Modo 1v1 */
+.felt-table.mode-1v1 .side-player-zone {
+  display: none !important;
+}

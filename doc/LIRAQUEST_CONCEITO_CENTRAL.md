@@ -268,3 +268,18 @@ O **Arcade de Lira** é o centro de diversão acessível pelo Terminal do Avatar
    - **Mecânica de Pulo Esmagador:** O jogador pode derrotar inimigos atacando com suas armas/projéteis ou pulando diretamente sobre a cabeça deles (estilo Mario/Sonic).
    - **Coletáveis & Economia:** Moedas de ouro giratórias, gemas de XP e fatias de pizza de cura. Vitórias concedem +50 Ouro base (+ moedas coletadas na fase) e +80 XP para a evolução do herói na família.
 
+
+7. **🧭 Evolução de Design: Modo Masmorra Minimalista (Inspirado em Dungeon Encounters):**
+   - **Conceito:** Pivotagem do modo de aventura para um formato puro de tabuleiro tático e dungeon crawler minimalista por grid, reduzindo atrito e complexidade desnecessária para a família.
+   - **Arquitetura Homologada:** Stack híbrida baseada em **Vue 3 + Tailwind CSS** (menus, inventários, combate tático ATB e cartas de hábitos) associado a um **Canvas HTML5 / PixiJS** (tabuleiro matricial de coordenadas X/Y/Z, névoa de guerra e marcadores numéricos hexadecimais).
+   - **Infraestrutura:** Servidor unificado Node.js + Express e banco MySQL na Hostinger.
+   - **Documento Completo de Arquitetura:** Consulte [ARQUITETURA_TECNOLOGICA.md](file:///e:/11_Games/LiraQuest/doc/ARQUITETURA_TECNOLOGICA.md).
+
+8. **🃏 Módulo Standalone: Truco Paulista Mobile (`/truco`):**
+   - **Conceito:** Mini-game clássico de Truco Paulista totalmente responsivo (otimizado para dispositivos móveis e desktop), acessível pela URL `https://liraquest.com.br/truco`.
+   - **Mecânicas e Modos de Jogo:**
+     - **2 vs 2 em Duplas (4 Jogadores):** Sul (Você) + Norte (Tião, IA parceira) contra Leste (Tonho) e Oeste (Zé Truqueiro).
+     - **1 vs 1 (Mano a Mano):** Duelo rápido individual contra a IA.
+     - **Regras Oficiais:** Carta Vira e Manilhas dinâmicas (4 ➔ 5 ➔ 6 ➔ 7 ➔ Q ➔ J ➔ K ➔ A ➔ 2 ➔ 3 ➔ 4) com hierarquia clássica de naipes (♣ Zap > ♥ Copeta > ♠ Espadilha > ♦ Picafumo), Mão de 11 com revelação mútua de cartas da dupla e Mão de Ferro no escuro.
+   - **Tecnologia & Áudio:** 100% autônomo em HTML5/CSS3/Vanilla JS e áudio procedural via Web Audio API. Possui botão de retorno integrado ao LiraQuest no menu de opções.
+

@@ -212,4 +212,16 @@ Rotas dedicadas ao Jogo 4 do Arcade (`/battle.html`): combate tático por turnos
 ## 🚀 14. Aventura 2D em Plataforma (Mini-Game Arcade Side-Scrolling)
 Página dedicada ao Jogo 5 do Arcade (`/adventure.html`): jogo de ação e aventura de plataforma clássico em rolagem lateral com os 5 heróis (Capitão América, Ciclope, Homem-Aranha, Wolverine e Gambit). Utiliza a rota `/api/battle/finish` para premiar o jogador com ouro coletado (+ bônus de fase) e XP de aventura para evolução na família.
 
+---
+
+## 🃏 15. Módulo Standalone de Truco Paulista (`/truco`)
+
+Módulo separado com interface mobile responsiva servido pelo backend Node.js:
+
+| Método | Rota | Autenticação | Descrição |
+|:---|:---|:---|:---|
+| `GET` | `/truco` | Pública | Rota principal que entrega o jogo de Truco Paulista (`public/truco/index.html`) |
+| `GET` | `/truco/*` | Pública | Entrega de assets estáticos dedicados (`style.css`, `game.js`, `audio.js`, etc.) e subrotas |
+
+
 
