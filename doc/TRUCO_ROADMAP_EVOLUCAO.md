@@ -72,17 +72,21 @@ Este documento estabelece o planejamento detalhado para a evolução do minigame
 
 ---
 
-### 🧠 ETAPA 2: Motor Tático Posicional da IA (Pé, Para-Pé e Fazer a Primeira)
+### 🧠 ETAPA 2: Motor Tático Posicional da IA (Pé, Para-Pé e Fazer a Primeira) [CONCLUÍDA ✅]
 **Objetivo:** Eliminar jogadas ingênuas e fazer os bots jogarem com a disciplina tática dos grandes truqueiros.
 
-1. **A Regra de Ouro da 1ª Vaza:**
+1. **A Regra de Ouro da 1ª Vaza & Papel do Pé:**
    - No Truco Paulista, ganhar a 1ª vaza garante vantagem matemática decisiva (quem faz a 1ª precisa apenas empatar as seguintes).
    - O **Pé** (último a jogar) avalia se a vaza já pertence ao parceiro: se sim, joga o menor lixo; se pertence ao adversário, gasta a menor carta necessária para matar a vaza ou cangar.
 2. **O Papel Protetor do Para-Pé (3º jogador):**
-   - Se o parceiro abriu com carta baixa e o 2º jogador superou, o Para-pé não joga carta média: ele joga a sua maior carta para espremer o Pé adversário.
-3. **Canga Estratégica (Empate):**
+   - Se o parceiro abriu com carta baixa e o 2º jogador superou, o Para-pé não joga carta média: ele joga a sua maior carta ("chama na chincha") para espremer o Pé adversário a sangrar sua melhor manilha.
+3. **Canga Estratégica (Empate) & Canga da Vitória:**
    - Se a 1ª vaza empatou, a agressividade na 2ª vaza sobe para 100% (quem fizer a 2ª leva tudo).
-   - Se a dupla já venceu a 1ª vaza, a IA busca empatar a 2ª de propósito para fechar a rodada imediatamente.
+   - Se a dupla já venceu a 1ª vaza, o Pé ou o Para-Pé prioriza empatar a 2ª vaza de propósito (`tieCards[0]`), ativando a regra de fechamento imediato da mão com vitória da dupla!
+4. **Indicadores Visuais de Posição na Mesa (UI/UX):**
+   - Crachás estilizados em cada estação de jogador exibindo em tempo real: `MÃO` (amarelo), `MEIO` (azul), `PARA-PÉ` (roxo) e `PÉ` (verde esmeralda).
+5. **Diálogos Táticos do Tião e Adversários:**
+   - Chamadas contextuais avisando quem fecha a vaza ("Tô no Pé, parceiro!", "Tô de Para-Pé, vou arrochar a maior!", "Cangou a primeira, cai matando na segunda!").
 
 ---
 

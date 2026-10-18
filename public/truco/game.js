@@ -127,6 +127,34 @@ const BOT_QUOTES = {
   mao11Refuse: [
     "Mão horrível... vamo correr da mão de 11.",
     "Com esse lixo? Melhor dar 1 ponto."
+  ],
+  tiaoPe: [
+    "Tô no Pé, parceiro! Joga tranquilo que eu arremato no final!",
+    "Tô fechando a vaza! Guarda o seu que o Pé é nosso!",
+    "Deixa comigo que o Pé não perdoa nada!"
+  ],
+  tiaoParaPe: [
+    "Tô de Para-Pé! Vou arrochar a maior pra sangrar o Pé deles!",
+    "Vou forçar o Pé deles a queimar manilha pesada agora!",
+    "No Para-Pé a gente bate firme pra espremer o adversário!"
+  ],
+  tiaoTieWin: [
+    "Ganhamos a primeira, parceiro! Se amarrar na segunda a mão é nossa!",
+    "Só empata a segunda que a mão fecha pra nós!",
+    "Canga da vitória! Quem fez a primeira leva na amarração!"
+  ],
+  tiaoCangaAdvice: [
+    "Cangou a primeira! Cai matando na segunda com a maior que tiver!",
+    "Primeira empatou! Agora quem fizer a segunda leva a mão inteira!"
+  ],
+  enemyPe: [
+    "Tô no Pé e aqui não passa nem mosquito!",
+    "Pode vir que eu tô fechando a conta!",
+    "O Pé é meu e a primeira vaza também!"
+  ],
+  enemyParaPe: [
+    "Toma essa no Para-Pé pra sangrar o seu parceiro!",
+    "Quero ver o Pé de vocês cobrir essa!"
   ]
 };
 
@@ -235,6 +263,34 @@ class TrucoGame {
     const idx = this.getPlayerIndex(currentId);
     const nextIdx = (idx + 1) % this.players.length;
     return this.players[nextIdx].id;
+  }
+
+  // Identifica a função tática de cada jogador na vaza atual: Mão, Meio, Para-Pé ou Pé
+  getTacticalRoles() {
+    const roles = {};
+    const currentTrick = this.tricks[this.roundNumber - 1];
+    const leadId = currentTrick?.leadPlayerId || this.players[this.starterIndex]?.id;
+    if (!leadId) return roles;
+
+    const numPlayers = this.players.length;
+    let curr = leadId;
+    for (let i = 0; i < numPlayers; i++) {
+      let roleName = 'Meio';
+      let roleClass = 'role-meio';
+      if (i === 0) {
+        roleName = 'Mão';
+        roleClass = 'role-mao';
+      } else if (i === numPlayers - 1) {
+        roleName = 'Pé';
+        roleClass = 'role-pe';
+      } else if (numPlayers === 4 && i === 2) {
+        roleName = 'Para-Pé';
+        roleClass = 'role-parape';
+      }
+      roles[curr] = { name: roleName, class: roleClass, order: i + 1 };
+      curr = this.getNextPlayerId(curr);
+    }
+    return roles;
   }
 
   // Baralho oficial de 40 cartas
@@ -453,6 +509,25 @@ class TrucoGame {
 
     this.emitState();
 
+    // Diálogos táticos de posição e macetes do truco
+    if (this.gameMode === '4p' && !this.isGameOver) {
+      const roles = this.getTacticalRoles();
+      if (this.roundNumber === 1) {
+        if (roles['bot_partner']?.name === 'Pé') {
+          setTimeout(() => this.botSay('bot_partner', this.pickRandom(BOT_QUOTES.tiaoPe)), 350);
+        } else if (roles['bot_partner']?.name === 'Para-Pé') {
+          setTimeout(() => this.botSay('bot_partner', this.pickRandom(BOT_QUOTES.tiaoParaPe)), 350);
+        }
+      } else if (this.roundNumber === 2) {
+        const firstTrick = this.tricks[0];
+        if (firstTrick && firstTrick.winnerTeam === 'draw') {
+          setTimeout(() => this.botSay('bot_partner', this.pickRandom(BOT_QUOTES.tiaoCangaAdvice)), 350);
+        } else if (firstTrick && firstTrick.winnerTeam === 'us') {
+          setTimeout(() => this.botSay('bot_partner', this.pickRandom(BOT_QUOTES.tiaoTieWin)), 350);
+        }
+      }
+    }
+
     if (this.currentTurnPlayerId !== 'player') {
       setTimeout(() => this.botPlayTurn(this.currentTurnPlayerId), 900);
     }
@@ -574,27 +649,32 @@ class TrucoGame {
     const playIndex = previousPlays.length; // 0 = Mão, 1 = Meio, 2 = Para-pé (em 4p), 3 = Pé (em 4p)
     const isMao = (playIndex === 0);
     const isPe = (playIndex === numPlayers - 1); // Último a fechar a vaza
-    const isParaPe = (numPlayers === 4 && playIndex === 2); // Penúltimo da vaza
+    const isParaPe = (numPlayers === 4 && playIndex === 2); // Penúltimo da vaza (3º em 4p)
+    const isMeio = (playIndex === 1);
 
     // -------------------------------------------------------------------------
-    // CENÁRIO A: O BOT É O "MÃO" (Abre a vaza)
+    // CENÁRIO A: O BOT É O "MÃO" (Abre a vaza - 1º a jogar)
     // -------------------------------------------------------------------------
     if (isMao) {
-      // 1ª Vaza: Abrindo a mão
+      // 1ª Vaza: Abertura crucial da mão
       if (this.roundNumber === 1) {
         const manilhas = sorted.filter(c => c.isManilha);
-        // Se tiver 2 manilhas (ex: Casal ou duas manilhas fortes):
+        // 1. Se tiver 2 manilhas (ex: Casal ou duas manilhas fortes):
         if (manilhas.length >= 2) {
-          // Sai com a menor das manilhas para já cravar a primeira com folga
+          // Sai com a menor das manilhas para cravar a primeira com segurança e guardar a maior
           return manilhas[0];
         }
-        // Se tiver 1 manilha e cartas médias/boas (ex: 3 ou 2):
-        if (manilhas.length === 1 && sorted.some(c => c.power >= 9 && !c.isManilha)) {
-          // Sai chamando com a carta média (3 ou 2) para tirar manilha dos adversários
-          const strongCommons = sorted.filter(c => c.power >= 9 && !c.isManilha);
+        // 2. Se tiver 1 manilha e cartas médias/boas (ex: 3 ou 2):
+        // Malícia clássica: "Chamar manilha" com o 3 ou 2 para forçar adversário a gastar ou ganhar de graça
+        const strongCommons = sorted.filter(c => c.power >= 9 && !c.isManilha);
+        if (manilhas.length === 1 && strongCommons.length > 0) {
+          return strongCommons[strongCommons.length - 1]; // Joga o 3 ou 2
+        }
+        // 3. Se tiver só um 3 ou 2 sem manilha: sai com ele para tentar fazer a 1ª na força bruta
+        if (strongCommons.length > 0) {
           return strongCommons[strongCommons.length - 1];
         }
-        // Caso normal: sai com a carta intermediária para sondar a mesa
+        // 4. Mão fraca: sai com carta intermediária (ex: 7) para sondar a mesa sem entregar lixo direto
         if (sorted.length === 3) return sorted[1];
         return sorted[0];
       }
@@ -602,38 +682,43 @@ class TrucoGame {
       // 2ª Vaza:
       if (this.roundNumber === 2) {
         const firstTrick = this.tricks[0];
-        // Se a 1ª vaza cangou (empate): QUEM FIZER A SEGUNDA LEVA A MÃO!
+        // REGRA DE OURO: Se a 1ª vaza cangou (empate), QUEM FIZER A SEGUNDA GANHA A MÃO INTEIRA!
         if (firstTrick && firstTrick.winnerTeam === 'draw') {
-          return sorted[sorted.length - 1]; // Maior carta absoluta
+          return sorted[sorted.length - 1]; // Maior carta absoluta sem dó!
         }
-        // Se a dupla perdeu a primeira: tem que matar com a mais forte
+        // Se a dupla perdeu a primeira: é obrigatório vencer a 2ª para não perder o jogo imediatamente!
         if (firstTrick && firstTrick.winnerTeam !== botObj.team) {
           return sorted[sorted.length - 1];
         }
-        // Se a dupla ganhou a primeira: sai com carta forte para fechar a partida
+        // Se a dupla ganhou a primeira: sai com a melhor carta para fechar 2 a 0 direto
         return sorted[sorted.length - 1];
       }
 
-      // 3ª Vaza (vaza decisiva final): joga a última carta restante com tudo
+      // 3ª Vaza (Vaza decisiva final): joga a última carta com força máxima
       return sorted[sorted.length - 1];
     }
 
     // -------------------------------------------------------------------------
     // CENÁRIO B: JÁ HOUVE JOGADAS ANTERIORES NA VAZA (Meio, Para-Pé ou Pé)
     // -------------------------------------------------------------------------
-    let bestPlay = null;
-    let highestPower = -1;
+    let maxPower = -1;
+    let topPlaysList = [];
 
     previousPlays.forEach(p => {
       const pwr = p.card.covered ? 0 : p.card.power;
-      if (pwr > highestPower) {
-        highestPower = pwr;
-        bestPlay = p;
+      if (pwr > maxPower) {
+        maxPower = pwr;
+        topPlaysList = [p];
+      } else if (pwr === maxPower && pwr > 0) {
+        topPlaysList.push(p);
       }
     });
 
-    const leaderPlayer = bestPlay ? this.getPlayer(bestPlay.playerId) : null;
-    const isPartnerWinning = leaderPlayer && leaderPlayer.team === botObj.team;
+    const highestPower = maxPower;
+    // O parceiro está vencendo SOZINHO sem estar empatado com adversário?
+    const isPartnerLeadingAlone = (topPlaysList.length === 1 && this.getPlayer(topPlaysList[0].playerId).team === botObj.team);
+    // Adversário está ganhando ou amarrado na maior carta?
+    const isEnemyLeadingOrTied = topPlaysList.some(p => this.getPlayer(p.playerId).team !== botObj.team);
 
     // Cartas disponíveis do bot que vencem ou empatam a mesa:
     const winningCards = sorted.filter(c => c.power > highestPower);
@@ -643,24 +728,27 @@ class TrucoGame {
     // PAPEL 1: O "PÉ" (Último jogador a fechar a vaza - Informação Perfeita!)
     // -------------------------------------------------------------------------
     if (isPe) {
-      // 1. Se o parceiro já está vencendo a vaza:
-      if (isPartnerWinning) {
-        // A vaza já é nossa! NINGUÉM joga depois do Pé. POUPE MUNIÇÃO!
-        if (botId === 'bot_partner' && Math.random() < 0.4) {
+      // 1. Se o parceiro já está vencendo a vaza sozinho:
+      if (isPartnerLeadingAlone) {
+        // A vaza já é nossa! Ninguém mais joga. POUPE MUNIÇÃO ABSOLUTA!
+        if (botId === 'bot_partner' && Math.random() < 0.5) {
           this.botSay('bot_partner', this.pickRandom(BOT_QUOTES.partnerHelper));
         }
         return sorted[0]; // Menor lixo absoluto
       }
 
-      // 2. Se o adversário está vencendo:
+      // 2. O adversário está vencendo ou empatado com o parceiro:
       // REGRA DE OURO DO TRUCO: O PÉ DEVE FAZER A PRIMEIRA VAZA!
       if (this.roundNumber === 1) {
         if (winningCards.length > 0) {
-          // Mata com a menor carta que for suficiente para levar a primeira
+          // Mata com a menor carta vencedora suficiente (poupa Zap se um 2 ou Dama já mata)
+          if (botId !== 'bot_partner' && Math.random() < 0.35) {
+            this.botSay(botId, this.pickRandom(BOT_QUOTES.enemyPe));
+          }
           return winningCards[0];
         }
         if (tieCards.length > 0) {
-          // Se não dá para matar, mas dá para cangar (empatar): CANGA A PRIMEIRA!
+          // Se não dá para matar, CANGA A PRIMEIRA! No Pé, cangar é jogada de mestre!
           return tieCards[0];
         }
         // Não dá para ganhar nem empatar: descarta o menor lixo
@@ -670,23 +758,30 @@ class TrucoGame {
       // Na 2ª Vaza:
       if (this.roundNumber === 2) {
         const firstTrick = this.tricks[0];
-        // Se a 1ª vaza foi canga: se vencer agora ganha a mão inteira!
+        // Caso 2A: Se a 1ª vaza foi CANGA (empate): QUEM FIZER A 2ª LEVA A MÃO!
         if (firstTrick && firstTrick.winnerTeam === 'draw') {
-          if (winningCards.length > 0) return winningCards[winningCards.length - 1]; // Maior
+          if (winningCards.length > 0) return winningCards[0]; // Mata com o suficiente e leva a mão!
+          if (tieCards.length > 0) return tieCards[0]; // Canga novamente e empurra pra 3ª
           return sorted[0];
         }
-        // Se a nossa dupla ganhou a 1ª vaza: empatar ou ganhar fecha a mão!
+        // Caso 2B: Se a nossa dupla GANHOU a 1ª vaza:
         if (firstTrick && firstTrick.winnerTeam === botObj.team) {
-          if (winningCards.length > 0) return winningCards[0];
-          if (tieCards.length > 0) return tieCards[0]; // Canga que dá vitória!
+          // MACETE DE OURO: CANGA DA VITÓRIA! Quem ganhou a 1ª e empata a 2ª GANHA A MÃO NA HORA!
+          if (tieCards.length > 0) {
+            return tieCards[0]; // Empate que dá vitória imediata sem gastar carta maior!
+          }
+          if (winningCards.length > 0) {
+            return winningCards[0]; // Fecha 2 a 0!
+          }
           return sorted[0];
         }
-        // Se a nossa dupla perdeu a 1ª vaza: obrigatório ganhar se puder
+        // Caso 2C: Se a nossa dupla PERDEU a 1ª vaza:
+        // Obrigatório matar para levar a partida para a 3ª vaza!
         if (winningCards.length > 0) return winningCards[0];
         return sorted[0];
       }
 
-      // 3ª Vaza: se puder ganhar, mata; senão lixo
+      // 3ª Vaza: vaza finalíssima
       if (winningCards.length > 0) return winningCards[0];
       return sorted[0];
     }
@@ -696,41 +791,96 @@ class TrucoGame {
     // Quem joga depois dele é o adversário (que é o Pé da outra dupla)!
     // -------------------------------------------------------------------------
     if (isParaPe) {
-      // 1. Se o parceiro abriu com carta muito forte (ex: Zap ou Copeta):
-      if (isPartnerWinning && highestPower >= 102) {
-        // O parceiro já garantiu um canhão. Para-pé descarta baixo para poupar
+      // 1. Se o parceiro (Mão) abriu com carta muito forte (Manilha ou 3 não coberto):
+      if (isPartnerLeadingAlone && highestPower >= 10) {
+        // O parceiro já garantiu pressão pesada na mesa. Para-pé poupa munição!
         return sorted[0];
       }
 
-      // 2. Se o parceiro jogou baixo (lixo) ou o adversário cobriu e está liderando:
-      // NÃO PODE DEIXAR MOLE PRO PÉ ADVERSÁRIO! "Chama na chincha com a maior!"
-      if (!isPartnerWinning || highestPower < 8) {
+      // 2. Se o adversário cobriu o parceiro ou está liderando:
+      // MACETE DE OURO: "NÃO DEIXE MOLE PRO PÉ ADVERSÁRIO! CHAMA NA CHINCHA COM A MAIOR!"
+      if (isEnemyLeadingOrTied || highestPower < 8) {
         if (winningCards.length > 0) {
-          // Se estamos na 1ª vaza, o Para-pé joga a sua MAIOR carta para esganar o Pé adversário!
+          // Na 1ª vaza, o Para-pé sobe a sua MAIOR carta para esganar e sangrar o Pé adversário!
           if (this.roundNumber === 1) {
-            return winningCards[winningCards.length - 1]; // Maior carta que tiver!
+            if (botId === 'bot_partner' && Math.random() < 0.45) {
+              this.botSay('bot_partner', this.pickRandom(BOT_QUOTES.tiaoParaPe));
+            } else if (botId !== 'bot_partner' && Math.random() < 0.35) {
+              this.botSay(botId, this.pickRandom(BOT_QUOTES.enemyParaPe));
+            }
+            return winningCards[winningCards.length - 1]; // Maior carta absoluta!
           }
+          // Na 2ª vaza após canga: quem fizer a 2ª leva a mão, joga a maior!
+          if (this.roundNumber === 2 && this.tricks[0]?.winnerTeam === 'draw') {
+            return winningCards[winningCards.length - 1];
+          }
+          // Na 2ª vaza normal: mata com a menor vencedora
           return winningCards[0];
         }
-        // Se não tem como vencer, descarta a menor para o parceiro no Pé ver
+        // Não consegue matar, mas consegue empatar na 1ª vaza: canga!
+        if (tieCards.length > 0 && this.roundNumber === 1) {
+          return tieCards[0];
+        }
+        // Não tem como matar nem empatar: descarta o menor lixo para o parceiro no Pé ver
         return sorted[0];
       }
 
-      // Se o parceiro está ganhando com carta razoável:
+      // Se o parceiro está liderando com segurança razoável:
       return sorted[0];
     }
 
     // -------------------------------------------------------------------------
     // PAPEL 3: O "MEIO" (2º a jogar)
     // -------------------------------------------------------------------------
-    if (winningCards.length > 0) {
-      // Tenta cobrir a carta da abertura com a menor carta vencedora
-      return winningCards[0];
+    if (isMeio) {
+      // 1ª Vaza:
+      if (this.roundNumber === 1) {
+        // Se a abertura foi carta baixa (power <= 6):
+        if (highestPower <= 6) {
+          // Tenta matar economicamente com a menor carta vencedora
+          if (winningCards.length > 0) {
+            // Se a menor carta vencedora for a ÚNICA manilha forte (Zap/Copeta) e o resto for lixo:
+            // Poupa a manilha e joga o menor lixo, confiando no parceiro que é o Pé!
+            const firstWin = winningCards[0];
+            if (firstWin.isManilha && firstWin.manilhaRank >= 3 && sorted.filter(c => c.isManilha).length === 1) {
+              return sorted[0];
+            }
+            return firstWin;
+          }
+        }
+        // Se a abertura foi forte (power >= 7):
+        if (winningCards.length > 0) {
+          return winningCards[0];
+        }
+        if (tieCards.length > 0) {
+          return tieCards[0]; // Canga na primeira
+        }
+        return sorted[0];
+      }
+
+      // 2ª Vaza:
+      if (this.roundNumber === 2) {
+        const firstTrick = this.tricks[0];
+        // Se a 1ª foi canga: quem fizer a 2ª ganha a mão inteira!
+        if (firstTrick && firstTrick.winnerTeam === 'draw') {
+          if (winningCards.length > 0) return winningCards[winningCards.length - 1];
+          return sorted[0];
+        }
+        // Se a nossa dupla ganhou a primeira: se der pra empatar, fecha a mão!
+        if (firstTrick && firstTrick.winnerTeam === botObj.team && tieCards.length > 0) {
+          return tieCards[0];
+        }
+        if (winningCards.length > 0) return winningCards[0];
+        return sorted[0];
+      }
+
+      // 3ª Vaza:
+      if (winningCards.length > 0) return winningCards[0];
+      return sorted[0];
     }
-    if (tieCards.length > 0 && this.roundNumber === 1) {
-      return tieCards[0]; // Canga na 1ª
-    }
-    // Não consegue ganhar: descarta o menor lixo e deixa a decisão pro parceiro
+
+    // Fallback de segurança
+    if (winningCards.length > 0) return winningCards[0];
     return sorted[0];
   }
 
@@ -958,7 +1108,7 @@ class TrucoGame {
     setTimeout(() => this.botsRespondToTruco(nextVal), 1400);
   }
 
-  // Robôs adversários decidem se pedem Truco
+  // Robôs adversários decidem se pedem Truco com base em cartas e posição tática
   shouldBotTruco(botId) {
     if (this.isMaoDe11 || this.isMaoDeFerro || this.isGameOver || this.betState !== 'none') return false;
     const botObj = this.getPlayer(botId);
@@ -972,13 +1122,47 @@ class TrucoGame {
 
     const unplayedCards = this.hands[botId].filter(c => !c.played);
     const handStrength = this.evaluateHandStrength(unplayedCards);
-    const hasZap = unplayedCards.some(c => c.isManilha && c.manilhaRank === 4);
-    const hasCopeta = unplayedCards.some(c => c.isManilha && c.manilhaRank === 3);
+    const manilhas = unplayedCards.filter(c => c.isManilha);
+    const hasZap = manilhas.some(c => c.manilhaRank === 4);
+    const hasCopeta = manilhas.some(c => c.manilhaRank === 3);
 
+    const roles = this.getTacticalRoles();
+    const isBotPe = roles[botId]?.name === 'Pé';
     const firstTrickWon = this.tricks[0] && this.tricks[0].winnerTeam === 'them';
-    const isBluffing = Math.random() < 0.16;
+    const firstTrickDraw = this.tricks[0] && this.tricks[0].winnerTeam === 'draw';
 
-    if (hasZap || (hasCopeta && firstTrickWon) || handStrength >= 26 || isBluffing) {
+    // 1. TÁTICA DO PÉ NA 2ª VAZA APÓS CANGA:
+    // Se a 1ª vaza cangou e o bot no Pé tem carta para matar a mesa -> TRUCA COM 85% DE CHANCE!
+    if (isBotPe && this.roundNumber === 2 && firstTrickDraw) {
+      const currentTrick = this.tricks[1];
+      if (currentTrick && currentTrick.plays.length > 0) {
+        const topPower = Math.max(...currentTrick.plays.map(p => p.card.covered ? 0 : p.card.power));
+        if (unplayedCards.some(c => c.power > topPower)) {
+          return Math.random() < 0.85;
+        }
+      }
+    }
+
+    // 2. TÁTICA DO PÉ NA 2ª VAZA (QUANDO A DUPLA DELE GANHOU A 1ª):
+    // Se a dupla ganhou a 1ª e o bot no Pé tem carta para empatar ou ganhar a 2ª -> TRUCA PARA FECHAR!
+    if (isBotPe && this.roundNumber === 2 && firstTrickWon) {
+      const currentTrick = this.tricks[1];
+      if (currentTrick && currentTrick.plays.length > 0) {
+        const topPower = Math.max(...currentTrick.plays.map(p => p.card.covered ? 0 : p.card.power));
+        if (unplayedCards.some(c => c.power >= topPower)) {
+          return Math.random() < 0.75;
+        }
+      }
+    }
+
+    // 3. DUAS MANILHAS NA MÃO (ZAP + COPETA OU OUTRA):
+    if (manilhas.length >= 2 || hasZap) {
+      return Math.random() < 0.65;
+    }
+
+    // 4. BLEFE OU MÃO FORTE CONTEXTUAL:
+    const isBluffing = Math.random() < 0.15;
+    if ((hasCopeta && firstTrickWon) || handStrength >= 26 || isBluffing) {
       return Math.random() < 0.6;
     }
     return false;
@@ -1191,7 +1375,8 @@ class TrucoGame {
       isGameOver: this.isGameOver,
       lastBettorTeam: this.lastBettorTeam,
       lastBettorPlayerId: this.lastBettorPlayerId,
-      resolvingTrick: !!this.resolvingTrick
+      resolvingTrick: !!this.resolvingTrick,
+      tacticalRoles: this.getTacticalRoles()
     };
   }
 }

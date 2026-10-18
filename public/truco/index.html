@@ -148,6 +148,7 @@
           <span class="avatar-icon">🤖</span>
           <span class="emoji-reaction-badge" id="badge-bot_partner">😐</span>
         </div>
+        <span class="tactical-role-pill" id="role-tag-bot_partner">Mão</span>
         <div class="speech-bubble" id="speech-bot_partner"></div>
         <div class="bot-mini-cards" id="cards-bot_partner"></div>
       </section>
@@ -159,6 +160,7 @@
           <span class="avatar-icon">👾</span>
           <span class="emoji-reaction-badge" id="badge-bot_left">😐</span>
         </div>
+        <span class="tactical-role-pill" id="role-tag-bot_left">Meio</span>
         <div class="speech-bubble" id="speech-bot_left"></div>
       </section>
 
@@ -169,6 +171,7 @@
           <span class="avatar-icon">🤠</span>
           <span class="emoji-reaction-badge" id="badge-bot_right">😐</span>
         </div>
+        <span class="tactical-role-pill" id="role-tag-bot_right">Pé</span>
         <div class="speech-bubble" id="speech-bot_right"></div>
       </section>
 
@@ -210,6 +213,7 @@
             <span class="avatar-icon">🧑</span>
             <span class="emoji-reaction-badge" id="badge-player">😐</span>
           </div>
+          <span class="tactical-role-pill" id="role-tag-player">Você • Mão</span>
         </div>
 
         <!-- CONTROLE DE CARTA ABERTA / COBERTA -->
@@ -615,6 +619,22 @@
         });
         const activeStation = document.getElementById(`station-${state.currentTurnPlayerId}`);
         if (activeStation) activeStation.classList.add('active-turn');
+
+        // Atualiza as pílulas de posição tática (Mão, Meio, Para-Pé, Pé)
+        if (state.tacticalRoles) {
+          const allStationIds = ['player', 'bot_partner', 'bot_left', 'bot_right'];
+          allStationIds.forEach(id => {
+            const roleEl = document.getElementById(`role-tag-${id}`);
+            const roleInfo = state.tacticalRoles[id];
+            if (roleEl && roleInfo) {
+              roleEl.textContent = id === 'player' ? `Você • ${roleInfo.name}` : roleInfo.name;
+              roleEl.className = `tactical-role-pill ${roleInfo.class}`;
+              roleEl.style.display = 'inline-block';
+            } else if (roleEl) {
+              roleEl.style.display = 'none';
+            }
+          });
+        }
 
         // Cartas dos Bots (Mostra cartas azuis de costas como no screenshot)
         if (cardsPartnerEl) {
