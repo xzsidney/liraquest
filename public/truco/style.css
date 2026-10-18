@@ -553,18 +553,20 @@ html, body {
   position: absolute;
   background: #ffffff;
   color: #111;
-  padding: 4px 8px;
-  border-radius: 6px;
+  padding: 5px 9px;
+  border-radius: 8px;
   font-weight: 700;
   font-size: 0.72rem;
-  max-width: 150px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  line-height: 1.35;
+  width: max-content;
+  max-width: 130px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.55);
   opacity: 0;
   transform: scale(0.85);
   transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   pointer-events: none;
-  z-index: 40;
-  text-align: center;
+  z-index: 45;
+  word-break: break-word;
 }
 
 .speech-bubble.visible {
@@ -572,9 +574,56 @@ html, body {
   transform: scale(1);
 }
 
-.station-north .speech-bubble { top: 52px; }
-.station-west .speech-bubble  { left: 60px; bottom: 4px; }
-.station-east .speech-bubble  { right: 60px; bottom: 4px; }
+/* Norte (Tião / Parceiro) - Posicionado à ESQUERDA do avatar */
+.station-north .speech-bubble {
+  top: 2px;
+  right: calc(100% + 8px);
+  text-align: right;
+}
+
+.station-north .speech-bubble::after {
+  content: '';
+  position: absolute;
+  top: 12px;
+  right: -6px;
+  border-width: 5px 0 5px 6px;
+  border-style: solid;
+  border-color: transparent transparent transparent #ffffff;
+}
+
+/* Oeste (Zé Truqueiro / Lateral Esquerda) - Posicionado ABAIXO do personagem */
+.station-west .speech-bubble {
+  top: calc(100% + 8px);
+  left: 0;
+  text-align: left;
+}
+
+.station-west .speech-bubble::after {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 18px;
+  border-width: 0 5px 6px 5px;
+  border-style: solid;
+  border-color: transparent transparent #ffffff transparent;
+}
+
+/* Leste (Tonho / Lateral Direita) - Posicionado ABAIXO do personagem */
+.station-east .speech-bubble {
+  top: calc(100% + 8px);
+  right: 0;
+  text-align: right;
+}
+
+.station-east .speech-bubble::after {
+  content: '';
+  position: absolute;
+  top: -6px;
+  right: 18px;
+  border-width: 0 5px 6px 5px;
+  border-style: solid;
+  border-color: transparent transparent #ffffff transparent;
+}
 
 /* ==========================================================================
    BOTÃO GRANDE LARANJA DE TRUCO (CANTO INFERIOR ESQUERDO, ACIMA DO AVATAR)
