@@ -21,7 +21,7 @@ Start-Process "e:\11_Games\Zteste\truco-game\index.html"
   - **Oeste:** Zé Truqueiro (Robô Oponente) — Dupla **Eles**
   - **Leste:** Tonho (Robô Oponente) — Dupla **Eles**
 - **Sentido de Jogo:**
-  - Tradicional anti-horário: Sul (Você) ➔ Leste (Tonho) ➔ Norte (Tião) ➔ Oeste (Zé).
+  - Sentido da direita para a esquerda: Sul (Você) ➔ Oeste (Zé) ➔ Norte (Tião) ➔ Leste (Tonho) ➔ Sul (Você).
 - **Vaza de 4 Cartas:**
   - Cada um dos 4 participantes joga 1 carta na rodada.
   - A carta mais forte decide o ponto da vaza para a respectiva dupla.

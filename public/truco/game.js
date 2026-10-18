@@ -131,13 +131,13 @@ const BOT_QUOTES = {
 };
 
 // Configuração dos Jogadores para o modo 4 Jogadores (2v2)
-// Sentido anti-horário: Sul (Você) -> Leste (Tonho) -> Norte (Tião) -> Oeste (Zé)
+// Sentido horário (Direita para a Esquerda): Sul (Você) -> Oeste (Zé) -> Norte (Tião) -> Leste (Tonho)
 const PLAYERS_CONFIG = {
   '4p': [
     { id: 'player', name: 'Você', team: 'us', avatar: '😎', role: 'Sul (Você)' },
-    { id: 'bot_right', name: 'Tonho', team: 'them', avatar: '🤠', role: 'Leste (Adversário)' },
+    { id: 'bot_left', name: 'Zé Truqueiro', team: 'them', avatar: '🤖', role: 'Oeste (Adversário)' },
     { id: 'bot_partner', name: 'Tião', team: 'us', avatar: '🤝', role: 'Norte (Seu Parceiro)' },
-    { id: 'bot_left', name: 'Zé Truqueiro', team: 'them', avatar: '🤖', role: 'Oeste (Adversário)' }
+    { id: 'bot_right', name: 'Tonho', team: 'them', avatar: '🤠', role: 'Leste (Adversário)' }
   ],
   '1v1': [
     { id: 'player', name: 'Você', team: 'us', avatar: '😎', role: 'Você' },
