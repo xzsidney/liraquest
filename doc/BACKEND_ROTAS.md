@@ -225,6 +225,18 @@ Módulo separado com interface mobile responsiva servido pelo backend Node.js:
 | `GET` | `/api/truco/profile` | JWT | Retorna dados do usuário autenticado no LiraQuest, perfil do Herói (`Character`) e saldo de Ouro para a mesa de Truco |
 | `POST` | `/api/truco/finish` | JWT | Registra o desfecho da partida de Truco (`is_victory`, `game_mode`, `player_score`, `bot_score`), creditando +40 Ouro e +60 XP no Herói em caso de vitória (+10 Ouro e +15 XP em derrota) e checando subida de nível (`leveled_up`) |
 
+---
+
+## 🧟‍♂️ 16. Módulo Companheiro Narrativo de Marvel Zombies (`/zombi`)
+
+Módulo separado com interface web responsiva para apoiar partidas físicas de tabuleiro estilo campanha RPG (*Fort Hendrix*):
+
+| Método | Rota | Autenticação | Descrição |
+|:---|:---|:---|:---|
+| `GET` | `/zombi` | Pública | Entrega o aplicativo companheiro (`public/zombi/index.html`) com suporte a cards com imagens recortadas, alertas de dependência e teclado numérico virtual (Keypad) |
+| `GET` | `/zombi/*` | Pública | Entrega de arquivos estáticos dedicados (`style.css`, `app.js`, imagens de recortes em `img/`) |
+
+
 
 
 

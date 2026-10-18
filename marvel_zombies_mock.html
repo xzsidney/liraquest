@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Marvel Zombies - Companheiro de Campanha (MOCK TESTE)</title>
+  <style>
+    :root {
+      --bg-dark: #0a0b10;
+      --card-bg: #141622;
+      --card-border: #2a2e45;
+      --red-blood: #8b0000;
+      --red-bright: #e53e3e;
+      --gold-accent: #d97706;
+      --gold-light: #fbbf24;
+      --green-toxic: #10b981;
+      --blue-arcane: #2563eb;
+      --text-main: #e2e8f0;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      padding-bottom: 90px;
+      line-height: 1.5;
+    }
+
+    /* Cabeçalho Comic */
+    header {
+      background: linear-gradient(180deg, #1f080c 0%, #0a0b10 100%);
+      border-bottom: 2px solid var(--red-blood);
+      padding: 16px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(8px);
+    }
+
+    .badge-mock {
+      background: #7c2d12;
+      color: #fed7aa;
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      display: inline-block;
+      margin-bottom: 6px;
+      border: 1px solid #ea580c;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: #ffffff;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    }
+
+    h1 span {
+      color: var(--red-bright);
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Barra de Status Rápido */
+    .status-bar {
+      display: flex;
+      justify-content: space-around;
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--card-border);
+      padding: 10px 8px;
+      font-size: 0.8rem;
+    }
+
+    .status-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .status-label {
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+    }
+
+    .status-value {
+      font-weight: 700;
+      color: var(--gold-light);
+    }
+
+    .container {
+      max-width: 650px;
+      margin: 0 auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--gold-light);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Accordion de Setup */
+    .setup-box {
+      border-left: 4px solid var(--blue-arcane);
+    }
+
+    .setup-details {
+      margin-top: 10px;
+      font-size: 0.88rem;
+      color: var(--text-main);
+      background: rgba(0,0,0,0.25);
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .setup-details ul {
+      margin-left: 20px;
+      margin-top: 6px;
+    }
+
+    .setup-details li {
+      margin-bottom: 4px;
+    }
+
+    /* Botão Toggle */
+    .btn-toggle {
+      background: none;
+      border: none;
+      color: var(--blue-arcane);
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 0;
+    }
+
+    /* Prólogo */
+    .story-text {
+      font-style: italic;
+      color: #cbd5e1;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      border-left: 3px solid var(--red-bright);
+      padding-left: 12px;
+      margin: 8px 0;
+    }
+
+    /* Grade de Objetivos */
+    .objectives-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .obj-card {
+      background: #1a1d2e;
+      border: 1px solid #333954;
+      border-radius: 10px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .obj-card.completed {
+      border-color: var(--green-toxic);
+      background: #0f241d;
+      opacity: 0.85;
+    }
+
+    .obj-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .obj-badge {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--red-blood);
+      color: #fff;
+    }
+
+    .obj-badge.blue { background: #1e40af; }
+    .obj-badge.green { background: #065f46; }
+    .obj-badge.gold { background: #92400e; }
+
+    .obj-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .obj-desc {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    /* Botões Principais */
+    .btn {
+      width: 100%;
+      background: linear-gradient(180deg, #991b1b 0%, #7f1d1d 100%);
+      color: #fff;
+      border: none;
+      padding: 12px 16px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      border-radius: 8px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.1s ease, filter 0.15s ease;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+      filter: brightness(0.9);
+    }
+
+    .btn-secondary {
+      background: #334155;
+      color: #e2e8f0;
+    }
+
+    .btn-success {
+      background: linear-gradient(180deg, #059669 0%, #047857 100%);
+    }
+
+    /* MODAL DE EVENTO */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 16px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #181b29;
+      border: 2px solid var(--red-blood);
+      border-radius: 14px;
+      max-width: 520px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.9);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 8px;
+    }
+
+    .modal-title {
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: var(--gold-light);
+      text-transform: uppercase;
+    }
+
+    .btn-close-modal {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.4rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .event-body {
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .event-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .choice-btn {
+      background: #24293e;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: left;
+      color: #f8fafc;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .choice-btn:hover, .choice-btn:active {
+      background: #333a56;
+      border-color: var(--gold-accent);
+    }
+
+    .choice-title {
+      font-weight: 800;
+      color: var(--gold-light);
+      margin-bottom: 3px;
+      display: block;
+    }
+
+    /* Caixa de Teste de Dados */
+    .dice-test-box {
+      background: #11131c;
+      border: 1px dashed var(--gold-accent);
+      border-radius: 8px;
+      padding: 14px;
+      text-align: center;
+      margin: 10px 0;
+    }
+
+    .dice-result-btns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    /* Caixa de Consequência */
+    .consequence-box {
+      background: #0f172a;
+      border-radius: 8px;
+      padding: 14px;
+      border-left: 4px solid var(--gold-light);
+      display: none;
+      margin-top: 10px;
+      line-height: 1.5;
+    }
+
+    .consequence-box.success {
+      border-left-color: var(--green-toxic);
+      background: #062b1e;
+    }
+
+    .consequence-box.failure {
+      border-left-color: var(--red-bright);
+      background: #2d0c11;
+    }
+
+    .consequence-title {
+      font-weight: 800;
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+    }
+
+    /* Inventário / Itens Coletados */
+    .inventory-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .inv-tag {
+      background: #1e293b;
+      border: 1px solid #475569;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      color: var(--gold-light);
+    }
+
+    /* Rodapé Fixo */
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(10, 11, 16, 0.95);
+      border-top: 1px solid var(--card-border);
+      backdrop-filter: blur(8px);
+      padding: 10px 16px;
+      display: flex;
+      justify-content: center;
+      z-index: 90;
+    }
+
+    .bottom-bar-inner {
+      max-width: 650px;
+      width: 100%;
+      display: flex;
+      gap: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CABEÇALHO -->
+  <header>
+    <div class="badge-mock">🧪 Modo Teste de Layout (MOCK)</div>
+    <h1>Marvel <span>Zombies</span></h1>
+    <div class="subtitle">Companheiro Narrativo Digital • Campanha RPG</div>
+  </header>
+
+  <!-- BARRA DE STATUS RÁPIDO -->
+  <div class="status-bar">
+    <div class="status-item">
+      <span class="status-label">Missão</span>
+      <span class="status-value">Mock MZ-1</span>
+    </div>
+    <div class="status-item">
+      <span class="status-label">Objetivos</span>
+      <span class="status-value" id="stats-obj">0 / 3 Feitos</span>
+    </div>
+    <div class="status-item">
+      <span class="status-label">Alarme</span>
+      <span class="status-value" id="stats-alarm" style="color: #10b981;">SILENCIOSO</span>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- 1. GUIA DE SETUP DA MESA (FÍSICA) -->
+    <div class="card setup-box">
+      <div class="card-title">
+        🗺️ Montagem do Tabuleiro (Mesa Física)
+      </div>
+      <p style="font-size: 0.88rem; color: var(--text-muted);">
+        Para testar este layout, monte o tabuleiro usando o mapa da Missão 1 (pág. 24 do manual).
+      </p>
+      
+      <button class="btn-toggle" onclick="toggleSetup()" id="btn-toggle-setup" style="margin-top: 8px;">
+        ▶ Mostrar tiles e componentes
+      </button>
+
+      <div class="setup-details" id="setup-details" style="display: none;">
+        <strong>Tiles necessários:</strong> 3R, 5R, 8R, 9V (página 24)<br>
+        <strong>Tokens a colocar na mesa:</strong>
+        <ul>
+          <li><strong>Zona Inicial:</strong> Posição START (Tile 5R/8R).</li>
+          <li><strong>Marcadores de Spawn:</strong> Conforme mapa original (2 pontos vermelhos).</li>
+          <li><strong>Tokens de Objetivo Vermelhos:</strong> Coloque nos 3 locais marcados abaixo.</li>
+          <li><strong>Transeuntes:</strong> 4 cartas viradas para baixo nos locais indicados.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 2. PRÓLOGO DO CAPÍTULO -->
+    <div class="card">
+      <div class="card-title">📖 Prólogo: O Despertar da Fome</div>
+      <div class="story-text">
+        "O cheiro metálico da chuva ácida mal disfarça o pulsar do sangue vivo descendo as ruas de Nova York. Tony Stark e o Capitão América tentam resistir à insanidade que queima em seus estômagos. A S.H.I.E.L.D. ergueu bloqueios para conter a quarentena. Se quisermos sobreviver e encontrar peças para desativar a rede de satélites deles, teremos que caçar..."
+      </div>
+      <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 6px;">
+        💡 <strong>Regra:</strong> Mova seu Herói Zumbi até a zona de um Objetivo no tabuleiro físico para interagir com ele nesta tela.
+      </p>
+    </div>
+
+    <!-- 3. OBJETIVOS OCULTOS (INTERAÇÃO SEM SPOILERS) -->
+    <div class="card">
+      <div class="card-title">🎯 Objetivos no Tabuleiro</div>
+      <p style="font-size: 0.84rem; color: var(--text-muted); margin-bottom: 8px;">
+        Toque no botão correspondente quando seu herói estiver na zona do token:
+      </p>
+
+      <div class="objectives-grid">
+        
+        <!-- Objetivo 1 -->
+        <div class="obj-card" id="card-obj-1">
+          <div class="obj-header">
+            <span class="obj-badge">Objetivo Vermelho</span>
+            <span class="obj-desc">Esquina Superior Direita (Tile 8R)</span>
+          </div>
+          <div class="obj-name">💻 Terminal de Segurança da S.H.I.E.L.D.</div>
+          <button class="btn" onclick="openObjective(1)" id="btn-obj-1">
+            Investigar Terminal
+          </button>
+        </div>
+
+        <!-- Objetivo 2 -->
+        <div class="obj-card" id="card-obj-2">
+          <div class="obj-header">
+            <span class="obj-badge blue">Objetivo Azul / Transeunte</span>
+            <span class="obj-desc">Interior da Farmácia (Tile 3R)</span>
+          </div>
+          <div class="obj-name">🚪 Refúgio Trancado</div>
+          <button class="btn" onclick="openObjective(2)" id="btn-obj-2">
+            Arrombar Refúgio
+          </button>
+        </div>
+
+        <!-- Objetivo 3 -->
+        <div class="obj-card" id="card-obj-3">
+          <div class="obj-header">
+            <span class="obj-badge gold">Objetivo Crítico</span>
+            <span class="obj-desc">Beco Central com Carro Tombado (Tile 9V)</span>
+          </div>
+          <div class="obj-name">🚨 Caixa Preta da Caravana Stark</div>
+          <button class="btn" onclick="openObjective(3)" id="btn-obj-3">
+            Examinar Destroços
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 4. DIÁRIO DE CAMPANHA & ITENS COLETADOS -->
+    <div class="card">
+      <div class="card-title">🎒 Inventário da Campanha</div>
+      <p style="font-size: 0.82rem; color: var(--text-muted);">
+        Itens especiais e registros encontrados nesta missão (ficam salvos para as próximas missões):
+      </p>
+      <div class="inventory-list" id="inventory-display">
+        <span class="inv-tag" id="empty-inv-msg" style="color: var(--text-muted);">Nenhum item coletado ainda</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BARRA INFERIOR COM AÇÃO DE CONCLUIR -->
+  <div class="bottom-bar">
+    <div class="bottom-bar-inner">
+      <button class="btn btn-secondary" onclick="resetMock()" style="flex: 1;">
+        🔄 Resetar Teste
+      </button>
+      <button class="btn btn-success" id="btn-finish-mission" onclick="finishMission()" style="flex: 2; display: none;">
+        🏆 Concluir Missão & Próximo Capítulo
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL DE EVENTO / ESCOLHAS E TESTES -->
+  <div class="modal-overlay" id="event-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-title">Evento</div>
+        <button class="btn-close-modal" onclick="closeModal()">&times;</button>
+      </div>
+
+      <div class="event-body" id="modal-text">
+        <!-- Preenchido via Javascript -->
+      </div>
+
+      <!-- Área Dinâmica para Escolha / Teste de Dados -->
+      <div id="modal-interactive-area"></div>
+
+      <!-- Consequência Revelada -->
+      <div class="consequence-box" id="consequence-box">
+        <div class="consequence-title" id="consequence-title">Resultado</div>
+        <div id="consequence-desc"></div>
+        <button class="btn btn-secondary" style="margin-top: 12px;" onclick="closeModal()">
+          Entendido (Voltar ao Jogo)
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // ESTADO DO MOCK
+    const gameState = {
+      completedObjs: new Set(),
+      alarmActive: false,
+      inventory: [],
+    };
+
+    function toggleSetup() {
+      const details = document.getElementById('setup-details');
+      const btn = document.getElementById('btn-toggle-setup');
+      if (details.style.display === 'none') {
+        details.style.display = 'block';
+        btn.textContent = '▼ Ocultar tiles e componentes';
+      } else {
+        details.style.display = 'none';
+        btn.textContent = '▶ Mostrar tiles e componentes';
+      }
+    }
+
+    // ABRIR MODAL DO OBJETIVO
+    function openObjective(id) {
+      const modal = document.getElementById('event-modal');
+      const title = document.getElementById('modal-title');
+      const text = document.getElementById('modal-text');
+      const area = document.getElementById('modal-interactive-area');
+      const consBox = document.getElementById('consequence-box');
+
+      consBox.style.display = 'none';
+      area.innerHTML = '';
+
+      if (id === 1) {
+        title.innerHTML = '💻 Terminal da S.H.I.E.L.D.';
+        text.innerHTML = `
+          Você alcança o console militar piscando com luzes vermelhas. Ele monitora as frequências de reforço da área.
+          <br><br>
+          Você pode tentar invadir o sistema para roubar as frequências de rádio, mas os alarmes estão armados!
+        `;
+
+        area.innerHTML = `
+          <div class="dice-test-box">
+            <strong style="color: var(--gold-light);">🎲 TESTE DE DADOS NA MESA:</strong>
+            <p style="font-size: 0.85rem; margin-top: 4px;">Role 1 dado pelo Herói Zumbi que está interagindo:</p>
+            <div class="dice-result-btns">
+              <button class="btn btn-secondary" onclick="resolveObj1(false)">
+                ❌ Tirei 1 ou 2<br>(Falha)
+              </button>
+              <button class="btn btn-success" onclick="resolveObj1(true)">
+                ✔️ Tirei 3 ou mais<br>(Sucesso!)
+              </button>
+            </div>
+          </div>
+        `;
+      } 
+      else if (id === 2) {
+        title.innerHTML = '🚪 Refúgio Trancado na Farmácia';
+        text.innerHTML = `
+          Atrás das prateleiras caídas, você ouve o choro abafado de um funcionário sobrevivente e o brilho de um kit médico de emergência.
+          <br><br>
+          <strong>O que você decide fazer com ele?</strong>
+        `;
+
+        area.innerHTML = `
+          <div class="event-options">
+            <button class="choice-btn" onclick="resolveObj2('devour')">
+              <span class="choice-title">🩸 Opção A: Devorar o Sobrevivente</span>
+              O herói que interage zera sua Fome imediatamente e ganha +5 XP, mas perde o rádio de socorro.
+            </button>
+            <button class="choice-btn" onclick="resolveObj2('spare')">
+              <span class="choice-title">🤝 Opção B: Poupar e Forçar a Cooperar</span>
+              Ele entrega as chaves do armário de soro da Stark Tech (+1 Item Especial), mas avisa a S.H.I.E.L.D. depois!
+            </button>
+          </div>
+        `;
+      }
+      else if (id === 3) {
+        title.innerHTML = '🚨 Caixa Preta Stark';
+        text.innerHTML = `
+          O veículo blindado foi esmagado, mas a torre de comunicação traseira ainda tem energia reserva.
+          <br><br>
+          Ao puxar o disco de dados rígido, os sensores de pressão ativam uma contagem regressiva!
+        `;
+
+        area.innerHTML = `
+          <div class="dice-test-box">
+            <strong style="color: var(--gold-light);">🎲 TESTE DE FORÇA / AGILIDADE:</strong>
+            <p style="font-size: 0.85rem; margin-top: 4px;">Role 2 dados. Você precisa de pelo menos um resultado 4+:</p>
+            <div class="dice-result-btns">
+              <button class="btn btn-secondary" onclick="resolveObj3(false)">
+                💥 Nenhum 4+<br>(Explosão de Gás)
+              </button>
+              <button class="btn btn-success" onclick="resolveObj3(true)">
+                🛡️ Teve pelo menos um 4+<br>(Desarmou a Carga)
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
+      modal.classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('event-modal').classList.remove('active');
+      updateUI();
+    }
+
+    // RESOLUÇÃO 1
+    function resolveObj1(success) {
+      const area = document.getElementById('modal-interactive-area');
+      const consBox = document.getElementById('consequence-box');
+      const consTitle = document.getElementById('consequence-title');
+      const consDesc = document.getElementById('consequence-desc');
+
+      area.innerHTML = '';
+      consBox.style.display = 'block';
+
+      if (success) {
+        consBox.className = 'consequence-box success';
+        consTitle.textContent = '🎉 SUCESSO: Rádio Militar Hackeado!';
+        consDesc.innerHTML = `
+          Você baixou os códigos de patrulha antes que os alarmes disparassem!
+          <br>• <strong>Efeito na mesa:</strong> O herói que realizou a ação ganha <strong>+5 XP</strong>.
+          <br>• <strong>Bônus de Campanha:</strong> Item <em>"Frequência da S.H.I.E.L.D."</em> adicionado à mochila.
+        `;
+        addItem('Frequência da S.H.I.E.L.D.');
+      } else {
+        consBox.className = 'consequence-box failure';
+        consTitle.textContent = '🚨 FALHA: Alarme Geral Disparado!';
+        consDesc.innerHTML = `
+          As sirenes começam a uivar por todo o quarteirão!
+          <br>• <strong>Efeito Imediato na mesa:</strong> Coloque <strong>2 Troopers</strong> extras no Ponto de Spawn mais próximo deste objetivo!
+          <br>• O herói ganha <strong>+2 XP</strong> pela tentativa.
+        `;
+        setAlarm(true);
+      }
+
+      markCompleted(1);
+    }
+
+    // RESOLUÇÃO 2
+    function resolveObj2(choice) {
+      const area = document.getElementById('modal-interactive-area');
+      const consBox = document.getElementById('consequence-box');
+      const consTitle = document.getElementById('consequence-title');
+      const consDesc = document.getElementById('consequence-desc');
+
+      area.innerHTML = '';
+      consBox.style.display = 'block';
+
+      if (choice === 'devour') {
+        consBox.className = 'consequence-box failure';
+        consTitle.textContent = '🩸 BOCA CHEIA DE SANGUE!';
+        consDesc.innerHTML = `
+          Você cedeu à Fome voraz! O herói reduz sua Fome para 0 e ganha <strong>+5 XP</strong> imediatos.
+          <br>• <strong>Consequência de Campanha:</strong> Na Missão 2, a S.H.I.E.L.D. já saberá que você não faz prisioneiros.
+        `;
+        addItem('Reputação: Monstro Voraz');
+      } else {
+        consBox.className = 'consequence-box success';
+        consTitle.textContent = '🧪 COOPERAÇÃO FORÇADA!';
+        consDesc.innerHTML = `
+          Com medo de ser devorado, o funcionário abre um compartimento secreto e te entrega uma injeção de adrenalina Stark!
+          <br>• <strong>Item ganho:</strong> <em>"Estimulante Stark"</em> (Pode ser usado 1x em qualquer missão para dar +1 Ação grátis).
+          <br>• O herói ganha <strong>+5 XP</strong>.
+        `;
+        addItem('Estimulante Stark');
+      }
+
+      markCompleted(2);
+    }
+
+    // RESOLUÇÃO 3
+    function resolveObj3(success) {
+      const area = document.getElementById('modal-interactive-area');
+      const consBox = document.getElementById('consequence-box');
+      const consTitle = document.getElementById('consequence-title');
+      const consDesc = document.getElementById('consequence-desc');
+
+      area.innerHTML = '';
+      consBox.style.display = 'block';
+
+      if (success) {
+        consBox.className = 'consequence-box success';
+        consTitle.textContent = '🛡️ CHIP DE NAVEGAÇÃO RESGATADO!';
+        consDesc.innerHTML = `
+          Com precisão cirúrgica, você desativa a armadilha incendiária do veículo e arranca a caixa preta intacta!
+          <br>• <strong>Efeito na mesa:</strong> Todos os Heróis Zumbis ganham <strong>+3 XP</strong>.
+          <br>• <strong>Item Ganho:</strong> <em>"Dados de Satélite da Torre Stark"</em>.
+        `;
+        addItem('Dados de Satélite da Torre Stark');
+      } else {
+        consBox.className = 'consequence-box failure';
+        consTitle.textContent = '💥 DETONAÇÃO DEFENSIVA!';
+        consDesc.innerHTML = `
+          Um cano de gás sob pressão rompe ao ser forçado!
+          <br>• <strong>Efeito na mesa:</strong> Todos os heróis na mesma zona sofrem <strong>1 Dano (Ferimento)</strong>!
+          <br>• Você ainda recupera o chip danificado (+5 XP para o herói).
+        `;
+        addItem('Dados Danificados da Torre');
+      }
+
+      markCompleted(3);
+    }
+
+    function markCompleted(id) {
+      gameState.completedObjs.add(id);
+      const card = document.getElementById('card-obj-' + id);
+      const btn = document.getElementById('btn-obj-' + id);
+      if (card) card.classList.add('completed');
+      if (btn) {
+        btn.textContent = '✔️ Concluído';
+        btn.className = 'btn btn-secondary';
+        btn.disabled = true;
+      }
+    }
+
+    function addItem(name) {
+      if (!gameState.inventory.includes(name)) {
+        gameState.inventory.push(name);
+      }
+    }
+
+    function setAlarm(active) {
+      gameState.alarmActive = active;
+      const el = document.getElementById('stats-alarm');
+      if (active) {
+        el.textContent = '🚨 DISPARADO';
+        el.style.color = '#ef4444';
+      }
+    }
+
+    function updateUI() {
+      // Atualizar contador
+      const count = gameState.completedObjs.size;
+      document.getElementById('stats-obj').textContent = `${count} / 3 Feitos`;
+
+      // Atualizar inventário
+      const invDisplay = document.getElementById('inventory-display');
+      if (gameState.inventory.length === 0) {
+        invDisplay.innerHTML = '<span class="inv-tag" style="color: var(--text-muted);">Nenhum item coletado ainda</span>';
+      } else {
+        invDisplay.innerHTML = gameState.inventory.map(item => `<span class="inv-tag">📦 ${item}</span>`).join('');
+      }
+
+      // Habilitar botão de vitória se todos os 3 objetivos forem feitos
+      const finishBtn = document.getElementById('btn-finish-mission');
+      if (count >= 3) {
+        finishBtn.style.display = 'block';
+      }
+    }
+
+    function finishMission() {
+      alert(`🎉 MISSÃO DE TESTE CONCLUÍDA!\n\nItens Salvos na Campanha: ${gameState.inventory.join(', ')}\n\nStatus do Alarme: ${gameState.alarmActive ? 'Alarme Soou (Reforços na próxima)' : 'Infiltração Furtiva'}\n\nO próximo capítulo usará essas escolhas para definir o mapa e a história seguinte!`);
+    }
+
+    function resetMock() {
+      if (confirm('Deseja resetar o teste da missão?')) {
+        gameState.completedObjs.clear();
+        gameState.inventory = [];
+        gameState.alarmActive = false;
+        location.reload();
+      }
+    }
+  </script>
+</body>
+</html>

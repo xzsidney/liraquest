@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#8b0000">
+  <title>Marvel Zombies - Companheiro de Campanha RPG</title>
+  
+  <!-- Fontes Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- CABEÇALHO HEROICO / ZOMBIE -->
+  <header class="app-header">
+    <div class="header-top">
+      <span class="badge-module">🧟‍♂️ Módulo Oficial LiraQuest</span>
+      <span class="badge-version">MOCK V2 • INTERATIVO</span>
+    </div>
+    <h1 class="comic-title">MARVEL <span>ZOMBIES</span></h1>
+    <div class="comic-subtitle">Companheiro de Campanha RPG • Baseado em Fort Hendrix</div>
+  </header>
+
+  <!-- BARRA DE STATUS FIXA SUPERIOR -->
+  <div class="hud-bar">
+    <div class="hud-item">
+      <span class="hud-label">Capítulo</span>
+      <span class="hud-value" id="hud-chapter">01: O Despertar</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">Progresso</span>
+      <span class="hud-value" id="hud-progress">0 / 4 Concluídos</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">Alarme S.H.I.E.L.D.</span>
+      <span class="hud-value status-safe" id="hud-alarm">SILENCIOSO</span>
+    </div>
+  </div>
+
+  <main class="main-container">
+
+    <!-- 1. GUIA DE SETUP DA MESA (FÍSICA) -->
+    <section class="game-card setup-card">
+      <div class="card-header-toggle" onclick="toggleSetup()">
+        <div class="card-header-title">
+          <span class="icon">🗺️</span>
+          <span>Montagem da Mesa Física (Missão MZ1 - Pág. 24)</span>
+        </div>
+        <span class="toggle-icon" id="setup-toggle-icon">▼</span>
+      </div>
+
+      <div class="setup-content" id="setup-content">
+        <p class="setup-intro">
+          Monte o tabuleiro exatamente como na <strong>Missão 1</strong> do manual de regras:
+        </p>
+        <div class="tiles-badge-row">
+          <span class="tile-tag">Tile 3R</span>
+          <span class="tile-tag">Tile 8R</span>
+          <span class="tile-tag">Tile 9V</span>
+          <span class="tile-tag">Tile 5R</span>
+        </div>
+        <ul class="setup-checklist">
+          <li><strong>Zona Inicial:</strong> Posição START (Esquina dos tiles 5R e 8R).</li>
+          <li><strong>Spawns:</strong> 2 pontos vermelhos nos extremos do quarteirão.</li>
+          <li><strong>Tokens de Objetivo:</strong> 4 marcadores vermelhos nos locais indicados nos cards abaixo.</li>
+          <li><strong>Transeuntes (Bystanders):</strong> 4 cartas viradas para baixo.</li>
+        </ul>
+        <button class="btn-view-map" onclick="openMapModal()">
+          🔍 Ver Foto do Mapa Completo da Missão
+        </button>
+      </div>
+    </section>
+
+    <!-- 2. PRÓLOGO NARRATIVO -->
+    <section class="game-card story-card">
+      <div class="card-title">
+        <span class="icon">📖</span>
+        <span>Prólogo: O Banquete dos Condenados</span>
+      </div>
+      <div class="comic-dialogue">
+        <p>"A fome não pensa, ela devora. Enquanto a névoa tóxica cobre os arranha-céus em ruínas, a S.H.I.E.L.D. estabeleceu um perímetro militar com portas pressurizadas. Se quisermos invadir a rede central deles, precisamos de credenciais e de um caminho até os túneis do metrô."</p>
+      </div>
+      <div class="rule-hint">
+        💡 <strong>Como Jogar:</strong> Mova seu Herói Zumbi até a zona do objetivo no tabuleiro físico. Ao chegar lá, toque no card correspondente na tela para interagir!
+      </div>
+    </section>
+
+    <!-- 3. CARDS DE OBJETIVOS COM IMAGENS RECORTADAS E DEPENDÊNCIAS -->
+    <section class="objectives-section">
+      <h2 class="section-heading">🎯 Objetivos e Locais no Tabuleiro</h2>
+
+      <div class="objectives-grid">
+
+        <!-- CARD 1: LABORATÓRIO OSCORP (Dá a senha) -->
+        <article class="obj-card" id="obj-card-1">
+          <div class="crop-img-wrapper crop-oscorp">
+            <div class="tile-label">Tile 8R • Laboratório Oscorp</div>
+            <div class="obj-radar-pin">🎯 OBJ 1</div>
+          </div>
+          <div class="obj-info">
+            <div class="obj-tags">
+              <span class="tag-status available" id="tag-obj-1">Disponível</span>
+              <span class="tag-type">💻 Terminal de Dados</span>
+            </div>
+            <h3 class="obj-title">Terminal Central da Oscorp</h3>
+            <p class="obj-desc">
+              Um computador de alta segurança ainda está ligado na sala dos fundos. Pode conter códigos vitais para a rede do metrô.
+            </p>
+            <button class="btn-action" id="btn-obj-1" onclick="interactObjective(1)">
+              🔍 Investigar Terminal
+            </button>
+          </div>
+        </article>
+
+        <!-- CARD 2: METRÔ SUBTERRÂNEO (DEPENDÊNCIA + ENIGMA COM SENHA) -->
+        <article class="obj-card locked" id="obj-card-2">
+          <div class="crop-img-wrapper crop-metro">
+            <img src="img/metro_crop.png" alt="Recorte do Metrô" class="crop-img-metro">
+            <div class="tile-label">Tile 3R • Entrada do Metrô</div>
+            <div class="obj-radar-pin">🔒 OBJ 2</div>
+          </div>
+          <div class="obj-info">
+            <div class="obj-tags">
+              <span class="tag-status locked" id="tag-obj-2">Bloqueado</span>
+              <span class="tag-type">🚪 Porta Blindada com Senha</span>
+            </div>
+            <h3 class="obj-title">Acesso Subterrâneo do Metrô</h3>
+            
+            <!-- ALERTA DE DEPENDÊNCIA (CONFORME PEDIDO DO USUÁRIO) -->
+            <div class="dependency-alert" id="alert-dep-2">
+              ⚠️ <strong>ACESSO BLOQUEADO:</strong> Esta porta de aço requer uma <strong>Senha Numérica de 3 Dígitos</strong>. Você precisa investigar o <em>Terminal da Oscorp (Objetivo 1)</em> para descobrir a senha!
+            </div>
+
+            <p class="obj-desc">
+              Uma porta de alta pressão tranca a escadaria do metrô. Um painel eletrônico com luzes vermelhas espera um código de 3 dígitos.
+            </p>
+            
+            <button class="btn-action btn-locked" id="btn-obj-2" onclick="interactObjective(2)">
+              🔒 Tentar Acessar (Bloqueado)
+            </button>
+          </div>
+        </article>
+
+        <!-- CARD 3: BECO COM CARRO TOMBADO (TESTE DE FORÇA) -->
+        <article class="obj-card" id="obj-card-3">
+          <div class="crop-img-wrapper crop-rubble">
+            <div class="tile-label">Tile 9V • Beco dos Destroços</div>
+            <div class="obj-radar-pin">🎯 OBJ 3</div>
+          </div>
+          <div class="obj-info">
+            <div class="obj-tags">
+              <span class="tag-status available" id="tag-obj-3">Disponível</span>
+              <span class="tag-type">🚨 Contêiner Stark</span>
+            </div>
+            <h3 class="obj-title">Blindado da Caravana Stark</h3>
+            <p class="obj-desc">
+              Um veículo destruído com compartimento de carga sob pressão. Ao tentar abrir, os alarmes de gás podem disparar!
+            </p>
+            <button class="btn-action" id="btn-obj-3" onclick="interactObjective(3)">
+              🛠️ Forçar Compartimento
+            </button>
+          </div>
+        </article>
+
+        <!-- CARD 4: POSTO DA S.H.I.E.L.D. (DILEMA MORAL) -->
+        <article class="obj-card" id="obj-card-4">
+          <div class="crop-img-wrapper crop-shield">
+            <div class="tile-label">Tile 5R • Esquina Sul</div>
+            <div class="obj-radar-pin">🎯 OBJ 4</div>
+          </div>
+          <div class="obj-info">
+            <div class="obj-tags">
+              <span class="tag-status available" id="tag-obj-4">Disponível</span>
+              <span class="tag-type">🩸 Transeunte encurralado</span>
+            </div>
+            <h3 class="obj-title">Agente de Comunicação Sharon</h3>
+            <p class="obj-desc">
+              Atrás de barricadas de contenção, um agente vivo tenta emitir um sinal de socorro para os Super-Heróis Vivos.
+            </p>
+            <button class="btn-action" id="btn-obj-4" onclick="interactObjective(4)">
+              🩸 Encurralar Sobrevivente
+            </button>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- 4. DIÁRIO DE CAMPANHA & INVENTÁRIO PERSISTENTE -->
+    <section class="game-card inventory-card">
+      <div class="card-title">
+        <span class="icon">🎒</span>
+        <span>Mochila de Campanha & Descobertas</span>
+      </div>
+      <p class="inv-subtitle">
+        Pistas, códigos e artefatos que você carrega para as próximas missões:
+      </p>
+      <div class="inventory-container" id="inventory-container">
+        <div class="empty-inv" id="empty-inv-msg">Nenhum item ou código descoberto ainda.</div>
+      </div>
+    </section>
+
+    <!-- BOTÃO FINALIZAR CAPÍTULO -->
+    <div class="chapter-finish-area">
+      <button class="btn-finish-chapter" id="btn-finish-chapter" onclick="finishChapter()" style="display: none;">
+        🏆 TODOS OBJETIVOS CONCLUÍDOS • AVANÇAR HISTÓRIA
+      </button>
+    </div>
+
+  </main>
+
+  <!-- ================= MODAIS INTERATIVOS ================= -->
+
+  <!-- MODAL DE HISTÓRIA / TESTE -->
+  <div class="modal-backdrop" id="story-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-tag" id="modal-tag">EVENTO</div>
+        <h3 class="modal-title" id="modal-title">Título do Evento</h3>
+        <button class="btn-close" onclick="closeStoryModal()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-story-text" id="modal-text"></div>
+        <div id="modal-interactive-slot"></div>
+        <div class="result-banner" id="result-banner" style="display: none;">
+          <h4 id="result-title">Resultado</h4>
+          <p id="result-desc"></p>
+          <button class="btn-confirm-result" onclick="closeStoryModal()">Confirmar e Continuar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DO TECLADO NUMÉRICO (KEYPAD INTERATIVO) -->
+  <div class="modal-backdrop" id="keypad-modal">
+    <div class="modal-box keypad-box">
+      <div class="modal-header">
+        <div class="modal-tag">TRAVA DE SEGURANÇA</div>
+        <h3 class="modal-title">Painel Digital do Metrô</h3>
+        <button class="btn-close" onclick="closeKeypad()">&times;</button>
+      </div>
+      
+      <div class="keypad-body">
+        <p class="keypad-instruction">
+          Digite o código de 3 dígitos encontrado nos arquivos da Oscorp:
+        </p>
+        
+        <!-- DISPLAY LED -->
+        <div class="keypad-display" id="keypad-display">_ _ _</div>
+        <div class="keypad-feedback" id="keypad-feedback">Aguardando código...</div>
+
+        <!-- TECLADO NUMÉRICO VIRTUAL -->
+        <div class="keypad-grid">
+          <button class="key-btn" onclick="pressKey('1')">1</button>
+          <button class="key-btn" onclick="pressKey('2')">2</button>
+          <button class="key-btn" onclick="pressKey('3')">3</button>
+          <button class="key-btn" onclick="pressKey('4')">4</button>
+          <button class="key-btn" onclick="pressKey('5')">5</button>
+          <button class="key-btn" onclick="pressKey('6')">6</button>
+          <button class="key-btn" onclick="pressKey('7')">7</button>
+          <button class="key-btn" onclick="pressKey('8')">8</button>
+          <button class="key-btn" onclick="pressKey('9')">9</button>
+          <button class="key-btn key-action key-clear" onclick="clearKey()">LIMPAR</button>
+          <button class="key-btn" onclick="pressKey('0')">0</button>
+          <button class="key-btn key-action key-enter" onclick="submitKey()">ENTRAR</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE VISUALIZAÇÃO DO MAPA COMPLETO -->
+  <div class="modal-backdrop" id="map-modal">
+    <div class="modal-box map-modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">Mapa da Missão MZ1 (Manual Pág. 24)</h3>
+        <button class="btn-close" onclick="closeMapModal()">&times;</button>
+      </div>
+      <div class="map-modal-body">
+        <img src="img/map_mz1.png" alt="Mapa MZ1" class="full-map-img">
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
