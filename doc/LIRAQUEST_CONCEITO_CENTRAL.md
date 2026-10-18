@@ -282,4 +282,5 @@ O **Arcade de Lira** é o centro de diversão acessível pelo Terminal do Avatar
      - **1 vs 1 (Mano a Mano):** Duelo rápido individual contra a IA.
      - **Regras Oficiais:** Carta Vira e Manilhas dinâmicas (4 ➔ 5 ➔ 6 ➔ 7 ➔ Q ➔ J ➔ K ➔ A ➔ 2 ➔ 3 ➔ 4) com hierarquia clássica de naipes (♣ Zap > ♥ Copeta > ♠ Espadilha > ♦ Picafumo), Mão de 11 com revelação mútua de cartas da dupla e Mão de Ferro no escuro.
    - **Tecnologia & Áudio:** 100% autônomo em HTML5/CSS3/Vanilla JS e áudio procedural via Web Audio API. Possui botão de retorno integrado ao LiraQuest no menu de opções.
+   - **Plano de Evolução Arquitetural & IA:** Consulte o planejamento detalhado em [TRUCO_ROADMAP_EVOLUCAO.md](file:///e:/11_Games/LiraQuest/doc/TRUCO_ROADMAP_EVOLUCAO.md) cobrindo autenticação Node.js, motor de sinais corporais e macetes clássicos (Cama de Gato, Casal Maior, Fazer a Primeira) e Multiplayer Familiar via WebSockets.
 

@@ -1609,3 +1609,49 @@ html, body {
   background: rgba(128, 0, 32, 0.5);
   border-color: var(--gold);
 }
+
+/* Badge do Usuário Logado no LiraQuest */
+.start-user-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1.5px solid rgba(245, 176, 39, 0.45);
+  border-radius: 14px;
+  padding: 8px 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  max-width: 320px;
+  width: 100%;
+  text-align: left;
+}
+
+.start-user-pill .pill-avatar {
+  font-size: 1.8rem;
+  width: 42px;
+  height: 42px;
+  background: rgba(128, 0, 32, 0.6);
+  border: 1.5px solid var(--gold);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.start-user-pill .pill-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.start-user-pill .pill-name {
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+
+.start-user-pill .pill-meta {
+  color: #fde047;
+  font-size: 0.78rem;
+  font-weight: 600;
+}

@@ -19,6 +19,7 @@ import rewardRoutes from './server/routes/rewardRoutes.js';
 import quizRoutes from './server/routes/quizRoutes.js';
 import dungeonRoutes from './server/routes/dungeonRoutes.js';
 import battleRoutes from './server/routes/battleRoutes.js';
+import trucoRoutes from './server/routes/trucoRoutes.js';
 import { initChameleonSocket } from './server/sockets/chameleonSocket.js';
 import { initDuelSocket } from './server/sockets/duelSocket.js';
 
@@ -63,6 +64,7 @@ app.use('/api/rewards', rewardRoutes);
 app.use('/api/quiz', quizRoutes);
 app.use('/api/dungeon', dungeonRoutes);
 app.use('/api/battle', battleRoutes);
+app.use('/api/truco', trucoRoutes);
 
 
 // Health check & status

@@ -189,8 +189,22 @@ class TrucoGame {
     this.onStateChange = null;
     this.onBotSpeech = null;
     this.onMessage = null;
+    this.onGameOver = null;
+
+    this.playerName = 'Você';
+    this.playerAvatar = '😎';
 
     this.setupPlayers();
+  }
+
+  setPlayerProfile(name, avatar) {
+    if (name) this.playerName = name;
+    if (avatar) this.playerAvatar = avatar;
+    const p = this.players.find(x => x.id === 'player');
+    if (p) {
+      p.name = this.playerName;
+      p.avatar = this.playerAvatar;
+    }
   }
 
   setGameMode(mode) {
@@ -201,7 +215,12 @@ class TrucoGame {
   }
 
   setupPlayers() {
-    this.players = PLAYERS_CONFIG[this.gameMode];
+    this.players = JSON.parse(JSON.stringify(PLAYERS_CONFIG[this.gameMode]));
+    const p = this.players.find(x => x.id === 'player');
+    if (p) {
+      p.name = this.playerName || 'Você';
+      p.avatar = this.playerAvatar || '😎';
+    }
   }
 
   getPlayer(id) {
@@ -545,75 +564,174 @@ class TrucoGame {
     }
   }
 
-  // IA Cooperativa e Competitiva para escolha da carta
+  // IA Tática Cooperativa e Competitiva para escolha da carta (Mão, Meio, Para-pé e Pé)
   pickBotCard(botId, availableCards, previousPlays) {
     const sorted = [...availableCards].sort((a, b) => a.power - b.power);
     const botObj = this.getPlayer(botId);
+    const numPlayers = this.players.length;
 
-    // Se já houve cartas jogadas nesta vaza
-    if (previousPlays.length > 0) {
-      // Encontra a melhor carta jogada até agora na vaza
-      let bestPlay = null;
-      let highestPower = -1;
+    // Identificação dos papéis táticos na vaza:
+    const playIndex = previousPlays.length; // 0 = Mão, 1 = Meio, 2 = Para-pé (em 4p), 3 = Pé (em 4p)
+    const isMao = (playIndex === 0);
+    const isPe = (playIndex === numPlayers - 1); // Último a fechar a vaza
+    const isParaPe = (numPlayers === 4 && playIndex === 2); // Penúltimo da vaza
 
-      previousPlays.forEach(p => {
-        const pwr = p.card.covered ? 0 : p.card.power;
-        if (pwr > highestPower) {
-          highestPower = pwr;
-          bestPlay = p;
+    // -------------------------------------------------------------------------
+    // CENÁRIO A: O BOT É O "MÃO" (Abre a vaza)
+    // -------------------------------------------------------------------------
+    if (isMao) {
+      // 1ª Vaza: Abrindo a mão
+      if (this.roundNumber === 1) {
+        const manilhas = sorted.filter(c => c.isManilha);
+        // Se tiver 2 manilhas (ex: Casal ou duas manilhas fortes):
+        if (manilhas.length >= 2) {
+          // Sai com a menor das manilhas para já cravar a primeira com folga
+          return manilhas[0];
         }
-      });
-
-      const leaderPlayer = bestPlay ? this.getPlayer(bestPlay.playerId) : null;
-      const isPartnerWinning = leaderPlayer && leaderPlayer.team === botObj.team;
-
-      // Se o PARCEIRO já está vencendo a vaza:
-      if (isPartnerWinning) {
-        // Se a carta do parceiro é muito forte (ex: Manilha ou 3) ou se o bot é o último a jogar:
-        const remainingPlayersCount = this.players.length - previousPlays.length - 1;
-        if (highestPower >= 9 || remainingPlayersCount === 0) {
-          // Poupa munição! Joga a menor carta para ajudar a dupla
-          if (botId === 'bot_partner' && Math.random() < 0.3) {
-            this.botSay('bot_partner', this.pickRandom(BOT_QUOTES.partnerHelper));
-          }
-          return sorted[0];
+        // Se tiver 1 manilha e cartas médias/boas (ex: 3 ou 2):
+        if (manilhas.length === 1 && sorted.some(c => c.power >= 9 && !c.isManilha)) {
+          // Sai chamando com a carta média (3 ou 2) para tirar manilha dos adversários
+          const strongCommons = sorted.filter(c => c.power >= 9 && !c.isManilha);
+          return strongCommons[strongCommons.length - 1];
         }
+        // Caso normal: sai com a carta intermediária para sondar a mesa
+        if (sorted.length === 3) return sorted[1];
+        return sorted[0];
       }
 
-      // Se o ADVERSÁRIO está vencendo ou se o parceiro está com carta fraca:
-      const winningCards = sorted.filter(c => c.power > highestPower);
-      const tieCards = sorted.filter(c => c.power === highestPower);
-
-      if (winningCards.length > 0) {
-        // Joga a MENOR carta que garante a liderança
-        return winningCards[0];
-      }
-
-      // Se não consegue ganhar, avalia empatar (canga)
-      if (tieCards.length > 0) {
-        if (this.roundNumber === 1 || (this.roundNumber === 2 && this.tricks[0]?.winnerTeam === botObj.team)) {
-          return tieCards[0];
+      // 2ª Vaza:
+      if (this.roundNumber === 2) {
+        const firstTrick = this.tricks[0];
+        // Se a 1ª vaza cangou (empate): QUEM FIZER A SEGUNDA LEVA A MÃO!
+        if (firstTrick && firstTrick.winnerTeam === 'draw') {
+          return sorted[sorted.length - 1]; // Maior carta absoluta
         }
-      }
-
-      // Se não consegue nem empatar nem ganhar, joga fora a pior carta ("lixo")
-      return sorted[0];
-    }
-
-    // Se o bot é o primeiro a jogar na vaza (abre a vaza)
-    if (this.roundNumber === 1) {
-      if (sorted.length === 3) return sorted[1]; // carta intermediária
-      return sorted[0];
-    } else if (this.roundNumber === 2) {
-      const firstTrick = this.tricks[0];
-      if (firstTrick && firstTrick.winnerTeam !== botObj.team) {
-        // Se a dupla perdeu a primeira, tem que ir com a mais forte
+        // Se a dupla perdeu a primeira: tem que matar com a mais forte
+        if (firstTrick && firstTrick.winnerTeam !== botObj.team) {
+          return sorted[sorted.length - 1];
+        }
+        // Se a dupla ganhou a primeira: sai com carta forte para fechar a partida
         return sorted[sorted.length - 1];
       }
+
+      // 3ª Vaza (vaza decisiva final): joga a última carta restante com tudo
       return sorted[sorted.length - 1];
-    } else {
+    }
+
+    // -------------------------------------------------------------------------
+    // CENÁRIO B: JÁ HOUVE JOGADAS ANTERIORES NA VAZA (Meio, Para-Pé ou Pé)
+    // -------------------------------------------------------------------------
+    let bestPlay = null;
+    let highestPower = -1;
+
+    previousPlays.forEach(p => {
+      const pwr = p.card.covered ? 0 : p.card.power;
+      if (pwr > highestPower) {
+        highestPower = pwr;
+        bestPlay = p;
+      }
+    });
+
+    const leaderPlayer = bestPlay ? this.getPlayer(bestPlay.playerId) : null;
+    const isPartnerWinning = leaderPlayer && leaderPlayer.team === botObj.team;
+
+    // Cartas disponíveis do bot que vencem ou empatam a mesa:
+    const winningCards = sorted.filter(c => c.power > highestPower);
+    const tieCards = sorted.filter(c => c.power === highestPower);
+
+    // -------------------------------------------------------------------------
+    // PAPEL 1: O "PÉ" (Último jogador a fechar a vaza - Informação Perfeita!)
+    // -------------------------------------------------------------------------
+    if (isPe) {
+      // 1. Se o parceiro já está vencendo a vaza:
+      if (isPartnerWinning) {
+        // A vaza já é nossa! NINGUÉM joga depois do Pé. POUPE MUNIÇÃO!
+        if (botId === 'bot_partner' && Math.random() < 0.4) {
+          this.botSay('bot_partner', this.pickRandom(BOT_QUOTES.partnerHelper));
+        }
+        return sorted[0]; // Menor lixo absoluto
+      }
+
+      // 2. Se o adversário está vencendo:
+      // REGRA DE OURO DO TRUCO: O PÉ DEVE FAZER A PRIMEIRA VAZA!
+      if (this.roundNumber === 1) {
+        if (winningCards.length > 0) {
+          // Mata com a menor carta que for suficiente para levar a primeira
+          return winningCards[0];
+        }
+        if (tieCards.length > 0) {
+          // Se não dá para matar, mas dá para cangar (empatar): CANGA A PRIMEIRA!
+          return tieCards[0];
+        }
+        // Não dá para ganhar nem empatar: descarta o menor lixo
+        return sorted[0];
+      }
+
+      // Na 2ª Vaza:
+      if (this.roundNumber === 2) {
+        const firstTrick = this.tricks[0];
+        // Se a 1ª vaza foi canga: se vencer agora ganha a mão inteira!
+        if (firstTrick && firstTrick.winnerTeam === 'draw') {
+          if (winningCards.length > 0) return winningCards[winningCards.length - 1]; // Maior
+          return sorted[0];
+        }
+        // Se a nossa dupla ganhou a 1ª vaza: empatar ou ganhar fecha a mão!
+        if (firstTrick && firstTrick.winnerTeam === botObj.team) {
+          if (winningCards.length > 0) return winningCards[0];
+          if (tieCards.length > 0) return tieCards[0]; // Canga que dá vitória!
+          return sorted[0];
+        }
+        // Se a nossa dupla perdeu a 1ª vaza: obrigatório ganhar se puder
+        if (winningCards.length > 0) return winningCards[0];
+        return sorted[0];
+      }
+
+      // 3ª Vaza: se puder ganhar, mata; senão lixo
+      if (winningCards.length > 0) return winningCards[0];
       return sorted[0];
     }
+
+    // -------------------------------------------------------------------------
+    // PAPEL 2: O "PARA-PÉ" (Penúltimo jogador - 3º a jogar em 4p)
+    // Quem joga depois dele é o adversário (que é o Pé da outra dupla)!
+    // -------------------------------------------------------------------------
+    if (isParaPe) {
+      // 1. Se o parceiro abriu com carta muito forte (ex: Zap ou Copeta):
+      if (isPartnerWinning && highestPower >= 102) {
+        // O parceiro já garantiu um canhão. Para-pé descarta baixo para poupar
+        return sorted[0];
+      }
+
+      // 2. Se o parceiro jogou baixo (lixo) ou o adversário cobriu e está liderando:
+      // NÃO PODE DEIXAR MOLE PRO PÉ ADVERSÁRIO! "Chama na chincha com a maior!"
+      if (!isPartnerWinning || highestPower < 8) {
+        if (winningCards.length > 0) {
+          // Se estamos na 1ª vaza, o Para-pé joga a sua MAIOR carta para esganar o Pé adversário!
+          if (this.roundNumber === 1) {
+            return winningCards[winningCards.length - 1]; // Maior carta que tiver!
+          }
+          return winningCards[0];
+        }
+        // Se não tem como vencer, descarta a menor para o parceiro no Pé ver
+        return sorted[0];
+      }
+
+      // Se o parceiro está ganhando com carta razoável:
+      return sorted[0];
+    }
+
+    // -------------------------------------------------------------------------
+    // PAPEL 3: O "MEIO" (2º a jogar)
+    // -------------------------------------------------------------------------
+    if (winningCards.length > 0) {
+      // Tenta cobrir a carta da abertura com a menor carta vencedora
+      return winningCards[0];
+    }
+    if (tieCards.length > 0 && this.roundNumber === 1) {
+      return tieCards[0]; // Canga na 1ª
+    }
+    // Não consegue ganhar: descarta o menor lixo e deixa a decisão pro parceiro
+    return sorted[0];
   }
 
   // Resolução da Vaza (Trick) de 2 ou 4 cartas
@@ -783,6 +901,9 @@ class TrucoGame {
       if (this.gameMode === '4p') {
         this.botSay('bot_partner', "CAMPEÕES! Ninguém segura nossa dupla!");
       }
+      if (this.onGameOver) {
+        this.onGameOver(true, this.playerScore, this.botScore);
+      }
     } else if (this.botScore >= this.targetScore) {
       this.botScore = this.targetScore;
       this.isGameOver = true;
@@ -790,6 +911,9 @@ class TrucoGame {
       this.notifyMessage(`💀 FIM DE JOGO! ELES FECHARAM O JOGO POR ${this.botScore} A ${this.playerScore}!`, "loss");
       const opponent = this.players.find(p => p.team === 'them');
       if (opponent) this.botSay(opponent.id, "GANHAMOS! Paga a rodada de cerveja no balcão!");
+      if (this.onGameOver) {
+        this.onGameOver(false, this.playerScore, this.botScore);
+      }
     }
   }
 

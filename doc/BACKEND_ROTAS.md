@@ -222,6 +222,9 @@ Módulo separado com interface mobile responsiva servido pelo backend Node.js:
 |:---|:---|:---|:---|
 | `GET` | `/truco` | Pública | Rota principal que entrega o jogo de Truco Paulista (`public/truco/index.html`) |
 | `GET` | `/truco/*` | Pública | Entrega de assets estáticos dedicados (`style.css`, `game.js`, `audio.js`, etc.) e subrotas |
+| `GET` | `/api/truco/profile` | JWT | Retorna dados do usuário autenticado no LiraQuest, perfil do Herói (`Character`) e saldo de Ouro para a mesa de Truco |
+| `POST` | `/api/truco/finish` | JWT | Registra o desfecho da partida de Truco (`is_victory`, `game_mode`, `player_score`, `bot_score`), creditando +40 Ouro e +60 XP no Herói em caso de vitória (+10 Ouro e +15 XP em derrota) e checando subida de nível (`leveled_up`) |
+
 
 
 

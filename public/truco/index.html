@@ -27,6 +27,15 @@
         <h1 class="start-title">TRUCO<br><span>PAULISTA</span></h1>
         <p class="start-subtitle">Mão de 11 • Manilhas • IA Cooperativa</p>
 
+        <!-- STATUS DO USUÁRIO LOGADO NO LIRAQUEST -->
+        <div class="start-user-pill" id="start-user-pill" style="display: none;">
+          <span class="pill-avatar" id="start-user-avatar">🧙‍♂️</span>
+          <div class="pill-details">
+            <div class="pill-name" id="start-user-name">Carregando Herói...</div>
+            <div class="pill-meta" id="start-user-meta">🪙 0 Ouro • Nível 1</div>
+          </div>
+        </div>
+
         <!-- SELEÇÃO DE MODO DE JOGO -->
         <div class="start-mode-selection">
           <button class="start-mode-card active" id="start-mode-4p" type="button">
@@ -361,6 +370,36 @@
 
         <h3>⭐ Mão de 11 em Duplas</h3>
         <p>Quando uma dupla atinge 11 pontos, <strong>os parceiros olham as cartas um do outro</strong> para avaliar a força combinada e decidir se jogam a mão (vale 3) ou correm (entregam 1 ponto).</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL DE RECOMPENSAS DO LIRAQUEST ================= -->
+  <div class="decision-overlay" id="reward-modal">
+    <div class="decision-box" style="border-color: var(--gold); text-align: center; max-width: 350px;">
+      <div style="font-size: 3rem; margin-bottom: 6px;" id="reward-icon">🏆</div>
+      <h2 id="reward-title" style="color: var(--gold); font-size: 1.35rem; margin-bottom: 6px;">VITÓRIA ÉPICA!</h2>
+      <p id="reward-desc" style="font-size: 0.88rem; color: #cbd5e1; margin-bottom: 16px;">
+        Partida concluída! Recompensas creditadas na sua conta familiar.
+      </p>
+
+      <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;">
+        <span class="reward-pill-gold" id="reward-gold-tag" style="font-size: 0.9rem; padding: 6px 14px; border-radius: 14px; background: rgba(245, 176, 39, 0.25); color: #fbbf24; border: 1px solid rgba(245, 176, 39, 0.5); font-weight: 800;">
+          💰 +40 Ouro
+        </span>
+        <span class="reward-pill-xp" id="reward-xp-tag" style="font-size: 0.9rem; padding: 6px 14px; border-radius: 14px; background: rgba(59, 130, 246, 0.25); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.5); font-weight: 800;">
+          ⭐ +60 XP
+        </span>
+      </div>
+
+      <div id="reward-levelup-box" style="display: none; background: rgba(245, 176, 39, 0.2); border: 1px solid var(--gold); border-radius: 10px; padding: 10px; margin-bottom: 16px; color: #fde047; font-weight: 800; font-size: 0.95rem;">
+        🌟 SUBIU DE NÍVEL! NOVO NÍVEL: <span id="reward-new-level">2</span>!
+      </div>
+
+      <div class="decision-actions" style="justify-content: center; width: 100%;">
+        <button class="btn-action btn-accept" id="btn-close-reward" style="width: 100%; justify-content: center;">
+          🎉 Coletar Recompensas
+        </button>
       </div>
     </div>
   </div>
@@ -994,6 +1033,109 @@
         mobileMenuModal.classList.remove('active');
         startScreen.classList.add('active');
       });
+
+      // =========================================================================
+      // INTEGRAÇÃO COM SESSÃO & ECONOMIA DO LIRAQUEST (ETAPA 1)
+      // =========================================================================
+      const token = localStorage.getItem('liraquest_token');
+      const startUserPill = document.getElementById('start-user-pill');
+      const startUserName = document.getElementById('start-user-name');
+      const startUserMeta = document.getElementById('start-user-meta');
+      const startUserAvatar = document.getElementById('start-user-avatar');
+      const playerStationAvatar = document.querySelector('#avatar-player .avatar-icon');
+
+      const rewardModal = document.getElementById('reward-modal');
+      const rewardTitle = document.getElementById('reward-title');
+      const rewardDesc = document.getElementById('reward-desc');
+      const rewardIcon = document.getElementById('reward-icon');
+      const rewardGoldTag = document.getElementById('reward-gold-tag');
+      const rewardXpTag = document.getElementById('reward-xp-tag');
+      const rewardLevelupBox = document.getElementById('reward-levelup-box');
+      const rewardNewLevel = document.getElementById('reward-new-level');
+      const btnCloseReward = document.getElementById('btn-close-reward');
+
+      let currentLiraUser = null;
+
+      if (token) {
+        fetch('/api/truco/profile', {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success && data.user) {
+              currentLiraUser = data;
+              const displayName = data.character?.name || data.user.name;
+              const gold = data.character?.gold || 0;
+              const level = data.character?.level || 1;
+              const heroAvatar = '⚔️';
+
+              if (startUserPill) startUserPill.style.display = 'flex';
+              if (startUserName) startUserName.textContent = displayName;
+              if (startUserMeta) startUserMeta.textContent = `🪙 ${gold} Ouro • Nível ${level}`;
+              if (startUserAvatar) startUserAvatar.textContent = heroAvatar;
+
+              // Atualiza o perfil no motor de Truco
+              game.setPlayerProfile(displayName, heroAvatar);
+              if (playerStationAvatar) playerStationAvatar.textContent = heroAvatar;
+            }
+          })
+          .catch(err => console.warn('Aviso: executando Truco em modo convidado:', err));
+      }
+
+      // Handler de Fim de Partida com Recompensas
+      game.onGameOver = (isVictory, pScore, bScore) => {
+        if (!token) return; // Visitante joga sem persistência
+
+        fetch('/api/truco/finish', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            is_victory: isVictory,
+            game_mode: selectedGameMode,
+            player_score: pScore,
+            bot_score: bScore,
+            bet_value: game.betValue
+          })
+        })
+          .then(r => r.json())
+          .then(data => {
+            if (data.success) {
+              const r = data.rewards;
+              if (rewardTitle) rewardTitle.textContent = isVictory ? "VITÓRIA ÉPICA!" : "FIM DE JOGO!";
+              if (rewardIcon) rewardIcon.textContent = isVictory ? "🏆" : "🎖️";
+              if (rewardDesc) rewardDesc.textContent = data.message;
+              if (rewardGoldTag) rewardGoldTag.textContent = `💰 +${r.gold} Ouro`;
+              if (rewardXpTag) rewardXpTag.textContent = `⭐ +${r.xp} XP`;
+
+              if (r.leveled_up && rewardLevelupBox && rewardNewLevel) {
+                rewardLevelupBox.style.display = 'block';
+                rewardNewLevel.textContent = r.new_level;
+              } else if (rewardLevelupBox) {
+                rewardLevelupBox.style.display = 'none';
+              }
+
+              // Atualiza saldo local do card inicial
+              if (startUserMeta && data.character) {
+                startUserMeta.textContent = `🪙 ${data.character.gold} Ouro • Nível ${data.character.level}`;
+              }
+
+              setTimeout(() => {
+                if (rewardModal) rewardModal.classList.add('active');
+              }, 1200);
+            }
+          })
+          .catch(err => console.error('Erro ao salvar recompensa de Truco:', err));
+      };
+
+      if (btnCloseReward && rewardModal) {
+        btnCloseReward.addEventListener('click', () => {
+          window.trucoAudio.playClick();
+          rewardModal.classList.remove('active');
+        });
+      }
     });
   </script>
 </body>

@@ -500,7 +500,12 @@ Histórico e estado das sessões de combate da Arena 2D e Raids Familiares.
 ---
 
 ## 🃏 Módulo de Mini-Game de Truco Paulista (`/truco`)
-- **Status do Banco de Dados:** O módulo de Truco Paulista roda atualmente de forma *client-side standalone* em JavaScript/HTML5 e Web Audio API, sem persistência ou tabelas SQL no momento. Toda a lógica de jogo, regras oficiais, bots cooperativos e placar são resolvidos localmente na sessão do navegador. Caso no futuro haja integração com o saldo de Ouro/Fichas da família ou partidas multiplayer via WebSocket, as tabelas com prefixo `family_truco_*` serão documentadas nesta seção.
+- **Integração de Economia & Gamificação (Etapa 1 Concluída):**
+  - **Tabela `characters`:** A rota `POST /api/truco/finish` credita Ouro (`characters.gold`) e Experiência (`characters.current_xp`), processando automaticamente subida de nível (`characters.level`).
+  - **Tabela `user_progress`:** Sincroniza o saldo e presença ativa do membro familiar.
+  - **Sessão:** Leitura do usuário autenticado a partir de `family_users.id` via JWT (`GET /api/truco/profile`).
+  - **Tabelas Futuras:** Quando o multiplayer via WebSocket for implementado (Etapa 5), tabelas relacionais com prefixo `family_truco_*` serão criadas e documentadas nesta seção.
+
 
 
 
