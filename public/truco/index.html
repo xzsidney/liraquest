@@ -101,6 +101,7 @@
           <span class="team-score" id="score-num-them">0</span>
           <span class="bet-val-tag" id="score-hand-val">1</span>
         </div>
+        <div id="tactic-indicator-tag" style="display: none; font-size: 0.62rem; font-weight: 800; background: linear-gradient(135deg, #d97706, #b45309); color: #fff; padding: 2px 6px; border-radius: 6px; margin-top: 5px; text-align: center; border: 1px solid #fde047; box-shadow: 0 2px 6px rgba(0,0,0,0.4);">👑 CASAL MAIOR</div>
       </div>
 
       <!-- ================= TOPO DIREITO: ÍCONES + PLACA MANILHAS + DECK & VIRA ================= -->
@@ -605,6 +606,17 @@
           } else {
             if (dotUs) dotUs.textContent = '';
             if (dotThem) dotThem.textContent = '';
+          }
+        }
+
+        // Indicador tático especial no placar (Casal Maior)
+        const tacticTag = document.getElementById('tactic-indicator-tag');
+        if (tacticTag) {
+          if (state.casalMaior?.us) {
+            tacticTag.style.display = 'block';
+            tacticTag.textContent = '👑 CASAL MAIOR (Zap + Copeta)';
+          } else {
+            tacticTag.style.display = 'none';
           }
         }
 

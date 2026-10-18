@@ -90,16 +90,23 @@ Este documento estabelece o planejamento detalhado para a evolução do minigame
 
 ---
 
-### 🪤 ETAPA 3: Motor de Malandragem & Macetes Avançados
+### 🪤 ETAPA 3: Motor de Malandragem & Macetes Avançados [CONCLUÍDA ✅]
 **Objetivo:** Implementar artimanhas psicológicas clássicas da mesa de baralho.
 
 1. **Tática da "Cama de Gato":**
-   - Quando o bot ou a dupla possui duas cartas imbatíveis (ex: Zap + Copeta ou Zap + 3), na 1ª vaza eles descartam lixo intencionalmente, induzindo o adversário a cantar Truco.
-   - Ao receber o Truco adversário, a IA aceita com alta probabilidade ou aumenta para Seis, descarregando as manilhas nas vazas 2 e 3.
+   - Quando o bot adversário possui cartas imbatíveis (Zap + Copeta/3 + 1 lixo), na 1ª vaza ele descarta o lixo intencionalmente fingindo fraqueza.
+   - Ao receber o Truco do jogador humano, a IA aceita imediatamente (100%) ou retruca (Seis), desarmando a armadilha nas vazas 2 e 3 com o Zap!
+   - Se o adversário não trucar, o bot armado ganha a 2ª vaza e canta Truco na 3ª antes de jogar a maior.
 2. **Tática do "Casal Maior":**
-   - Algoritmo que detecta quando as duas maiores manilhas da mesa estão na mesma dupla. A IA adota postura de tranquilidade, não gastando ambas na mesma vaza.
-3. **IA de Blefe Ponderado:**
-   - Capacidade de trucar na 3ª vaza mesmo com carta fraca quando o oponente demonstra fraqueza ou corre com facilidade.
+   - Detecção em tempo real quando o Zap e a Copeta estão na mesma dupla.
+   - A IA protege a dupla para jamais encavalar ou queimar ambas as manilhas na mesma vaza (se uma já está vencendo, a outra é guardada).
+   - Selo dourado luminoso no placar: `👑 CASAL MAIOR (Zap + Copeta)`.
+3. **Tática de "Chamar Sangue":**
+   - Na 1ª vaza, o bot armado com manilha joga o 3 ou o 2 como isca para forçar o adversário a gastar sua manilha mais pesada para cobrir.
+4. **IA de Blefe Ponderado & Rastreador Psicológico:**
+   - Na 3ª vaza com o jogo empatado em 1 x 1, bots com cartas fracas (power <= 5) podem bolar um blefe descarado de Truco!
+   - A probabilidade de blefe aumenta dinamicamente conforme o jogador humano foge/corre de trucos anteriores (`playerFoldsCount`).
+   - Se o jogador humano correr do blefe, o bot comemora e revela a malandragem no chat. Se peitar e vencer, o bot reconhece o tiro pela culatra!
 
 ---
 

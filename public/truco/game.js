@@ -155,6 +155,42 @@ const BOT_QUOTES = {
   enemyParaPe: [
     "Toma essa no Para-Pé pra sangrar o seu parceiro!",
     "Quero ver o Pé de vocês cobrir essa!"
+  ],
+  camaDeGatoSpring: [
+    "Caiu feito pato na Cama de Gato! TOMA ESSE ZAP!",
+    "Dormi na primeira pra te pegar na segunda! SEIS!",
+    "Malandragem pura! A Cama de Gato tava armada!",
+    "Achou que eu tava morto? O bicho acordou agora!"
+  ],
+  camaDeGatoTiao: [
+    "Eles caíram na Cama de Gato direitinho, parceiro! Agora é caixa!",
+    "Fingimos de morto e levamos a mão inteira!",
+    "Essa foi a clássica Cama de Gato de boteco!"
+  ],
+  casalMaior: [
+    "Tamo de Casal Maior, parceiro! Zap e Copeta engatilhados!",
+    "Casal Maior na mesa! Ninguém bota o bico nessa mão!",
+    "Com Zap e Copeta na mão, só chora quem tá do outro lado!"
+  ],
+  chamarSangue: [
+    "Chamei sangue na mesa! Quero ver quem tem manilha pra cobrir!",
+    "Botei esse 3 pra ver quem sangra manilha agora!",
+    "Tirei o bicho grande da toca de vocês!"
+  ],
+  bluffTruco: [
+    "TRUCO NA CARA! Quem não aguenta bebe leite!",
+    "Se tiver coragem de aceitar, desce!",
+    "Tô sentindo cheiro de medo do outro lado da mesa!"
+  ],
+  bluffRevealedWin: [
+    "Correu de carta 4! Caiu no blefe do malandro!",
+    "O cachorro não tinha dente e você correu de medo! Hahaha!",
+    "Ganhei no grito! Essa foi puro blefe de boteco!"
+  ],
+  bluffCaught: [
+    "Dessa vez o blefe não colou... mas valeu a tentativa!",
+    "Peitou bonito! Tava só com lixo mesmo!",
+    "O malandro também erra o tiro de vez em quando!"
   ]
 };
 
@@ -212,6 +248,12 @@ class TrucoGame {
     this.isGameOver = false;
     this.roundInProgress = false;
     this.resolvingTrick = false;
+
+    // Rastreadores táticos avançados (Etapa 3 - Malandragem)
+    this.playerFoldsCount = 0;
+    this.camaDeGato = { us: false, them: false, armador: null, baitPlayed: false };
+    this.casalMaior = { us: false, them: false };
+    this.activeBluff = { isBluff: false, botId: null, caught: false };
 
     // Callbacks de Eventos
     this.onStateChange = null;
@@ -319,12 +361,62 @@ class TrucoGame {
     return deck;
   }
 
+  // Avaliação estratégica de Casal Maior e Cama de Gato no início de cada mão
+  evaluateAdvancedTactics() {
+    this.camaDeGato = { us: false, them: false, armador: null, baitPlayed: false };
+    this.casalMaior = { us: false, them: false };
+    this.activeBluff = { isBluff: false, botId: null, caught: false };
+
+    if (this.isMaoDeFerro || this.isMaoDe11) return;
+
+    // 1. CASAL MAIOR (ZAP + COPETA NA MESMA DUPLA)
+    // Para Nós (Você + Tião):
+    const usCards = [...(this.hands['player'] || []), ...(this.hands['bot_partner'] || [])];
+    const usHasZap = usCards.some(c => c.isManilha && c.manilhaRank === 4);
+    const usHasCopeta = usCards.some(c => c.isManilha && c.manilhaRank === 3);
+    if (usHasZap && usHasCopeta) {
+      this.casalMaior.us = true;
+      if (this.gameMode === '4p' && Math.random() < 0.65) {
+        setTimeout(() => this.botSay('bot_partner', this.pickRandom(BOT_QUOTES.casalMaior)), 500);
+      }
+    }
+
+    // Para Eles (Adversários):
+    const themBots = this.players.filter(p => p.team === 'them');
+    let themCards = [];
+    themBots.forEach(b => {
+      themCards.push(...(this.hands[b.id] || []));
+    });
+    const themHasZap = themCards.some(c => c.isManilha && c.manilhaRank === 4);
+    const themHasCopeta = themCards.some(c => c.isManilha && c.manilhaRank === 3);
+    if (themHasZap && themHasCopeta) {
+      this.casalMaior.them = true;
+    }
+
+    // 2. CAMA DE GATO (ARMADILHA NA 1ª VAZA)
+    // Robô adversário arma Cama de Gato se possuir Zap + outra manilha ou 3 + 1 carta de lixo
+    for (const b of themBots) {
+      const bHand = this.hands[b.id] || [];
+      const bHasZap = bHand.some(c => c.isManilha && c.manilhaRank === 4);
+      const bHasSecondBoss = bHand.some(c => (c.isManilha && c.manilhaRank >= 2) || (!c.isManilha && c.power === 10));
+      const bHasTrash = bHand.some(c => !c.isManilha && c.power <= 6);
+
+      if (bHasZap && bHasSecondBoss && bHasTrash && Math.random() < 0.65) {
+        this.camaDeGato.them = true;
+        this.camaDeGato.armador = b.id;
+        this.camaDeGato.baitPlayed = false;
+        break;
+      }
+    }
+  }
+
   startNewGame() {
     this.playerScore = 0;
     this.botScore = 0;
     this.handNumber = 0;
     this.starterIndex = Math.floor(Math.random() * this.players.length);
     this.isGameOver = false;
+    this.playerFoldsCount = 0;
 
     const modeName = this.gameMode === '4p' ? "2 vs 2 (4 Jogadores em Duplas)" : "1 vs 1 (Mano a Mano)";
     this.notifyMessage(`Partida iniciada no modo ${modeName}! Quem fizer 12 pontos primeiro vence.`, "info");
@@ -374,6 +466,9 @@ class TrucoGame {
     this.players.forEach(p => {
       this.enrichCards(this.hands[p.id]);
     });
+
+    // Avalia táticas de Cama de Gato e Casal Maior para a mão
+    this.evaluateAdvancedTactics();
 
     window.trucoAudio.playCardSlide();
 
@@ -653,6 +748,15 @@ class TrucoGame {
     const isMeio = (playIndex === 1);
 
     // -------------------------------------------------------------------------
+    // MALANDRAGEM 1: CAMA DE GATO ARMADA (1ª VAZA)
+    // -------------------------------------------------------------------------
+    if (this.roundNumber === 1 && this.camaDeGato.them && this.camaDeGato.armador === botId && !this.camaDeGato.baitPlayed) {
+      this.camaDeGato.baitPlayed = true;
+      // Descarta deliberadamente a menor carta podre (isca) para induzir o adversário a trucar!
+      return sorted[0];
+    }
+
+    // -------------------------------------------------------------------------
     // CENÁRIO A: O BOT É O "MÃO" (Abre a vaza - 1º a jogar)
     // -------------------------------------------------------------------------
     if (isMao) {
@@ -665,9 +769,12 @@ class TrucoGame {
           return manilhas[0];
         }
         // 2. Se tiver 1 manilha e cartas médias/boas (ex: 3 ou 2):
-        // Malícia clássica: "Chamar manilha" com o 3 ou 2 para forçar adversário a gastar ou ganhar de graça
+        // MALANDRAGEM 2: "CHAMAR SANGUE" com o 3 ou 2 para forçar o adversário a queimar manilha
         const strongCommons = sorted.filter(c => c.power >= 9 && !c.isManilha);
         if (manilhas.length === 1 && strongCommons.length > 0) {
+          if (Math.random() < 0.35) {
+            this.botSay(botId, this.pickRandom(BOT_QUOTES.chamarSangue));
+          }
           return strongCommons[strongCommons.length - 1]; // Joga o 3 ou 2
         }
         // 3. Se tiver só um 3 ou 2 sem manilha: sai com ele para tentar fazer a 1ª na força bruta
@@ -719,6 +826,19 @@ class TrucoGame {
     const isPartnerLeadingAlone = (topPlaysList.length === 1 && this.getPlayer(topPlaysList[0].playerId).team === botObj.team);
     // Adversário está ganhando ou amarrado na maior carta?
     const isEnemyLeadingOrTied = topPlaysList.some(p => this.getPlayer(p.playerId).team !== botObj.team);
+
+    // MALANDRAGEM 3: CASAL MAIOR (ZAP + COPETA) - NÃO ENCAVALAR MANILHAS
+    const teamHasCasal = (botObj.team === 'them' ? this.casalMaior.them : this.casalMaior.us);
+    if (teamHasCasal) {
+      const partnerHasTopTrick = previousPlays.some(p => {
+        const pObj = this.getPlayer(p.playerId);
+        return pObj.team === botObj.team && p.card.isManilha && p.card.manilhaRank >= 3;
+      });
+      if (partnerHasTopTrick) {
+        // O parceiro já jogou Zap ou Copeta e está vencendo a vaza! Guarda o canhão e joga o menor lixo!
+        return sorted[0];
+      }
+    }
 
     // Cartas disponíveis do bot que vencem ou empatam a mesa:
     const winningCards = sorted.filter(c => c.power > highestPower);
@@ -1021,15 +1141,28 @@ class TrucoGame {
       this.playerScore += this.betValue;
       window.trucoAudio.playRoundWin();
       this.notifyMessage(`🎉 NÓS VENCEMOS A MÃO! (+${this.betValue} ponto${this.betValue > 1 ? 's' : ''})`, "win");
-      if (this.gameMode === '4p') {
+      if (this.activeBluff.caught) {
+        const bluffBot = this.activeBluff.botId;
+        setTimeout(() => {
+          this.botSay(bluffBot, this.pickRandom(BOT_QUOTES.bluffCaught));
+          this.activeBluff.caught = false;
+          this.activeBluff.isBluff = false;
+        }, 400);
+      } else if (this.gameMode === '4p') {
         this.botSay('bot_partner', "Boa parceiro! Jogamos muito!");
       }
     } else if (winnerTeam === 'them') {
       this.botScore += this.betValue;
       window.trucoAudio.playRoundLoss();
       this.notifyMessage(`💥 A DUPLA ADVERSÁRIA LEVOU A MÃO! (+${this.betValue} ponto${this.betValue > 1 ? 's' : ''})`, "loss");
-      const opponent = this.players.find(p => p.team === 'them');
-      if (opponent && Math.random() < 0.7) this.botSay(opponent.id, this.pickRandom(BOT_QUOTES.winHand));
+      if (this.camaDeGato.them && this.camaDeGato.baitPlayed) {
+        setTimeout(() => {
+          this.botSay(this.camaDeGato.armador, this.pickRandom(BOT_QUOTES.camaDeGatoSpring));
+        }, 350);
+      } else {
+        const opponent = this.players.find(p => p.team === 'them');
+        if (opponent && Math.random() < 0.7) this.botSay(opponent.id, this.pickRandom(BOT_QUOTES.winHand));
+      }
     } else {
       this.notifyMessage("Canga nas 3 vazas! Ninguém pontuou nessa mão.", "info");
     }
@@ -1160,8 +1293,37 @@ class TrucoGame {
       return Math.random() < 0.65;
     }
 
-    // 4. BLEFE OU MÃO FORTE CONTEXTUAL:
-    const isBluffing = Math.random() < 0.15;
+    // 4. MALANDRAGEM: FECHAMENTO DA CAMA DE GATO (VAZAS 2 E 3)
+    if (this.camaDeGato.them && this.camaDeGato.armador === botId && this.camaDeGato.baitPlayed && this.roundNumber >= 2) {
+      if (hasZap || hasCopeta) {
+        if (Math.random() < 0.85) {
+          return true; // Grita Truco para liquidar a fatura da armadilha!
+        }
+      }
+    }
+
+    // 5. MALANDRAGEM: BLEFE NA 3ª VAZA (JOGO 1 A 1)
+    if (this.roundNumber === 3) {
+      const t1 = this.tricks[0]?.winnerTeam;
+      const t2 = this.tricks[1]?.winnerTeam;
+      const isOneAndOne = (t1 === 'them' && t2 === 'us') || (t1 === 'us' && t2 === 'them');
+
+      if (isOneAndOne && unplayedCards.length === 1) {
+        const lastCard = unplayedCards[0];
+        // Se a última carta for fraca (power <= 5) e não for manilha:
+        if (!lastCard.isManilha && lastCard.power <= 5) {
+          // A chance de blefar sobe conforme o jogador humano já correu de trucos anteriores
+          const bluffChance = Math.min(0.60, 0.20 + (this.playerFoldsCount * 0.12));
+          if (Math.random() < bluffChance) {
+            this.activeBluff = { isBluff: true, botId: botId, caught: false };
+            return true; // Blefe total de Truco!
+          }
+        }
+      }
+    }
+
+    // 6. BLEFE CONTEXTUAL GERAL OU MÃO FORTE:
+    const isBluffing = Math.random() < 0.14;
     if ((hasCopeta && firstTrickWon) || handStrength >= 26 || isBluffing) {
       return Math.random() < 0.6;
     }
@@ -1177,10 +1339,16 @@ class TrucoGame {
     this.betState = 'waiting_player';
     window.trucoAudio.playTrucoAlert(nextVal);
 
-    if (nextVal === 3) this.botSay(botId, this.pickRandom(BOT_QUOTES.truco));
-    else if (nextVal === 6) this.botSay(botId, this.pickRandom(BOT_QUOTES.seis));
-    else if (nextVal === 9) this.botSay(botId, this.pickRandom(BOT_QUOTES.nove));
-    else if (nextVal === 12) this.botSay(botId, this.pickRandom(BOT_QUOTES.doze));
+    if (this.activeBluff.isBluff && this.activeBluff.botId === botId) {
+      this.botSay(botId, this.pickRandom(BOT_QUOTES.bluffTruco));
+    } else if (this.camaDeGato.them && this.camaDeGato.armador === botId && this.roundNumber >= 2) {
+      this.botSay(botId, this.pickRandom(BOT_QUOTES.camaDeGatoSpring));
+    } else {
+      if (nextVal === 3) this.botSay(botId, this.pickRandom(BOT_QUOTES.truco));
+      else if (nextVal === 6) this.botSay(botId, this.pickRandom(BOT_QUOTES.seis));
+      else if (nextVal === 9) this.botSay(botId, this.pickRandom(BOT_QUOTES.nove));
+      else if (nextVal === 12) this.botSay(botId, this.pickRandom(BOT_QUOTES.doze));
+    }
 
     const botName = this.getPlayer(botId).name;
     this.notifyMessage(`⚠️ ${botName.toUpperCase()} GRITOU ${this.getBetLabel(nextVal)}! Como sua dupla responde?`, "warning");
@@ -1226,9 +1394,34 @@ class TrucoGame {
 
     const leadBot = themPlayers[0];
 
+    // MALANDRAGEM: SE A CAMA DE GATO ESTAVA ARMADA E O ADVERSÁRIO TRUCOU!
+    if (this.camaDeGato.them && this.camaDeGato.baitPlayed) {
+      if (canRaise && Math.random() < 0.6) {
+        this.betValue = requestedValue;
+        this.lastBettorTeam = 'them';
+        this.lastBettorPlayerId = leadBot.id;
+        this.betState = 'waiting_player';
+        window.trucoAudio.playTrucoAlert(raiseVal);
+        this.botSay(leadBot.id, this.pickRandom(BOT_QUOTES.camaDeGatoSpring));
+        this.notifyMessage(`💥 CAIU NA CAMA DE GATO! ${leadBot.name} RETRUCOU: PEDIU ${this.getBetLabel(raiseVal)}!`, "warning");
+        this.emitState();
+        return;
+      }
+      this.betValue = requestedValue;
+      this.betState = 'none';
+      window.trucoAudio.playClick();
+      this.botSay(leadBot.id, this.pickRandom(BOT_QUOTES.camaDeGatoSpring));
+      this.notifyMessage(`💥 CAIU NA CAMA DE GATO! A dupla adversária aceitou o ${this.getBetLabel(requestedValue)} com a armadilha pronta!`, "warning");
+      this.emitState();
+      if (this.currentTurnPlayerId !== 'player') {
+        setTimeout(() => this.botPlayTurn(this.currentTurnPlayerId), 900);
+      }
+      return;
+    }
+
     // Chance de retrucar (aumentar)
-    if (canRaise && (hasZap || (hasCopeta && wonFirstTrick) || bestHandStrength >= 28)) {
-      if (Math.random() < 0.45) {
+    if (canRaise && (hasZap || (hasCopeta && wonFirstTrick) || bestHandStrength >= 28 || this.casalMaior.them)) {
+      if (Math.random() < (this.casalMaior.them ? 0.6 : 0.45)) {
         this.betValue = requestedValue;
         this.lastBettorTeam = 'them';
         this.lastBettorPlayerId = leadBot.id;
@@ -1247,7 +1440,8 @@ class TrucoGame {
 
     // Aceitar ou Correr
     let acceptChance = 0.55;
-    if (hasZap || hasCopeta) acceptChance = 0.95;
+    if (this.casalMaior.them) acceptChance = 1.0;
+    else if (hasZap || hasCopeta) acceptChance = 0.95;
     else if (bestHandStrength >= 18) acceptChance = 0.8;
     else if (wonFirstTrick) acceptChance = 0.7;
     else if (bestHandStrength < 10 && this.roundNumber > 1 && this.tricks[0]?.winnerTeam === 'us') acceptChance = 0.15;
@@ -1285,6 +1479,9 @@ class TrucoGame {
       window.trucoAudio.playClick();
       this.betValue = requestedValue;
       this.betState = 'none';
+      if (this.activeBluff.isBluff) {
+        this.activeBluff.caught = true; // Se o jogador vencer a mão, o bot comenta que foi pego
+      }
       this.notifyMessage(`Nossa dupla aceitou o ${this.getBetLabel(requestedValue)}! A mão vale ${this.betValue} pontos.`, "info");
       this.emitState();
 
@@ -1294,7 +1491,20 @@ class TrucoGame {
     } else if (action === 'refuse') {
       window.trucoAudio.playClick();
       this.betState = 'none';
-      this.notifyMessage(`Nossa dupla correu do Truco! Adversários ganharam ${this.betValue} ponto(s).`, "loss");
+      this.playerFoldsCount++;
+
+      // Se o adversário estava blefando:
+      if (this.activeBluff.isBluff) {
+        const bluffBot = this.activeBluff.botId;
+        setTimeout(() => {
+          this.botSay(bluffBot, this.pickRandom(BOT_QUOTES.bluffRevealedWin));
+        }, 400);
+        this.notifyMessage(`🎭 BLEFE REVELADO! ${this.getPlayer(bluffBot).name} estava blefando com carta fraca e ganhou no grito!`, "warning");
+        this.activeBluff.isBluff = false;
+      } else {
+        this.notifyMessage(`Nossa dupla correu do Truco! Adversários ganharam ${this.betValue} ponto(s).`, "loss");
+      }
+
       this.botScore += this.betValue;
       this.checkEndGame();
       this.emitState();
@@ -1376,7 +1586,9 @@ class TrucoGame {
       lastBettorTeam: this.lastBettorTeam,
       lastBettorPlayerId: this.lastBettorPlayerId,
       resolvingTrick: !!this.resolvingTrick,
-      tacticalRoles: this.getTacticalRoles()
+      tacticalRoles: this.getTacticalRoles(),
+      casalMaior: this.casalMaior,
+      camaDeGatoActive: !!(this.camaDeGato.them || this.camaDeGato.us)
     };
   }
 }
