@@ -300,4 +300,7 @@ O **Arcade de Lira** é o centro de diversão acessível pelo Terminal do Avatar
      - **Token 5 (Interruptor de Mapa):** Altera o estado físico da partida (transformadores, válvulas, giroscópios, torretas e pilares de plasma).
      - **Token 6 (Extração / Conclusão):** Rota final liberada após obter o item de clímax do Token 3.
    - **Alternância Dinâmica de Perspectiva:** Permite jogar toda a campanha tanto no **Modo Heróis Vivos 🛡️** (cegar a Terra e detonar o EMP) quanto no **Modo Heróis Zumbis 🧟** (erguer o Farol Quântico para atrair o Banquete Cósmico), salvando o progresso automaticamente no MySQL.
-
+   - **Compêndio Oficial & Dashboard Tático de Personagens (/zombi/characters.html):**
+     - **82 Personagens Cadastrados no Banco:** Catálogo consolidado na tabela definition_mz_characters abrangendo a Caixa Base, X-Men Resistance, Heroes' Resistance, Hydra Resurrection, Promos do Kickstarter e expansões temáticas (Quarteto Fantástico, Guardiões da Galáxia, Sinister Six, Sentinelas, etc.).
+     - **3 Modos de Ficha por Miniatura:** Super-Herói Vivo, Herói Zumbi (com mecânica de Fome) e Boss Inimigo da carta de Spawn.
+     - **Recursos Interativos Táticos:** Visualização dos 4 patamares de habilidades por cor de XP (Azul, Amarelo, Laranja e Vermelho), simulador integrado de rolagem de dados de combate com animação de sacudida e áudio Web Audio API, e painel de controle e dano em tempo real para o HP de Boss Inimigo.

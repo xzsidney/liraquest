@@ -30,6 +30,7 @@ import { FamilyDungeonRun } from './FamilyDungeonRun.js';
 import { FamilyZombiCampaign } from './FamilyZombiCampaign.js';
 import { FamilyZombiMission } from './FamilyZombiMission.js';
 import { FamilyZombiToken } from './FamilyZombiToken.js';
+import { DefinitionMzCharacter } from './DefinitionMzCharacter.js';
 
 // ==========================================
 // 1. Associações de Usuário & Família
@@ -198,4 +199,5 @@ export {
   FamilyZombiCampaign,
   FamilyZombiMission,
   FamilyZombiToken,
+  DefinitionMzCharacter,
 };

@@ -1,7 +1,9 @@
+import { Op } from 'sequelize';
 import {
   FamilyZombiCampaign,
   FamilyZombiMission,
   FamilyZombiToken,
+  DefinitionMzCharacter,
 } from '../models/index.js';
 
 /**
@@ -155,6 +157,101 @@ export const resetCampaignState = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Erro ao reiniciar campanha.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * GET /api/zombi/characters
+ * Lista todos os personagens de Marvel Zombies com suporte a filtros rápidos.
+ * Query Params opcionais:
+ *  - box: filtra pelo nome da caixa
+ *  - mode: 'hero', 'zombie' ou 'boss'
+ *  - search: busca textual pelo nome do personagem
+ */
+export const listMzCharacters = async (req, res) => {
+  try {
+    const { box, mode, search } = req.query;
+    const where = {};
+
+    if (box) {
+      where.box_name = box;
+    }
+
+    if (mode === 'hero') {
+      where.has_super_hero = true;
+    } else if (mode === 'zombie') {
+      where.has_zombie_hero = true;
+    } else if (mode === 'boss') {
+      where.has_boss_enemy = true;
+    }
+
+    if (search && search.trim() !== '') {
+      where[Op.or] = [
+        { name: { [Op.like]: `%${search.trim()}%` } },
+        { code: { [Op.like]: `%${search.trim()}%` } },
+      ];
+    }
+
+    const characters = await DefinitionMzCharacter.findAll({
+      where,
+      attributes: [
+        'id',
+        'code',
+        'name',
+        'box_name',
+        'has_super_hero',
+        'has_zombie_hero',
+        'has_boss_enemy',
+        'boss_health',
+      ],
+      order: [['name', 'ASC']],
+    });
+
+    return res.json({
+      success: true,
+      total: characters.length,
+      characters,
+    });
+  } catch (error) {
+    console.error('Erro ao listar personagens Marvel Zombies:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Erro ao listar personagens Marvel Zombies.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * GET /api/zombi/characters/:code
+ * Retorna os detalhes completos da ficha de um personagem (incluindo perfis, ataques e habilidades).
+ */
+export const getMzCharacterByCode = async (req, res) => {
+  try {
+    const { code } = req.params;
+
+    const character = await DefinitionMzCharacter.findOne({
+      where: { code },
+    });
+
+    if (!character) {
+      return res.status(404).json({
+        success: false,
+        message: `Personagem '${code}' não encontrado no catálogo.`,
+      });
+    }
+
+    return res.json({
+      success: true,
+      character,
+    });
+  } catch (error) {
+    console.error(`Erro ao buscar personagem '${req.params.code}':`, error);
+    return res.status(500).json({
+      success: false,
+      message: 'Erro ao buscar detalhes do personagem.',
       error: error.message,
     });
   }

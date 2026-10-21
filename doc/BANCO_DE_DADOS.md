@@ -572,6 +572,24 @@ Armazena os 6 tokens investigativos (1 a 6) de cada missão, com dependências, 
 | `actions_json` | `JSON` | Não | Opções de escolha, códigos de Keypad, resultados de 1d6 e flags concedidas |
 | `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
 
+### 🦸 `definition_mz_characters`
+Catálogo global imutável com os **82 personagens oficiais** de Marvel Zombies (Caixa Base, X-Men Resistance, Heroes' Resistance, Hydra Resurrection, Promos do Kickstarter e expansões), modelado no padrão *Document-Relational* com índices SQL rápidos e payload de perfis em JSON.
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único UUID |
+| `code` | `VARCHAR(60)` (UNIQUE) | Não | Slug único do personagem (ex: `thor`, `wolverine`, `deadpool`) |
+| `name` | `VARCHAR(100)` | Não | Nome de exibição oficial do herói (ex: "Thor", "Deadpool") |
+| `box_name` | `VARCHAR(120)` | Não | Nome da caixa ou expansão padronizada (Indexado) |
+| `has_super_hero` | `BOOLEAN` | Não | `true` se possui modo de jogo Super-Herói Vivo |
+| `has_zombie_hero` | `BOOLEAN` | Não | `true` se possui modo de jogo Herói Zumbi |
+| `has_boss_enemy` | `BOOLEAN` | Não | `true` se possui modo de jogo Boss Inimigo |
+| `boss_health` | `INT` | Sim | Vitalidade máxima quando enfrentado como Boss (ex: 4, 5, 6 HP) |
+| `boss_ability` | `TEXT` | Sim | Resumo da habilidade ativa ou passiva de spawn do Boss |
+| `profiles` | `JSON` | Não | Objeto estruturado com todas as facetas (`attack`: nome, alcance, dados, precisão; `skills`: azul, amarelo, laranja, vermelho; `boss_enemy`) |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+
+
 
 
 

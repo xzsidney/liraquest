@@ -238,6 +238,10 @@ Módulo separado com interface web responsiva e persistência MySQL para apoiar 
 | `GET` | `/api/zombi/campaign` | Pública | Retorna a campanha ativa (`family_zombi_campaigns`) com todas as 5 missões (`family_zombi_missions`), os 6 tokens de cada missão (`family_zombi_tokens`) e o progresso salvo |
 | `POST` | `/api/zombi/state` | Pública | Salva em tempo real no MySQL o capítulo atual, o modo ativo (`HERO` ou `ZOMBIE`), os tokens resolvidos e as pistas/flags adquiridas |
 | `POST` | `/api/zombi/reset` | Pública | Reinicia o estado salvo de um capítulo específico ou da campanha completa |
+| `GET` | `/api/zombi/characters` | Pública | Lista os 82 personagens oficiais com suporte a filtros via query params (`?box=...`, `?mode=hero|zombie|boss`, `?search=...`) para abastecer dropdowns e filtros rápidos |
+| `GET` | `/api/zombi/characters/:code` | Pública | Retorna a ficha completa de um personagem específico por slug (`code`), incluindo todos os seus perfis (`super_hero`, `zombie_hero`, `boss_enemy`), ataques e habilidades |
+| `GET` | `/zombi/characters.html` | Pública | Entrega a interface oficial do Companion Tático de Personagens com simulador de dados e gerenciador de HP de Boss |
+
 
 
 

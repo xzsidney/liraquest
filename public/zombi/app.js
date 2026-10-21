@@ -47,12 +47,15 @@ function soundError() {
   setTimeout(() => playTone(165, 0.25), 140);
 }
 
+// Prefixo de API inteligente: se aberto via arquivo local (file://), conecta no localhost:3000
+const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:3000' : '';
+
 // ================= CARREGAMENTO INICIAL DO BANCO DE DADOS =================
 async function loadCampaignFromDB() {
   const syncBadge = document.getElementById('syncStatus');
   try {
     syncBadge.textContent = '🔄 Sincronizando MySQL...';
-    const res = await fetch('/api/zombi/campaign');
+    const res = await fetch(`${API_BASE}/api/zombi/campaign`);
     const data = await res.json();
 
     if (!data.success || !data.campaign) {
@@ -83,7 +86,7 @@ async function persistStateToDB() {
   const syncBadge = document.getElementById('syncStatus');
   try {
     syncBadge.textContent = '💾 Salvando no MySQL...';
-    const res = await fetch('/api/zombi/state', {
+    const res = await fetch(`${API_BASE}/api/zombi/state`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

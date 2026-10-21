@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiraQuest — Marvel Zombies Companion Tático</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;500;600;700;800;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            comic: ['Bangers', 'cursive'],
+            display: ['Rajdhani', 'sans-serif'],
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            mz: {
+              blue: '#0284c7',
+              yellow: '#eab308',
+              orange: '#ea580c',
+              red: '#dc2626',
+              dark: '#080b10',
+              card: '#111722',
+              border: '#1f293d',
+              zombie: '#991b1b',
+              blood: '#450a0a',
+              bordo: '#800020'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .comic-dots {
+      background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 0);
+      background-size: 8px 8px;
+    }
+
+    .comic-panel {
+      border: 3px solid #000;
+      box-shadow: 6px 6px 0px #000;
+    }
+
+    .comic-panel-sm {
+      border: 2px solid #000;
+      box-shadow: 3px 3px 0px #000;
+    }
+
+    @keyframes dice-shake {
+      0% { transform: rotate(0deg) scale(1); }
+      25% { transform: rotate(-15deg) scale(1.1); }
+      50% { transform: rotate(15deg) scale(1.1); }
+      75% { transform: rotate(-10deg) scale(1.05); }
+      100% { transform: rotate(0deg) scale(1); }
+    }
+
+    .animate-shake {
+      animation: dice-shake 0.35s ease-in-out infinite;
+    }
+  </style>
+</head>
+
+<body class="bg-[#070a0e] text-zinc-100 min-h-screen font-sans selection:bg-amber-400 selection:text-black pb-16">
+
+  <!-- ================= TOP HEADER BAR ================= -->
+  <header class="bg-[#0d121c] border-b-2 border-black px-4 sm:px-6 py-3.5 sticky top-0 z-40 shadow-xl">
+    <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Logo & Links -->
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="w-10 h-10 rounded-xl bg-amber-500 hover:bg-amber-400 border-2 border-black flex items-center justify-center text-black text-xl font-comic shadow-[2px_2px_0px_#000] transition active:scale-95" title="Voltar para a Campanha">
+          MZ
+        </a>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] tracking-widest font-black uppercase text-amber-400 block leading-none">Compêndio Oficial</span>
+            <span class="text-[9px] bg-emerald-950 text-emerald-400 border border-emerald-700/60 px-1.5 py-0.2 rounded font-mono font-bold">MySQL Hostinger</span>
+          </div>
+          <h1 class="text-xl sm:text-2xl font-comic tracking-wide text-white uppercase leading-tight drop-shadow">
+            Marvel Zombies Companion
+          </h1>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="flex items-center gap-2">
+        <a href="index.html" class="bg-zinc-800 hover:bg-zinc-700 active:scale-95 text-zinc-200 border-2 border-black px-3 py-1.5 rounded-lg text-xs font-display font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-[2px_2px_0px_#000] transition">
+          <i class="fa-solid fa-map-location-dot text-amber-400"></i>
+          <span>Campanha RPG</span>
+        </a>
+        <a href="../index.html" class="bg-red-950 hover:bg-red-900 active:scale-95 text-red-200 border-2 border-black px-3 py-1.5 rounded-lg text-xs font-display font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-[2px_2px_0px_#000] transition">
+          <i class="fa-solid fa-house text-amber-400"></i>
+          <span>LiraQuest</span>
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 pt-6 space-y-6">
+
+    <!-- ================= FILTERS & SELECTION HUB ================= -->
+    <section class="bg-[#111723] rounded-2xl p-4 sm:p-5 comic-panel comic-dots space-y-4">
+      
+      <!-- Top Row: Box Filter + Search Input -->
+      <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+        <!-- Box Filter -->
+        <div class="sm:col-span-6 space-y-1">
+          <label for="boxFilter" class="text-xs font-display font-bold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
+            <i class="fa-solid fa-box-open text-amber-400"></i> Filtrar por Caixa:
+          </label>
+          <select id="boxFilter" onchange="applyFilters()" class="w-full bg-[#0a0e17] border-2 border-black rounded-xl px-3 py-2 font-display font-bold text-sm text-white focus:outline-none focus:border-amber-400 cursor-pointer shadow-[2px_2px_0px_#000]">
+            <option value="">Todas as Caixas e Expansões (82)</option>
+          </select>
+        </div>
+
+        <!-- Search Input -->
+        <div class="sm:col-span-6 space-y-1">
+          <label for="searchInput" class="text-xs font-display font-bold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
+            <i class="fa-solid fa-magnifying-glass text-amber-400"></i> Buscar por Nome:
+          </label>
+          <div class="relative">
+            <input type="text" id="searchInput" oninput="applyFilters()" placeholder="Ex: Thor, Wolverine, Thanos..." class="w-full bg-[#0a0e17] border-2 border-black rounded-xl px-3 py-2 font-display text-sm text-white focus:outline-none focus:border-amber-400 shadow-[2px_2px_0px_#000] placeholder-zinc-500">
+            <i class="fa-solid fa-filter absolute right-3 top-2.5 text-zinc-500 text-xs"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Row: Character Dropdown + Mode Switcher -->
+      <div class="flex flex-col md:flex-row gap-4 items-center justify-between pt-2 border-t border-zinc-800">
+        
+        <!-- Character Dropdown -->
+        <div class="w-full md:w-1/2 space-y-1.5">
+          <label for="heroSelector" class="text-xs font-display font-bold uppercase tracking-wider text-amber-400 flex items-center justify-between">
+            <span class="flex items-center gap-1.5"><i class="fa-solid fa-mask"></i> Selecione o Personagem:</span>
+            <span id="charCountBadge" class="text-[10px] text-zinc-400 font-mono">82 disponíveis</span>
+          </label>
+          <div class="relative">
+            <select id="heroSelector" onchange="loadCharacterDetails(this.value)" class="w-full bg-[#0a0e17] border-2 border-black rounded-xl px-4 py-2.5 font-display font-bold text-base text-white focus:outline-none focus:border-amber-400 cursor-pointer shadow-[3px_3px_0px_#000] appearance-none">
+              <option value="">Carregando heróis do banco de dados...</option>
+            </select>
+            <i class="fa-solid fa-chevron-down absolute right-4 top-3.5 text-zinc-400 pointer-events-none"></i>
+          </div>
+        </div>
+
+        <!-- Mode Switcher (Hero / Zombie / Boss) -->
+        <div class="w-full md:w-auto flex flex-col items-start md:items-end space-y-1.5">
+          <span class="text-xs font-display font-bold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
+            <i class="fa-solid fa-sliders"></i> Modo da Ficha:
+          </span>
+          <div class="grid grid-cols-3 gap-1 bg-[#0a0e17] p-1.5 rounded-xl border-2 border-black shadow-[3px_3px_0px_#000] w-full md:w-auto">
+            <button id="btn-mode-hero" onclick="setProfileMode('super_hero')" class="px-3 sm:px-4 py-1.5 rounded-lg text-xs font-display font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-shield-halved"></i>
+              <span class="hidden sm:inline">Herói</span> Vivo
+            </button>
+            <button id="btn-mode-zombie" onclick="setProfileMode('zombie_hero')" class="px-3 sm:px-4 py-1.5 rounded-lg text-xs font-display font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-skull"></i>
+              <span class="hidden sm:inline">Herói</span> Zumbi
+            </button>
+            <button id="btn-mode-boss" onclick="setProfileMode('boss_enemy')" class="px-3 sm:px-4 py-1.5 rounded-lg text-xs font-display font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-biohazard"></i>
+              Boss Inimigo
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ================= MAIN DASHBOARD CARD ================= -->
+    <div id="characterCard" class="relative rounded-2xl bg-[#0f1520] border-4 border-black shadow-[8px_8px_0px_#000] overflow-hidden">
+      
+      <!-- Card Top: Name & Origin Box Badge -->
+      <div id="cardHeaderBar" class="bg-gradient-to-r from-sky-600 to-blue-700 border-b-4 border-black px-5 py-3 flex flex-wrap items-center justify-between gap-2 transition-colors duration-300">
+        <div class="flex items-center gap-3">
+          <span id="cardHeaderIcon" class="text-2xl text-white">
+            <i class="fa-solid fa-shield-halved"></i>
+          </span>
+          <div>
+            <h2 id="charNameDisplay" class="text-2xl sm:text-3xl font-comic tracking-wider text-white uppercase drop-shadow-[2px_2px_0px_#000]">
+              Carregando...
+            </h2>
+            <span id="charBoxBadge" class="text-[11px] font-display font-semibold uppercase tracking-wider text-zinc-200 bg-black/40 px-2 py-0.5 rounded border border-white/20">
+              Catálogo Oficial
+            </span>
+          </div>
+        </div>
+
+        <div id="modePill" class="bg-black/60 text-sky-300 border border-sky-400 font-comic uppercase tracking-wider text-xs px-3 py-1 rounded-full">
+          Super-Herói Vivo
+        </div>
+      </div>
+
+      <div class="p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- LEFT COLUMN: COMBAT WEAPON / BOSS HP & COMBAT ROLLER (5 COLS) -->
+        <div class="lg:col-span-5 space-y-5">
+          
+          <!-- Attack Spec Box (When Playing as Player Hero) -->
+          <div id="attackBox" class="bg-[#151c2a] rounded-xl p-4 comic-panel-sm space-y-3">
+            <div class="flex items-center justify-between border-b border-zinc-700/80 pb-2">
+              <span class="text-xs font-display font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+                <i class="fa-solid fa-hand-fist"></i> Ataque Primário / Assinatura
+              </span>
+              <span id="attackName" class="font-comic text-base text-white tracking-wide">--</span>
+            </div>
+
+            <!-- Weapon Badges Grid (Range, Dice, Accuracy) -->
+            <div class="grid grid-cols-3 gap-2 text-center">
+              <div class="bg-black/50 border border-zinc-700 p-2 rounded-lg">
+                <span class="block text-[10px] uppercase font-bold text-zinc-400 font-display">Alcance</span>
+                <span id="statRange" class="font-comic text-xl text-amber-400">0</span>
+              </div>
+              <div class="bg-black/50 border border-zinc-700 p-2 rounded-lg">
+                <span class="block text-[10px] uppercase font-bold text-zinc-400 font-display">Dados</span>
+                <span id="statDice" class="font-comic text-xl text-sky-400">0</span>
+              </div>
+              <div class="bg-black/50 border border-zinc-700 p-2 rounded-lg">
+                <span class="block text-[10px] uppercase font-bold text-zinc-400 font-display">Acerto</span>
+                <span id="statAcc" class="font-comic text-xl text-emerald-400">0+</span>
+              </div>
+            </div>
+
+            <!-- Combat Attack Roller Button -->
+            <button onclick="rollCharacterAttack()" class="w-full mt-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 active:scale-95 text-black font-comic text-base tracking-wider uppercase py-2.5 rounded-xl border-2 border-black shadow-[3px_3px_0px_#000] flex items-center justify-center gap-2 transition">
+              <i class="fa-solid fa-dice"></i> Executar Ataque de Combate
+            </button>
+          </div>
+
+          <!-- Boss HP Tracker Box (Only Visible in Boss Mode) -->
+          <div id="bossBox" class="hidden bg-[#1f1013] rounded-xl p-4 comic-panel-sm space-y-4 border-red-900">
+            <div class="flex items-center justify-between border-b border-red-900/60 pb-2">
+              <span class="text-xs font-display font-bold uppercase tracking-wider text-red-400 flex items-center gap-1.5">
+                <i class="fa-solid fa-heart-pulse"></i> Vitalidade do Chefe (HP)
+              </span>
+              <span id="bossHpCounter" class="font-comic text-xl text-white font-bold tracking-wide">0 / 0 HP</span>
+            </div>
+
+            <!-- Health Bar -->
+            <div class="w-full bg-black/70 h-3 rounded-full overflow-hidden p-0.5 border border-red-950">
+              <div id="bossHpBar" class="h-full bg-gradient-to-r from-red-600 to-rose-500 rounded-full transition-all duration-300" style="width: 100%;"></div>
+            </div>
+
+            <!-- Quick Hit Buttons -->
+            <div class="flex items-center gap-2">
+              <button onclick="alterBossHP(-1)" class="flex-1 bg-red-900/80 hover:bg-red-800 text-white font-display font-bold py-2 rounded-lg text-xs uppercase border border-red-700 active:scale-95 transition">
+                -1 Dano
+              </button>
+              <button onclick="alterBossHP(-2)" class="flex-1 bg-red-800 hover:bg-red-700 text-white font-display font-bold py-2 rounded-lg text-xs uppercase border border-red-600 active:scale-95 transition">
+                -2 Crítico
+              </button>
+              <button onclick="resetBossHP()" title="Restaurar HP" class="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold rounded-lg text-xs border border-zinc-700 transition">
+                <i class="fa-solid fa-rotate-left"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Dice Results Visual Arena -->
+          <div id="diceArena" class="bg-[#0b0f16] rounded-xl p-4 comic-panel-sm space-y-2">
+            <div class="flex items-center justify-between text-xs font-display font-bold uppercase text-zinc-400">
+              <span>Resultado dos Dados:</span>
+              <span id="diceSummary" class="text-amber-400 font-mono">Aguardando ataque</span>
+            </div>
+            <div id="diceCup" class="flex flex-wrap items-center justify-center gap-2.5 min-h-[50px] py-1">
+              <span class="text-xs text-zinc-500 font-display">Clique em 'Executar Ataque' para rolar</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN: PROGRESSION TRACKER & SKILLS (7 COLS) -->
+        <div class="lg:col-span-7 space-y-3.5">
+          
+          <!-- Not Available in this Mode Warning -->
+          <div id="modeUnavailableNotice" class="hidden bg-amber-950/60 border-2 border-amber-600/80 rounded-xl p-5 text-center space-y-2">
+            <i class="fa-solid fa-triangle-exclamation text-3xl text-amber-400"></i>
+            <h3 class="font-comic text-xl text-amber-200">Modo Indisponível</h3>
+            <p id="modeUnavailableText" class="text-xs text-zinc-300 font-sans leading-relaxed">
+              Este personagem não possui perfil oficial para este modo nas regras do jogo.
+            </p>
+          </div>
+
+          <!-- ================= PLAYER HERO SKILLS BARS (BLUE, YELLOW, ORANGE, RED) ================= -->
+          <div id="heroSkillsContainer" class="space-y-3">
+            
+            <!-- BLUE SKILL (INITIAL) -->
+            <div class="comic-panel-sm rounded-xl overflow-hidden bg-[#121927]">
+              <div class="bg-mz-blue px-3.5 py-1.5 flex items-center justify-between border-b-2 border-black">
+                <span class="font-comic tracking-wider text-xs uppercase text-white drop-shadow">
+                  Nível Inicial (Azul - 0 XP)
+                </span>
+                <i class="fa-solid fa-star text-white/80 text-xs"></i>
+              </div>
+              <div class="p-3 text-xs sm:text-sm text-zinc-200 leading-relaxed font-sans" id="skillBlue">
+                <!-- Skill text -->
+              </div>
+            </div>
+
+            <!-- YELLOW (+1 ACTION) -->
+            <div class="comic-panel-sm rounded-xl overflow-hidden bg-[#18181b]">
+              <div class="bg-mz-yellow px-3.5 py-1.5 flex items-center justify-between border-b-2 border-black">
+                <span class="font-comic tracking-wider text-xs uppercase text-black">
+                  Nível Amarelo (7 XP)
+                </span>
+                <span class="text-[10px] font-black uppercase text-black font-display bg-black/10 px-1.5 rounded">Padrão</span>
+              </div>
+              <div class="p-2.5 text-xs sm:text-sm font-bold text-amber-300 font-display flex items-center gap-2" id="skillYellow">
+                <i class="fa-solid fa-plus-circle"></i> +1 Ação por Turno
+              </div>
+            </div>
+
+            <!-- ORANGE SKILL -->
+            <div class="comic-panel-sm rounded-xl overflow-hidden bg-[#1b1512]">
+              <div class="bg-mz-orange px-3.5 py-1.5 flex items-center justify-between border-b-2 border-black">
+                <span class="font-comic tracking-wider text-xs uppercase text-white drop-shadow">
+                  Nível Laranja (19 XP)
+                </span>
+                <i class="fa-solid fa-bolt text-white/80 text-xs"></i>
+              </div>
+              <div class="p-3 text-xs sm:text-sm text-zinc-200 leading-relaxed font-sans" id="skillOrange">
+                <!-- Skill text -->
+              </div>
+            </div>
+
+            <!-- RED SKILL (SUPREME) -->
+            <div class="comic-panel-sm rounded-xl overflow-hidden bg-[#201014]">
+              <div class="bg-mz-red px-3.5 py-1.5 flex items-center justify-between border-b-2 border-black">
+                <span class="font-comic tracking-wider text-xs uppercase text-white drop-shadow">
+                  Nível Vermelho (43+ XP)
+                </span>
+                <i class="fa-solid fa-skull-crossbones text-white/80 text-xs"></i>
+              </div>
+              <div class="p-3 text-xs sm:text-sm text-zinc-200 leading-relaxed font-sans" id="skillRed">
+                <!-- Skill text -->
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ================= BOSS ENEMY SKILL (ONLY IN BOSS MODE) ================= -->
+          <div id="bossSkillsContainer" class="hidden space-y-3">
+            <div class="comic-panel-sm rounded-xl overflow-hidden bg-[#1d0e11] border-red-700">
+              <div class="bg-red-800 px-4 py-2 flex items-center justify-between border-b-2 border-black">
+                <span class="font-comic tracking-wider text-sm uppercase text-white">
+                  Habilidade Ativa do Boss / Inimigo
+                </span>
+                <span class="text-[10px] font-black uppercase text-red-200 font-display bg-black/30 px-2 py-0.5 rounded">
+                  Spawn Trigger
+                </span>
+              </div>
+              <div class="p-4 text-xs sm:text-sm text-red-100 leading-relaxed font-sans" id="bossAbility">
+                <!-- Boss ability text -->
+              </div>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-black/40 border border-zinc-800 text-xs text-zinc-400 space-y-1">
+              <span class="font-bold text-amber-400 uppercase text-[11px] block font-display">
+                <i class="fa-solid fa-circle-info mr-1"></i> Regras de Ativação de Boss:
+              </span>
+              <p>Os Super-Heróis Zumbis ativam na Fase dos Inimigos. Eles realizam 1 Ação por ativação padrão e executam sua regra passiva sempre que aplicável.</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ================= JAVASCRIPT CONNECTED TO REST API ================= -->
+  <script>
+    // State
+    let charactersList = [];
+    let currentCharacter = null;
+    let activeProfileMode = "super_hero";
+    let currentBossHP = 4;
+    let maxBossHP = 4;
+
+    // Web Audio Synthesizer
+    function playBeep(freq = 440, type = 'sine', duration = 0.1) {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    // Prefixo de API inteligente para suporte a abertura direta via arquivo (file://)
+    const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:3000' : '';
+
+    // Carregar Lista Inicial da API
+    async function loadCharacters() {
+      try {
+        const res = await fetch(`${API_BASE}/api/zombi/characters`);
+        const data = await res.json();
+        if (data.success && data.characters) {
+          charactersList = data.characters;
+          populateBoxFilter();
+          applyFilters();
+          
+          // Selecionar o primeiro herói (ou Deadpool/Thor se houver)
+          const preferred = charactersList.find(c => c.code === 'deadpool') || charactersList[0];
+          if (preferred) {
+            await loadCharacterDetails(preferred.code);
+          }
+        }
+      } catch (err) {
+        console.error('Erro ao conectar na API:', err);
+        document.getElementById('charNameDisplay').textContent = "Erro ao carregar banco";
+      }
+    }
+
+    // Popular filtro de caixas
+    function populateBoxFilter() {
+      const boxSelect = document.getElementById('boxFilter');
+      const boxes = new Set();
+      charactersList.forEach(c => {
+        if (c.box_name) boxes.add(c.box_name);
+      });
+
+      Array.from(boxes).sort().forEach(box => {
+        const opt = document.createElement('option');
+        opt.value = box;
+        opt.textContent = box;
+        boxSelect.appendChild(opt);
+      });
+    }
+
+    // Aplicar Filtros no Dropdown
+    function applyFilters() {
+      const selectedBox = document.getElementById('boxFilter').value;
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+      const select = document.getElementById('heroSelector');
+
+      const filtered = charactersList.filter(c => {
+        const matchesBox = !selectedBox || c.box_name === selectedBox;
+        const matchesSearch = !searchTerm || c.name.toLowerCase().includes(searchTerm) || c.code.toLowerCase().includes(searchTerm);
+        return matchesBox && matchesSearch;
+      });
+
+      select.innerHTML = '';
+      if (filtered.length === 0) {
+        const opt = document.createElement('option');
+        opt.value = '';
+        opt.textContent = 'Nenhum herói encontrado com esses filtros';
+        select.appendChild(opt);
+        document.getElementById('charCountBadge').textContent = '0 encontrados';
+        return;
+      }
+
+      document.getElementById('charCountBadge').textContent = `${filtered.length} encontrados`;
+
+      filtered.forEach(char => {
+        const opt = document.createElement('option');
+        opt.value = char.code;
+        opt.textContent = `${char.name} (${char.box_name})`;
+        select.appendChild(opt);
+      });
+
+      if (currentCharacter && filtered.some(c => c.code === currentCharacter.code)) {
+        select.value = currentCharacter.code;
+      } else {
+        select.value = filtered[0].code;
+        loadCharacterDetails(filtered[0].code);
+      }
+    }
+
+    // Carregar detalhes completos do personagem selecionado
+    async function loadCharacterDetails(code) {
+      if (!code) return;
+      try {
+        const res = await fetch(`${API_BASE}/api/zombi/characters/${code}`);
+        const data = await res.json();
+        if (data.success && data.character) {
+          currentCharacter = data.character;
+
+          // Ajustar modo se o modo atual não existir neste herói
+          if (activeProfileMode === 'super_hero' && !currentCharacter.has_super_hero) {
+            activeProfileMode = currentCharacter.has_zombie_hero ? 'zombie_hero' : 'boss_enemy';
+          } else if (activeProfileMode === 'zombie_hero' && !currentCharacter.has_zombie_hero) {
+            activeProfileMode = currentCharacter.has_super_hero ? 'super_hero' : 'boss_enemy';
+          } else if (activeProfileMode === 'boss_enemy' && !currentCharacter.has_boss_enemy) {
+            activeProfileMode = currentCharacter.has_super_hero ? 'super_hero' : 'zombie_hero';
+          }
+
+          updateModeButtonsState();
+          renderCurrentDashboard();
+          playBeep(520, 'triangle', 0.08);
+        }
+      } catch (err) {
+        console.error('Erro ao carregar detalhes do herói:', err);
+      }
+    }
+
+    // Alterar modo da ficha
+    function setProfileMode(mode) {
+      activeProfileMode = mode;
+      updateModeButtonsState();
+      renderCurrentDashboard();
+      playBeep(mode === 'boss_enemy' ? 280 : 440, 'sawtooth', 0.12);
+    }
+
+    function updateModeButtonsState() {
+      const btnHero = document.getElementById('btn-mode-hero');
+      const btnZombie = document.getElementById('btn-mode-zombie');
+      const btnBoss = document.getElementById('btn-mode-boss');
+
+      const neutralClass = "px-3 sm:px-4 py-1.5 rounded-lg text-xs font-display font-bold uppercase tracking-wider text-zinc-400 hover:text-white transition-all";
+      btnHero.className = neutralClass;
+      btnZombie.className = neutralClass;
+      btnBoss.className = neutralClass;
+
+      // Desabilitar botões se não houver perfil
+      if (currentCharacter) {
+        btnHero.classList.toggle('opacity-30', !currentCharacter.has_super_hero);
+        btnZombie.classList.toggle('opacity-30', !currentCharacter.has_zombie_hero);
+        btnBoss.classList.toggle('opacity-30', !currentCharacter.has_boss_enemy);
+      }
+
+      if (activeProfileMode === 'super_hero') {
+        btnHero.className = "px-3 sm:px-4 py-1.5 rounded-lg text-xs font-display font-bold uppercase tracking-wider bg-sky-600 text-white shadow-md border border-sky-400";
+      } else if (activeProfileMode === 'zombie_hero') {
+        btnZombie.className = "px-3 sm:px-4 py-1.5 rounded-lg text-xs font-display font-bold uppercase tracking-wider bg-red-700 text-white shadow-md border border-red-500";
+      } else if (activeProfileMode === 'boss_enemy') {
+        btnBoss.className = "px-3 sm:px-4 py-1.5 rounded-lg text-xs font-display font-bold uppercase tracking-wider bg-purple-700 text-white shadow-md border border-purple-500";
+      }
+    }
+
+    // Renderizar Ficha
+    function renderCurrentDashboard() {
+      if (!currentCharacter) return;
+
+      document.getElementById('charNameDisplay').textContent = currentCharacter.name;
+      document.getElementById('charBoxBadge').textContent = currentCharacter.box_name;
+
+      const headerBar = document.getElementById('cardHeaderBar');
+      const headerIcon = document.getElementById('cardHeaderIcon');
+      const modePill = document.getElementById('modePill');
+
+      const attackBox = document.getElementById('attackBox');
+      const bossBox = document.getElementById('bossBox');
+      const heroSkillsContainer = document.getElementById('heroSkillsContainer');
+      const bossSkillsContainer = document.getElementById('bossSkillsContainer');
+      const modeUnavailableNotice = document.getElementById('modeUnavailableNotice');
+
+      const profiles = currentCharacter.profiles || {};
+      const hasCurrentMode = (activeProfileMode === 'super_hero' && currentCharacter.has_super_hero) ||
+                             (activeProfileMode === 'zombie_hero' && currentCharacter.has_zombie_hero) ||
+                             (activeProfileMode === 'boss_enemy' && currentCharacter.has_boss_enemy);
+
+      if (!hasCurrentMode) {
+        modeUnavailableNotice.classList.remove('hidden');
+        document.getElementById('modeUnavailableText').textContent = 
+          `${currentCharacter.name} não possui miniatura/carta oficial para o modo ${activeProfileMode === 'super_hero' ? 'Herói Vivo' : activeProfileMode === 'zombie_hero' ? 'Herói Zumbi' : 'Boss Inimigo'}.`;
+        attackBox.classList.add('hidden');
+        bossBox.classList.add('hidden');
+        heroSkillsContainer.classList.add('hidden');
+        bossSkillsContainer.classList.add('hidden');
+        return;
+      }
+
+      modeUnavailableNotice.classList.add('hidden');
+
+      if (activeProfileMode === 'super_hero') {
+        headerBar.className = "bg-gradient-to-r from-sky-600 to-blue-700 border-b-4 border-black px-5 py-3 flex flex-wrap items-center justify-between gap-2 transition-colors duration-300";
+        headerIcon.innerHTML = `<i class="fa-solid fa-shield-halved"></i>`;
+        modePill.className = "bg-black/60 text-sky-300 border border-sky-400 font-comic uppercase tracking-wider text-xs px-3 py-1 rounded-full";
+        modePill.textContent = "Super-Herói Vivo";
+
+        attackBox.classList.remove('hidden');
+        bossBox.classList.add('hidden');
+        heroSkillsContainer.classList.remove('hidden');
+        bossSkillsContainer.classList.add('hidden');
+
+        const prof = profiles.super_hero;
+        if (prof && prof.attack) {
+          document.getElementById('attackName').textContent = prof.attack.name;
+          document.getElementById('statRange').textContent = prof.attack.range;
+          document.getElementById('statDice').textContent = prof.attack.dice;
+          document.getElementById('statAcc').textContent = prof.attack.accuracy + "+";
+        }
+        if (prof && prof.skills) {
+          document.getElementById('skillBlue').textContent = prof.skills.blue;
+          document.getElementById('skillYellow').innerHTML = `<i class="fa-solid fa-plus-circle text-amber-400"></i> ${prof.skills.yellow}`;
+          document.getElementById('skillOrange').textContent = prof.skills.orange;
+          document.getElementById('skillRed').textContent = prof.skills.red;
+        }
+
+      } else if (activeProfileMode === 'zombie_hero') {
+        headerBar.className = "bg-gradient-to-r from-red-700 to-rose-900 border-b-4 border-black px-5 py-3 flex flex-wrap items-center justify-between gap-2 transition-colors duration-300";
+        headerIcon.innerHTML = `<i class="fa-solid fa-skull"></i>`;
+        modePill.className = "bg-black/60 text-red-300 border border-red-500 font-comic uppercase tracking-wider text-xs px-3 py-1 rounded-full";
+        modePill.textContent = "Herói Zumbi (Faminto)";
+
+        attackBox.classList.remove('hidden');
+        bossBox.classList.add('hidden');
+        heroSkillsContainer.classList.remove('hidden');
+        bossSkillsContainer.classList.add('hidden');
+
+        const prof = profiles.zombie_hero;
+        if (prof && prof.attack) {
+          document.getElementById('attackName').textContent = prof.attack.name;
+          document.getElementById('statRange').textContent = prof.attack.range;
+          document.getElementById('statDice').textContent = prof.attack.dice;
+          document.getElementById('statAcc').textContent = prof.attack.accuracy + "+";
+        }
+        if (prof && prof.skills) {
+          document.getElementById('skillBlue').textContent = prof.skills.blue;
+          document.getElementById('skillYellow').innerHTML = `<i class="fa-solid fa-plus-circle text-amber-400"></i> ${prof.skills.yellow}`;
+          document.getElementById('skillOrange').textContent = prof.skills.orange;
+          document.getElementById('skillRed').textContent = prof.skills.red;
+        }
+
+      } else if (activeProfileMode === 'boss_enemy') {
+        headerBar.className = "bg-gradient-to-r from-purple-800 to-zinc-900 border-b-4 border-black px-5 py-3 flex flex-wrap items-center justify-between gap-2 transition-colors duration-300";
+        headerIcon.innerHTML = `<i class="fa-solid fa-biohazard text-amber-400"></i>`;
+        modePill.className = "bg-black/60 text-purple-300 border border-purple-500 font-comic uppercase tracking-wider text-xs px-3 py-1 rounded-full";
+        modePill.textContent = "Boss Inimigo (Spawn Card)";
+
+        attackBox.classList.add('hidden');
+        bossBox.classList.remove('hidden');
+        heroSkillsContainer.classList.add('hidden');
+        bossSkillsContainer.classList.remove('hidden');
+
+        const prof = profiles.boss_enemy;
+        maxBossHP = prof.health;
+        currentBossHP = prof.health;
+        updateBossHPDisplay();
+        document.getElementById('bossAbility').textContent = prof.ability;
+      }
+    }
+
+    // Boss HP Tracker
+    function alterBossHP(delta) {
+      currentBossHP = Math.max(0, Math.min(maxBossHP, currentBossHP + delta));
+      updateBossHPDisplay();
+      playBeep(260, 'square', 0.08);
+    }
+
+    function resetBossHP() {
+      currentBossHP = maxBossHP;
+      updateBossHPDisplay();
+      playBeep(440, 'sine', 0.08);
+    }
+
+    function updateBossHPDisplay() {
+      document.getElementById('bossHpCounter').textContent = `${currentBossHP} / ${maxBossHP} HP`;
+      const pct = (currentBossHP / maxBossHP) * 100;
+      document.getElementById('bossHpBar').style.width = `${pct}%`;
+    }
+
+    // Rolador de Dados de Ataque
+    function rollCharacterAttack() {
+      if (!currentCharacter) return;
+
+      const profile = activeProfileMode === 'zombie_hero' 
+        ? currentCharacter.profiles?.zombie_hero 
+        : currentCharacter.profiles?.super_hero;
+
+      if (!profile || !profile.attack) return;
+
+      const numDice = profile.attack.dice;
+      const targetAcc = profile.attack.accuracy;
+
+      const cup = document.getElementById('diceCup');
+      cup.innerHTML = '';
+      cup.classList.add('animate-shake');
+
+      playBeep(620, 'sawtooth', 0.05);
+
+      setTimeout(() => {
+        cup.classList.remove('animate-shake');
+        let hits = 0;
+        let results = [];
+
+        for (let i = 0; i < numDice; i++) {
+          const val = Math.floor(Math.random() * 6) + 1;
+          const isHit = val >= targetAcc;
+          if (isHit) hits++;
+          results.push({ val, isHit });
+        }
+
+        cup.innerHTML = '';
+        results.forEach(r => {
+          const die = document.createElement('div');
+          die.className = `w-10 h-10 rounded-lg flex items-center justify-center font-comic text-xl border-2 border-black shadow-[2px_2px_0px_#000] ${r.isHit ? 'bg-emerald-500 text-black font-black' : 'bg-zinc-800 text-zinc-400'}`;
+          die.textContent = r.val;
+          cup.appendChild(die);
+        });
+
+        const summary = document.getElementById('diceSummary');
+        summary.textContent = `${hits} ACERTO(S) COM ${profile.attack.name}!`;
+        summary.className = hits > 0 ? "text-emerald-400 font-bold font-display" : "text-red-400 font-bold font-display";
+
+        playBeep(hits > 0 ? 880 : 220, hits > 0 ? 'sine' : 'square', 0.15);
+      }, 250);
+    }
+
+    // Inicializar carregando da API
+    window.addEventListener('load', loadCharacters);
+  </script>
+</body>
+</html>
