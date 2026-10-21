@@ -27,6 +27,9 @@ import { FamilyDungeonAdventure } from './FamilyDungeonAdventure.js';
 import { FamilyDungeonScene } from './FamilyDungeonScene.js';
 import { FamilyDungeonAction } from './FamilyDungeonAction.js';
 import { FamilyDungeonRun } from './FamilyDungeonRun.js';
+import { FamilyZombiCampaign } from './FamilyZombiCampaign.js';
+import { FamilyZombiMission } from './FamilyZombiMission.js';
+import { FamilyZombiToken } from './FamilyZombiToken.js';
 
 // ==========================================
 // 1. Associações de Usuário & Família
@@ -154,6 +157,15 @@ FamilyDungeonRun.belongsTo(Character, { foreignKey: 'character_id', as: 'charact
 FamilyDungeonAdventure.hasMany(FamilyDungeonRun, { foreignKey: 'adventure_id', as: 'runs' });
 FamilyDungeonRun.belongsTo(FamilyDungeonAdventure, { foreignKey: 'adventure_id', as: 'adventure' });
 
+// ==========================================
+// 10. Associações da Campanha Investigativa Marvel Zombies
+// ==========================================
+FamilyZombiCampaign.hasMany(FamilyZombiMission, { foreignKey: 'campaign_id', as: 'missions', onDelete: 'CASCADE' });
+FamilyZombiMission.belongsTo(FamilyZombiCampaign, { foreignKey: 'campaign_id', as: 'campaign' });
+
+FamilyZombiMission.hasMany(FamilyZombiToken, { foreignKey: 'mission_id', as: 'tokens', onDelete: 'CASCADE' });
+FamilyZombiToken.belongsTo(FamilyZombiMission, { foreignKey: 'mission_id', as: 'mission' });
+
 export {
   sequelize,
   FamilyUser,
@@ -183,4 +195,7 @@ export {
   FamilyDungeonScene,
   FamilyDungeonAction,
   FamilyDungeonRun,
+  FamilyZombiCampaign,
+  FamilyZombiMission,
+  FamilyZombiToken,
 };

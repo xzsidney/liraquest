@@ -506,6 +506,73 @@ Histórico e estado das sessões de combate da Arena 2D e Raids Familiares.
   - **Sessão:** Leitura do usuário autenticado a partir de `family_users.id` via JWT (`GET /api/truco/profile`).
   - **Tabelas Futuras:** Quando o multiplayer via WebSocket for implementado (Etapa 5), tabelas relacionais com prefixo `family_truco_*` serão criadas e documentadas nesta seção.
 
+---
+
+## 🧟‍♂️ Módulo Companheiro de Campanha RPG Marvel Zombies (`/zombi`)
+
+Tabelas relacionais que sustentam o motor investigativo **"Carmen Sandiego + Fort Hendrix"** para partidas físicas de *Marvel Zombies*.
+
+### 🌌 `family_zombi_campaigns`
+Armazena a definição da campanha e o estado persistente da investigação familiar (capítulo atual, modo ativo e flags conquistadas).
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único UUID |
+| `code` | `VARCHAR(60)` (UNIQUE) | Não | Slug único da campanha (ex: `o_sinal_do_fim_do_mundo`) |
+| `title` | `VARCHAR(150)` | Não | Título da campanha |
+| `subtitle` | `VARCHAR(200)` | Sim | Subtítulo descritivo |
+| `premise_hero` | `TEXT` | Não | Premissa narrativa na perspectiva dos Heróis Vivos |
+| `premise_zombie` | `TEXT` | Não | Premissa narrativa na perspectiva dos Heróis Zumbis |
+| `current_mission_number` | `INT` | Não | Capítulo atual em andamento (1 a 5) |
+| `active_mode` | `ENUM('HERO','ZOMBIE')` | Não | Modo de jogo selecionado na campanha |
+| `campaign_state` | `JSON` | Sim | Estado salvo dos tokens concluídos e flags adquiridas por capítulo |
+| `is_active` | `BOOLEAN` | Não | Se a campanha está ativa |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+
+### 🗺️ `family_zombi_missions`
+Armazena cada um dos 5 capítulos interligados da campanha e seu mapeamento com o manual físico (*MZ1* a *MZ5*).
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único UUID |
+| `campaign_id` | `UUID` (FK) | Não | Referência a `family_zombi_campaigns.id` (CASCADE) |
+| `mission_number` | `INT` | Não | Ordem do capítulo (1 a 5) |
+| `code` | `VARCHAR(60)` (UNIQUE) | Não | Código único da missão (ex: `M01_O_PRIMEIRO_ECO`) |
+| `title` | `VARCHAR(150)` | Não | Título do capítulo |
+| `location_name` | `VARCHAR(180)` | Não | Nome do cenário da missão |
+| `rulebook_map_code` | `VARCHAR(30)` | Não | Referência ao mapa do livro de regras (`MZ1` a `MZ5`) |
+| `tiles_needed` | `VARCHAR(120)` | Não | Lista de tiles necessários na mesa física |
+| `map_image_url` | `VARCHAR(255)` | Sim | Caminho da imagem do mapa completo |
+| `setup_notes` | `TEXT` | Sim | Instruções de preparação do tabuleiro físico |
+| `lore_hero` | `TEXT` | Não | Texto introdutório para o Modo Heróis Vivos |
+| `lore_zombie` | `TEXT` | Não | Texto introdutório para o Modo Heróis Zumbis |
+| `inventory_badges` | `JSON` | Não | Lista de insígnias de progresso e pistas do capítulo |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+
+### 🎯 `family_zombi_tokens`
+Armazena os 6 tokens investigativos (1 a 6) de cada missão, com dependências, enigmas de senha e rolagens de D6.
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único UUID |
+| `mission_id` | `UUID` (FK) | Não | Referência a `family_zombi_missions.id` (CASCADE) |
+| `token_number` | `INT` | Não | Número do token no tabuleiro (1 a 6) |
+| `token_role` | `VARCHAR(60)` | Não | Função estrutural (Triagem, Investigação, Clímax, Ganância, Interruptor, Extração) |
+| `title` | `VARCHAR(150)` | Não | Nome da sala ou ponto de interesse |
+| `tile_location` | `VARCHAR(120)` | Sim | Identificação do tile e posição |
+| `crop_image_url` | `VARCHAR(255)` | Sim | Imagem recortada da zona no tabuleiro |
+| `initial_status` | `ENUM('AVAILABLE','LOCKED')` | Não | Estado inicial do token |
+| `requires_flags` | `JSON` | Não | Array de flags necessárias para desbloquear (`["has_key", "has_power"]`) |
+| `lock_banner_text` | `VARCHAR(255)` | Sim | Alerta exibido enquanto os pré-requisitos não forem cumpridos |
+| `unlock_action_label` | `VARCHAR(120)` | Sim | Rótulo do botão de ação quando liberado |
+| `room_desc_hero` | `TEXT` | Não | Descrição curta do card no Modo Heróis Vivos |
+| `room_desc_zombie` | `TEXT` | Não | Descrição curta do card no Modo Heróis Zumbis |
+| `modal_lore_hero` | `TEXT` | Não | Narrativa detalhada do modal no Modo Heróis Vivos |
+| `modal_lore_zombie` | `TEXT` | Não | Narrativa detalhada do modal no Modo Heróis Zumbis |
+| `actions_json` | `JSON` | Não | Opções de escolha, códigos de Keypad, resultados de 1d6 e flags concedidas |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+
+
 
 
 

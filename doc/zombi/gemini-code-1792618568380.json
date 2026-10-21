@@ -1,0 +1,761 @@
+{
+  "characters": [
+   
+  {
+    "id": "mister_fantastic",
+    "name": "Mister Fantastic",
+    "box": "Fantastic 4: Under Siege",
+    "profiles": {
+      "super_hero": {
+        "attack": { "name": "Corpo Elástico", "range": "0-1", "dice": 3, "accuracy": 4 },
+        "skills": {
+          "blue": "Intelecto Superior: Pode interagir com terminais, portas e tokens a até Alcance 1 sem entrar na zona.",
+          "yellow": "+1 Ação",
+          "orange": "Barreira Maleável: Reduz em 1 o dano causado a qualquer aliado na sua zona.",
+          "red": "Elasticidade Extrema: O seu alcance de ataque físico e interação aumenta para Alcance 0-2."
+        }
+      },
+      "zombie_hero": {
+        "attack": { "name": "Constrição Zumbi", "range": "0-1", "dice": 3, "accuracy": 4 },
+        "skills": {
+          "blue": "Pancada Contorcida: Se o nível de Fome for 2 ou superior, puxa o alvo 1 zona em direção a si.",
+          "yellow": "+1 Ação",
+          "orange": "Membros Deformados: Pode executar a Ação de Devorar a até Alcance 1 de distância.",
+          "red": "Abraço Sufocante: Causa 2 ferimentos automáticos a todos os heróis na mesma zona."
+        }
+      },
+      "boss_enemy": {
+        "health": 5,
+        "ability": "Corpo Maleável: Anula o primeiro golpe de dano que sofrer em cada rodada de combate."
+      }
+    }
+  },
+  {
+    "id": "invisible_woman",
+    "name": "Invisible Woman",
+    "box": "Fantastic 4: Under Siege",
+    "profiles": {
+      "super_hero": {
+        "attack": { "name": "Esferas de Força", "range": "0-2", "dice": 2, "accuracy": 3 },
+        "skills": {
+          "blue": "Invisibilidade Defensiva: Não pode ser alvejada por ataques à distância se houver outro aliado na zona.",
+          "yellow": "+1 Ação",
+          "orange": "Cúpula Protetora: Gaste 1 Poder para anular todo o dano de um ataque contra a sua zona.",
+          "red": "Onda de Concussão Invisível: Empurra todos os inimigos da sua zona e de zonas adjacentes para longe."
+        }
+      },
+      "zombie_hero": {
+        "attack": { "name": "Impacto Translúcido", "range": "0-1", "dice": 3, "accuracy": 4 },
+        "skills": {
+          "blue": "Aproximação Silenciosa: Ignora a presença de inimigos e heróis vivos durante o movimento.",
+          "yellow": "+1 Ação",
+          "orange": "Campos de Força Sufocantes: Imobiliza os heróis vivos na zona alvo até à próxima ativação.",
+          "red": "Camuflagem Predatória: Só pode ser atacada por heróis que estejam na mesma zona que ela."
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Escudo Invisível: Todos os ataques à distância contra a Mulher Invisível sofrem uma penalidade de -1 dado."
+      }
+    }
+  },
+  {
+    "id": "the_thing",
+    "name": "The Thing",
+    "box": "Fantastic 4: Under Siege",
+    "profiles": {
+      "super_hero": {
+        "attack": { "name": "Hora do Pau!", "range": "0", "dice": 4, "accuracy": 3 },
+        "skills": {
+          "blue": "Carapaça Rochosa: Reduz em 1 ponto qualquer fonte de dano sofrido (mínimo de 1).",
+          "yellow": "+1 Ação",
+          "orange": "Onda de Choque Sísmica: Ao golpear o solo, derruba todos os soldados e tropas na sua zona.",
+          "red": "Força Implacável: Cada resultado 6 num ataque causa 2 ferimentos automáticos e destrói portas."
+        }
+      },
+      "zombie_hero": {
+        "attack": { "name": "Esmagamento Rochoso", "range": "0", "dice": 4, "accuracy": 4 },
+        "skills": {
+          "blue": "Pele Pétrea Putrefacta: Ignora danos causados por armas convencionais e ataques à distância fracos.",
+          "yellow": "+1 Ação",
+          "orange": "Investida Bruta: Destrói qualquer barricada ou obstáculo ao entrar numa zona com inimigos.",
+          "red": "Fúria Faminta de Pedra: Ganha +2 dados de combate se estiver no patamar máximo de Fome."
+        }
+      },
+      "boss_enemy": {
+        "health": 6,
+        "ability": "Couraça Blindada: É imune a qualquer ataque que cause menos de 2 de Dano direto."
+      }
+    }
+  },
+  {
+    "id": "super_skrull",
+    "name": "Super Skrull",
+    "box": "Fantastic 4: Under Siege",
+    "profiles": {
+      "super_hero": {
+        "attack": { "name": "Poderes Combinados", "range": "0-1", "dice": 3, "accuracy": 3 },
+        "skills": {
+          "blue": "Mimetismo do Quarteto: Alterna no início da rodada entre voo em chamas, esticar-se ou blindagem de pedra.",
+          "yellow": "+1 Ação",
+          "orange": "Rajada Piocinética: Causa 1 dano adicional em área a todas as miniaturas na zona alvo.",
+          "red": "Arsenal Alienígena: Ataca duas zonas distintas simultaneamente com a mesma ação de combate."
+        }
+      },
+      "zombie_hero": {
+        "attack": { "name": "Garras em Chamas", "range": "0-1", "dice": 3, "accuracy": 3 },
+        "skills": {
+          "blue": "Fome Camaleónica: Pode disfarçar-se de transeunte ferido para se aproximar sem ser atacado.",
+          "yellow": "+1 Ação",
+          "orange": "Punho Extensível: Ataque de Devorar atinge alvos a até Alcance 1.",
+          "red": "Incinerar Biomassa: Destrói permanentemente alvos sem permitir que gerem cartas de benefício."
+        }
+      },
+      "boss_enemy": {
+        "health": 5,
+        "ability": "Poderes do Quarteto: Ataca à distância (Alcance 0-2) e reduz o dano total recebido em 1 ponto."
+      }
+    }
+  },
+  {
+    "id": "gamora",
+    "name": "Gamora",
+    "box": "Guardians of the Galaxy Set",
+    "profiles": {
+      "super_hero": {
+        "attack": { "name": "Lâmina Godslayer", "range": "0", "dice": 4, "accuracy": 3 },
+        "skills": {
+          "blue": "A Mulher Mais Perigosa: Rola novamente qualquer resultado 1 em ações de combate corpo a corpo.",
+          "yellow": "+1 Ação",
+          "orange": "Golpe Decapitador: Resultados 6 matam imediatamente especialistas ou comandantes.",
+          "red": "Dança Mortal: Executa 1 Ação de Ataque gratuita imediatamente após eliminar um Herói Zumbi."
+        }
+      },
+      "zombie_hero": {
+        "attack": { "name": "Golpe Predatório", "range": "0", "dice": 4, "accuracy": 3 },
+        "skills": {
+          "blue": "Assassina Faminta: Se a Fome for 1 ou superior, ganha +1 dado em ataques corpo a corpo.",
+          "yellow": "+1 Ação",
+          "orange": "Reflexos Mortais: Se sofrer dano, contra-ataca imediatamente com a espada antes de cair.",
+          "red": "Carnificina Cirúrgica: Pode devorar até dois alvos na mesma zona com a mesma ação."
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Mestria em Combate: Se Gamora estiver na mesma zona que um Super-Herói, ela ataca duas vezes por ativação."
+      }
+    }
+  },
+  {
+    "id": "groot",
+    "name": "Groot",
+    "box": "Guardians of the Galaxy Set",
+    "profiles": {
+      "super_hero": {
+        "attack": { "name": "Ramos Construtores", "range": "0-1", "dice": 3, "accuracy": 4 },
+        "skills": {
+          "blue": "Nós Somos Groot: Pode receber ferimentos no lugar de aliados situados na mesma zona.",
+          "yellow": "+1 Ação",
+          "orange": "Gaiola de Raízes: Imobiliza todos os inimigos na zona alvo, impedindo o avanço deles por 1 turno.",
+          "red": "Regeneração de Seiva: No final da sua ativação, recupera automaticamente 2 pontos de Vida perdidos."
+        }
+      },
+      "zombie_hero": null,
+      "boss_enemy": null
+    }
+  },
+  {
+    "id": "rocket",
+    "name": "Rocket Raccoon",
+    "box": "Guardians of the Galaxy Set",
+    "profiles": {
+      "super_hero": {
+        "attack": { "name": "Canhão de Plasma", "range": "0-2", "dice": 3, "accuracy": 4 },
+        "skills": {
+          "blue": "Engenhoca Improvisada: Ganha +1 em testes para desarmar armadilhas e abrir fechaduras mecânicas.",
+          "yellow": "+1 Ação",
+          "orange": "Artilharia Pesada: Gaste 1 Poder para dobrar o número de dados rolados no próximo disparo.",
+          "red": "Bomba de Fragmentação: Lança um explosivo que limpa completamente uma zona alvo de tropas comuns."
+        }
+      },
+      "zombie_hero": {
+        "attack": { "name": "Armas Sucateadas", "range": "0-1", "dice": 3, "accuracy": 4 },
+        "skills": {
+          "blue": "Fome Maníaca: Ao disparar armas de fogo, pode gastar Fome para aumentar o alcance do tiro.",
+          "yellow": "+1 Ação",
+          "orange": "Tiroteio Desesperado: Realiza um ataque de retaliação imediato se for alvejado à distância.",
+          "red": "Sobrecarga Atómica: Detona uma carga suicida ao morrer, eliminando tudo na mesma sala."
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Tiroteio Móvel: Rocket dispara o canhão de plasma a Alcance 0-2 antes de iniciar o seu movimento."
+      }
+    }
+  },
+  {
+    "id": "drax",
+    "name": "Drax the Destroyer",
+    "box": "Guardians of the Galaxy Set",
+    "profiles": {
+      "super_hero": {
+        "attack": { "name": "Adagas Duplas", "range": "0", "dice": 4, "accuracy": 3 },
+        "skills": {
+          "blue": "Vingança Cega: Ganha +1 dado em ataques corpo a corpo se estiver na mesma zona que um Boss.",
+          "yellow": "+1 Ação",
+          "orange": "Fúria do Destruidor: Ao sofrer dano, ganha imediatamente +2 de Poder de combate.",
+          "red": "Golpe de Fenda: Ignora completamente armaduras e escudos em alvos prioritários."
+        }
+      },
+      "zombie_hero": {
+        "attack": { "name": "Lâminas Famintas", "range": "0", "dice": 4, "accuracy": 3 },
+        "skills": {
+          "blue": "Perseguição Implacável: Move-se 1 zona extra se a zona de destino contiver carne viva.",
+          "yellow": "+1 Ação",
+          "orange": "Grito de Guerra Putrefacto: Atrai todos os heróis a até Alcance 1 para a sua zona.",
+          "red": "Devorador Imparável: Não pode ser atordoado nem impedido de avançar."
+        }
+      },
+      "boss_enemy": {
+        "health": 5,
+        "ability": "Fúria Destruidora: Drax avança diretamente em direção ao herói com maior vida e desfere 2 ataques."
+      }
+    }
+  },
+  {
+    "id": "thanos",
+    "name": "Thanos",
+    "box": "Guardians of the Galaxy Set",
+    "profiles": {
+      "super_hero": null,
+      "zombie_hero": {
+        "attack": { "name": "Manopla Corrompida", "range": "0-1", "dice": 5, "accuracy": 3 },
+        "skills": {
+          "blue": "Equilíbrio Mórbido: Elimina instantaneamente metade das tropas comuns ao entrar numa zona.",
+          "yellow": "+1 Ação",
+          "orange": "Manipulação da Realidade: Teleporta-se para qualquer zona aberta com linha de visão.",
+          "red": "O Estalar da Morte: Causa 3 de dano direto a todos os Super-Heróis vivos visíveis no mapa."
+        }
+      },
+      "boss_enemy": {
+        "health": 8,
+        "ability": "Titã Louco Zumbi: Requer 3 de dano no mesmo ataque para perder 1 ponto de vida. Ataca com a Manopla a Alcance 0-1 causando 2 de dano por acerto."
+      }
+    }
+  },
+  {
+    "id": "sentinel_nana",
+    "name": "Sentinel (Nana)",
+    "box": "Sentinel Strike",
+    "profiles": {
+      "super_hero": {
+        "attack": { "name": "Canhão Repulsor Sentinela", "range": "0-2", "dice": 4, "accuracy": 3 },
+        "skills": {
+          "blue": "Diretiva de Proteção: Pode gastar 1 Poder para interceptar projéteis direcionados a mutantes aliados.",
+          "yellow": "+1 Ação",
+          "orange": "Feixe Concussivo: Empurra todos os inimigos atingidos 1 zona para trás.",
+          "red": "Purga Tática: Dispara uma rajada contínua de laser que atinge 2 zonas consecutivas."
+        }
+      },
+      "zombie_hero": null,
+      "boss_enemy": {
+        "health": 7,
+        "ability": "Protocolo de Extermínio: Move-se 2 zonas por turno e esmaga o solo ao entrar na zona dos heróis, causando 1 ferimento automático a todos."
+      }
+    }
+  },
+  {
+    "id": "professor_x",
+    "name": "Professor X",
+    "box": "Sentinel Strike",
+    "profiles": {
+      "super_hero": {
+        "attack": { "name": "Rajada Telepática", "range": "0-2", "dice": 2, "accuracy": 3 },
+        "skills": {
+          "blue": "Coordenação Psíquica: Permite que um aliado a até Alcance 2 realize 1 movimento gratuito por turno.",
+          "yellow": "+1 Ação",
+          "orange": "Paralisia Mental: Impede que um Herói Zumbi na mesma linha de visão execute a sua próxima ativação.",
+          "red": "Comando Mental Supremo: Assume o controlo de uma tropa inimiga para atacar outros zumbis."
+        }
+      },
+      "zombie_hero": {
+        "attack": { "name": "Ondas de Loucura", "range": "0-2", "dice": 3, "accuracy": 4 },
+        "skills": {
+          "blue": "Voz da Fome Cósmica: Força os transeuntes a moverem-se em direção à sua zona.",
+          "yellow": "+1 Ação",
+          "orange": "Grito Psíquico Pútrido: Atordoa todos os heróis na mesma sala, reduzindo as suas ações.",
+          "red": "Devorar Psíquico: Drena a vida de sobreviventes distantes para saciar a sua própria fome."
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Cérebro Corrompido: No início de cada rodada, obriga todos os Super-Heróis a gastarem 1 Poder ou sofrerem 1 Ferimento mental."
+      }
+    }
+  },
+  {
+    "id": "venom",
+    "name": "Venom",
+    "box": "Clash of the Sinister Six",
+    "profiles": {
+      "super_hero": {
+        "attack": { "name": "Garras Simbióticas", "range": "0", "dice": 4, "accuracy": 3 },
+        "skills": {
+          "blue": "Nós Somos Venom: Regenera 1 ponto de Vida sempre que elimina um inimigo com 2 ou mais de vida.",
+          "yellow": "+1 Ação",
+          "orange": "Teia Negra: Prende os inimigos da zona, impedindo-os de avançar para fora dela.",
+          "red": "Frenesi do Simbionte: Ganha +2 dados de combate e ataca todas as miniaturas na zona."
+        }
+      },
+      "zombie_hero": {
+        "attack": { "name": "Mordida Voraz Simbiótica", "range": "0", "dice": 4, "accuracy": 3 },
+        "skills": {
+          "blue": "Massa Biológica Viva: Recupera 2 pontos de vida ao devorar em vez do valor padrão.",
+          "yellow": "+1 Ação",
+          "orange": "Tentáculos Vorazes: Puxa heróis vivos de zonas adjacentes para serem devorados.",
+          "red": "Banquete Monstruoso: Não sofre ferimentos durante a rodada em que devora um transeunte."
+        }
+      },
+      "boss_enemy": {
+        "health": 5,
+        "ability": "Simbionte Faminto: Venom regenera 1 ponto de Vida a cada turno e ignora penalidades de terreno."
+      }
+    }
+  },
+  {
+    "id": "green_goblin",
+    "name": "Green Goblin",
+    "box": "Clash of the Sinister Six",
+    "profiles": {
+      "super_hero": {
+        "attack": { "name": "Bombas de Abóbora", "range": "0-2", "dice": 3, "accuracy": 4 },
+        "skills": {
+          "blue": "Planador Goblin: Move-se por cima de zonas infestadas e obstáculos sem penalidades.",
+          "yellow": "+1 Ação",
+          "orange": "Gás Alucinogénio: Reduz a precisão dos ataques inimigos na zona alvo em 1 ponto.",
+          "red": "Tapete de Bombas: Causa 2 de dano direto a duas zonas consecutivas dentro da linha de visão."
+        }
+      },
+      "zombie_hero": {
+        "attack": { "name": "Bombas Químicas Putrefactas", "range": "0-2", "dice": 3, "accuracy": 4 },
+        "skills": {
+          "blue": "Mergulho Predatório: Entra e sai de zonas de combate desferindo mordidas rápidas.",
+          "yellow": "+1 Ação",
+          "orange": "Riso Sinistro da Fome: Desorienta heróis vivos, forçando-os a descartar cartas de suporte.",
+          "red": "Arsenal Caótico: Dispara uma saraivada explosiva que consome a biomassa de toda a sala."
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Bombardeamento Aéreo: Antes de se mover, o Duende Verde lança uma bomba de abóbora na zona com mais heróis."
+      }
+    }
+  },
+  {
+    "id": "mysterio",
+    "name": "Mysterio",
+    "box": "Clash of the Sinister Six",
+    "profiles": {
+      "super_hero": {
+        "attack": { "name": "Truques de Ilusão", "range": "0-1", "dice": 2, "accuracy": 4 },
+        "skills": {
+          "blue": "Mestre da Farsa: Faz com que os inimigos ataquem alvos falsos na mesma zona, anulando o dano.",
+          "yellow": "+1 Ação",
+          "orange": "Cortina de Fumaça: Impede ataques à distância direcionados à sua zona durante toda a rodada.",
+          "red": "Labirinto de Espelhos: Teleporta todos os zumbis da sala para a zona exterior do edifício."
+        }
+      },
+      "zombie_hero": {
+        "attack": { "name": "Gás Tóxico Ilusório", "range": "0-1", "dice": 3, "accuracy": 4 },
+        "skills": {
+          "blue": "Falsa Esperança: Projeta a ilusão de um sobrevivente para atrair heróis para armadilhas.",
+          "yellow": "+1 Ação",
+          "orange": "Nevoeiro da Decomposição: Inibe a linha de visão de todos os heróis a até 2 zonas.",
+          "red": "Pesadelo Terminal: Causa ferimento mental automático a qualquer herói que falhe um teste de ataque."
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Projeções Holográficas: Quando atacado, role 1d6. Com 4+, o ataque atinge uma ilusão e causa 0 de dano."
+      }
+    }
+  },
+  {
+    "id": "silver_surfer",
+    "name": "Silver Surfer",
+    "box": "Galactus the Devourer",
+    "profiles": {
+      "super_hero": {
+        "attack": { "name": "Poder Cósmico", "range": "0-2", "dice": 4, "accuracy": 3 },
+        "skills": {
+          "blue": "Prancha Cósmica: Pode mover-se até 3 zonas por ação de movimento, ignorando qualquer obstáculo.",
+          "yellow": "+1 Ação",
+          "orange": "Feixe da Força Cósmica: O seu ataque atravessa inimigos e atinge alvos na linha de visão.",
+          "red": "Chama Astral: Causa 3 de dano em área a todas as miniaturas inimigas na zona alvo."
+        }
+      },
+      "zombie_hero": {
+        "attack": { "name": "Poder Cósmico Maculado", "range": "0-2", "dice": 4, "accuracy": 3 },
+        "skills": {
+          "blue": "Voo da Fome Cósmica: Atravessa paredes lacradas para alcançar alvos com biomassa.",
+          "yellow": "+1 Ação",
+          "orange": "Canalizar a Entidade: Aumenta a velocidade de aproximação de Galactus na mesa.",
+          "red": "Devorador Galáctico: Desintegra transeuntes e recupera toda a vida instantaneamente."
+        }
+      },
+      "boss_enemy": {
+        "health": 6,
+        "ability": "Velocidade Cósmica: O Surfista Prateado move-se 3 zonas por ativação e ataca à distância com 2 de Dano."
+      }
+    }
+  },
+  {
+    "id": "old_man_logan",
+    "name": "Old Man Logan",
+    "box": "Artist's Special Edition Set",
+    "profiles": {
+      "super_hero": {
+        "attack": { "name": "Garras Desgastadas", "range": "0", "dice": 3, "accuracy": 3 },
+        "skills": {
+          "blue": "Sobrevivente Calejado: Adiciona +1 dado de ataque se a sua vida for igual ou inferior a 2.",
+          "yellow": "+1 Ação",
+          "orange": "Fator de Cura Lento: Cura 1 ferimento no final de cada rodada se não tiver sofrido ataques.",
+          "red": "Fúria do Velho Logan: Realiza uma série de ataques devastadores com dano duplo corpo a corpo."
+        }
+      },
+      "zombie_hero": null,
+      "boss_enemy": null
+    }
+  },
+  {
+    "id": "old_man_hawkeye",
+    "name": "Old Man Hawkeye",
+    "box": "Artist's Special Edition Set",
+    "profiles": {
+      "super_hero": {
+        "attack": { "name": "Arco de Precisão", "range": "1-3", "dice": 3, "accuracy": 3 },
+        "skills": {
+          "blue": "Pontaria Cega: Ignora penalidades de cobertura, escuridão ou fumaça ao disparar flechas.",
+          "yellow": "+1 Ação",
+          "orange": "Flecha Sónica: Atordoa todas as tropas inimigas na zona alvo.",
+          "red": "Disparo Perfurante Fatal: Causa 3 de dano direto a um Boss a até Alcance 3 de distância."
+        }
+      },
+      "zombie_hero": null,
+      "boss_enemy": null
+    }
+  },
+    {
+      "id": "deadpool",
+      "name": "Deadpool",
+      "box": "Marvel Zombies Kickstarter Promos",
+      "profiles": {
+        "super_hero": {
+          "attack": {
+            "name": "Katanas Duplas",
+            "range": "0",
+            "dice": 3,
+            "accuracy": 4
+          },
+          "skills": {
+            "blue": "Uma vez durante o seu Turno, você pode gastar 1 Poder para comprar 1 Característica Heroica. Cada vez que você eliminar um Herói Zumbi, compre 1 Característica Heroica.",
+            "yellow": "+1 Ação",
+            "orange": "Uma vez durante o seu Turno, você pode selecionar 1 Zona dentro do Alcance 2. Todos os Inimigos naquela Zona são imediatamente ativados e tentam entrar na sua Zona.",
+            "red": "Uma vez durante o seu Turno, você pode realizar 1 Ação de Aumentar o Poder grátis. Você pode rolar novamente qualquer erro. Cada resultado 6 causa 2 golpes a um único Inimigo."
+          }
+        },
+        "zombie_hero": {
+          "attack": {
+            "name": "Katanas Duplas",
+            "range": "0",
+            "dice": 3,
+            "accuracy": 4
+          },
+          "skills": {
+            "blue": "Se estiver no nível de Fome 1 ou superior, pode comprar 1 Característica Zumbi adicional ao eliminar um Super-Herói.",
+            "yellow": "+1 Ação",
+            "orange": "Provocação Sarcástica: força todos os inimigos a até 2 zonas a moverem-se em sua direção.",
+            "red": "Regeneração Constante: recupera vida ao devorar e ganha rerrolagens de dados gratuitas."
+          }
+        },
+        "boss_enemy": {
+          "health": 4,
+          "ability": "Quando eliminado por um ataque regular, deite a miniatura. Ele levanta-se na próxima ativação ignorando a morte uma vez."
+        }
+      }
+    },
+    {
+      "id": "wolverine",
+      "name": "Wolverine",
+      "box": "Marvel Zombies: X-Men Resistance",
+      "profiles": {
+        "super_hero": {
+          "attack": {
+            "name": "Adamantium Claws",
+            "range": "0",
+            "dice": 3,
+            "accuracy": 3
+          },
+          "skills": {
+            "blue": "Ao atacar com Adamantium Claws, adicione +1 aos resultados para cada Ferimento sofrido. Resultados 6 geram +1 dado extra imediato.",
+            "yellow": "+1 Ação",
+            "orange": "Uma vez por Fase dos Inimigos, quando inimigos entram na sua Zona, gaste 1 Poder para realizar 1 ataque gratuito com Adamantium Claws.",
+            "red": "No início de cada Fase Final (End Phase), cure todos os ferimentos sofridos."
+          }
+        },
+        "zombie_hero": {
+          "attack": {
+            "name": "Adamantium Claws",
+            "range": "0",
+            "dice": 3,
+            "accuracy": 3
+          },
+          "skills": {
+            "blue": "Adicione +1 aos dados de ataque se estiver ferido. Resultados 6 concedem rolagem adicional de dados.",
+            "yellow": "+1 Ação",
+            "orange": "Gaste 1 de Fome para realizar um ataque de retaliação imediato quando entrarem na sua zona.",
+            "red": "Imunidade a ferimentos causados por Troopers ou Specialists comuns."
+          }
+        },
+        "boss_enemy": {
+          "health": 5,
+          "ability": "Regeneração Voraz: Recupera 1 ponto de vida no início de cada uma das suas ativações. Se eliminado sem Devour, deita-se e levanta no turno seguinte."
+        }
+      }
+    },
+    {
+      "id": "spider_man",
+      "name": "Spider-Man",
+      "box": "Marvel Zombies Caixa Base",
+      "profiles": {
+        "super_hero": {
+          "attack": {
+            "name": "Web Strike",
+            "range": "0-1",
+            "dice": 3,
+            "accuracy": 4
+          },
+          "skills": {
+            "blue": "Sentido Aranha: Gaste 1 Poder para forçar um inimigo atacante a rerrolar todos os acertos.",
+            "yellow": "+1 Ação",
+            "orange": "Disparo de Teia: Prende inimigos numa zona em alcance 1, impedindo a sua deslocação até gastarem 1 ativação.",
+            "red": "Grande Responsabilidade: Ganha +1 dado em todos os ataques para cada aliado ou transeunte presente na sua zona."
+          }
+        },
+        "zombie_hero": {
+          "attack": {
+            "name": "Web Snare & Bite",
+            "range": "0-1",
+            "dice": 3,
+            "accuracy": 4
+          },
+          "skills": {
+            "blue": "Puxão de Teia: Puxa 1 transeunte ou inimigo de alcance 1 diretamente para a sua zona para ser devorado.",
+            "yellow": "+1 Ação",
+            "orange": "Movimento Acrobático: Ignora penalidades de movimentação por presença de inimigos.",
+            "red": "Fome Insaciável: Pode realizar uma Ação de Devorar extra sem custo de ação."
+          }
+        },
+        "boss_enemy": {
+          "health": 4,
+          "ability": "Sentido Aranha Corrompido: Anula o primeiro acerto sofrido em cada rodada de combate."
+        }
+      }
+    },
+    {
+      "id": "cyclops",
+      "name": "Cyclops",
+      "box": "Marvel Zombies: X-Men Resistance",
+      "profiles": {
+        "super_hero": {
+          "attack": {
+            "name": "Optic Blast",
+            "range": "0-2",
+            "dice": 3,
+            "accuracy": 3
+          },
+          "skills": {
+            "blue": "Liderança Tática: Concede +1 dado de ataque a um herói aliado na mesma linha de visão uma vez por turno.",
+            "yellow": "+1 Ação",
+            "orange": "Feixe Contínuo: O ataque óptico atinge todas as miniaturas em linha reta até alcance 2.",
+            "red": "Rajada Sem Controlo: Remove a viseira e causa 3 de dano a todas as zonas na linha de visão, mas ganha 1 exaustão."
+          }
+        },
+        "zombie_hero": {
+          "attack": {
+            "name": "Corrupted Optic Blast",
+            "range": "0-2",
+            "dice": 3,
+            "accuracy": 4
+          },
+          "skills": {
+            "blue": "Disparo Focado: Se o nível de Fome for 2 ou mais, o Optic Blast ignora armaduras e escudos.",
+            "yellow": "+1 Ação",
+            "orange": "Varredura Óptica: Dispara contra duas zonas diferentes com a mesma ação de ataque.",
+            "red": "Sobrecarga Mutante: Causa dano massivo na zona alvo e puxa os alvos sobreviventes 1 zona em direção a si."
+          }
+        },
+        "boss_enemy": {
+          "health": 4,
+          "ability": "Varredura em Linha: No início da ativação, ataca todos os Super-Heróis na sua linha de visão antes de se mover."
+        }
+      }
+    },
+    {
+      "id": "hulk",
+      "name": "Hulk",
+      "box": "Marvel Zombies: Heroes' Resistance",
+      "profiles": {
+        "super_hero": {
+          "attack": {
+            "name": "Hulk Smash",
+            "range": "0",
+            "dice": 4,
+            "accuracy": 4
+          },
+          "skills": {
+            "blue": "Quanto Mais Fúria, Mais Forte: Para cada ferimento recebido, adicione +1 dado em todos os ataques corpo a corpo.",
+            "yellow": "+1 Ação",
+            "orange": "Salto Sísmico: Salta até 2 zonas e causa 1 de dano a todos os inimigos na zona de aterragem.",
+            "red": "Hulk Esmaga!: Destrói portas, barricadas e obstáculos sem necessidade de testes de perícia ou chaves."
+          }
+        },
+        "zombie_hero": {
+          "attack": {
+            "name": "Zombie Smash",
+            "range": "0",
+            "dice": 4,
+            "accuracy": 4
+          },
+          "skills": {
+            "blue": "Fome Titânica: Cada ponto de fome concede +2 dados de ataque em vez de +1.",
+            "yellow": "+1 Ação",
+            "orange": "Investida Esmagadora: Empurra todos os heróis da zona de destino ao mover-se.",
+            "red": "Imparável: Ignora qualquer efeito de atordoamento ou redução de movimento."
+          }
+        },
+        "boss_enemy": {
+          "health": 6,
+          "ability": "Força Bruta Monstruosa: Causa 2 de dano por acerto e quebra imediatamente quaisquer barreiras presentes na sua zona."
+        }
+      }
+    },
+    {
+      "id": "doctor_strange",
+      "name": "Doctor Strange",
+      "box": "Marvel Zombies Caixa Base",
+      "profiles": {
+        "super_hero": {
+          "attack": {
+            "name": "Mystic Bolts",
+            "range": "0-2",
+            "dice": 2,
+            "accuracy": 3
+          },
+          "skills": {
+            "blue": "Mago Supremo: Ao realizar Power Up, elimina 1 Trooper/Walker a alcance 1. Pode gastar 1 Poder para um ataque mágico grátis.",
+            "yellow": "+1 Ação",
+            "orange": "Portal de Translocação: Teleporta-se ou teleporta um aliado adjacente até 2 zonas de distância.",
+            "red": "Olho de Agamotto: Cancela habilidades especiais de todos os Heróis Zumbis na mesma zona até ao final da rodada."
+          }
+        },
+        "zombie_hero": {
+          "attack": {
+            "name": "Dark Sorcery",
+            "range": "0-2",
+            "dice": 3,
+            "accuracy": 3
+          },
+          "skills": {
+            "blue": "Feitiçaria Corrompida: Ao devorar um transeunte, espalha 1 ferimento automático a todos os heróis a alcance 1.",
+            "yellow": "+1 Ação",
+            "orange": "Invocação das Trevas: Gera 2 Walkers adicionais na sua própria zona.",
+            "red": "Distorção Temporal: Repete uma ativação completa se eliminar um Super-Herói."
+          }
+        },
+        "boss_enemy": {
+          "health": 4,
+          "ability": "Ponto de Spawn Mágico: Age como um ponto de spawn ativo. Se ativar fora da zona dos heróis, teleporta-se imediatamente para a zona com mais heróis visíveis."
+        }
+      }
+    },
+    {
+      "id": "colossus",
+      "name": "Colossus",
+      "box": "Marvel Zombies: X-Men Resistance",
+      "profiles": {
+        "super_hero": {
+          "attack": {
+            "name": "Steel Fists",
+            "range": "0",
+            "dice": 3,
+            "accuracy": 3
+          },
+          "skills": {
+            "blue": "Aço Orgânico: Reduz todo o dano sofrido em 1 ponto (mínimo de 1 de dano por ataque).",
+            "yellow": "+1 Ação",
+            "orange": "Fastball Special: Pode arremessar um herói aliado adjacente até 2 zonas para realizar um ataque imediato gratuito.",
+            "red": "Barricada Viva: Nenhum inimigo pode deixar a zona de Colossus sem eliminá-lo primeiro."
+          }
+        },
+        "zombie_hero": {
+          "attack": {
+            "name": "Crushing Steel",
+            "range": "0",
+            "dice": 3,
+            "accuracy": 3
+          },
+          "skills": {
+            "blue": "Blindagem Imparável: Imune a ataques com dano inferior a 2.",
+            "yellow": "+1 Ação",
+            "orange": "Impacto Sísmico: Ao atacar, derruba todos os heróis sobreviventes na sala.",
+            "red": "Devorar Blindado: Cura 2 ferimentos ao devorar um transeunte em vez de 1."
+          }
+        },
+        "boss_enemy": {
+          "health": 6,
+          "ability": "Armadura Pesada: Todos os ataques sofridos têm o seu dano total reduzido em 1."
+        }
+      }
+    },
+    {
+      "id": "iron_man",
+      "name": "Iron Man",
+      "box": "Marvel Zombies Caixa Base",
+      "profiles": {
+        "super_hero": {
+          "attack": {
+            "name": "Repulsor Rays",
+            "range": "0-1",
+            "dice": 3,
+            "accuracy": 3
+          },
+          "skills": {
+            "blue": "Sistemas de Varredura: Ganha +1 em testes de perícia para hackear terminais e interagir com objetivos eletrónicos.",
+            "yellow": "+1 Ação",
+            "orange": "Propulsão a Jato: Movimenta-se por cima de zonas infestadas sem gastar ações adicionais.",
+            "red": "Unibeam Chest Blast: Ataque em linha reta que causa 3 de dano em cone direto."
+          }
+        },
+        "zombie_hero": {
+          "attack": {
+            "name": "Corrupted Repulsors",
+            "range": "0-1",
+            "dice": 3,
+            "accuracy": 3
+          },
+          "skills": {
+            "blue": "Sobrecarga de Reator: Se o nível de Fome estiver no máximo, ganha +2 dados em todos os disparos à distância.",
+            "yellow": "+1 Ação",
+            "orange": "Voo Predatório: Move-se 2 zonas em linha reta em direção ao transeunte mais próximo.",
+            "red": "Bombardeamento de Mísseis: Causa 2 de dano a duas zonas adjacentes em simultâneo."
+          }
+        },
+        "boss_enemy": {
+          "health": 4,
+          "ability": "Disparo Automático à Distância: Antes de dar qualquer passo, efetua um ataque de Repulsor contra o herói visível com menor vida."
+        }
+      }
+    }
+  ]
+}

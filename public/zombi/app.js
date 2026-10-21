@@ -1,471 +1,558 @@
 /**
- * MARVEL ZOMBIES - COMPANHEIRO DE CAMPANHA RPG
- * Script Interativo (Áudio, Enigmas, Teclado Numérico, Dependências)
+ * MARVEL ZOMBIES - MOTOR UNIVERSAL DE CAMPANHA INVESTIGATIVA RPG
+ * Conectado ao MySQL (/api/zombi/campaign & /api/zombi/state)
  */
 
-// ESTADO DO JOGO
-const state = {
-  chapter: 1,
-  completedObjs: new Set(),
-  alarmTriggered: false,
-  inventory: [],
-  discoveredCode: false, // Se encontrou a senha no Obj 1
-  keypadInput: '',
-  secretCode: '739', // Código para abrir a porta do metrô
+let campaignData = null;
+let currentMissionNumber = 1;
+let isZombieMode = false;
+
+// Estado em memória sincronizado com o banco de dados
+let campaignState = {
+  missions: {}, // { [missionNumber]: { completedTokens: [], flags: [] } }
+  legacy_items: [],
 };
 
-// ================= SISTEMA DE ÁUDIO SINTETIZADO (WEB AUDIO API) =================
+let activeTokenObj = null;
+let activeActionObj = null;
+let keypadBuffer = '';
+
+// ================= SINTETIZADOR DE ÁUDIO NATIVO (WEB AUDIO API) =================
 let audioCtx = null;
-
-function initAudio() {
-  if (!audioCtx) {
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (AudioContext) {
-      audioCtx = new AudioContext();
-    }
-  }
-}
-
-// Som de Bipe do Teclado Numérico
-function playBeep(freq = 600, duration = 0.08) {
+function playTone(freq = 600, duration = 0.08) {
   try {
-    initAudio();
-    if (!audioCtx) return;
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    if (!audioCtx) audioCtx = new AudioContext();
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
-    osc.type = 'sine';
     osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
     osc.connect(gain);
     gain.connect(audioCtx.destination);
     osc.start();
     osc.stop(audioCtx.currentTime + duration);
-  } catch (e) {
-    console.log('Audio não suportado ou bloqueado', e);
-  }
+  } catch (_) {}
 }
 
-// Som de Acesso Permitido
-function playGrantedSound() {
-  playBeep(523, 0.1);
-  setTimeout(() => playBeep(659, 0.1), 100);
-  setTimeout(() => playBeep(784, 0.2), 200);
+function soundSuccess() {
+  playTone(523, 0.09);
+  setTimeout(() => playTone(659, 0.09), 90);
+  setTimeout(() => playTone(784, 0.18), 180);
 }
 
-// Som de Acesso Negado (Erro)
-function playDeniedSound() {
-  playBeep(220, 0.2);
-  setTimeout(() => playBeep(180, 0.3), 150);
+function soundError() {
+  playTone(220, 0.18);
+  setTimeout(() => playTone(165, 0.25), 140);
 }
 
-// Som de Sirene de Alarme
-function playAlarmSound() {
-  playBeep(880, 0.15);
-  setTimeout(() => playBeep(600, 0.2), 150);
-  setTimeout(() => playBeep(880, 0.2), 350);
-}
+// ================= CARREGAMENTO INICIAL DO BANCO DE DADOS =================
+async function loadCampaignFromDB() {
+  const syncBadge = document.getElementById('syncStatus');
+  try {
+    syncBadge.textContent = '🔄 Sincronizando MySQL...';
+    const res = await fetch('/api/zombi/campaign');
+    const data = await res.json();
 
-// ================= SETUP DO TABULEIRO =================
-function toggleSetup() {
-  const content = document.getElementById('setup-content');
-  const icon = document.getElementById('setup-toggle-icon');
-  if (content.style.display === 'block') {
-    content.style.display = 'none';
-    icon.textContent = '▼';
-  } else {
-    content.style.display = 'block';
-    icon.textContent = '▲';
-  }
-}
-
-function openMapModal() {
-  document.getElementById('map-modal').classList.add('active');
-}
-
-function closeMapModal() {
-  document.getElementById('map-modal').classList.remove('active');
-}
-
-// ================= MODAL DE HISTÓRIA / EVENTO =================
-function openStoryModal(tag, title, text, interactiveHtml) {
-  document.getElementById('modal-tag').textContent = tag;
-  document.getElementById('modal-title').textContent = title;
-  document.getElementById('modal-text').innerHTML = text;
-  document.getElementById('modal-interactive-slot').innerHTML = interactiveHtml || '';
-  document.getElementById('result-banner').style.display = 'none';
-  document.getElementById('story-modal').classList.add('active');
-}
-
-function closeStoryModal() {
-  document.getElementById('story-modal').classList.remove('active');
-  updateHUD();
-}
-
-function showResult(title, desc, isSuccess = true) {
-  const banner = document.getElementById('result-banner');
-  const titleEl = document.getElementById('result-title');
-  const descEl = document.getElementById('result-desc');
-
-  banner.className = 'result-banner ' + (isSuccess ? 'success' : 'danger');
-  titleEl.textContent = title;
-  descEl.innerHTML = desc;
-  banner.style.display = 'block';
-  document.getElementById('modal-interactive-slot').innerHTML = '';
-
-  if (isSuccess) {
-    playGrantedSound();
-  } else {
-    playDeniedSound();
-  }
-}
-
-// ================= INTERAÇÃO COM OS OBJETIVOS =================
-function interactObjective(id) {
-  initAudio();
-
-  // OBJETIVO 1: TERMINAL OSCORP (REVELA SENHA)
-  if (id === 1) {
-    const text = `
-      Ao quebrar a porta do escritório dos fundos, as telas verdes da Oscorp ainda mostram linhas de comando da S.H.I.E.L.D.
-      <br><br>
-      Há um arquivo criptografado de evacuação: <em>"Acesso de Quarentena da Linha 6 do Metrô"</em>.
-      <br><br>
-      Você pode tentar usar o intelecto corrompido de Tony Stark ou o instinto de rastreio para decifrar a chave!
-    `;
-
-    const html = `
-      <div style="background: #0f121b; border: 1px dashed var(--gold-imperial); border-radius: 8px; padding: 14px; text-align: center; margin-top: 10px;">
-        <strong style="color: var(--gold-bright);">🎲 TESTE DE INTELIGÊNCIA / DADOS:</strong>
-        <p style="font-size: 0.85rem; margin-top: 4px; color: var(--text-secondary);">Role 1 dado pelo Herói Zumbi interagindo:</p>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px;">
-          <button class="btn-action" style="background: #334155;" onclick="resolveObj1(false)">
-            ❌ Tirei 1 ou 2<br><small>(Tentativa Lenta)</small>
-          </button>
-          <button class="btn-action" style="background: #059669;" onclick="resolveObj1(true)">
-            ✔️ Tirei 3 ou mais<br><small>(Sucesso Imediato!)</small>
-          </button>
-        </div>
-      </div>
-    `;
-
-    openStoryModal('OBJETIVO 1 • LABORATÓRIO', 'Terminal da Oscorp', text, html);
-  }
-
-  // OBJETIVO 2: ACESSO AO METRÔ (COM ENIGMA E SENHA)
-  else if (id === 2) {
-    // Verificar se o jogador já descobriu a senha ou se está bloqueado
-    if (!state.discoveredCode) {
-      playDeniedSound();
-      alert('⚠️ ACESSO NEGADO!\n\nA porta de titânio do metrô está bloqueada eletronicamente.\n\nInvestigue primeiro o Terminal da Oscorp (Objetivo 1) para encontrar a senha de liberação!');
-      return;
+    if (!data.success || !data.campaign) {
+      throw new Error(data.message || 'Campanha não encontrada');
     }
 
-    // Se já descobriu, abre o Teclado Numérico Interativo
-    openKeypad();
+    campaignData = data.campaign;
+    currentMissionNumber = campaignData.current_mission_number || 1;
+    isZombieMode = campaignData.active_mode === 'ZOMBIE';
+
+    if (campaignData.campaign_state && typeof campaignData.campaign_state === 'object') {
+      campaignState = {
+        missions: campaignData.campaign_state.missions || {},
+        legacy_items: campaignData.campaign_state.legacy_items || [],
+      };
+    }
+
+    document.body.classList.toggle('zombie-mode', isZombieMode);
+    syncBadge.textContent = '🟢 Banco MySQL Sincronizado';
+    renderAll();
+  } catch (err) {
+    console.error('Erro ao carregar do banco:', err);
+    syncBadge.textContent = '⚠️ Modo Offline / Local';
+  }
+}
+
+async function persistStateToDB() {
+  const syncBadge = document.getElementById('syncStatus');
+  try {
+    syncBadge.textContent = '💾 Salvando no MySQL...';
+    const res = await fetch('/api/zombi/state', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        current_mission_number: currentMissionNumber,
+        active_mode: isZombieMode ? 'ZOMBIE' : 'HERO',
+        campaign_state: campaignState,
+      }),
+    });
+    if (res.ok) {
+      syncBadge.textContent = '🟢 Salvo no MySQL';
+    }
+  } catch (e) {
+    syncBadge.textContent = '⚠️ Salvo Localmente';
+  }
+}
+
+function getMissionProgress(missionNum) {
+  if (!campaignState.missions[missionNum]) {
+    campaignState.missions[missionNum] = {
+      completedTokens: [],
+      flags: [],
+    };
+  }
+  return campaignState.missions[missionNum];
+}
+
+function getCurrentMission() {
+  if (!campaignData || !campaignData.missions) return null;
+  return (
+    campaignData.missions.find((m) => m.mission_number === currentMissionNumber) ||
+    campaignData.missions[0]
+  );
+}
+
+// ================= RENDERIZAÇÃO COMPLETA DA INTERFACE =================
+function renderAll() {
+  if (!campaignData) return;
+
+  // 1. Botão de Modo (Heróis Vivos vs Heróis Zumbis)
+  const modeIcon = document.getElementById('modeIcon');
+  const modeName = document.getElementById('modeName');
+  if (isZombieMode) {
+    modeIcon.innerText = '🧟';
+    modeName.innerText = 'Modo: Heróis Zumbis';
+  } else {
+    modeIcon.innerText = '🛡️';
+    modeName.innerText = 'Modo: Heróis Vivos';
   }
 
-  // OBJETIVO 3: BLINDADO STARK (TESTE DE FORÇA)
-  else if (id === 3) {
-    const text = `
-      O furgão blindado das Indústrias Stark foi amassado por um impacto colossal. Entre os destroços, você enxerga um estojo selado a vácuo com uma Bateria de Íons Stark.
-      <br><br>
-      Uma válvula de gás de contenção está prestes a romper com a pressão da lataria!
-    `;
-
-    const html = `
-      <div style="background: #0f121b; border: 1px dashed var(--gold-imperial); border-radius: 8px; padding: 14px; text-align: center; margin-top: 10px;">
-        <strong style="color: var(--gold-bright);">🎲 TESTE DE FORÇA BRUTA:</strong>
-        <p style="font-size: 0.85rem; margin-top: 4px; color: var(--text-secondary);">Role 2 dados na mesa física. Você precisa de pelo menos um 4+:</p>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px;">
-          <button class="btn-action" style="background: #7f1d1d;" onclick="resolveObj3(false)">
-            💥 Nenhum 4+<br><small>(Cano Rompido)</small>
-          </button>
-          <button class="btn-action" style="background: #059669;" onclick="resolveObj3(true)">
-            🛡️ Teve pelo menos um 4+<br><small>(Remoção Perfeita)</small>
-          </button>
-        </div>
-      </div>
-    `;
-
-    openStoryModal('OBJETIVO 3 • BECO', 'Blindado da Caravana Stark', text, html);
-  }
-
-  // OBJETIVO 4: AGENTE DA S.H.I.E.L.D. (DILEMA MORAL)
-  else if (id === 4) {
-    const text = `
-      Atrás das barricadas improvisadas, a Agente Sharon Carter empunha uma pistola de choque com as mãos trêmulas. O pulsar do sangue em suas veias é como música para a sua Fome Zumbi!
-      <br><br>
-      <strong>O que seu Herói decide fazer?</strong>
-    `;
-
-    const html = `
-      <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
-        <button class="btn-action" style="background: #881337; text-align: left; padding: 14px;" onclick="resolveObj4('devour')">
-          <strong style="color: #fecaca; display: block; font-size: 1rem;">🩸 Opção A: Ceder à Fome e Devorar!</strong>
-          <span style="font-size: 0.8rem; color: #cbd5e1;">Zera a Fome do herói e ganha +5 XP imediatos. Mas Sharon é eliminada para sempre.</span>
+  // 2. Barra dos 5 Capítulos
+  const chaptersBar = document.getElementById('chaptersBar');
+  chaptersBar.innerHTML = campaignData.missions
+    .map((m) => {
+      const mProg = getMissionProgress(m.mission_number);
+      const isDone = mProg.flags.includes('mission_complete');
+      const isActive = m.mission_number === currentMissionNumber;
+      const shortTitle = m.title.replace(/^CAPÍTULO \d+:\s*/i, '');
+      return `
+        <button class="chapter-tab ${isActive ? 'active' : ''} ${isDone ? 'completed' : ''}"
+                onclick="selectMission(${m.mission_number})">
+          <div class="ch-tab-num">
+            <span>CAPÍTULO ${m.mission_number}</span>
+            <span>${isDone ? '✓' : ''}</span>
+          </div>
+          <div class="ch-tab-name">${shortTitle}</div>
         </button>
-        <button class="btn-action" style="background: #1e3a8a; text-align: left; padding: 14px;" onclick="resolveObj4('interrogate')">
-          <strong style="color: #93c5fd; display: block; font-size: 1rem;">🗣️ Opção B: Reter a Fome e Interrogar!</strong>
-          <span style="font-size: 0.8rem; color: #cbd5e1;">Aumenta a Fome em +1 pelo esforço sobre-humano, mas descobre os planos do Capitão América vivo!</span>
-        </button>
-      </div>
+      `;
+    })
+    .join('');
+
+  // 3. Cabeçalho da Missão Atual
+  const mission = getCurrentMission();
+  if (!mission) return;
+
+  const prog = getMissionProgress(mission.mission_number);
+
+  document.getElementById('missionTag').textContent = `${campaignData.title} • Ato ${mission.mission_number} de ${campaignData.missions.length}`;
+  document.getElementById('missionMapBadge').textContent = `Mapa Oficial: ${mission.rulebook_map_code}`;
+  document.getElementById('missionTitle').textContent = mission.title;
+  document.getElementById('missionLocation').textContent = `📍 ${mission.location_name}`;
+  document.getElementById('loreMission').textContent = isZombieMode
+    ? mission.lore_zombie
+    : mission.lore_hero;
+
+  document.getElementById('tilesInline').textContent = `Tiles: ${mission.tiles_needed}`;
+  document.getElementById('setupNotesText').innerHTML = `<strong>Tiles Necessários:</strong> ${mission.tiles_needed}<br>${mission.setup_notes || ''}`;
+
+  const btnViewMap = document.getElementById('btnViewMap');
+  if (mission.map_image_url) {
+    btnViewMap.style.display = 'inline-block';
+  } else {
+    btnViewMap.style.display = 'none';
+  }
+
+  // 4. Painel de Pistas & Inventário do Capítulo
+  const invGroup = document.getElementById('inventoryGroup');
+  const badges = Array.isArray(mission.inventory_badges) ? mission.inventory_badges : [];
+  invGroup.innerHTML =
+    `<span class="inv-label">Pistas & Requisitos:</span>` +
+    badges
+      .map((b) => {
+        const acquired = prog.flags.includes(b.key);
+        return `<span class="inv-badge ${acquired ? 'acquired' : ''}">${b.label}</span>`;
+      })
+      .join('');
+
+  document.getElementById('progressCounter').textContent = `${prog.completedTokens.length} / ${mission.tokens.length} Tokens Concluídos`;
+
+  // 5. Grelha dos 6 Tokens
+  const grid = document.getElementById('tokensGrid');
+  grid.innerHTML = mission.tokens
+    .map((token) => {
+      const isCompleted = prog.completedTokens.includes(token.token_number);
+      const reqs = Array.isArray(token.requires_flags) ? token.requires_flags : [];
+      const allReqsMet = reqs.every((flag) => prog.flags.includes(flag));
+      const isLocked = !isCompleted && token.initial_status === 'LOCKED' && !allReqsMet;
+
+      let cardStateClass = '';
+      let badgeClass = 'badge-open';
+      let badgeText = 'Disponível';
+      let btnText = `🔍 ${token.unlock_action_label || 'Investigar Token ' + token.token_number}`;
+      let btnDisabled = '';
+
+      if (isCompleted) {
+        cardStateClass = 'cleared';
+        badgeClass = 'badge-done';
+        badgeText = 'Concluído';
+        btnText = '✓ Investigado';
+        btnDisabled = 'disabled';
+      } else if (isLocked) {
+        cardStateClass = 'locked';
+        badgeClass = 'badge-locked';
+        badgeText = 'Bloqueado';
+        btnText = '🔒 Acesso Trancado';
+        btnDisabled = 'disabled';
+      } else if (token.initial_status === 'LOCKED' && allReqsMet) {
+        badgeClass = 'badge-open';
+        badgeText = 'Liberado!';
+        btnText = `🔓 ${token.unlock_action_label || 'Acessar Token ' + token.token_number}`;
+      }
+
+      const desc = isZombieMode ? token.room_desc_zombie : token.room_desc_hero;
+
+      const cropBannerHtml = token.crop_image_url
+        ? `<div class="token-crop-banner"><img src="${token.crop_image_url}" alt="${token.title}"></div>`
+        : '';
+
+      let bannerHtml = '';
+      if (isLocked && token.lock_banner_text) {
+        bannerHtml = `<div class="req-banner">${token.lock_banner_text}</div>`;
+      } else if (!isCompleted && token.token_number === 4) {
+        bannerHtml = `<div class="req-banner risk-banner">🎲 <strong>Alto Risco (Push Your Luck):</strong> Opcional. Pode conceder bônus valiosos ou disparar armadilha!</div>`;
+      }
+
+      return `
+        <article class="token-card ${cardStateClass}">
+          <div class="card-top">
+            <div class="card-top-left">
+              <div class="token-pill">${token.token_number}</div>
+              <div>
+                <span class="token-role-label">${token.token_role}</span>
+                <span class="token-tile-loc">${token.tile_location || ''}</span>
+              </div>
+            </div>
+            <span class="token-state-badge ${badgeClass}">${badgeText}</span>
+          </div>
+          ${cropBannerHtml}
+          <div class="card-content">
+            <div>
+              <h3 class="room-title">${token.title}</h3>
+              <p class="room-desc">${desc}</p>
+              ${bannerHtml}
+            </div>
+            <button class="card-btn" onclick="openTokenModal(${token.token_number})" ${btnDisabled}>
+              ${btnText}
+            </button>
+          </div>
+        </article>
+      `;
+    })
+    .join('');
+
+  // 6. Banner de Vitória do Capítulo
+  const victoryBanner = document.getElementById('chapterVictoryBanner');
+  const isMissionComplete = prog.flags.includes('mission_complete');
+  if (isMissionComplete) {
+    victoryBanner.style.display = 'flex';
+    const btnNext = document.getElementById('btnNextChapter');
+    if (currentMissionNumber < campaignData.missions.length) {
+      btnNext.style.display = 'inline-block';
+      btnNext.textContent = `Ir para o Capítulo ${currentMissionNumber + 1} ➔`;
+    } else {
+      btnNext.style.display = 'none';
+    }
+  } else {
+    victoryBanner.style.display = 'none';
+  }
+}
+
+// ================= AÇÕES DE NAVEGAÇÃO E MODO =================
+function toggleHeroMode() {
+  isZombieMode = !isZombieMode;
+  document.body.classList.toggle('zombie-mode', isZombieMode);
+  playTone(440, 0.08);
+  renderAll();
+  persistStateToDB();
+}
+
+function selectMission(missionNum) {
+  currentMissionNumber = Number(missionNum);
+  playTone(520, 0.06);
+  renderAll();
+  persistStateToDB();
+}
+
+function goToNextMission() {
+  if (campaignData && currentMissionNumber < campaignData.missions.length) {
+    selectMission(currentMissionNumber + 1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function toggleSetupBox() {
+  const body = document.getElementById('setupDrawerBody');
+  const arrow = document.getElementById('setupArrow');
+  if (body.style.display === 'none') {
+    body.style.display = 'block';
+    arrow.textContent = '▲';
+  } else {
+    body.style.display = 'none';
+    arrow.textContent = '▼';
+  }
+}
+
+// ================= INTERAÇÃO COM MODAL DO TOKEN =================
+function openTokenModal(tokenNumber) {
+  const mission = getCurrentMission();
+  if (!mission) return;
+
+  const token = mission.tokens.find((t) => t.token_number === tokenNumber);
+  if (!token) return;
+
+  activeTokenObj = token;
+  playTone(600, 0.06);
+
+  document.getElementById('mRoleTag').textContent = `${token.token_role} • ${token.tile_location || ''}`;
+  document.getElementById('mTitle').textContent = `TOKEN ${token.token_number}: ${token.title}`;
+  document.getElementById('mLore').textContent = isZombieMode
+    ? token.modal_lore_zombie
+    : token.modal_lore_hero;
+
+  const mChoices = document.getElementById('mChoices');
+  const mDiceBox = document.getElementById('mDiceBox');
+  const mKeypadBox = document.getElementById('mKeypadBox');
+  const mResolution = document.getElementById('mResolution');
+  const mCancelBtn = document.getElementById('mCancelBtn');
+
+  mDiceBox.style.display = 'none';
+  mKeypadBox.style.display = 'none';
+  mResolution.style.display = 'none';
+  mChoices.style.display = 'flex';
+  mCancelBtn.style.display = 'block';
+  mChoices.innerHTML = '';
+
+  const actions = Array.isArray(token.actions_json) ? token.actions_json : [];
+  actions.forEach((act) => {
+    const btn = document.createElement('div');
+    btn.className = 'choice-option';
+    const actTitle = isZombieMode ? act.title_zombie || act.title_hero : act.title_hero;
+    btn.innerHTML = `
+      <div class="choice-title">${actTitle}</div>
+      <div class="choice-subtitle">${act.subtitle || ''}</div>
     `;
+    btn.onclick = () => triggerTokenAction(act);
+    mChoices.appendChild(btn);
+  });
 
-    openStoryModal('OBJETIVO 4 • BARRICADA', 'Encontro com Sharon Carter', text, html);
+  document.getElementById('modalInvestigate').classList.add('visible');
+}
+
+function triggerTokenAction(action) {
+  activeActionObj = action;
+  document.getElementById('mChoices').style.display = 'none';
+  document.getElementById('mCancelBtn').style.display = 'none';
+
+  if (action.type === 'direct') {
+    applyActionGrants(action, true);
+    const title = isZombieMode
+      ? action.outcome_title_zombie || action.outcome_title_hero
+      : action.outcome_title_hero;
+    const desc = isZombieMode
+      ? action.outcome_desc_zombie || action.outcome_desc_hero
+      : action.outcome_desc_hero;
+    showOutcomeBox(title, desc);
+  } else if (action.type === 'dice') {
+    document.getElementById('mDiceBox').style.display = 'block';
+    document.getElementById('mDiceResult').textContent = '-';
+    document.getElementById('mDiceCritique').textContent = 'Role 1d6 ou clique no botão do dado da mesa.';
+  } else if (action.type === 'keypad') {
+    keypadBuffer = '';
+    updateKeypadUI();
+    document.getElementById('keypadFeedback').textContent = 'Digite a senha de 3 dígitos...';
+    document.getElementById('keypadFeedback').style.color = '#94a3b8';
+    document.getElementById('mKeypadBox').style.display = 'block';
   }
 }
 
-// ================= RESOLUÇÃO DOS OBJETIVOS =================
-
-// Resolução 1 (Terminal Oscorp)
-function resolveObj1(fast) {
-  state.discoveredCode = true;
-  markObjCompleted(1);
-
-  // Adicionar item e liberar Objetivo 2
-  addInventoryItem('Memorando da Oscorp', 'Contém o código de acesso [ 7 - 3 - 9 ] para a porta do metrô.');
-
-  // Atualizar visual do Objetivo 2 (Desbloqueado!)
-  const card2 = document.getElementById('obj-card-2');
-  const tag2 = document.getElementById('tag-obj-2');
-  const btn2 = document.getElementById('btn-obj-2');
-  const alert2 = document.getElementById('alert-dep-2');
-
-  card2.classList.remove('locked');
-  tag2.className = 'tag-status available';
-  tag2.textContent = 'Senha Obtida';
-  
-  btn2.className = 'btn-action';
-  btn2.innerHTML = '🔢 Digitar Senha no Painel do Metrô';
-
-  alert2.className = 'dependency-alert solved';
-  alert2.innerHTML = '🔓 <strong>SENHA ENCONTRADA:</strong> O código registrado no terminal é <strong>[ 7 - 3 - 9 ]</strong>! Agora você pode abrir o teclado numérico do Objetivo 2!';
-
-  if (fast) {
-    showResult(
-      '🎉 SUCESSO: Códigos Descobertos!',
-      `Você quebrou o firewall com perfeição!
-       <br>• O herói que interagiu ganha <strong>+5 XP</strong> no tabuleiro.
-       <br>• <strong>Código Revelado:</strong> <span style="color: var(--gold-bright); font-size: 1.1rem; font-weight: 900;">7 - 3 - 9</span>.
-       <br>• A escadaria do metrô (Objetivo 2) agora pode ser acessada!`,
-      true
-    );
-  } else {
-    triggerAlarm();
-    showResult(
-      '⚠️ CÓDIGO EXTRAÍDO (Mas o Alarme Soou!)',
-      `O terminal disparou um alerta silencioso antes de liberar o arquivo!
-       <br>• <strong>Código Revelado:</strong> <span style="color: var(--gold-bright); font-size: 1.1rem; font-weight: 900;">7 - 3 - 9</span>.
-       <br>• O herói ganha <strong>+3 XP</strong>.
-       <br>• <strong>Efeito na Mesa:</strong> Adicione <strong>1 Guard</strong> no Ponto de Spawn mais próximo!`,
-      false
-    );
-  }
+// ================= DESAFIO DE DADOS 1D6 =================
+function rollChallengeDice() {
+  const resElem = document.getElementById('mDiceResult');
+  let count = 0;
+  const timer = setInterval(() => {
+    const val = Math.floor(Math.random() * 6) + 1;
+    resElem.textContent = val;
+    playTone(400 + val * 60, 0.04);
+    count++;
+    if (count > 8) {
+      clearInterval(timer);
+      resolveDiceValue(val);
+    }
+  }, 55);
 }
 
-// Resolução 3 (Blindado Stark)
-function resolveObj3(success) {
-  markObjCompleted(3);
+function resolveDiceValue(val) {
+  if (!activeActionObj || !activeActionObj.dice_outcomes) return;
 
-  if (success) {
-    addInventoryItem('Bateria Stark de Íons', 'Pode ser usada na Missão 2 para energizar os elevadores da Torre.');
-    showResult(
-      '⚡ SUCESSO: Núcleo de Energia Resgatado!',
-      `Com calma cirúrgica, você desativa o dispositivo de segurança sem detonar os tanques!
-       <br>• O herói ganha <strong>+5 XP</strong>.
-       <br>• <em>Bateria Stark de Íons</em> guardada na sua mochila de campanha!`,
-      true
-    );
-  } else {
-    showResult(
-      '💥 DETONAÇÃO DEFENSIVA!',
-      `A válvula estoura ao ser puxada, espalhando gás paralisante na sala!
-       <br>• <strong>Efeito na Mesa:</strong> Todos os heróis na mesma zona sofrem <strong>1 Ferimento</strong>!
-       <br>• Você ainda consegue resgatar a <em>Bateria Avariada</em> (+3 XP).`,
-      false
-    );
-    addInventoryItem('Bateria Stark Danificada', 'Fornece energia instável para a próxima fase.');
-  }
-}
+  document.getElementById('mDiceResult').textContent = val;
+  document.getElementById('mDiceCritique').textContent = `Resultado final: ${val}`;
 
-// Resolução 4 (Sharon Carter)
-function resolveObj4(choice) {
-  markObjCompleted(4);
+  let tier = 'low';
+  if (val >= 4) tier = 'high';
+  else if (val >= 2) tier = 'mid';
 
-  if (choice === 'devour') {
-    addInventoryItem('Memórias de Sharon', 'Você absorveu as lembranças táticas da S.H.I.E.L.D. ao devorá-la.');
-    showResult(
-      '🩸 DELEITE SANGUINÁRIO!',
-      `A Fome foi insuportável! Sharon foi devorada num frenesi brutal.
-       <br>• O herói que atacou <strong>zera sua barra de Fome para 0</strong> e recebe <strong>+5 XP</strong>!
-       <br>• <strong>Impacto de Campanha:</strong> A S.H.I.E.L.D. não tentará mais negociar com seu grupo.`,
-      false
-    );
-  } else {
-    addInventoryItem('Fita Gravada de Sharon', 'Contém o plano dos Vingadores Vivos para evacuar a cidade de helicóptero.');
-    showResult(
-      '🤝 INFORMAÇÃO CRÍTICA OBTIDA!',
-      `Você segurou a mandíbula por um fio de lucidez! Aterrorizada, Sharon entrega um gravador militar.
-       <br>• O herói aumenta sua <strong>Fome em +1</strong>, mas recebe <strong>+5 XP</strong>.
-       <br>• Você descobre a rota secreta dos heróis sobreviventes para o Capítulo 2!`,
-      true
-    );
-  }
+  const outcome = activeActionObj.dice_outcomes[tier];
+  applyActionGrants(activeActionObj, true);
+
+  const desc = isZombieMode
+    ? outcome.desc_zombie || outcome.desc_hero
+    : outcome.desc_hero;
+
+  showOutcomeBox(outcome.title, desc, tier !== 'low');
 }
 
 // ================= TECLADO NUMÉRICO (KEYPAD) =================
-function openKeypad() {
-  state.keypadInput = '';
-  updateKeypadDisplay();
-  document.getElementById('keypad-feedback').textContent = 'Aguardando 3 dígitos...';
-  document.getElementById('keypad-feedback').style.color = 'var(--text-muted)';
-  document.getElementById('keypad-modal').classList.add('active');
-}
-
-function closeKeypad() {
-  document.getElementById('keypad-modal').classList.remove('active');
-  updateHUD();
-}
-
-function pressKey(digit) {
-  if (state.keypadInput.length < 3) {
-    state.keypadInput += digit;
-    playBeep(700 + state.keypadInput.length * 100, 0.05);
-    updateKeypadDisplay();
+function pressKeypad(digit) {
+  if (keypadBuffer.length < 3) {
+    keypadBuffer += digit;
+    playTone(650 + keypadBuffer.length * 90, 0.05);
+    updateKeypadUI();
   }
 }
 
-function clearKey() {
-  state.keypadInput = '';
-  playBeep(350, 0.05);
-  updateKeypadDisplay();
-  document.getElementById('keypad-feedback').textContent = 'Display limpo.';
-  document.getElementById('keypad-feedback').style.color = 'var(--text-muted)';
+function clearKeypad() {
+  keypadBuffer = '';
+  playTone(320, 0.06);
+  updateKeypadUI();
 }
 
-function updateKeypadDisplay() {
-  const display = document.getElementById('keypad-display');
-  const len = state.keypadInput.length;
-  if (len === 0) display.textContent = '_ _ _';
-  else if (len === 1) display.textContent = state.keypadInput[0] + ' _ _';
-  else if (len === 2) display.textContent = state.keypadInput[0] + ' ' + state.keypadInput[1] + ' _';
-  else if (len === 3) display.textContent = state.keypadInput.split('').join(' ');
+function updateKeypadUI() {
+  const disp = document.getElementById('keypadDisplay');
+  const chars = keypadBuffer.split('');
+  disp.textContent = [chars[0] || '_', chars[1] || '_', chars[2] || '_'].join(' ');
 }
 
-function submitKey() {
-  if (state.keypadInput.length !== 3) {
-    playDeniedSound();
-    document.getElementById('keypad-feedback').textContent = 'Digite os 3 dígitos antes de confirmar!';
-    document.getElementById('keypad-feedback').style.color = 'var(--blood-glow)';
-    return;
-  }
+function submitKeypad() {
+  if (!activeActionObj) return;
+  const expected = String(activeActionObj.keypad_code || '').trim();
 
-  // Verificar código
-  if (state.keypadInput === state.secretCode) {
-    playGrantedSound();
-    document.getElementById('keypad-feedback').textContent = '✅ CÓDIGO CORRETO! ACESSO LIBERADO!';
-    document.getElementById('keypad-feedback').style.color = 'var(--toxic-green)';
-
-    setTimeout(() => {
-      closeKeypad();
-      markObjCompleted(2);
-      addInventoryItem('Chave Mestra dos Trilhos', 'Permite navegar livremente pelo túnel do metrô no Capítulo 2.');
-      
-      openStoryModal(
-        'PORTA DO METRÔ DESTRAVADA!',
-        'Descida aos Trilhos Escuros',
-        `Com um estalo hidráulico pesado, as trancas de titânio se recolhem e a porta desliza para o lado!
-         <br><br>
-         O vento frio do subsolo sopra o cheiro de civis escondidos nas plataformas.
-         <br><br>
-         • <strong>Efeito na Mesa:</strong> Remova o token da porta ou vire para o lado aberto.
-         <br>• O herói que abriu ganha <strong>+5 XP</strong>!
-         <br>• A rota de fuga da Missão 1 está totalmente desimpedida!`,
-        ''
-      );
-    }, 600);
-
+  if (keypadBuffer === expected) {
+    document.getElementById('mKeypadBox').style.display = 'none';
+    applyActionGrants(activeActionObj, true);
+    const title = isZombieMode
+      ? activeActionObj.outcome_title_zombie || activeActionObj.outcome_title_hero
+      : activeActionObj.outcome_title_hero;
+    const desc = isZombieMode
+      ? activeActionObj.outcome_desc_zombie || activeActionObj.outcome_desc_hero
+      : activeActionObj.outcome_desc_hero;
+    showOutcomeBox(title, desc, true);
   } else {
-    playDeniedSound();
-    triggerAlarm();
-    document.getElementById('keypad-feedback').textContent = '❌ CÓDIGO INVÁLIDO! ALARME DISPARADO!';
-    document.getElementById('keypad-feedback').style.color = 'var(--blood-glow)';
-    state.keypadInput = '';
-    setTimeout(updateKeypadDisplay, 800);
+    soundError();
+    const fb = document.getElementById('keypadFeedback');
+    fb.textContent = '❌ SENHA INCORRETA! Verifique as pistas obtidas no capítulo!';
+    fb.style.color = '#ef4444';
+    keypadBuffer = '';
+    setTimeout(updateKeypadUI, 600);
   }
 }
 
-// ================= GESTÃO DE ESTADO & HUD =================
-function markObjCompleted(id) {
-  state.completedObjs.add(id);
+// ================= APLICAÇÃO DE RECOMPENSAS E FLAGS =================
+function applyActionGrants(action, markTokenCleared = true) {
+  const mission = getCurrentMission();
+  if (!mission || !activeTokenObj) return;
 
-  const card = document.getElementById('obj-card-' + id);
-  const tag = document.getElementById('tag-obj-' + id);
-  const btn = document.getElementById('btn-obj-' + id);
+  const prog = getMissionProgress(mission.mission_number);
 
-  if (card) card.classList.add('completed');
-  if (tag) {
-    tag.className = 'tag-status done';
-    tag.textContent = 'Resolvido';
-  }
-  if (btn) {
-    btn.className = 'btn-action btn-done';
-    btn.innerHTML = '✔️ Concluído';
-    btn.onclick = null;
+  // Adicionar flags concedidas pela ação
+  if (Array.isArray(action.grants_flags)) {
+    action.grants_flags.forEach((f) => {
+      if (!prog.flags.includes(f)) {
+        prog.flags.push(f);
+      }
+    });
   }
 
-  updateHUD();
+  // Marcar token como concluído (se for a ação principal ou se não for apenas ação secundária sem flag em token com múltiplas ações)
+  const isMainAction =
+    (Array.isArray(action.grants_flags) && action.grants_flags.length > 0) ||
+    activeTokenObj.token_number === 4;
+
+  if (markTokenCleared && isMainAction) {
+    if (!prog.completedTokens.includes(activeTokenObj.token_number)) {
+      prog.completedTokens.push(activeTokenObj.token_number);
+    }
+  }
+
+  renderAll();
+  persistStateToDB();
 }
 
-function triggerAlarm() {
-  if (!state.alarmTriggered) {
-    state.alarmTriggered = true;
-    playAlarmSound();
-    const alarmHud = document.getElementById('hud-alarm');
-    alarmHud.className = 'hud-value status-alarm';
-    alarmHud.textContent = '🚨 DISPARADO';
-  }
+function showOutcomeBox(title, desc, isGood = true) {
+  if (isGood) soundSuccess();
+  else soundError();
+
+  const box = document.getElementById('mResolution');
+  document.getElementById('mOutcomeTitle').textContent = title;
+  document.getElementById('mOutcomeDesc').innerHTML = desc;
+  box.style.display = 'block';
 }
 
-function addInventoryItem(name, desc) {
-  if (!state.inventory.some(i => i.name === name)) {
-    state.inventory.push({ name, desc });
-    renderInventory();
-  }
+function closeModal() {
+  document.getElementById('modalInvestigate').classList.remove('visible');
 }
 
-function renderInventory() {
-  const container = document.getElementById('inventory-container');
-  if (state.inventory.length === 0) {
-    container.innerHTML = '<div class="empty-inv">Nenhum item ou código descoberto ainda.</div>';
+// ================= MODAIS AUXILIARES E RESET =================
+function openPremiseModal() {
+  if (!campaignData) return;
+  document.getElementById('pTitle').textContent = campaignData.title;
+  document.getElementById('pHeroText').textContent = campaignData.premise_hero;
+  document.getElementById('pZombieText').textContent = campaignData.premise_zombie;
+  document.getElementById('modalPremise').classList.add('visible');
+}
+
+function closePremiseModal() {
+  document.getElementById('modalPremise').classList.remove('visible');
+}
+
+function openMapModal() {
+  const mission = getCurrentMission();
+  if (!mission || !mission.map_image_url) return;
+  document.getElementById('mapModalTitle').textContent = `Mapa Oficial - ${mission.rulebook_map_code}`;
+  document.getElementById('mapModalImg').src = mission.map_image_url;
+  document.getElementById('modalMap').classList.add('visible');
+}
+
+function closeMapModal() {
+  document.getElementById('modalMap').classList.remove('visible');
+}
+
+async function resetCurrentMission() {
+  if (!confirm(`Deseja reiniciar a investigação do Capítulo ${currentMissionNumber}?`)) {
     return;
   }
-
-  container.innerHTML = state.inventory.map(item => `
-    <div class="inv-item-pill">
-      <span class="inv-item-name">📦 ${item.name}</span>
-      <span class="inv-item-desc">${item.desc}</span>
-    </div>
-  `).join('');
+  campaignState.missions[currentMissionNumber] = {
+    completedTokens: [],
+    flags: [],
+  };
+  renderAll();
+  await persistStateToDB();
 }
 
-function updateHUD() {
-  const count = state.completedObjs.size;
-  document.getElementById('hud-progress').textContent = `${count} / 4 Concluídos`;
-
-  const finishBtn = document.getElementById('btn-finish-chapter');
-  if (count >= 4) {
-    finishBtn.style.display = 'block';
-  }
-}
-
-function finishChapter() {
-  playGrantedSound();
-  alert(
-    `🎉 PARABÉNS! CAPÍTULO 1 CONCLUÍDO COM SUCESSO!\n\n` +
-    `📦 Itens de Campanha Salvos: ${state.inventory.map(i => i.name).join(', ')}\n` +
-    `🚨 Alarme: ${state.alarmTriggered ? 'Disparado (Haverá mais patrulhas no Cap 2)' : 'Furtivo (Vantagem de surpresa)'}\n\n` +
-    `Seus heróis descem pelas escadas do metrô em direção à Torre dos Vingadores (Capítulo 2)!`
-  );
-}
+// Inicializar ao abrir a página
+window.addEventListener('DOMContentLoaded', loadCampaignFromDB);

@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marvel Zombies - Dashboard Oficial de Personagens</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;500;600;700;800;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            comic: ['Bangers', 'cursive'],
+            display: ['Rajdhani', 'sans-serif'],
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            mz: {
+              blue: '#0284c7',
+              yellow: '#eab308',
+              orange: '#ea580c',
+              red: '#dc2626',
+              dark: '#080b10',
+              card: '#111722',
+              border: '#1f293d',
+              zombie: '#991b1b',
+              blood: '#450a0a'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Halftone & Comic Dots styling */
+    .comic-dots {
+      background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 0);
+      background-size: 8px 8px;
+    }
+
+    /* Comic Book Borders & Shadows */
+    .comic-panel {
+      border: 3px solid #000;
+      box-shadow: 6px 6px 0px #000;
+    }
+
+    .comic-panel-sm {
+      border: 2px solid #000;
+      box-shadow: 3px 3px 0px #000;
+    }
+
+    /* Animated dice shake */
+    @keyframes dice-shake {
+      0% { transform: rotate(0deg) scale(1); }
+      25% { transform: rotate(-15deg) scale(1.1); }
+      50% { transform: rotate(15deg) scale(1.1); }
+      75% { transform: rotate(-10deg) scale(1.05); }
+      100% { transform: rotate(0deg) scale(1); }
+    }
+
+    .animate-shake {
+      animation: dice-shake 0.35s ease-in-out infinite;
+    }
+  </style>
+</head>
+
+<body class="bg-[#070a0e] text-zinc-100 min-h-screen font-sans selection:bg-amber-400 selection:text-black pb-16">
+
+  <!-- ================= TOP HEADER BAR ================= -->
+  <header class="bg-[#0d121c] border-b-2 border-black px-4 sm:px-6 py-3.5 sticky top-0 z-40 shadow-xl">
+    <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Logo -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-amber-500 border-2 border-black flex items-center justify-center text-black text-xl font-comic shadow-[2px_2px_0px_#000]">
+          MZ
+        </div>
+        <div>
+          <span class="text-[10px] tracking-widest font-black uppercase text-amber-400 block leading-none">Dashboard Tático</span>
+          <h1 class="text-xl sm:text-2xl font-comic tracking-wide text-white uppercase leading-tight drop-shadow">
+            Marvel Zombies Companion
+          </h1>
+        </div>
+      </div>
+
+      <!-- JSON Upload & Action controls -->
+      <div class="flex items-center gap-2">
+        <label for="jsonFileInput" class="cursor-pointer bg-zinc-800 hover:bg-zinc-700 active:scale-95 text-zinc-200 border-2 border-black px-3 py-1.5 rounded-lg text-xs font-display font-bold uppercase tracking-wider flex items-center gap-2 shadow-[2px_2px_0px_#000] transition">
+          <i class="fa-solid fa-file-arrow-up text-amber-400"></i>
+          <span>Carregar JSON</span>
+        </label>
+        <input type="file" id="jsonFileInput" accept=".json" class="hidden" onchange="handleFileUpload(event)">
+
+        <button onclick="downloadCurrentJSON()" title="Baixar JSON Atual" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border-2 border-black p-2 rounded-lg text-xs shadow-[2px_2px_0px_#000] transition">
+          <i class="fa-solid fa-download"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 pt-6 space-y-6">
+
+    <!-- ================= CONTROL HUB: SELECT HERO & PROFILE MODE ================= -->
+    <section class="bg-[#111723] rounded-2xl p-4 sm:p-5 comic-panel comic-dots flex flex-col md:flex-row gap-4 items-center justify-between">
+      
+      <!-- Character Dropdown -->
+      <div class="w-full md:w-1/2 space-y-1.5">
+        <label for="heroSelector" class="text-xs font-display font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+          <i class="fa-solid fa-mask"></i> Selecione o Personagem:
+        </label>
+        <div class="relative">
+          <select id="heroSelector" onchange="selectCharacter(this.value)" class="w-full bg-[#0a0e17] border-2 border-black rounded-xl px-4 py-2.5 font-display font-bold text-base text-white focus:outline-none focus:border-amber-400 cursor-pointer shadow-[3px_3px_0px_#000] appearance-none">
+            <!-- Populated via JavaScript -->
+          </select>
+          <i class="fa-solid fa-chevron-down absolute right-4 top-3.5 text-zinc-400 pointer-events-none"></i>
+        </div>
+      </div>
+
+      <!-- Mode Switcher (Hero / Zombie / Boss) -->
+      <div class="w-full md:w-auto flex flex-col items-start md:items-end space-y-1.5">
+        <span class="text-xs font-display font-bold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
+          <i class="fa-solid fa-sliders"></i> Modo da Ficha:
+        </span>
+        <div class="grid grid-cols-3 gap-1 bg-[#0a0e17] p-1.5 rounded-xl border-2 border-black shadow-[3px_3px_0px_#000] w-full md:w-auto">
+          <button id="btn-mode-hero" onclick="setProfileMode('super_hero')" class="px-3 sm:px-4 py-1.5 rounded-lg text-xs font-display font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span class="hidden sm:inline">Herói</span> Vivo
+          </button>
+          <button id="btn-mode-zombie" onclick="setProfileMode('zombie_hero')" class="px-3 sm:px-4 py-1.5 rounded-lg text-xs font-display font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-skull"></i>
+            <span class="hidden sm:inline">Herói</span> Zumbi
+          </button>
+          <button id="btn-mode-boss" onclick="setProfileMode('boss_enemy')" class="px-3 sm:px-4 py-1.5 rounded-lg text-xs font-display font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-biohazard"></i>
+            Boss Inimigo
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ================= MAIN DASHBOARD CARD (OFFICIAL STYLE) ================= -->
+    <div id="characterCard" class="relative rounded-2xl bg-[#0f1520] border-4 border-black shadow-[8px_8px_0px_#000] overflow-hidden">
+      
+      <!-- Card Top: Name & Origin Box Badge -->
+      <div id="cardHeaderBar" class="bg-gradient-to-r from-sky-600 to-blue-700 border-b-4 border-black px-5 py-3 flex flex-wrap items-center justify-between gap-2 transition-colors duration-300">
+        <div class="flex items-center gap-3">
+          <span id="cardHeaderIcon" class="text-2xl text-white">
+            <i class="fa-solid fa-shield-halved"></i>
+          </span>
+          <div>
+            <h2 id="charNameDisplay" class="text-2xl sm:text-3xl font-comic tracking-wider text-white uppercase drop-shadow-[2px_2px_0px_#000]">
+              Deadpool
+            </h2>
+            <span id="charBoxBadge" class="text-[11px] font-display font-semibold uppercase tracking-wider text-zinc-200 bg-black/40 px-2 py-0.5 rounded border border-white/20">
+              Marvel Zombies Kickstarter Promos
+            </span>
+          </div>
+        </div>
+
+        <div id="modePill" class="bg-black/60 text-sky-300 border border-sky-400 font-comic uppercase tracking-wider text-xs px-3 py-1 rounded-full">
+          Super-Herói Vivo
+        </div>
+      </div>
+
+      <div class="p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- LEFT COLUMN: COMBAT WEAPON / BOSS HP & COMBAT ROLLER (5 COLS) -->
+        <div class="lg:col-span-5 space-y-5">
+          
+          <!-- Attack Spec Box (When Playing as Player Hero) -->
+          <div id="attackBox" class="bg-[#151c2a] rounded-xl p-4 comic-panel-sm space-y-3">
+            <div class="flex items-center justify-between border-b border-zinc-700/80 pb-2">
+              <span class="text-xs font-display font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+                <i class="fa-solid fa-hand-fist"></i> Ataque Primário / Assinatura
+              </span>
+              <span id="attackName" class="font-comic text-base text-white tracking-wide">Katanas Duplas</span>
+            </div>
+
+            <!-- Weapon Badges Grid (Range, Dice, Accuracy) -->
+            <div class="grid grid-cols-3 gap-2 text-center">
+              <div class="bg-black/50 border border-zinc-700 p-2 rounded-lg">
+                <span class="block text-[10px] uppercase font-bold text-zinc-400 font-display">Alcance</span>
+                <span id="statRange" class="font-comic text-xl text-amber-400">0</span>
+              </div>
+              <div class="bg-black/50 border border-zinc-700 p-2 rounded-lg">
+                <span class="block text-[10px] uppercase font-bold text-zinc-400 font-display">Dados</span>
+                <span id="statDice" class="font-comic text-xl text-sky-400">3</span>
+              </div>
+              <div class="bg-black/50 border border-zinc-700 p-2 rounded-lg">
+                <span class="block text-[10px] uppercase font-bold text-zinc-400 font-display">Acerto</span>
+                <span id="statAcc" class="font-comic text-xl text-emerald-400">4+</span>
+              </div>
+            </div>
+
+            <!-- Combat Attack Roller Button -->
+            <button onclick="rollCharacterAttack()" class="w-full mt-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 active:scale-95 text-black font-comic text-base tracking-wider uppercase py-2.5 rounded-xl border-2 border-black shadow-[3px_3px_0px_#000] flex items-center justify-center gap-2 transition">
+              <i class="fa-solid fa-dice"></i> Executar Ataque de Combate
+            </button>
+          </div>
+
+          <!-- Boss HP Tracker Box (Only Visible in Boss Mode) -->
+          <div id="bossBox" class="hidden bg-[#1f1013] rounded-xl p-4 comic-panel-sm space-y-4 border-red-900">
+            <div class="flex items-center justify-between border-b border-red-900/60 pb-2">
+              <span class="text-xs font-display font-bold uppercase tracking-wider text-red-400 flex items-center gap-1.5">
+                <i class="fa-solid fa-heart-pulse"></i> Vitalidade do Chefe (HP)
+              </span>
+              <span id="bossHpCounter" class="font-comic text-xl text-white font-bold tracking-wide">4 / 4 HP</span>
+            </div>
+
+            <!-- Health Bar -->
+            <div class="w-full bg-black/70 h-3 rounded-full overflow-hidden p-0.5 border border-red-950">
+              <div id="bossHpBar" class="h-full bg-gradient-to-r from-red-600 to-rose-500 rounded-full transition-all duration-300" style="width: 100%;"></div>
+            </div>
+
+            <!-- Quick Hit Buttons -->
+            <div class="flex items-center gap-2">
+              <button onclick="alterBossHP(-1)" class="flex-1 bg-red-900/80 hover:bg-red-800 text-white font-display font-bold py-2 rounded-lg text-xs uppercase border border-red-700 active:scale-95 transition">
+                -1 Dano
+              </button>
+              <button onclick="alterBossHP(-2)" class="flex-1 bg-red-800 hover:bg-red-700 text-white font-display font-bold py-2 rounded-lg text-xs uppercase border border-red-600 active:scale-95 transition">
+                -2 Crítico
+              </button>
+              <button onclick="resetBossHP()" title="Restaurar HP" class="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold rounded-lg text-xs border border-zinc-700 transition">
+                <i class="fa-solid fa-rotate-left"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Dice Results Visual Arena -->
+          <div id="diceArena" class="bg-[#0b0f16] rounded-xl p-4 comic-panel-sm space-y-2">
+            <div class="flex items-center justify-between text-xs font-display font-bold uppercase text-zinc-400">
+              <span>Resultado dos Dados:</span>
+              <span id="diceSummary" class="text-amber-400 font-mono">Aguardando ataque</span>
+            </div>
+
+            <div id="diceCup" class="flex flex-wrap items-center justify-center gap-2.5 min-h-[50px] py-1">
+              <span class="text-xs text-zinc-500 font-display">Clique em 'Executar Ataque' para rolar</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN: PROGRESSION TRACKER & SKILLS (7 COLS) -->
+        <div class="lg:col-span-7 space-y-3.5">
+          
+          <!-- ================= PLAYER HERO SKILLS BARS (BLUE, YELLOW, ORANGE, RED) ================= -->
+          <div id="heroSkillsContainer" class="space-y-3">
+            
+            <!-- BLUE SKILL (INITIAL) -->
+            <div class="comic-panel-sm rounded-xl overflow-hidden bg-[#121927]">
+              <div class="bg-mz-blue px-3.5 py-1.5 flex items-center justify-between border-b-2 border-black">
+                <span class="font-comic tracking-wider text-xs uppercase text-white drop-shadow">
+                  Nível Inicial (Azul - 0 XP)
+                </span>
+                <i class="fa-solid fa-star text-white/80 text-xs"></i>
+              </div>
+              <div class="p-3 text-xs sm:text-sm text-zinc-200 leading-relaxed font-sans" id="skillBlue">
+                <!-- Skill text -->
+              </div>
+            </div>
+
+            <!-- YELLOW (+1 ACTION) -->
+            <div class="comic-panel-sm rounded-xl overflow-hidden bg-[#18181b]">
+              <div class="bg-mz-yellow px-3.5 py-1.5 flex items-center justify-between border-b-2 border-black">
+                <span class="font-comic tracking-wider text-xs uppercase text-black">
+                  Nível Amarelo (7 XP)
+                </span>
+                <span class="text-[10px] font-black uppercase text-black font-display bg-black/10 px-1.5 rounded">Padrão</span>
+              </div>
+              <div class="p-2.5 text-xs sm:text-sm font-bold text-amber-300 font-display flex items-center gap-2" id="skillYellow">
+                <i class="fa-solid fa-plus-circle"></i> +1 Ação por Turno
+              </div>
+            </div>
+
+            <!-- ORANGE SKILL -->
+            <div class="comic-panel-sm rounded-xl overflow-hidden bg-[#1b1512]">
+              <div class="bg-mz-orange px-3.5 py-1.5 flex items-center justify-between border-b-2 border-black">
+                <span class="font-comic tracking-wider text-xs uppercase text-white drop-shadow">
+                  Nível Laranja (19 XP)
+                </span>
+                <i class="fa-solid fa-bolt text-white/80 text-xs"></i>
+              </div>
+              <div class="p-3 text-xs sm:text-sm text-zinc-200 leading-relaxed font-sans" id="skillOrange">
+                <!-- Skill text -->
+              </div>
+            </div>
+
+            <!-- RED SKILL (SUPREME) -->
+            <div class="comic-panel-sm rounded-xl overflow-hidden bg-[#201014]">
+              <div class="bg-mz-red px-3.5 py-1.5 flex items-center justify-between border-b-2 border-black">
+                <span class="font-comic tracking-wider text-xs uppercase text-white drop-shadow">
+                  Nível Vermelho (43+ XP)
+                </span>
+                <i class="fa-solid fa-skull-crossbones text-white/80 text-xs"></i>
+              </div>
+              <div class="p-3 text-xs sm:text-sm text-zinc-200 leading-relaxed font-sans" id="skillRed">
+                <!-- Skill text -->
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ================= BOSS ENEMY SKILL (ONLY IN BOSS MODE) ================= -->
+          <div id="bossSkillsContainer" class="hidden space-y-3">
+            <div class="comic-panel-sm rounded-xl overflow-hidden bg-[#1d0e11] border-red-700">
+              <div class="bg-red-800 px-4 py-2 flex items-center justify-between border-b-2 border-black">
+                <span class="font-comic tracking-wider text-sm uppercase text-white">
+                  Habilidade Ativa do Boss / Inimigo
+                </span>
+                <span class="text-[10px] font-black uppercase text-red-200 font-display bg-black/30 px-2 py-0.5 rounded">
+                  Spawn Trigger
+                </span>
+              </div>
+              <div class="p-4 text-xs sm:text-sm text-red-100 leading-relaxed font-sans" id="bossAbility">
+                <!-- Boss ability text -->
+              </div>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-black/40 border border-zinc-800 text-xs text-zinc-400 space-y-1">
+              <span class="font-bold text-amber-400 uppercase text-[11px] block font-display">
+                <i class="fa-solid fa-circle-info mr-1"></i> Regras de Ativação de Boss:
+              </span>
+              <p>Os Super-Heróis Zumbis ativam na Fase dos Inimigos. Eles realizam 1 Ação por ativação padrão e executam sua regra passiva sempre que aplicável.</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ================= JAVASCRIPT LOGIC & EMBEDDED DATABASE ================= -->
+  <script>
+    // Embedded Database loaded from the provided JSON schema
+    const defaultDatabase = {
+      "characters": [
+        {
+          "id": "deadpool",
+          "name": "Deadpool",
+          "box": "Marvel Zombies Kickstarter Promos",
+          "profiles": {
+            "super_hero": {
+              "attack": { "name": "Katanas Duplas", "range": "0", "dice": 3, "accuracy": 4 },
+              "skills": {
+                "blue": "Uma vez durante o seu Turno, você pode gastar 1 Poder para comprar 1 Característica Heroica. Cada vez que você eliminar um Herói Zumbi, compre 1 Característica Heroica.",
+                "yellow": "+1 Ação",
+                "orange": "Uma vez durante o seu Turno, você pode selecionar 1 Zona dentro do Alcance 2. Todos os Inimigos naquela Zona são imediatamente ativados e tentam entrar na sua Zona.",
+                "red": "Uma vez durante o seu Turno, você pode realizar 1 Ação de Aumentar o Poder grátis. Você pode rolar novamente qualquer erro. Cada resultado 6 causa 2 golpes a um único Inimigo."
+              }
+            },
+            "zombie_hero": {
+              "attack": { "name": "Katanas Duplas", "range": "0", "dice": 3, "accuracy": 4 },
+              "skills": {
+                "blue": "Se estiver no nível de Fome 1 ou superior, pode comprar 1 Característica Zumbi adicional ao eliminar um Super-Herói.",
+                "yellow": "+1 Ação",
+                "orange": "Provocação Sarcástica: força todos os inimigos a até 2 zonas a moverem-se em sua direção.",
+                "red": "Regeneração Constante: recupera vida ao devorar e ganha rerrolagens de dados gratuitas."
+              }
+            },
+            "boss_enemy": {
+              "health": 4,
+              "ability": "Quando eliminado por um ataque regular, deite a miniatura. Ele levanta-se na próxima ativação ignorando a morte uma vez."
+            }
+          }
+        },
+        {
+          "id": "wolverine",
+          "name": "Wolverine",
+          "box": "Marvel Zombies: X-Men Resistance",
+          "profiles": {
+            "super_hero": {
+              "attack": { "name": "Adamantium Claws", "range": "0", "dice": 3, "accuracy": 3 },
+              "skills": {
+                "blue": "Ao atacar com Adamantium Claws, adicione +1 aos resultados para cada Ferimento sofrido. Resultados 6 geram +1 dado extra imediato.",
+                "yellow": "+1 Ação",
+                "orange": "Uma vez por Fase dos Inimigos, quando inimigos entram na sua Zona, gaste 1 Poder para realizar 1 ataque gratuito com Adamantium Claws.",
+                "red": "No início de cada Fase Final (End Phase), cure todos os ferimentos sofridos."
+              }
+            },
+            "zombie_hero": {
+              "attack": { "name": "Adamantium Claws", "range": "0", "dice": 3, "accuracy": 3 },
+              "skills": {
+                "blue": "Adicione +1 aos dados de ataque se estiver ferido. Resultados 6 concedem rolagem adicional de dados.",
+                "yellow": "+1 Ação",
+                "orange": "Gaste 1 de Fome para realizar um ataque de retaliação imediato quando entrarem na sua zona.",
+                "red": "Imunidade a ferimentos causados por Troopers ou Specialists comuns."
+              }
+            },
+            "boss_enemy": {
+              "health": 5,
+              "ability": "Regeneração Voraz: Recupera 1 ponto de vida no início de cada uma das suas ativações. Se eliminado sem Devour, deita-se e levanta no turno seguinte."
+            }
+          }
+        },
+        {
+          "id": "spider_man",
+          "name": "Spider-Man",
+          "box": "Marvel Zombies Caixa Base",
+          "profiles": {
+            "super_hero": {
+              "attack": { "name": "Web Strike", "range": "0-1", "dice": 3, "accuracy": 4 },
+              "skills": {
+                "blue": "Sentido Aranha: Gaste 1 Poder para forçar um inimigo atacante a rerrolar todos os acertos.",
+                "yellow": "+1 Ação",
+                "orange": "Disparo de Teia: Prende inimigos numa zona em alcance 1, impedindo a sua deslocação até gastarem 1 ativação.",
+                "red": "Grande Responsabilidade: Ganha +1 dado em todos os ataques para cada aliado ou transeunte presente na sua zona."
+              }
+            },
+            "zombie_hero": {
+              "attack": { "name": "Web Snare & Bite", "range": "0-1", "dice": 3, "accuracy": 4 },
+              "skills": {
+                "blue": "Puxão de Teia: Puxa 1 transeunte ou inimigo de alcance 1 diretamente para a sua zona para ser devorado.",
+                "yellow": "+1 Ação",
+                "orange": "Movimento Acrobático: Ignora penalidades de movimentação por presença de inimigos.",
+                "red": "Fome Insaciável: Pode realizar uma Ação de Devorar extra sem custo de ação."
+              }
+            },
+            "boss_enemy": {
+              "health": 4,
+              "ability": "Sentido Aranha Corrompido: Anula o primeiro acerto sofrido em cada rodada de combate."
+            }
+          }
+        },
+        {
+          "id": "cyclops",
+          "name": "Cyclops",
+          "box": "Marvel Zombies: X-Men Resistance",
+          "profiles": {
+            "super_hero": {
+              "attack": { "name": "Optic Blast", "range": "0-2", "dice": 3, "accuracy": 3 },
+              "skills": {
+                "blue": "Liderança Tática: Concede +1 dado de ataque a um herói aliado na mesma linha de visão uma vez por turno.",
+                "yellow": "+1 Ação",
+                "orange": "Feixe Contínuo: O ataque óptico atinge todas as miniaturas em linha reta até alcance 2.",
+                "red": "Rajada Sem Controlo: Remove a viseira e causa 3 de dano a todas as zonas na linha de visão, mas ganha 1 exaustão."
+              }
+            },
+            "zombie_hero": {
+              "attack": { "name": "Corrupted Optic Blast", "range": "0-2", "dice": 3, "accuracy": 4 },
+              "skills": {
+                "blue": "Disparo Focado: Se o nível de Fome for 2 ou mais, o Optic Blast ignora armaduras e escudos.",
+                "yellow": "+1 Ação",
+                "orange": "Varredura Óptica: Dispara contra duas zonas diferentes com a mesma ação de ataque.",
+                "red": "Sobrecarga Mutante: Causa dano massivo na zona alvo e puxa os alvos sobreviventes 1 zona em direção a si."
+              }
+            },
+            "boss_enemy": {
+              "health": 4,
+              "ability": "Varredura em Linha: No início da ativação, ataca todos os Super-Heróis na sua linha de visão antes de se mover."
+            }
+          }
+        },
+        {
+          "id": "hulk",
+          "name": "Hulk",
+          "box": "Marvel Zombies: Heroes' Resistance",
+          "profiles": {
+            "super_hero": {
+              "attack": { "name": "Hulk Smash", "range": "0", "dice": 4, "accuracy": 4 },
+              "skills": {
+                "blue": "Quanto Mais Fúria, Mais Forte: Para cada ferimento recebido, adicione +1 dado em todos os ataques corpo a corpo.",
+                "yellow": "+1 Ação",
+                "orange": "Salto Sísmico: Salta até 2 zonas e causa 1 de dano a todos os inimigos na zona de aterragem.",
+                "red": "Hulk Esmaga!: Destrói portas, barricadas e obstáculos sem necessidade de testes de perícia ou chaves."
+              }
+            },
+            "zombie_hero": {
+              "attack": { "name": "Zombie Smash", "range": "0", "dice": 4, "accuracy": 4 },
+              "skills": {
+                "blue": "Fome Titânica: Cada ponto de fome concede +2 dados de ataque em vez de +1.",
+                "yellow": "+1 Ação",
+                "orange": "Investida Esmagadora: Empurra todos os heróis da zona de destino ao mover-se.",
+                "red": "Imparável: Ignora qualquer efeito de atordoamento ou redução de movimento."
+              }
+            },
+            "boss_enemy": {
+              "health": 6,
+              "ability": "Força Bruta Monstruosa: Causa 2 de dano por acerto e quebra imediatamente quaisquer barreiras presentes na sua zona."
+            }
+          }
+        },
+        {
+          "id": "doctor_strange",
+          "name": "Doctor Strange",
+          "box": "Marvel Zombies Caixa Base",
+          "profiles": {
+            "super_hero": {
+              "attack": { "name": "Mystic Bolts", "range": "0-2", "dice": 2, "accuracy": 3 },
+              "skills": {
+                "blue": "Mago Supremo: Ao realizar Power Up, elimina 1 Trooper/Walker a alcance 1. Pode gastar 1 Poder para um ataque mágico grátis.",
+                "yellow": "+1 Ação",
+                "orange": "Portal de Translocação: Teleporta-se ou teleporta um aliado adjacente até 2 zonas de distância.",
+                "red": "Olho de Agamotto: Cancela habilidades especiais de todos os Heróis Zumbis na mesma zona até ao final da rodada."
+              }
+            },
+            "zombie_hero": {
+              "attack": { "name": "Dark Sorcery", "range": "0-2", "dice": 3, "accuracy": 3 },
+              "skills": {
+                "blue": "Feitiçaria Corrompida: Ao devorar um transeunte, espalha 1 ferimento automático a todos os heróis a alcance 1.",
+                "yellow": "+1 Ação",
+                "orange": "Invocação das Trevas: Gera 2 Walkers adicionais na sua própria zona.",
+                "red": "Distorção Temporal: Repete uma ativação completa se eliminar um Super-Herói."
+              }
+            },
+            "boss_enemy": {
+              "health": 4,
+              "ability": "Ponto de Spawn Mágico: Age como um ponto de spawn ativo. Se ativar fora da zona dos heróis, teleporta-se imediatamente para a zona com mais heróis visíveis."
+            }
+          }
+        },
+        {
+          "id": "colossus",
+          "name": "Colossus",
+          "box": "Marvel Zombies: X-Men Resistance",
+          "profiles": {
+            "super_hero": {
+              "attack": { "name": "Steel Fists", "range": "0", "dice": 3, "accuracy": 3 },
+              "skills": {
+                "blue": "Aço Orgânico: Reduz todo o dano sofrido em 1 ponto (mínimo de 1 de dano por ataque).",
+                "yellow": "+1 Ação",
+                "orange": "Fastball Special: Pode arremessar um herói aliado adjacente até 2 zonas para realizar um ataque imediato gratuito.",
+                "red": "Barricada Viva: Nenhum inimigo pode deixar a zona de Colossus sem eliminá-lo primeiro."
+              }
+            },
+            "zombie_hero": {
+              "attack": { "name": "Crushing Steel", "range": "0", "dice": 3, "accuracy": 3 },
+              "skills": {
+                "blue": "Blindagem Imparável: Imune a ataques com dano inferior a 2.",
+                "yellow": "+1 Ação",
+                "orange": "Impacto Sísmico: Ao atacar, derruba todos os heróis sobreviventes na sala.",
+                "red": "Devorar Blindado: Cura 2 ferimentos ao devorar um transeunte em vez de 1."
+              }
+            },
+            "boss_enemy": {
+              "health": 6,
+              "ability": "Armadura Pesada: Todos os ataques sofridos têm o seu dano total reduzido em 1."
+            }
+          }
+        },
+        {
+          "id": "iron_man",
+          "name": "Iron Man",
+          "box": "Marvel Zombies Caixa Base",
+          "profiles": {
+            "super_hero": {
+              "attack": { "name": "Repulsor Rays", "range": "0-1", "dice": 3, "accuracy": 3 },
+              "skills": {
+                "blue": "Sistemas de Varredura: Ganha +1 em testes de perícia para hackear terminais e interagir com objetivos eletrónicos.",
+                "yellow": "+1 Ação",
+                "orange": "Propulsão a Jato: Movimenta-se por cima de zonas infestadas sem gastar ações adicionais.",
+                "red": "Unibeam Chest Blast: Ataque em linha reta que causa 3 de dano em cone direto."
+              }
+            },
+            "zombie_hero": {
+              "attack": { "name": "Corrupted Repulsors", "range": "0-1", "dice": 3, "accuracy": 3 },
+              "skills": {
+                "blue": "Sobrecarga de Reator: Se o nível de Fome estiver no máximo, ganha +2 dados em todos os disparos à distância.",
+                "yellow": "+1 Ação",
+                "orange": "Voo Predatório: Move-se 2 zonas em linha reta em direção ao transeunte mais próximo.",
+                "red": "Bombardeamento de Mísseis: Causa 2 de dano a duas zonas adjacentes em simultâneo."
+              }
+            },
+            "boss_enemy": {
+              "health": 4,
+              "ability": "Disparo Automático à Distância: Antes de dar qualquer passo, efetua um ataque de Repulsor contra o herói visível com menor vida."
+            }
+          }
+        }
+      ]
+    };
+
+    // Application State
+    let currentDatabase = defaultDatabase;
+    let selectedCharacterId = "deadpool";
+    let activeProfileMode = "super_hero"; // "super_hero", "zombie_hero", "boss_enemy"
+    let currentBossHP = 4;
+    let maxBossHP = 4;
+
+    // Web Audio Synthesizer
+    function playBeep(freq = 440, type = 'sine', duration = 0.1) {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    // Populate Selector Dropdown
+    function populateDropdown() {
+      const select = document.getElementById('heroSelector');
+      select.innerHTML = '';
+      currentDatabase.characters.forEach(char => {
+        const opt = document.createElement('option');
+        opt.value = char.id;
+        opt.textContent = `${char.name} (${char.box})`;
+        select.appendChild(opt);
+      });
+      select.value = selectedCharacterId;
+    }
+
+    // Select Character
+    function selectCharacter(id) {
+      selectedCharacterId = id;
+      renderCurrentDashboard();
+      playBeep(520, 'triangle', 0.08);
+    }
+
+    // Switch Profile Mode
+    function setProfileMode(mode) {
+      activeProfileMode = mode;
+      
+      const btnHero = document.getElementById('btn-mode-hero');
+      const btnZombie = document.getElementById('btn-mode-zombie');
+      const btnBoss = document.getElementById('btn-mode-boss');
+
+      const neutralClass = "px-3 sm:px-4 py-1.5 rounded-lg text-xs font-display font-bold uppercase tracking-wider text-zinc-400 hover:text-white transition-all";
+      btnHero.className = neutralClass;
+      btnZombie.className = neutralClass;
+      btnBoss.className = neutralClass;
+
+      if (mode === 'super_hero') {
+        btnHero.className = "px-3 sm:px-4 py-1.5 rounded-lg text-xs font-display font-bold uppercase tracking-wider bg-sky-600 text-white shadow-md border border-sky-400";
+      } else if (mode === 'zombie_hero') {
+        btnZombie.className = "px-3 sm:px-4 py-1.5 rounded-lg text-xs font-display font-bold uppercase tracking-wider bg-red-700 text-white shadow-md border border-red-500";
+      } else if (mode === 'boss_enemy') {
+        btnBoss.className = "px-3 sm:px-4 py-1.5 rounded-lg text-xs font-display font-bold uppercase tracking-wider bg-purple-700 text-white shadow-md border border-purple-500";
+      }
+
+      renderCurrentDashboard();
+      playBeep(mode === 'boss_enemy' ? 280 : 440, 'sawtooth', 0.12);
+    }
+
+    // Render Character Dashboard
+    function renderCurrentDashboard() {
+      const char = currentDatabase.characters.find(c => c.id === selectedCharacterId);
+      if (!char) return;
+
+      // Header Info
+      document.getElementById('charNameDisplay').textContent = char.name;
+      document.getElementById('charBoxBadge').textContent = char.box;
+
+      const headerBar = document.getElementById('cardHeaderBar');
+      const headerIcon = document.getElementById('cardHeaderIcon');
+      const modePill = document.getElementById('modePill');
+
+      const attackBox = document.getElementById('attackBox');
+      const bossBox = document.getElementById('bossBox');
+      const heroSkillsContainer = document.getElementById('heroSkillsContainer');
+      const bossSkillsContainer = document.getElementById('bossSkillsContainer');
+
+      if (activeProfileMode === 'super_hero') {
+        headerBar.className = "bg-gradient-to-r from-sky-600 to-blue-700 border-b-4 border-black px-5 py-3 flex flex-wrap items-center justify-between gap-2 transition-colors duration-300";
+        headerIcon.innerHTML = `<i class="fa-solid fa-shield-halved"></i>`;
+        modePill.className = "bg-black/60 text-sky-300 border border-sky-400 font-comic uppercase tracking-wider text-xs px-3 py-1 rounded-full";
+        modePill.textContent = "Super-Herói Vivo";
+
+        attackBox.classList.remove('hidden');
+        bossBox.classList.add('hidden');
+        heroSkillsContainer.classList.remove('hidden');
+        bossSkillsContainer.classList.add('hidden');
+
+        const prof = char.profiles.super_hero;
+        document.getElementById('attackName').textContent = prof.attack.name;
+        document.getElementById('statRange').textContent = prof.attack.range;
+        document.getElementById('statDice').textContent = prof.attack.dice;
+        document.getElementById('statAcc').textContent = prof.attack.accuracy + "+";
+
+        document.getElementById('skillBlue').textContent = prof.skills.blue;
+        document.getElementById('skillYellow').innerHTML = `<i class="fa-solid fa-plus-circle text-amber-400"></i> ${prof.skills.yellow}`;
+        document.getElementById('skillOrange').textContent = prof.skills.orange;
+        document.getElementById('skillRed').textContent = prof.skills.red;
+
+      } else if (activeProfileMode === 'zombie_hero') {
+        headerBar.className = "bg-gradient-to-r from-red-700 to-rose-900 border-b-4 border-black px-5 py-3 flex flex-wrap items-center justify-between gap-2 transition-colors duration-300";
+        headerIcon.innerHTML = `<i class="fa-solid fa-skull"></i>`;
+        modePill.className = "bg-black/60 text-red-300 border border-red-500 font-comic uppercase tracking-wider text-xs px-3 py-1 rounded-full";
+        modePill.textContent = "Herói Zumbi (Faminto)";
+
+        attackBox.classList.remove('hidden');
+        bossBox.classList.add('hidden');
+        heroSkillsContainer.classList.remove('hidden');
+        bossSkillsContainer.classList.add('hidden');
+
+        const prof = char.profiles.zombie_hero;
+        document.getElementById('attackName').textContent = prof.attack.name;
+        document.getElementById('statRange').textContent = prof.attack.range;
+        document.getElementById('statDice').textContent = prof.attack.dice;
+        document.getElementById('statAcc').textContent = prof.attack.accuracy + "+";
+
+        document.getElementById('skillBlue').textContent = prof.skills.blue;
+        document.getElementById('skillYellow').innerHTML = `<i class="fa-solid fa-plus-circle text-amber-400"></i> ${prof.skills.yellow}`;
+        document.getElementById('skillOrange').textContent = prof.skills.orange;
+        document.getElementById('skillRed').textContent = prof.skills.red;
+
+      } else if (activeProfileMode === 'boss_enemy') {
+        headerBar.className = "bg-gradient-to-r from-purple-800 to-zinc-900 border-b-4 border-black px-5 py-3 flex flex-wrap items-center justify-between gap-2 transition-colors duration-300";
+        headerIcon.innerHTML = `<i class="fa-solid fa-biohazard text-amber-400"></i>`;
+        modePill.className = "bg-black/60 text-purple-300 border border-purple-500 font-comic uppercase tracking-wider text-xs px-3 py-1 rounded-full";
+        modePill.textContent = "Boss Inimigo (Spawn Card)";
+
+        attackBox.classList.add('hidden');
+        bossBox.classList.remove('hidden');
+        heroSkillsContainer.classList.add('hidden');
+        bossSkillsContainer.classList.remove('hidden');
+
+        const prof = char.profiles.boss_enemy;
+        maxBossHP = prof.health;
+        currentBossHP = prof.health;
+        updateBossHPDisplay();
+        document.getElementById('bossAbility').textContent = prof.ability;
+      }
+    }
+
+    // Boss HP Controls
+    function alterBossHP(delta) {
+      currentBossHP = Math.max(0, Math.min(maxBossHP, currentBossHP + delta));
+      updateBossHPDisplay();
+      playBeep(260, 'square', 0.08);
+    }
+
+    function resetBossHP() {
+      currentBossHP = maxBossHP;
+      updateBossHPDisplay();
+      playBeep(440, 'sine', 0.08);
+    }
+
+    function updateBossHPDisplay() {
+      document.getElementById('bossHpCounter').textContent = `${currentBossHP} / ${maxBossHP} HP`;
+      const pct = (currentBossHP / maxBossHP) * 100;
+      document.getElementById('bossHpBar').style.width = `${pct}%`;
+    }
+
+    // Combat Attack Dice Roller
+    function rollCharacterAttack() {
+      const char = currentDatabase.characters.find(c => c.id === selectedCharacterId);
+      if (!char) return;
+
+      const profile = activeProfileMode === 'zombie_hero' ? char.profiles.zombie_hero : char.profiles.super_hero;
+      const numDice = profile.attack.dice;
+      const targetAcc = profile.attack.accuracy;
+
+      const cup = document.getElementById('diceCup');
+      cup.innerHTML = '';
+      cup.classList.add('animate-shake');
+
+      playBeep(620, 'sawtooth', 0.05);
+
+      setTimeout(() => {
+        cup.classList.remove('animate-shake');
+        let hits = 0;
+        let results = [];
+
+        for (let i = 0; i < numDice; i++) {
+          const val = Math.floor(Math.random() * 6) + 1;
+          const isHit = val >= targetAcc;
+          if (isHit) hits++;
+          results.push({ val, isHit });
+        }
+
+        cup.innerHTML = '';
+        results.forEach(r => {
+          const die = document.createElement('div');
+          die.className = `w-10 h-10 rounded-lg flex items-center justify-center font-comic text-xl border-2 border-black shadow-[2px_2px_0px_#000] ${r.isHit ? 'bg-emerald-500 text-black font-black' : 'bg-zinc-800 text-zinc-400'}`;
+          die.textContent = r.val;
+          cup.appendChild(die);
+        });
+
+        const summary = document.getElementById('diceSummary');
+        summary.textContent = `${hits} ACERTO(S) COM ${profile.attack.name}!`;
+        summary.className = hits > 0 ? "text-emerald-400 font-bold font-display" : "text-red-400 font-bold font-display";
+
+        playBeep(hits > 0 ? 880 : 220, hits > 0 ? 'sine' : 'square', 0.15);
+      }, 250);
+    }
+
+    // JSON File Upload Handler
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (parsed && Array.isArray(parsed.characters)) {
+            currentDatabase = parsed;
+            selectedCharacterId = parsed.characters[0].id;
+            populateDropdown();
+            renderCurrentDashboard();
+            playBeep(920, 'sine', 0.2);
+          } else {
+            // Error handling through inline UI
+            document.getElementById('diceSummary').textContent = "JSON Inválido: precisa da chave 'characters'";
+            document.getElementById('diceSummary').className = "text-red-400 font-bold";
+          }
+        } catch (err) {
+          document.getElementById('diceSummary').textContent = "Erro ao ler arquivo JSON.";
+          document.getElementById('diceSummary').className = "text-red-400 font-bold";
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // Download Current JSON
+    function downloadCurrentJSON() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentDatabase, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "marvel_zombies_characters.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      playBeep(700, 'sine', 0.1);
+    }
+
+    // Initialize Application
+    window.addEventListener('load', () => {
+      populateDropdown();
+      setProfileMode('super_hero');
+    });
+  </script>
+</body>
+</html>

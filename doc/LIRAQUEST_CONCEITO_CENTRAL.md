@@ -290,3 +290,14 @@ O **Arcade de Lira** é o centro de diversão acessível pelo Terminal do Avatar
    - **Tecnologia & Áudio:** 100% autônomo em HTML5/CSS3/Vanilla JS e áudio procedural via Web Audio API. Possui botão de retorno integrado ao LiraQuest no menu de opções.
    - **Plano de Evolução Arquitetural & IA:** Consulte o planejamento detalhado em [TRUCO_ROADMAP_EVOLUCAO.md](file:///e:/11_Games/LiraQuest/doc/TRUCO_ROADMAP_EVOLUCAO.md) cobrindo o roadmap completo rumo ao Multiplayer Familiar via WebSockets (Etapa 5).
 
+9. **🧟‍♂️ Módulo Companheiro Investigativo de Tabuleiro: Marvel Zombies RPG (`/zombi`):**
+   - **Conceito ("Carmen Sandiego + Fort Hendrix"):** Aplicativo web companheiro alimentado pelo banco de dados MySQL para transformar os mapas oficiais de *Marvel Zombies* (`MZ1` a `MZ5`) na campanha de 5 capítulos interligados **"O Sinal do Fim do Mundo"**.
+   - **Arquitetura de 6 Tokens por Cenário:**
+     - **Token 1 (Triagem Livre):** Entrega pistas iniciais e direciona a investigação.
+     - **Token 2 (Investigação & Teste):** Teste de perícia em 1d6 (4-6 Sucesso, 2-3 Custo, 1 Falha Crítica) para extrair chaves e códigos de 3 dígitos.
+     - **Token 3 (Clímax / Gatekeeper):** Bloqueado por múltiplos pré-requisitos (`has_key` + `has_power`) e senha em Keypad digital; aciona o confronto de Boss.
+     - **Token 4 (Armadilha de Ganância - *Push Your Luck*):** Opcional de alto risco e alta recompensa.
+     - **Token 5 (Interruptor de Mapa):** Altera o estado físico da partida (transformadores, válvulas, giroscópios, torretas e pilares de plasma).
+     - **Token 6 (Extração / Conclusão):** Rota final liberada após obter o item de clímax do Token 3.
+   - **Alternância Dinâmica de Perspectiva:** Permite jogar toda a campanha tanto no **Modo Heróis Vivos 🛡️** (cegar a Terra e detonar o EMP) quanto no **Modo Heróis Zumbis 🧟** (erguer o Farol Quântico para atrair o Banquete Cósmico), salvando o progresso automaticamente no MySQL.
+

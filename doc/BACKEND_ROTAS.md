@@ -227,14 +227,17 @@ Módulo separado com interface mobile responsiva servido pelo backend Node.js:
 
 ---
 
-## 🧟‍♂️ 16. Módulo Companheiro Narrativo de Marvel Zombies (`/zombi`)
+## 🧟‍♂️ 16. Módulo Companheiro Narrativo de Marvel Zombies (`/zombi` e `/api/zombi`)
 
-Módulo separado com interface web responsiva para apoiar partidas físicas de tabuleiro estilo campanha RPG (*Fort Hendrix*):
+Módulo separado com interface web responsiva e persistência MySQL para apoiar partidas físicas de tabuleiro estilo campanha investigativa RPG (*Carmen Sandiego + Fort Hendrix*):
 
 | Método | Rota | Autenticação | Descrição |
 |:---|:---|:---|:---|
-| `GET` | `/zombi` | Pública | Entrega o aplicativo companheiro (`public/zombi/index.html`) com suporte a cards com imagens recortadas, alertas de dependência e teclado numérico virtual (Keypad) |
+| `GET` | `/zombi` | Pública | Entrega o aplicativo companheiro (`public/zombi/index.html`) com suporte a 5 capítulos, alternância Modo Herói/Zumbi, 6 tokens investigativos, testes de D6 e Keypad de senha |
 | `GET` | `/zombi/*` | Pública | Entrega de arquivos estáticos dedicados (`style.css`, `app.js`, imagens de recortes em `img/`) |
+| `GET` | `/api/zombi/campaign` | Pública | Retorna a campanha ativa (`family_zombi_campaigns`) com todas as 5 missões (`family_zombi_missions`), os 6 tokens de cada missão (`family_zombi_tokens`) e o progresso salvo |
+| `POST` | `/api/zombi/state` | Pública | Salva em tempo real no MySQL o capítulo atual, o modo ativo (`HERO` ou `ZOMBIE`), os tokens resolvidos e as pistas/flags adquiridas |
+| `POST` | `/api/zombi/reset` | Pública | Reinicia o estado salvo de um capítulo específico ou da campanha completa |
 
 
 

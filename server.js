@@ -20,6 +20,7 @@ import quizRoutes from './server/routes/quizRoutes.js';
 import dungeonRoutes from './server/routes/dungeonRoutes.js';
 import battleRoutes from './server/routes/battleRoutes.js';
 import trucoRoutes from './server/routes/trucoRoutes.js';
+import zombiRoutes from './server/routes/zombiRoutes.js';
 import { initChameleonSocket } from './server/sockets/chameleonSocket.js';
 import { initDuelSocket } from './server/sockets/duelSocket.js';
 
@@ -65,6 +66,7 @@ app.use('/api/quiz', quizRoutes);
 app.use('/api/dungeon', dungeonRoutes);
 app.use('/api/battle', battleRoutes);
 app.use('/api/truco', trucoRoutes);
+app.use('/api/zombi', zombiRoutes);
 
 
 // Health check & status
@@ -130,6 +132,12 @@ app.get(['/testeBD', '/api/testeBD'], async (req, res) => {
 app.use('/truco', express.static(path.join(__dirname, 'public', 'truco')));
 app.get(['/truco', '/truco/*'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'truco', 'index.html'));
+});
+
+// Módulo Independente: Companheiro RPG Marvel Zombies (https://liraquest.com.br/zombi)
+app.use('/zombi', express.static(path.join(__dirname, 'public', 'zombi')));
+app.get(['/zombi', '/zombi/*'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'zombi', 'index.html'));
 });
 
 // Fallback para SPA (Single Page Application)

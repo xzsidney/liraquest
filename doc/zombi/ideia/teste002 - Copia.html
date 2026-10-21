@@ -1,0 +1,942 @@
+ <!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marvel Zombies - Missão 1: O Vetor da Carne</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Rajdhani:wght@600;700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg: #090c10;
+      --card-bg: #141922;
+      --panel-bg: #1b212d;
+      --accent-red: #ef4444;
+      --accent-green: #10b981;
+      --accent-yellow: #f59e0b;
+      --accent-blue: #38bdf8;
+      --accent-purple: #a855f7;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --theme-color: #38bdf8;
+    }
+
+    body.zombie-mode {
+      --theme-color: #ef4444;
+      --panel-bg: #201315;
+      --card-bg: #1a1012;
+      --border: #5c1d24;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      padding-bottom: 90px;
+      transition: background 0.3s;
+    }
+
+    /* Faixa de Alerta */
+    .hazard-stripe {
+      height: 12px;
+      background: repeating-linear-gradient(
+        -45deg,
+        var(--accent-yellow),
+        var(--accent-yellow) 12px,
+        #000 12px,
+        #000 24px
+      );
+    }
+
+    .container {
+      max-width: 1050px;
+      margin: 0 auto;
+      padding: 14px;
+    }
+
+    /* Barra Superior com Seletor de Modo */
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 14px;
+      background: rgba(0,0,0,0.4);
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .mode-switch-btn {
+      background: #1e293b;
+      border: 2px solid var(--theme-color);
+      color: #fff;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Cabeçalho da Missão */
+    .mission-header {
+      background: var(--panel-bg);
+      border-left: 6px solid var(--theme-color);
+      border-radius: 10px;
+      padding: 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+      transition: all 0.3s;
+    }
+
+    .mission-tag {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 0.8rem;
+      letter-spacing: 1.5px;
+      color: var(--accent-yellow);
+      text-transform: uppercase;
+    }
+
+    .mission-title {
+      font-family: 'Bangers', cursive;
+      font-size: 2.2rem;
+      letter-spacing: 1px;
+      color: #fff;
+      margin: 4px 0 8px 0;
+    }
+
+    .mission-lore {
+      font-size: 0.88rem;
+      color: #cbd5e1;
+      line-height: 1.45;
+      font-style: italic;
+      border-left: 3px solid rgba(255,255,255,0.2);
+      padding-left: 10px;
+    }
+
+    /* Painel de Inventário e Investigação */
+    .status-panel {
+      background: #11151e;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .inventory-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .inv-label {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--accent-yellow);
+      text-transform: uppercase;
+    }
+
+    .inv-badge {
+      background: #1f2937;
+      border: 1px solid #374151;
+      color: #6b7280;
+      font-size: 0.78rem;
+      padding: 4px 10px;
+      border-radius: 16px;
+      transition: all 0.2s;
+    }
+
+    .inv-badge.acquired {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: var(--accent-green);
+      color: #34d399;
+      font-weight: 600;
+    }
+
+    /* Grelha de Tokens */
+    .tokens-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 16px;
+    }
+
+    /* Card de Investigação */
+    .token-card {
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      transition: transform 0.15s, border-color 0.2s;
+    }
+
+    .token-card.locked {
+      opacity: 0.75;
+      border-color: #3f1d24;
+      background: #171114;
+    }
+
+    .token-card.cleared {
+      border-color: var(--accent-green);
+      background: #0d1a15;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 14px;
+      background: rgba(0,0,0,0.35);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .token-pill {
+      font-family: 'Bangers', cursive;
+      font-size: 1.5rem;
+      background: #000;
+      border: 2px solid var(--accent-yellow);
+      color: var(--accent-yellow);
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .token-state-badge {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    .badge-open { background: #1e3a8a; color: #93c5fd; }
+    .badge-locked { background: #7f1d1d; color: #fca5a5; }
+    .badge-done { background: #064e3b; color: #6ee7b7; }
+
+    .card-content {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      justify-content: space-between;
+    }
+
+    .room-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .room-desc {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+      margin-bottom: 12px;
+    }
+
+    .req-banner {
+      background: rgba(0,0,0,0.5);
+      border-left: 3px solid var(--accent-yellow);
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      color: #fde68a;
+      margin-bottom: 12px;
+      line-height: 1.35;
+    }
+
+    .card-btn {
+      width: 100%;
+      background: var(--theme-color);
+      color: #000;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      text-transform: uppercase;
+      border: none;
+      padding: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: filter 0.1s;
+    }
+
+    .card-btn:hover { filter: brightness(1.15); }
+
+    .card-btn:disabled {
+      background: #272f3d;
+      color: #64748b;
+      cursor: not-allowed;
+    }
+
+    /* Modal de Decisão e Desafio */
+    .modal-backdrop {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(5px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 999;
+    }
+
+    .modal-backdrop.visible { display: flex; }
+
+    .modal-card {
+      background: #171c26;
+      border: 2px solid var(--accent-yellow);
+      border-radius: 12px;
+      max-width: 550px;
+      width: 100%;
+      padding: 22px;
+      box-shadow: 0 10px 35px rgba(0,0,0,0.9);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+
+    .modal-title {
+      font-family: 'Bangers', cursive;
+      font-size: 1.7rem;
+      color: var(--accent-yellow);
+      letter-spacing: 0.5px;
+    }
+
+    .modal-lore {
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      line-height: 1.5;
+      background: rgba(0,0,0,0.35);
+      padding: 12px;
+      border-left: 3px solid var(--theme-color);
+      border-radius: 4px;
+      margin-bottom: 16px;
+      font-style: italic;
+    }
+
+    .choice-box {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .choice-option {
+      background: #1e2634;
+      border: 1px solid #334155;
+      padding: 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      text-align: left;
+      color: #e2e8f0;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .choice-option:hover {
+      background: #253043;
+      border-color: var(--theme-color);
+    }
+
+    .choice-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--accent-yellow);
+      margin-bottom: 3px;
+    }
+
+    .choice-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Bloco de Desfecho/Resultado */
+    .resolution-box {
+      display: none;
+      background: rgba(0,0,0,0.4);
+      border-radius: 6px;
+      padding: 14px;
+      margin-top: 14px;
+      border: 1px dashed var(--accent-green);
+    }
+
+    .outcome-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      color: #34d399;
+      font-size: 1.1rem;
+      margin-bottom: 6px;
+    }
+
+    .outcome-text {
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      line-height: 1.45;
+      margin-bottom: 12px;
+    }
+
+    .dice-action-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(0,0,0,0.5);
+      padding: 10px;
+      border-radius: 6px;
+      margin: 10px 0;
+    }
+
+    .btn-dice {
+      background: var(--accent-red);
+      color: #fff;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .dice-output {
+      font-family: 'Bangers', cursive;
+      font-size: 1.7rem;
+      color: var(--accent-yellow);
+      min-width: 35px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hazard-stripe"></div>
+
+  <div class="container">
+
+    <!-- Barra de Modo e Utilidades -->
+    <div class="top-nav">
+      <button class="mode-switch-btn" onclick="toggleHeroMode()">
+        <span id="modeIcon">🛡️</span>
+        <span id="modeName">Modo: Heróis Vivos</span>
+      </button>
+
+      <button onclick="resetCampaign()" style="background:transparent; border:1px solid #475569; color:#94a3b8; padding:5px 10px; border-radius:4px; font-size:0.75rem; cursor:pointer;">
+        ↺ Reiniciar Investigação
+      </button>
+    </div>
+
+    <!-- Cabeçalho -->
+    <header class="mission-header">
+      <div class="mission-tag">Ato 1 • Campanha: O Sinal do Fim do Mundo</div>
+      <h1 class="mission-title">MISSÃO 1: O VETOR DA CARNE</h1>
+      <p class="mission-lore" id="loreMission">
+        "O Cérebro da Mansão Xavier captou uma transmissão alienígena de baixa frequência. Os infectados modificaram a antena principal para guiar a Entidade Devoradora até à Terra. Precisamos de nos infiltrar nas salas, reunir as credenciais, rearmar a energia e recolher o Transponder Cósmico antes que o céu quebre."
+      </p>
+    </header>
+
+    <!-- Barra de Pistas & Inventário -->
+    <div class="status-panel">
+      <div class="inventory-group">
+        <span class="inv-label">Pistas & Itens:</span>
+        <span class="inv-badge" id="inv-log">📑 Pistas do Hall</span>
+        <span class="inv-badge" id="inv-key">🔑 Chave Criptográfica Alfa</span>
+        <span class="inv-badge" id="inv-power">⚡ Disjuntor Geral Ligado</span>
+        <span class="inv-badge" id="inv-transponder">🌌 Transponder Cósmico</span>
+      </div>
+    </div>
+
+    <!-- Grelha de Tokens 1 a 6 -->
+    <div class="tokens-grid">
+
+      <!-- TOKEN 1 -->
+      <div class="token-card" id="card-t1">
+        <div class="card-top">
+          <div class="token-pill">1</div>
+          <span class="token-state-badge badge-open" id="badge-t1">Disponível</span>
+        </div>
+        <div class="card-content">
+          <div>
+            <h3 class="room-title">Quadro de Comando do Hall</h3>
+            <p class="room-desc">Painel de segurança do saguão arrancado a frio. Fios soltos faíscam sobre manchas de óleo e sangue.</p>
+          </div>
+          <button class="card-btn" id="btn-t1" onclick="openTokenModal(1)">
+            🔍 Investigar Token 1
+          </button>
+        </div>
+      </div>
+
+      <!-- TOKEN 2 -->
+      <div class="token-card" id="card-t2">
+        <div class="card-top">
+          <div class="token-pill">2</div>
+          <span class="token-state-badge badge-open" id="badge-t2">Disponível</span>
+        </div>
+        <div class="card-content">
+          <div>
+            <h3 class="room-title">A Biblioteca & Arquivos</h3>
+            <p class="room-desc">Estantes viradas e uma consola de consulta do Cérebro rachada. Um odor nauseabundo vem detrás dos livros caídos.</p>
+          </div>
+          <button class="card-btn" id="btn-t2" onclick="openTokenModal(2)">
+            🔍 Inspecionar Token 2
+          </button>
+        </div>
+      </div>
+
+      <!-- TOKEN 3 -->
+      <div class="token-card locked" id="card-t3">
+        <div class="card-top">
+          <div class="token-pill">3</div>
+          <span class="token-state-badge badge-locked" id="badge-t3">Bloqueado</span>
+        </div>
+        <div class="card-content">
+          <div>
+            <h3 class="room-title">Ala Médica / Quarentena</h3>
+            <p class="room-desc">Câmara blindada com visor fumado. Guarda a consola que descarrega o Transponder Cósmico.</p>
+            <div class="req-banner" id="req-t3">
+              🔒 <strong>Requisitos:</strong> Chave Alfa (Token 2) + Energia da Mansão (Token 5).
+            </div>
+          </div>
+          <button class="card-btn" id="btn-t3" onclick="openTokenModal(3)" disabled>
+            🔒 Acesso Trancado
+          </button>
+        </div>
+      </div>
+
+      <!-- TOKEN 4 -->
+      <div class="token-card" id="card-t4">
+        <div class="card-top">
+          <div class="token-pill">4</div>
+          <span class="token-state-badge badge-open" id="badge-t4">Disponível</span>
+        </div>
+        <div class="card-content">
+          <div>
+            <h3 class="room-title">Cozinha / Despensa Lacrada</h3>
+            <p class="room-desc">Um frigorífico industrial amarrado com correntes. Há uma fita amarela a dizer: "NÃO ABRIR - CONTAMINADO".</p>
+            <div class="req-banner" style="border-color:#38bdf8; color:#bae6fd;">
+              🎲 <strong>Risco Alto:</strong> Pode conter rações intactas de cura ou uma armadilha biológica!
+            </div>
+          </div>
+          <button class="card-btn" id="btn-t4" onclick="openTokenModal(4)">
+            ⚠️ Avaliar Token 4
+          </button>
+        </div>
+      </div>
+
+      <!-- TOKEN 5 -->
+      <div class="token-card" id="card-t5">
+        <div class="card-top">
+          <div class="token-pill">5</div>
+          <span class="token-state-badge badge-open" id="badge-t5">Disponível</span>
+        </div>
+        <div class="card-content">
+          <div>
+            <h3 class="room-title">Oficina dos Geradores</h3>
+            <p class="room-desc">Motores pesados a trabalhar em marcha lenta. A alavanca geral desarmou durante a invasão.</p>
+          </div>
+          <button class="card-btn" id="btn-t5" onclick="openTokenModal(5)">
+            ⚙️ Controlar Token 5
+          </button>
+        </div>
+      </div>
+
+      <!-- TOKEN 6 -->
+      <div class="token-card locked" id="card-t6">
+        <div class="card-top">
+          <div class="token-pill">6</div>
+          <span class="token-state-badge badge-locked" id="badge-t6">Bloqueado</span>
+        </div>
+        <div class="card-content">
+          <div>
+            <h3 class="room-title">Garagem / Ponto de Fuga</h3>
+            <p class="room-desc">O portão basculante dos veículos da Mansão. A fuga só faz sentido com o Transponder em mãos.</p>
+            <div class="req-banner" id="req-t6">
+              🔒 <strong>Requisito Final:</strong> Possuir o <strong>Transponder Cósmico (Token 3)</strong>.
+            </div>
+          </div>
+          <button class="card-btn" id="btn-t6" onclick="openTokenModal(6)" disabled>
+            🔒 Fuga Indisponível
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Modal Interativo de Decisão e Carmen Sandiego -->
+  <div class="modal-backdrop" id="modalInvestigate">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 class="modal-title" id="mTitle">TOKEN 1: ENTRADA</h2>
+      </div>
+
+      <p class="modal-lore" id="mLore">Descrição do ambiente...</p>
+
+      <!-- Lista de Escolhas (O jogador decide agir ou recuar) -->
+      <div class="choice-box" id="mChoices"></div>
+
+      <!-- Painel de Desfecho após a escolha -->
+      <div class="resolution-box" id="mResolution">
+        <div class="outcome-title" id="mOutcomeTitle">Resultado da Ação</div>
+        <div class="outcome-text" id="mOutcomeDesc">Descrição do que aconteceu...</div>
+        
+        <div id="mDiceBox" style="display:none;" class="dice-action-area">
+          <button class="btn-dice" onclick="rollChallengeDice()">🎲 Rolar D6 de Perícia</button>
+          <span class="dice-output" id="mDiceResult">-</span>
+          <span style="font-size:0.8rem; color:#94a3b8;" id="mDiceCritique"></span>
+        </div>
+
+        <button class="card-btn" style="margin-top:10px;" onclick="closeModal()">
+          ✓ Confirmar e Fechar
+        </button>
+      </div>
+
+      <button id="mCancelBtn" onclick="closeModal()" style="margin-top:14px; background:transparent; border:none; color:#94a3b8; font-size:0.85rem; cursor:pointer; width:100%; text-align:center;">
+        ← Recuar (Não gastar ação nem mexer em nada)
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Estado Global da Campanha
+    let isZombieMode = false;
+    let gameState = {
+      t1_done: false,
+      t2_done: false,
+      t3_done: false,
+      t4_done: false,
+      t5_done: false,
+      t6_done: false,
+      has_log: false,
+      has_key: false,
+      has_power: false,
+      has_transponder: false
+    };
+
+    let activeToken = null;
+    let diceCallback = null;
+
+    function toggleHeroMode() {
+      isZombieMode = !isZombieMode;
+      document.body.classList.toggle('zombie-mode', isZombieMode);
+
+      const modeIcon = document.getElementById('modeIcon');
+      const modeName = document.getElementById('modeName');
+      const lore = document.getElementById('loreMission');
+
+      if (isZombieMode) {
+        modeIcon.innerText = "🧟";
+        modeName.innerText = "Modo: Heróis Zumbis";
+        lore.innerText = `"A fome cósmica queima por dentro. Precisamos de sintonizar a antena da Mansão com o vetor de Galactus para garantir o Banquete Cósmico. Os guardas e sobreviventes barricaram as portas. Vamos arrombar os acessos, arrancar as credenciais dos cientistas e ligar o gerador!"`;
+      } else {
+        modeIcon.innerText = "🛡️";
+        modeName.innerText = "Modo: Heróis Vivos";
+        lore.innerText = `"O Cérebro da Mansão Xavier captou uma transmissão alienígena de baixa frequência. Os infectados modificaram a antena principal para guiar a Entidade Devoradora até à Terra. Precisamos de nos infiltrar nas salas, reunir as credenciais, rearmar a energia e recolher o Transponder Cósmico antes que o céu quebre."`;
+      }
+      updateUI();
+    }
+
+    function openTokenModal(num) {
+      activeToken = num;
+      const modal = document.getElementById('modalInvestigate');
+      const mTitle = document.getElementById('mTitle');
+      const mLore = document.getElementById('mLore');
+      const mChoices = document.getElementById('mChoices');
+      const mResolution = document.getElementById('mResolution');
+      const mCancelBtn = document.getElementById('mCancelBtn');
+      const mDiceBox = document.getElementById('mDiceBox');
+
+      mResolution.style.display = 'none';
+      mDiceBox.style.display = 'none';
+      mChoices.style.display = 'flex';
+      mCancelBtn.style.display = 'block';
+      mChoices.innerHTML = '';
+
+      if (num === 1) {
+        mTitle.innerText = "TOKEN 1: Saguão de Entrada";
+        mLore.innerText = isZombieMode
+          ? "Os consoles de segurança estão chamuscados. Há restos de registros de fuga deixados pelos humanos."
+          : "O terminal de segurança pisca com códigos estáticos. Há relatórios de evacuação manchados no chão.";
+
+        addChoice("Gastar 1 Ação para examinar os registos do sistema", "Descubra pistas sobre quem passou por aqui e para onde foi.", () => {
+          gameState.t1_done = true;
+          gameState.has_log = true;
+          showOutcome(
+            "Pista Estilo Carmen Sandiego Obtida!",
+            isZombieMode
+              ? "O log revela que um cientista fugiu com a chave de criptografia para a Biblioteca (Token 2). Além disso, os sensores acusam pulso de energia na Oficina (Token 5) e cheiro de carne na Cozinha (Token 4)!"
+              : "O diário do Hank McCoy diz: 'Escondi a Chave Criptográfica Alfa na consola da Biblioteca (Token 2). Mas lembrem-se: a Ala Médica (Token 3) está sem luz até religarem a Oficina (Token 5)!'"
+          );
+        });
+      }
+
+      else if (num === 2) {
+        mTitle.innerText = "TOKEN 2: A Biblioteca da Mansão";
+        mLore.innerText = "Pilhas de enciclopédias e móveis partidos espalhados pela sala. No fundo, a consola de dados emite um zumbido.";
+
+        addChoice("Tentar extrair a Chave Criptográfica da Consola", "Requer teste de perícia no D6 para não acionar o alarme.", () => {
+          setupDiceChallenge((roll) => {
+            if (roll >= 3) {
+              gameState.t2_done = true;
+              gameState.has_key = true;
+              return {
+                title: "Sucesso no Terminal!",
+                desc: "Descarregou o código com mestria. A 'Chave Criptográfica Alfa' foi adicionada ao inventário! A consola indica que o Token 3 aceitará o código assim que a energia do Token 5 for restabelecida."
+              };
+            } else {
+              gameState.t2_done = true;
+              gameState.has_key = true;
+              return {
+                title: "Alarme Disparado! (Falha Parcial)",
+                desc: "Conseguiu a Chave Alfa, mas o leitor entrou em curto e disparou uma buzina ensurdecedora: gere 1 Carta de Spawn imediata nesta sala!"
+              };
+            }
+          });
+        });
+
+        addChoice("Vasculhar a Estante Tombada (Ganância por XP / Itens)", "Revistar os escombros à procura de recursos adicionais.", () => {
+          showOutcome(
+            "⚠️ EMBOSCADA NOS ESCOMBROS!",
+            "Ao puxar as tábuas, um infetado encurralado agarra o seu braço! O herói sofre 1 de Dano automático. Encontra apenas 1 Carta de Traço/Equipamento descartável."
+          );
+        });
+      }
+
+      else if (num === 3) {
+        mTitle.innerText = "TOKEN 3: Ala Médica Quarentenada";
+        mLore.innerText = isZombieMode
+          ? "A câmara blindada guarda o Transponder sintonizado. É o que precisamos para chamar a entidade cósmica!"
+          : "O laboratório lacrado onde o Transponder que está a transmitir o sinal cósmico foi deixado em contenção.";
+
+        addChoice("Inserir Chave Alfa e descarregar o Transponder", "Gasta 1 Ação de interação para obter o item da missão.", () => {
+          gameState.t3_done = true;
+          gameState.has_transponder = true;
+          showOutcome(
+            isZombieMode ? "🚨 ALERTA: REFORÇOS DA S.H.I.E.L.D.!" : "🚨 ALERTA BOSS: APARECIMENTO DO HERÓI ZUMBI!",
+            isZombieMode
+              ? "Recuperou o Transponder! Mas as portas de entrada arrebentam: uma patrulha de elite de Soldados e um Sentinela avançam no mapa para impedir a sua fuga até à Garagem (Token 6)!"
+              : "Recolheu o Transponder Cósmico! Mas o barulho da câmara atrai o Wolverine Zumbi (ou o Herói Zumbi mais forte da mesa)! Coloque a miniatura do Boss na porta da sala!"
+          );
+        });
+      }
+
+      else if (num === 4) {
+        mTitle.innerText = "TOKEN 4: Frigorífico da Cozinha";
+        mLore.innerText = "O frigorífico trancado com correntes grossas exala um vapor denso. Há algo valioso ou um horror absoluto lá dentro.";
+
+        addChoice("Arrombar a Corrente (Risco Máximo)", "Role 1d6: 4+ dá rações e cura completa. 1-3 liberta contaminação e monstros!", () => {
+          setupDiceChallenge((roll) => {
+            gameState.t4_done = true;
+            if (roll >= 4) {
+              return {
+                title: "Sorte Incrível! (Suprimentos Intactos)",
+                desc: "As rações do laboratório estavam intactas. Todos os heróis na sala recuperam 2 de Vida e ganham +5 XP!"
+              };
+            } else {
+              return {
+                title: "☣️ DESASTRE BIOLÓGICO!",
+                desc: "Uma nuvem de esporos negros e zumbis rastejantes saltam de dentro! Todos na sala sofrem 1 de Dano e deve comprar 1 carta de Spawn imediata!"
+              };
+            }
+          });
+        });
+      }
+
+      else if (num === 5) {
+        mTitle.innerText = "TOKEN 5: Oficina dos Geradores";
+        mLore.innerText = "A alavanca mestre está emperrada por estilhaços metálicos e cabos rompidos.";
+
+        addChoice("Puxar a Alavanca Geral e Rearmar a Força", "Restaura a eletricidade na Mansão inteira.", () => {
+          gameState.t5_done = true;
+          gameState.has_power = true;
+          showOutcome(
+            "⚡ Energia da Mansão Restaurada!",
+            "Os motores começam a rugir e as luzes de emergência acendem-se. Pista Carmen Sandiego: os trincos elétricos do Laboratório (Token 3) responderam e a porta da Garagem (Token 6) já tem energia nos painéis!"
+          );
+        });
+      }
+
+      else if (num === 6) {
+        mTitle.innerText = "TOKEN 6: Fuga pela Garagem";
+        mLore.innerText = "O veículo de fuga blindado está no elevador mecânico. Os motores estão quentes.";
+
+        addChoice("Acionar o Portão e Escapar da Mansão!", "Condição: Nenhum inimigo pode estar presente na Zona de Saída.", () => {
+          gameState.t6_done = true;
+          showOutcome(
+            "🏆 VITÓRIA DO CAPÍTULO 1!",
+            isZombieMode
+              ? "Com o Transponder a bordo, partem para as ruas de Manhattan. O sinal cósmico está garantido: a Entidade aproxima-se do planeta. Parabéns, avance para a Missão 2!"
+              : "Conseguiram escapar com o Transponder em mãos antes da horda fechar o perímetro! A Mansão caiu, mas agora têm o sinal decodificado para caçar a fonte nas ruas de Manhattan. Parabéns!"
+          );
+        });
+      }
+
+      modal.classList.add('visible');
+    }
+
+    function addChoice(title, subtitle, onClick) {
+      const box = document.getElementById('mChoices');
+      const btn = document.createElement('div');
+      btn.className = 'choice-option';
+      btn.innerHTML = `<div class="choice-title">${title}</div><div class="choice-subtitle">${subtitle}</div>`;
+      btn.onclick = onClick;
+      box.appendChild(btn);
+    }
+
+    function setupDiceChallenge(callback) {
+      document.getElementById('mChoices').style.display = 'none';
+      document.getElementById('mCancelBtn').style.display = 'none';
+      document.getElementById('mResolution').style.display = 'block';
+      document.getElementById('mDiceBox').style.display = 'flex';
+      document.getElementById('mDiceResult').innerText = '-';
+      document.getElementById('mDiceCritique').innerText = 'Prima o botão para rolar o teste.';
+      document.getElementById('mOutcomeTitle').innerText = 'Teste de Perícia Exigido';
+      document.getElementById('mOutcomeDesc').innerText = 'Role 1d6 para determinar a consequência imediata do seu ato.';
+      diceCallback = callback;
+    }
+
+    function rollChallengeDice() {
+      const resElem = document.getElementById('mDiceResult');
+      let count = 0;
+      const timer = setInterval(() => {
+        const val = Math.floor(Math.random() * 6) + 1;
+        resElem.innerText = val;
+        count++;
+        if (count > 7) {
+          clearInterval(timer);
+          if (diceCallback) {
+            const outcome = diceCallback(val);
+            document.getElementById('mOutcomeTitle').innerText = outcome.title;
+            document.getElementById('mOutcomeDesc').innerText = outcome.desc;
+            document.getElementById('mDiceCritique').innerText = `Resultado final: ${val}`;
+            updateUI();
+          }
+        }
+      }, 50);
+    }
+
+    function showOutcome(title, text) {
+      document.getElementById('mChoices').style.display = 'none';
+      document.getElementById('mCancelBtn').style.display = 'none';
+      document.getElementById('mResolution').style.display = 'block';
+      document.getElementById('mOutcomeTitle').innerText = title;
+      document.getElementById('mOutcomeDesc').innerText = text;
+      updateUI();
+    }
+
+    function closeModal() {
+      document.getElementById('modalInvestigate').classList.remove('visible');
+    }
+
+    function updateUI() {
+      // Badges
+      document.getElementById('inv-log').classList.toggle('acquired', gameState.has_log);
+      document.getElementById('inv-key').classList.toggle('acquired', gameState.has_key);
+      document.getElementById('inv-power').classList.toggle('acquired', gameState.has_power);
+      document.getElementById('inv-transponder').classList.toggle('acquired', gameState.has_transponder);
+
+      // Token 1
+      if (gameState.t1_done) setCardCompleted(1);
+
+      // Token 2
+      if (gameState.t2_done) setCardCompleted(2);
+
+      // Token 3 (Requer Chave Alfa + Energia)
+      if (!gameState.t3_done) {
+        if (gameState.has_key && gameState.has_power) {
+          unlockCard(3, "Descarregar Transponder");
+        }
+      } else {
+        setCardCompleted(3);
+      }
+
+      // Token 4 & 5
+      if (gameState.t4_done) setCardCompleted(4);
+      if (gameState.t5_done) setCardCompleted(5);
+
+      // Token 6 (Requer Transponder)
+      if (!gameState.t6_done) {
+        if (gameState.has_transponder) {
+          unlockCard(6, "Escapar da Mansão!");
+        }
+      } else {
+        setCardCompleted(6);
+      }
+    }
+
+    function unlockCard(num, actionText) {
+      const card = document.getElementById(`card-t${num}`);
+      const btn = document.getElementById(`btn-t${num}`);
+      const badge = document.getElementById(`badge-t${num}`);
+      const req = document.getElementById(`req-t${num}`);
+
+      card.classList.remove('locked');
+      badge.className = "token-state-badge badge-open";
+      badge.innerText = "Liberado";
+      btn.disabled = false;
+      btn.innerHTML = `🔓 ${actionText}`;
+      if (req) req.style.display = "none";
+    }
+
+    function setCardCompleted(num) {
+      const card = document.getElementById(`card-t${num}`);
+      const btn = document.getElementById(`btn-t${num}`);
+      const badge = document.getElementById(`badge-t${num}`);
+
+      card.className = "token-card cleared";
+      badge.className = "token-state-badge badge-done";
+      badge.innerText = "Concluído";
+      btn.disabled = true;
+      btn.innerText = "✓ Investigado";
+    }
+
+    function resetCampaign() {
+      gameState = {
+        t1_done: false, t2_done: false, t3_done: false,
+        t4_done: false, t5_done: false, t6_done: false,
+        has_log: false, has_key: false, has_power: false, has_transponder: false
+      };
+      location.reload();
+    }
+
+    // Inicialização
+    updateUI();
+  </script>
+</body>
+</html>
