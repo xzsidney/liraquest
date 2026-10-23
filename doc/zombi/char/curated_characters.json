@@ -1,0 +1,98 @@
+{
+  "spider_man": {
+    "id": "spider_man",
+    "name": "Spider-Man",
+    "box": "Caixa Base: Marvel Zombies",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Acrobacias",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "Estilingue de Teia: Uma vez durante o seu turno, você pode gastar 1 Poder para se mover até 2 zonas, ignorando inimigos.",
+          "yellow": "+1 Ação",
+          "orange": "Lançadores de Teia: Uma vez durante cada Fase Inimiga, quando os Inimigos em uma Zona de sua escolha dentro do Alcance 2 se moveriam, você pode gastar 1 Poder para impedi-los de se mover.",
+          "red": "Sentido Aranha: Sempre que inimigos surgirem dentro do Alcance 2, antes de qualquer Investida, você pode realizar 1 Ação de Ataque ou Movimento gratuita."
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Aparece na zona mais próxima de um Herói Zumbi."
+      }
+    }
+  },
+  "spider_man_heroes_resistance": {
+    "id": "spider_man_heroes_resistance",
+    "name": "Spider-Man (Heroes' Resistance)",
+    "box": "Caixa: Marvel Zombies: Heroes' Resistance",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Acrobacias",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "Resgate Heroico: Uma vez durante o seu turno, você pode gastar 1 Poder para mover 1 Transeunte ou 1 Super-Herói de 1 Zona adjacente para a sua Zona.",
+          "yellow": "+1 Ação",
+          "orange": "Lançadores de Teia: Uma vez durante cada Fase Inimiga, quando os inimigos em uma Zona de sua escolha dentro do Alcance 2 se moveriam, você pode gastar 1 Poder para impedi-los de se mover.",
+          "red": "Sentido Aranha: Sempre que inimigos surgirem dentro do Alcance 2, antes de qualquer Investida, você pode realizar 1 Ação de Ataque ou Movimento gratuita."
+        }
+      }
+    }
+  },
+  "spider_man_special_artist": {
+    "id": "spider_man_special_artist",
+    "name": "Spider-Man (Special Artist Edition)",
+    "box": "Expansão: Artist's Special Edition Set",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Acrobacias",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "Lançadores de Teia: Uma vez durante cada Fase Inimiga, quando os inimigos em uma Zona de sua escolha dentro do Alcance 2 se moveriam, você pode gastar 2 Poderes para impedi-los de se mover.",
+          "yellow": "+1 Ação",
+          "orange": "Sentido Aranha: Sempre que inimigos surgirem dentro do Alcance 2, antes de qualquer Investida, você pode gastar 1 Poder para realizar 1 Ação de Ataque ou Movimento gratuita.",
+          "red": "Jogador de Equipe: Uma vez durante o seu turno, você pode fazer com que 1 outro Super-Herói dentro do Alcance 2 realize 1 Ação gratuita. Em seguida, retome o seu turno."
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Cada vez que um Herói Zumbi entrar em uma Zona com um Transeunte, role um dado. Com um resultado de 5 ou mais, faça surgir 1 Super-Herói nessa Zona."
+      }
+    }
+  },
+  "homem_aranha": {
+    "id": "homem_aranha",
+    "name": "Homem-Aranha",
+    "box": "Caixa Base: Marvel Zombies",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Acrobacias",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "Estilingue de Teia : Uma vez durante o seu turno, você pode gastar 1 Poder para se mover até 2 zonas, ignorando inimigos.",
+          "yellow": "+1 ação",
+          "orange": "Lançadores de Teia : Uma vez durante cada Fase Inimiga, quando os Inimigos em uma Zona de sua escolha dentro do Alcance 2 se moveriam, você pode gastar 1 Poder para impedi-los de se mover.",
+          "red": "Sentido Aranha : Sempre que inimigos surgirem dentro do Alcance 2, antes de qualquer Investida, você pode realizar 1 Ação de Ataque ou Movimento gratuita."
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Cada vez que um Herói Zumbi entrar em uma Zona com um Espectador, role um dado. Com um resultado de 5 ou mais, faça surgir 1 Super-Herói nessa Zona."
+      }
+    }
+  }
+}

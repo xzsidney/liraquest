@@ -334,6 +334,483 @@ const BOT_QUOTES = {
   ]
 };
 
+// =============================================================================
+// AGENTE ESPECIALISTA DO TRUCO PAULISTA (TRUCO EXPERT AGENT)
+// Baseado na Cartilha do Mestre (40 Anos de Experiência de Boteco)
+// =============================================================================
+class TrucoExpertAgent {
+  constructor(game) {
+    this.game = game;
+  }
+
+  // Identifica a melhor carta a ser jogada pelo bot
+  chooseCard(ctx) {
+    const { botId, role, roundNumber, availableCards, previousPlays, tricksHistory, handSignals, scoreDiff } = ctx;
+    const sorted = [...availableCards].sort((a, b) => a.power - b.power);
+    const manilhas = sorted.filter(c => c.isManilha);
+    const commons = sorted.filter(c => !c.isManilha);
+    const hasZap = manilhas.some(c => c.manilhaRank === 4);
+    const hasCopeta = manilhas.some(c => c.manilhaRank === 3);
+    const hasEspadilha = manilhas.some(c => c.manilhaRank === 2);
+    const hasPicafumo = manilhas.some(c => c.manilhaRank === 1);
+
+    const isMao = (role === 'Mão');
+    const isMeio = (role === 'Meio');
+    const isParaPe = (role === 'Para-Pé');
+    const isPe = (role === 'Pé');
+
+    // Cartas maiores jogadas até agora na vaza
+    let maxPower = -1;
+    let topPlaysList = [];
+    previousPlays.forEach(p => {
+      const pwr = p.card.covered ? 0 : p.card.power;
+      if (pwr > maxPower) {
+        maxPower = pwr;
+        topPlaysList = [p];
+      } else if (pwr === maxPower && pwr > 0) {
+        topPlaysList.push(p);
+      }
+    });
+    const highestPower = maxPower;
+    const isPartnerLeadingAlone = (topPlaysList.length === 1 && this.game.getPlayer(topPlaysList[0].playerId).team === ctx.botTeam);
+    const isEnemyLeadingOrTied = topPlaysList.some(p => this.game.getPlayer(p.playerId).team !== ctx.botTeam);
+
+    const winningCards = sorted.filter(c => c.power > highestPower);
+    const tieCards = sorted.filter(c => c.power === highestPower);
+
+    // Identificação de Casais na mão
+    const isCasalMaior = (hasZap && hasCopeta);
+    const isCasalPreto = (hasZap && hasEspadilha);
+    const isCasalSemZap = (!hasZap && manilhas.length >= 2); // Copas/Espadas, Vermelho, Espadas/Ouros
+
+    // Sinal emitido pelo parceiro
+    const partnerSignal = handSignals ? handSignals[ctx.partnerId] : null;
+
+    // =========================================================================
+    // RODADA 1: A BATALHA DA PRIMEIRA
+    // =========================================================================
+    if (roundNumber === 1) {
+      // -----------------------------------------------------------------------
+      // 1. O MÃO (1º a jogar da rodada)
+      // -----------------------------------------------------------------------
+      if (isMao) {
+        // A) CASAL MAIOR (Zap + Copeta): NUNCA fazer a primeira! Deixa passar para virar Pé na 2ª
+        if (isCasalMaior) {
+          return commons.length > 0 ? commons[0] : manilhas[0];
+        }
+
+        // B) CASAL SEM ZAP (Copas/Espadas, Vermelho, Espadas/Ouros):
+        // REGRA DE OURO DO MESTRE: Jogar a MAIOR MANILHA de cara! Não dar sopa para Zap e Rei!
+        if (isCasalSemZap) {
+          return manilhas[manilhas.length - 1]; // Desce a Copeta ou Espadilha logo de cara
+        }
+
+        // C) CASAL PRETO (Zap + Espadilha): Não descasalar à toa
+        if (isCasalPreto) {
+          if (commons.length > 0) return commons[0];
+          return hasEspadilha ? manilhas.find(c => c.manilhaRank === 2) : manilhas[0];
+        }
+
+        // D) Par Dobrado (Dois 3, Dois 2 ou Dois Ás):
+        const pairs = this.findHighPairs(commons);
+        if (pairs.length > 0) {
+          // Só joga um se o parceiro tiver dado algum sinal. Se o parceiro ficou em silêncio, guarda!
+          if (partnerSignal) {
+            return pairs[0]; // Joga uma das cartas do par como descarte tático
+          }
+        }
+
+        // E) Se o parceiro passou sinal de mão podre (🥱): assume a bronca e sai com a melhor carta (exceto Zap seco)
+        if (partnerSignal === 'lixo') {
+          if (manilhas.length > 0 && !hasZap) return manilhas[manilhas.length - 1];
+          const strongCom = commons.filter(c => c.power >= 9); // 3 ou 2
+          if (strongCom.length > 0) return strongCom[strongCom.length - 1];
+          if (hasZap && commons.length > 0) return commons[commons.length - 1]; // Não queima Zap seco
+        }
+
+        // F) Se tem apenas ZAP + lixo: NUNCA sai de Zap de cara! Sai com lixo ou 3
+        if (hasZap && manilhas.length === 1) {
+          const threeCard = commons.find(c => c.power === 10);
+          if (threeCard) return threeCard; // Chama sangue com o 3
+          return commons[0]; // Sai com o menor lixo e guarda o Zap no bolso
+        }
+
+        // G) Se tem 1 manilha média (Copeta/Espadilha/Picafumo) e tem 3:
+        const threeCard = commons.find(c => c.power === 10);
+        if (threeCard && manilhas.length === 1) {
+          return threeCard; // Sondagem ("Chamar Sangue")
+        }
+
+        // H) Se não tem sinal do parceiro (silêncio) e mão normal: joga menor carta
+        if (commons.length > 0) {
+          return commons[0]; // Sai na maciota
+        }
+        return sorted[0];
+      }
+
+      // -----------------------------------------------------------------------
+      // 2. O MEIO (2º a jogar) ou O PARA-PÉ (3º a jogar)
+      // -----------------------------------------------------------------------
+      if (isMeio || isParaPe) {
+        // A) Se o parceiro já está liderando a vaza SOZINHO:
+        if (isPartnerLeadingAlone) {
+          return sorted[0]; // Poupe munição total! Joga o menor lixo absoluto
+        }
+
+        // B) Adversário está ganhando a vaza:
+        if (isEnemyLeadingOrTied) {
+          if (winningCards.length > 0) {
+            // REGRA DE OURO DO ZAP DO MESTRE:
+            // NUNCA queimar o Zap em cima de carta fraca (power <= 7: 4, 5, 6, 7, Q, J, K)!
+            const lowestWinning = winningCards[0];
+            const isLowestZap = (lowestWinning.isManilha && lowestWinning.manilhaRank === 4);
+
+            if (isLowestZap && highestPower <= 7) {
+              // Descarta o menor lixo e guarda o Zap para garantir a 2ª ou 3ª vaza
+              return sorted[0];
+            }
+
+            // Casal Maior e o adversário jogou manilha: DEIXA PASSAR!
+            if (isCasalMaior && highestPower >= 101) {
+              return commons.length > 0 ? commons[0] : sorted[0];
+            }
+
+            // Casal Preto: só descasala Espadilha em cima de Picafumo ou 3
+            if (isCasalPreto && lowestWinning.manilhaRank === 2) {
+              if (highestPower === 10 || highestPower === 101) {
+                return lowestWinning;
+              }
+            }
+
+            return lowestWinning; // Mata com a menor carta vencedora suficiente
+          }
+
+          // Se não dá para matar, mas dá para CANGAR (empatar):
+          if (tieCards.length > 0) {
+            return tieCards[0];
+          }
+
+          return sorted[0]; // Descarta o menor lixo
+        }
+
+        return sorted[0];
+      }
+
+      // -----------------------------------------------------------------------
+      // 3. O PÉ (4º a fechar a rodada 1 - Informação Perfeita!)
+      // -----------------------------------------------------------------------
+      if (isPe) {
+        if (isPartnerLeadingAlone) {
+          return sorted[0]; // A vaza já é nossa
+        }
+
+        if (winningCards.length > 0) {
+          const lowestWinning = winningCards[0];
+          const isLowestZap = (lowestWinning.isManilha && lowestWinning.manilhaRank === 4);
+
+          // Se a mesa for fraca e só tem Zap pra matar, não queima se tiver lixo
+          if (isLowestZap && highestPower <= 7 && sorted.length > 1) {
+            return sorted[0];
+          }
+          return lowestWinning;
+        }
+
+        if (tieCards.length > 0) {
+          return tieCards[0]; // Cangar no Pé na Rodada 1 é jogada de mestre!
+        }
+
+        return sorted[0];
+      }
+    }
+
+    // =========================================================================
+    // RODADA 2: A VAZA DA DEFINIÇÃO
+    // =========================================================================
+    if (roundNumber === 2) {
+      const firstTrick = tricksHistory[0];
+      const weWonFirst = (firstTrick && firstTrick.winnerTeam === ctx.botTeam);
+      const firstDraw = (firstTrick && firstTrick.winnerTeam === 'draw');
+
+      // -----------------------------------------------------------------------
+      // CASO A: A RODADA 1 CANGOU (Empatou na primeira) -> VALE A VIDA!
+      // -----------------------------------------------------------------------
+      if (firstDraw) {
+        // REGRA DO MESTRE: Descer a MAIOR CARTA ABSOLUTA (inclusive o Zap)!
+        return sorted[sorted.length - 1];
+      }
+
+      // -----------------------------------------------------------------------
+      // CASO B: NOSSA DUPLA GANHOU A 1ª RODADA!
+      // -----------------------------------------------------------------------
+      if (weWonFirst) {
+        // 1. CANGA DA VITÓRIA: Quem ganhou a 1ª e empata a 2ª GANHA O JOGO NA HORA!
+        if (tieCards.length > 0) {
+          return tieCards[0];
+        }
+
+        if (isPartnerLeadingAlone) {
+          return sorted[0];
+        }
+
+        // Se o adversário jogou o ZAP na mesa na 2ª vaza: joga o menor lixo
+        if (highestPower === 104) {
+          return sorted[0];
+        }
+
+        // O bot é o FECHA da 2ª vaza: fecha o adversário com a maior carta
+        if (isPe) {
+          if (winningCards.length > 0) {
+            return winningCards[0];
+          }
+          return sorted[0];
+        }
+
+        if (winningCards.length > 0) return winningCards[0];
+        return sorted[0];
+      }
+
+      // -----------------------------------------------------------------------
+      // CASO C: NOSSA DUPLA PERDEU A 1ª RODADA (Obrigação de matar a 2ª)
+      // -----------------------------------------------------------------------
+      if (!weWonFirst && !firstDraw) {
+        if (isPartnerLeadingAlone) {
+          return sorted[0];
+        }
+        if (winningCards.length > 0) {
+          return winningCards[0];
+        }
+        return sorted[0];
+      }
+    }
+
+    // =========================================================================
+    // RODADA 3: O DESFECHO FINAL
+    // =========================================================================
+    if (roundNumber === 3) {
+      if (winningCards.length > 0) return winningCards[0];
+      return sorted[0];
+    }
+
+    return sorted[0];
+  }
+
+  // Avalia se o bot deve pedir TRUCO
+  shouldTruco(ctx) {
+    const { botId, botTeam, role, roundNumber, availableCards, previousPlays, tricksHistory, handSignals, scoreDiff } = ctx;
+    const manilhas = availableCards.filter(c => c.isManilha);
+    const hasZap = manilhas.some(c => c.manilhaRank === 4);
+    const hasCopeta = manilhas.some(c => c.manilhaRank === 3);
+    const hasEspadilha = manilhas.some(c => c.manilhaRank === 2);
+    const isPe = (role === 'Pé');
+
+    const firstTrick = tricksHistory[0];
+    const firstWon = firstTrick && firstTrick.winnerTeam === botTeam;
+    const firstDraw = firstTrick && firstTrick.winnerTeam === 'draw';
+
+    // Top power na mesa atual
+    let maxPower = -1;
+    let topPlayTeam = null;
+    previousPlays.forEach(p => {
+      const pwr = p.card.covered ? 0 : p.card.power;
+      if (pwr > maxPower) {
+        maxPower = pwr;
+        topPlayTeam = this.game.getPlayer(p.playerId).team;
+      }
+    });
+
+    // -------------------------------------------------------------------------
+    // FILTRO ANTI-SUICÍDIO RIGOROSO DO MESTRE:
+    // -------------------------------------------------------------------------
+    if (maxPower === 104 && topPlayTeam !== botTeam) {
+      return false; // Suicídio absoluto: adversário jogou Zap
+    }
+    if (topPlayTeam !== botTeam && maxPower >= 100 && !availableCards.some(c => c.power > maxPower)) {
+      return false; // Não tem carta para matar a manilha do oponente
+    }
+
+    // 1. PÓS-CANGA NA RODADA 2 (1ª rodada empatou):
+    if (roundNumber === 2 && firstDraw) {
+      if (manilhas.length > 0) {
+        return Math.random() < 0.85; // Truca para liquidar na canga
+      }
+    }
+
+    // 2. O FECHA DA RODADA 2 COM MANILHA:
+    if (roundNumber === 2 && firstWon && isPe) {
+      if (availableCards.some(c => c.isManilha && c.power > maxPower)) {
+        return true; // Truca antes de soltar a manilha
+      }
+    }
+
+    // 3. ROUBAR PONTOS NO FECHA (Pressão):
+    if (isPe && roundNumber >= 2) {
+      if (scoreDiff >= 7 && Math.random() < 0.45) {
+        return true;
+      }
+    }
+
+    // 4. DUAS MANILHAS OU ZAP:
+    if (manilhas.length >= 2 && roundNumber <= 2) {
+      return Math.random() < 0.65;
+    }
+
+    return false;
+  }
+
+  // Avalia a resposta ao Truco (Aceitar, Retrucar ou Correr)
+  respondToTruco(ctx) {
+    const { requestedValue, botTeam, role, roundNumber, availableCards, tricksHistory, handSignals, scoreDiff } = ctx;
+    const manilhas = availableCards.filter(c => c.isManilha);
+    const hasZap = manilhas.some(c => c.manilhaRank === 4);
+    const hasCopeta = manilhas.some(c => c.manilhaRank === 3);
+    const hasEspadilha = manilhas.some(c => c.manilhaRank === 2);
+    const hasPicafumo = manilhas.some(c => c.manilhaRank === 1);
+    const threeCards = availableCards.filter(c => !c.isManilha && c.power === 10);
+    const firstTrick = tricksHistory[0];
+    const firstWon = firstTrick && firstTrick.winnerTeam === botTeam;
+    const firstDraw = firstTrick && firstTrick.winnerTeam === 'draw';
+
+    const isCasalMaior = (hasZap && hasCopeta);
+    const isCasalPretoPe = (hasZap && hasEspadilha && role === 'Pé');
+
+    const canRaise = (requestedValue < 12);
+    const raiseVal = canRaise ? (requestedValue === 3 ? 6 : (requestedValue === 6 ? 9 : 12)) : null;
+
+    // -------------------------------------------------------------------------
+    // REGRA DE OURO DO MESTRE: NUNCA GRITAR SEIS/NOVE/DOZE SEM VER A CARTA!
+    // Exceções: 1) Ganhou 1ª com Zap; 2) Casal Maior; 3) Casal Preto no Pé
+    // -------------------------------------------------------------------------
+    if (canRaise) {
+      const authZapWin = (firstWon && hasZap);
+      if (isCasalMaior || isCasalPretoPe || authZapWin) {
+        return { action: 'raise', raiseVal };
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // ACEITAR OU CORRER:
+    // -------------------------------------------------------------------------
+
+    // A) MÃO DESARMADA / LIXO: Se não tem nada, CORRE direto!
+    if (manilhas.length === 0 && threeCards.length === 0 && availableCards.every(c => c.power <= 7)) {
+      return { action: 'refuse' };
+    }
+
+    // B) NA RODADA 3 (Última Rodada):
+    if (roundNumber === 3) {
+      const lastCard = availableCards[0];
+      if (!lastCard.isManilha && lastCard.power <= 8) {
+        return { action: 'refuse' };
+      }
+
+      if (firstWon) {
+        if (lastCard.isManilha) return { action: 'accept' };
+        if (scoreDiff >= 4) return { action: 'accept' };
+        return { action: 'refuse' };
+      }
+    }
+
+    // C) PÓS-CANGA NA RODADA 2 AO TOMAR SEIS:
+    if (roundNumber === 2 && firstDraw && requestedValue >= 6) {
+      if (hasZap) return { action: 'accept' };
+      if (hasCopeta) return { action: 'accept' };
+      if (hasEspadilha || hasPicafumo) {
+        return scoreDiff >= 0 ? { action: 'accept' } : { action: 'refuse' };
+      }
+      return { action: 'refuse' };
+    }
+
+    // D) CRITÉRIO DA RODADA 2 (Regra do Zap com Rei):
+    if (roundNumber === 2) {
+      if (hasZap && !hasCopeta && threeCards.length === 0 && availableCards.some(c => c.power <= 7)) {
+        const pSignal = handSignals ? handSignals[ctx.partnerId] : null;
+        if (pSignal && pSignal !== 'lixo') {
+          return { action: 'accept' };
+        }
+        return { action: 'refuse' };
+      }
+
+      if (manilhas.length >= 2 || (manilhas.length >= 1 && threeCards.length >= 1) || threeCards.length >= 2) {
+        return { action: 'accept' };
+      }
+
+      if (firstWon && (manilhas.length >= 1 || threeCards.length >= 1)) {
+        return { action: 'accept' };
+      }
+
+      return { action: 'refuse' };
+    }
+
+    // E) RODADA 1:
+    if (threeCards.length >= 2 || (manilhas.length >= 1 && threeCards.length >= 1) || manilhas.length >= 2) {
+      return { action: 'accept' };
+    }
+
+    if (hasPicafumo && manilhas.length === 1 && threeCards.length === 0) {
+      return Math.random() < 0.4 ? { action: 'accept' } : { action: 'refuse' };
+    }
+
+    return { action: 'refuse' };
+  }
+
+  // Avaliação da Mão de 11 (Régua de Segurança do Mestre)
+  evaluateMao11(combinedCards, scoreDiff, role) {
+    const manilhas = combinedCards.filter(c => c.isManilha);
+    const hasZap = manilhas.some(c => c.manilhaRank === 4);
+    const threeCount = combinedCards.filter(c => !c.isManilha && c.power === 10).length;
+    const twoCount = combinedCards.filter(c => !c.isManilha && c.power === 9).length;
+    const aceCount = combinedCards.filter(c => !c.isManilha && c.power === 8).length;
+
+    // 1. Manilha + 3
+    if (manilhas.length >= 1 && threeCount >= 1) return true;
+    // 2. Dois 3 e um 2 (ou Ás)
+    if (threeCount >= 2 && (twoCount >= 1 || aceCount >= 1)) return true;
+    // 3. Zap + dois 2
+    if (hasZap && twoCount >= 2) return true;
+    // 4. Qualquer Casal de Manilhas
+    if (manilhas.length >= 2) return true;
+
+    if (scoreDiff >= 6 && hasZap) return true;
+
+    return false;
+  }
+
+  // Conselho honesto do Tião para o jogador
+  getPartnerAdvice(partnerCards) {
+    const manilhas = partnerCards.filter(c => c.isManilha);
+    const hasZap = manilhas.some(c => c.manilhaRank === 4);
+    const hasCopeta = manilhas.some(c => c.manilhaRank === 3);
+    const threeCards = partnerCards.filter(c => !c.isManilha && c.power === 10);
+    const twoOrAce = partnerCards.filter(c => !c.isManilha && (c.power === 9 || c.power === 8));
+
+    if (hasZap) {
+      return "Parceiro, tô com o ZAP engatilhado! Aceita com gosto!";
+    }
+    if (hasCopeta || manilhas.length >= 2) {
+      return "Tô com manilha armada, parceiro! Essa eu garanto!";
+    }
+    if (manilhas.length === 1) {
+      return "Eu garanto uma vaza, parceiro!";
+    }
+    if (threeCards.length > 0) {
+      return "Eu tenho uma forcinha, parceiro! Dou uma cutucada!";
+    }
+    if (twoOrAce.length > 0) {
+      return "Vixi parceiro, tô fraquinho... tô pequeno, você que decide!";
+    }
+    return "Parceiro, só veio lixo pra mim... se não tiver bicho grande, corre!";
+  }
+
+  findHighPairs(cards) {
+    const powers = [10, 9, 8];
+    for (const p of powers) {
+      const match = cards.filter(c => c.power === p);
+      if (match.length >= 2) return match;
+    }
+    return [];
+  }
+}
+
 // Configuração dos Jogadores para o modo 4 Jogadores (2v2)
 // Sentido horário (Direita para a Esquerda): Sul (Você) -> Oeste (Zé) -> Norte (Tião) -> Leste (Tonho)
 const PLAYERS_CONFIG = {
@@ -397,8 +874,12 @@ class TrucoGame {
 
     // Sinais Tradicionais e Frases de Boteco (Etapa 4)
     this.signalTimeouts = [];
+    this.handSignals = { player: null, bot_partner: null, bot_left: null, bot_right: null };
     this.onBotSignal = null;
     this.onPlayerSignal = null;
+
+    // Agente Especialista do Truco (40 Anos de Experiência)
+    this.expertAgent = new TrucoExpertAgent(this);
 
     // Callbacks de Eventos
     this.onStateChange = null;
@@ -440,6 +921,15 @@ class TrucoGame {
 
   getPlayer(id) {
     return this.players.find(p => p.id === id);
+  }
+
+  getPartnerId(playerId) {
+    if (this.gameMode === '1v1') return null;
+    if (playerId === 'player') return 'bot_partner';
+    if (playerId === 'bot_partner') return 'player';
+    if (playerId === 'bot_left') return 'bot_right';
+    if (playerId === 'bot_right') return 'bot_left';
+    return null;
   }
 
   getPlayerIndex(id) {
@@ -590,6 +1080,7 @@ class TrucoGame {
     const signalObj = BOT_SIGNALS[signalKey];
     if (!signalObj) return;
 
+    this.handSignals[botId] = signalKey;
     const phrase = this.pickRandom(signalObj.botPhrases);
     if (this.onBotSignal) {
       this.onBotSignal(botId, signalKey, signalObj.emoji, phrase);
@@ -657,6 +1148,7 @@ class TrucoGame {
     const signalObj = BOT_SIGNALS[signalType];
     if (!signalObj) return;
 
+    this.handSignals['player'] = signalType;
     const playerPhrase = this.pickRandom(signalObj.playerPhrases);
 
     if (this.onPlayerSignal) {
@@ -728,6 +1220,7 @@ class TrucoGame {
   startNewHand() {
     if (this.isGameOver) return;
     this.clearSignalTimeouts();
+    this.handSignals = { player: null, bot_partner: null, bot_left: null, bot_right: null };
 
     this.handNumber++;
     // Alterna o pé/primeiro a jogar a cada mão inteira
@@ -790,19 +1283,11 @@ class TrucoGame {
         this.notifyMessage(`⭐ MÃO DE 11 PARA NÓS!${partnerDesc} Escolha jogar (vale 3) ou correr (dá 1 ponto a eles).`, "warning");
         this.betState = 'player_deciding_mao11';
 
-        // O parceiro dá uma dica se estiver no modo 4p
+        // O parceiro dá uma dica se estiver no modo 4p (via TrucoExpertAgent)
         if (this.gameMode === '4p') {
           setTimeout(() => {
-            const partnerStrength = this.evaluateHandStrength(this.hands['bot_partner']);
-            const hasZap = this.hands['bot_partner'].some(c => c.isManilha && c.manilhaRank === 4);
-            let quote = "";
-            if (hasZap || partnerStrength >= 25) {
-              quote = this.pickRandom(BOT_QUOTES.partnerAdviceStrong);
-            } else if (partnerStrength <= 12) {
-              quote = this.pickRandom(BOT_QUOTES.partnerAdviceWeak);
-            } else {
-              quote = this.pickRandom(BOT_QUOTES.partnerAdviceMedium);
-            }
+            const partnerCards = (this.hands['bot_partner'] || []).filter(c => !c.played);
+            const quote = this.expertAgent.getPartnerAdvice(partnerCards);
             this.lastPartnerAdvice = quote;
             this.botSay('bot_partner', quote);
             this.emitState();
@@ -843,25 +1328,27 @@ class TrucoGame {
     });
   }
 
-  // Decisão dos Robôs na Mão de 11
+  // Decisão dos Robôs na Mão de 11 (via TrucoExpertAgent / Régua do Mestre)
   botDecideMao11() {
-    let combinedStrength = 0;
-    let hasAnyManilha = false;
-
     const themPlayers = this.players.filter(p => p.team === 'them');
+    let combinedCards = [];
     themPlayers.forEach(p => {
-      combinedStrength += this.evaluateHandStrength(this.hands[p.id]);
-      if (this.hands[p.id].some(c => c.isManilha)) hasAnyManilha = true;
+      combinedCards.push(...(this.hands[p.id] || []));
     });
 
-    const threshold = this.gameMode === '4p' ? 36 : 18;
+    const scoreDiff = this.botScore - this.playerScore;
+    const roles = this.getTacticalRoles();
+    const leadBot = themPlayers[0];
+    const role = roles[leadBot.id]?.name || 'Meio';
 
-    if (hasAnyManilha || combinedStrength >= threshold) {
-      this.botSay(themPlayers[0].id, this.pickRandom(BOT_QUOTES.mao11Accept));
+    const willPlay = this.expertAgent.evaluateMao11(combinedCards, scoreDiff, role);
+
+    if (willPlay) {
+      this.botSay(leadBot.id, this.pickRandom(BOT_QUOTES.mao11Accept));
       this.notifyMessage("A dupla adversária aceitou jogar a Mão de 11! A mão vale 3 pontos.", "info");
       this.startTrick();
     } else {
-      this.botSay(themPlayers[0].id, this.pickRandom(BOT_QUOTES.mao11Refuse));
+      this.botSay(leadBot.id, this.pickRandom(BOT_QUOTES.mao11Refuse));
       this.notifyMessage("A dupla adversária correu da Mão de 11! Nós ganhamos 1 ponto.", "win");
       this.playerScore += 1;
       this.checkEndGame();
@@ -928,7 +1415,9 @@ class TrucoGame {
     }
 
     if (this.currentTurnPlayerId !== 'player') {
-      setTimeout(() => this.botPlayTurn(this.currentTurnPlayerId), 900);
+      // Na Rodada 1, dá um intervalo de 2.4s para o jogador humano passar sinal se desejar
+      const delay = (this.roundNumber === 1 && !this.isMaoDeFerro && !this.isMaoDe11) ? 2400 : 900;
+      setTimeout(() => this.botPlayTurn(this.currentTurnPlayerId), delay);
     }
   }
 
@@ -971,15 +1460,9 @@ class TrucoGame {
     }
   }
 
-  // Jogada de um Bot específico
+  // Jogada de um Bot específico (consultando o TrucoExpertAgent)
   botPlayTurn(botId) {
     if (this.currentTurnPlayerId !== botId || this.isGameOver || this.resolvingTrick) return;
-
-    // O bot pensa se deve pedir truco antes de colocar a carta na mesa
-    if (this.shouldBotTruco(botId)) {
-      this.botInitiateTruco(botId);
-      return;
-    }
 
     const availableCards = this.hands[botId].filter(c => !c.played);
     if (availableCards.length === 0) return;
@@ -990,18 +1473,41 @@ class TrucoGame {
       this.tricks.push(currentTrick);
     }
 
+    const roles = this.getTacticalRoles();
+    const botObj = this.getPlayer(botId);
+    const partnerId = this.getPartnerId(botId);
+    const scoreDiff = botObj.team === 'us' ? (this.playerScore - this.botScore) : (this.botScore - this.playerScore);
+
+    const ctx = {
+      botId,
+      botTeam: botObj.team,
+      partnerId,
+      role: roles[botId]?.name || 'Meio',
+      roundNumber: this.roundNumber,
+      availableCards,
+      previousPlays: currentTrick.plays,
+      tricksHistory: this.tricks,
+      handSignals: this.handSignals,
+      scoreDiff
+    };
+
+    // 1. O bot consulta o TrucoExpertAgent para avaliar se deve pedir truco
+    if (botObj.team !== 'us' && this.expertAgent.shouldTruco(ctx)) {
+      this.botInitiateTruco(botId);
+      return;
+    }
+
     let chosenCard = null;
     let playCovered = false;
 
     if (this.isMaoDeFerro) {
       chosenCard = availableCards[Math.floor(Math.random() * availableCards.length)];
     } else {
-      chosenCard = this.pickBotCard(botId, availableCards, currentTrick.plays);
+      chosenCard = this.expertAgent.chooseCard(ctx);
 
       // Blefe de carta coberta (apenas na 2ª ou 3ª vaza)
       if (this.roundNumber > 1 && chosenCard.power <= 3 && Math.random() < 0.2) {
         const firstTrick = this.tricks[0];
-        const botObj = this.getPlayer(botId);
         if (firstTrick && firstTrick.winnerTeam === botObj.team) {
           playCovered = true;
         }
@@ -1658,49 +2164,45 @@ class TrucoGame {
     const botName = this.getPlayer(botId).name;
     this.notifyMessage(`⚠️ ${botName.toUpperCase()} GRITOU ${this.getBetLabel(nextVal)}! Como sua dupla responde?`, "warning");
 
-    // No modo 4p, o seu parceiro Tião te dá uma dica sobre as cartas dele!
+    // No modo 4p, o seu parceiro Tião te dá uma dica sobre as cartas dele (via TrucoExpertAgent)!
     if (this.gameMode === '4p') {
       setTimeout(() => {
-        const partnerCards = this.hands['bot_partner'].filter(c => !c.played);
-        const pStrength = this.evaluateHandStrength(partnerCards);
-        const hasZap = partnerCards.some(c => c.isManilha && c.manilhaRank === 4);
-
-        if (hasZap || pStrength >= 22) {
-          this.botSay('bot_partner', this.pickRandom(BOT_QUOTES.partnerAdviceStrong));
-        } else if (pStrength <= 10) {
-          this.botSay('bot_partner', this.pickRandom(BOT_QUOTES.partnerAdviceWeak));
-        } else {
-          this.botSay('bot_partner', this.pickRandom(BOT_QUOTES.partnerAdviceMedium));
-        }
+        const partnerCards = (this.hands['bot_partner'] || []).filter(c => !c.played);
+        const advice = this.expertAgent.getPartnerAdvice(partnerCards);
+        this.botSay('bot_partner', advice);
       }, 500);
     }
 
     this.emitState();
   }
 
-  // Resposta dos robôs adversários quando Nós pedimos Truco
+  // Resposta dos robôs adversários quando Nós pedimos Truco (via TrucoExpertAgent)
   botsRespondToTruco(requestedValue) {
     const themPlayers = this.players.filter(p => p.team === 'them');
-    let bestHandStrength = 0;
-    let hasZap = false;
-    let hasCopeta = false;
-
-    themPlayers.forEach(p => {
-      const cards = this.hands[p.id].filter(c => !c.played);
-      const str = this.evaluateHandStrength(cards);
-      if (str > bestHandStrength) bestHandStrength = str;
-      if (cards.some(c => c.isManilha && c.manilhaRank === 4)) hasZap = true;
-      if (cards.some(c => c.isManilha && c.manilhaRank === 3)) hasCopeta = true;
-    });
-
-    const wonFirstTrick = this.tricks[0] && this.tricks[0].winnerTeam === 'them';
-    const canRaise = (requestedValue < 12);
-    const raiseVal = canRaise ? (requestedValue === 3 ? 6 : (requestedValue === 6 ? 9 : 12)) : null;
-
     const leadBot = themPlayers[0];
+    const roles = this.getTacticalRoles();
+    const role = roles[leadBot.id]?.name || 'Meio';
+    const scoreDiff = this.botScore - this.playerScore;
+
+    // Cartas disponíveis do bot adversário
+    const availableCards = (this.hands[leadBot.id] || []).filter(c => !c.played);
+
+    const ctx = {
+      requestedValue,
+      botTeam: 'them',
+      role,
+      roundNumber: this.roundNumber,
+      availableCards,
+      tricksHistory: this.tricks,
+      handSignals: this.handSignals,
+      scoreDiff,
+      partnerId: this.getPartnerId(leadBot.id)
+    };
 
     // MALANDRAGEM: SE A CAMA DE GATO ESTAVA ARMADA E O ADVERSÁRIO TRUCOU!
     if (this.camaDeGato.them && this.camaDeGato.baitPlayed) {
+      const canRaise = (requestedValue < 12);
+      const raiseVal = canRaise ? (requestedValue === 3 ? 6 : (requestedValue === 6 ? 9 : 12)) : null;
       if (canRaise && Math.random() < 0.6) {
         this.betValue = requestedValue;
         this.lastBettorTeam = 'them';
@@ -1724,34 +2226,26 @@ class TrucoGame {
       return;
     }
 
-    // Chance de retrucar (aumentar)
-    if (canRaise && (hasZap || (hasCopeta && wonFirstTrick) || bestHandStrength >= 28 || this.casalMaior.them)) {
-      if (Math.random() < (this.casalMaior.them ? 0.6 : 0.45)) {
-        this.betValue = requestedValue;
-        this.lastBettorTeam = 'them';
-        this.lastBettorPlayerId = leadBot.id;
-        this.betState = 'waiting_player';
-        window.trucoAudio.playTrucoAlert(raiseVal);
+    // Consulta a decisão do TrucoExpertAgent
+    const decision = this.expertAgent.respondToTruco(ctx);
 
-        if (raiseVal === 6) this.botSay(leadBot.id, this.pickRandom(BOT_QUOTES.seis));
-        else if (raiseVal === 9) this.botSay(leadBot.id, this.pickRandom(BOT_QUOTES.nove));
-        else if (raiseVal === 12) this.botSay(leadBot.id, this.pickRandom(BOT_QUOTES.doze));
+    if (decision.action === 'raise' && decision.raiseVal) {
+      this.betValue = requestedValue;
+      this.lastBettorTeam = 'them';
+      this.lastBettorPlayerId = leadBot.id;
+      this.betState = 'waiting_player';
+      window.trucoAudio.playTrucoAlert(decision.raiseVal);
 
-        this.notifyMessage(`💥 ${leadBot.name} não só aceitou como RETRUCOU: PEDIU ${this.getBetLabel(raiseVal)}!`, "warning");
-        this.emitState();
-        return;
-      }
+      if (decision.raiseVal === 6) this.botSay(leadBot.id, this.pickRandom(BOT_QUOTES.seis));
+      else if (decision.raiseVal === 9) this.botSay(leadBot.id, this.pickRandom(BOT_QUOTES.nove));
+      else if (decision.raiseVal === 12) this.botSay(leadBot.id, this.pickRandom(BOT_QUOTES.doze));
+
+      this.notifyMessage(`💥 ${leadBot.name} não só aceitou como RETRUCOU: PEDIU ${this.getBetLabel(decision.raiseVal)}!`, "warning");
+      this.emitState();
+      return;
     }
 
-    // Aceitar ou Correr
-    let acceptChance = 0.55;
-    if (this.casalMaior.them) acceptChance = 1.0;
-    else if (hasZap || hasCopeta) acceptChance = 0.95;
-    else if (bestHandStrength >= 18) acceptChance = 0.8;
-    else if (wonFirstTrick) acceptChance = 0.7;
-    else if (bestHandStrength < 10 && this.roundNumber > 1 && this.tricks[0]?.winnerTeam === 'us') acceptChance = 0.15;
-
-    if (Math.random() < acceptChance) {
+    if (decision.action === 'accept') {
       this.betValue = requestedValue;
       this.betState = 'none';
       window.trucoAudio.playClick();

@@ -131,6 +131,31 @@ Este documento estabelece o planejamento detalhado para a evolução do minigame
 
 ---
 
+### 🎓 MARCO ESPECIAL: O "TrucoExpertAgent" & Cartilha dos 40 Anos de Experiência - ✅ CONCLUÍDO
+**Objetivo:** Transformar a IA dos bots em truqueiros profissionais autênticos baseados em 40 anos de prática real de boteco (documentado em [TRUCO_CARTILHA_DO_MESTRE.md](file:///e:/11_Games/LiraQuest/doc/TRUCO_CARTILHA_DO_MESTRE.md)).
+
+1. **Gestão Sagrada do ZAP:**
+   - O Zap NUNCA é queimado em carta fraca na 1ª rodada.
+   - Posicionamento inteligente para o dono do Zap ser o **Pé na rodada seguinte**.
+2. **Doutrina dos Casais:**
+   - **Casal Maior (Zap + Copas):** Deixa os adversários fazerem a primeira (Cama de Gato) para cair de Pé na 2ª e gritar SEIS em cima da manilha deles!
+   - **Casal Preto (Zap + Espadas):** Não descasalar à toa (só em cima de Picafumo ou 3).
+   - **Casais sem Zap (Copas/Espadas, Vermelho, Espadas/Ouros):** Regra Inversa! Joga a maior de cara para não dar sopa para "Zap e Rei"!
+3. **Mecânica do Fecha na Rodada 2:**
+   - Fechamento com maior carta que não seja Zap.
+   - Se for fechar com manilha, truca ANTES de soltar a carta.
+4. **Regra de Ouro Anti-Suicídio:**
+   - NUNCA gritar Seis, Nove ou Doze no escuro sem ver a carta, exceto com 1ª ganha + Zap, Casal Maior ou Casal Preto no Pé!
+   - Filtro anti-suicídio impede o inimigo de trucar contra Zap exposto na mesa.
+5. **Comunicação Tática e Timing Humano:**
+   - Janela de reflexão de 2.4s na 1ª rodada para dar tempo ao jogador humano de passar sinais.
+   - Silêncio do jogador faz o parceiro jogar por baixo (menor carta); sinal de lixo (`🥱`) faz o parceiro assumir o comando da vaza.
+   - Tião fala com honestidade (nunca mais diz que tá armado até os dentes com um simples Ás).
+6. **Mão de 11 Calibrada:**
+   - Régua mínima estrita: Manilha + 3, dois 3 + 2/Ás, Zap + dois 2, ou qualquer Casal!
+
+---
+
 ### 🌐 ETAPA 5: Multiplayer Familiar Realtime (Socket.IO)
 **Objetivo:** Permitir partidas em rede local ou via internet entre pais, filhos e irmãos.
 

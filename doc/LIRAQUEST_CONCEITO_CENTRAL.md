@@ -288,6 +288,14 @@ O **Arcade de Lira** é o centro de diversão acessível pelo Terminal do Avatar
      - Mecânica inédita de **Intercepção PvE**: Adversários (Zé e Tonho) passam sinais entre si no início da mão (😉 Zap, 😚 Copeta, 🤨 Espadilha, 🤔 Picafumo, 😁 Três, 🥱 Lixo) com frases tradicionais de boteco (*"O tempo fechou por aqui..."*, *"Esse café tá quente!"*, *"O corte tá afiado!"*). O jogador atento pode deduzir as manilhas adversárias observando os avatares!
      - **Parceria Tática com Tião:** Tião pisca sinais para o jogador e reage ativamente quando o jogador envia sinais pelo menu `🤫`, validando a mão ou rindo de blefes pro parceiro.
    - **Tecnologia & Áudio:** 100% autônomo em HTML5/CSS3/Vanilla JS e áudio procedural via Web Audio API. Possui botão de retorno integrado ao LiraQuest no menu de opções.
+   - **Cartilha do Mestre & TrucoExpertAgent (40 Anos de Boteco):**
+     - Integração do motor cognitivo autônomo `TrucoExpertAgent` que segue a rigorosa cartilha de 40 anos de truco tradicional brasileiro:
+       - **Hierarquia Real de Força:** O Zap nunca é gasto na 1ª vaza contra lixo (manilha só mata manilha adversária); Ás não é manilha nem carta forte isolada; cartas 3 são usadas para cutucada/sangria.
+       - **Gestão Posicional de Casais:** Cama de gato para Casal Maior (Zap + Copeta) na posição Pé; proteção de Casal Preto (Zap + Espadilha); e descarte ofensivo imediato de casais menores (Copas/Espadas, Vermelho, Espadas/Ouros) para não tomar volta de Zap + Rei.
+       - **Filtro Anti-Suicídio & Critérios de Truco:** IA nunca truca na 2ª vaza sem ter como vencer após o adversário descer Zap; critérios rígidos de aceitar truco baseados em manilha + carta forte ou liderança elástica no placar.
+       - **Regra de Ouro:** Proibido gritar Seis/Nove/Doze no escuro sem ver a carta jogada primeiro, exceto com vaza ganha + Zap ou Casal Maior engatilhado no Pé.
+       - **Mão de 11 Calibrada:** Critérios matemáticos mínimos para correr ou aceitar o desafio (Manilha + 3, dois 3s + 2/Ás, Zap + dois 2s ou qualquer Casal).
+       - Documentação completa em [TRUCO_CARTILHA_DO_MESTRE.md](file:///e:/11_Games/LiraQuest/doc/TRUCO_CARTILHA_DO_MESTRE.md).
    - **Plano de Evolução Arquitetural & IA:** Consulte o planejamento detalhado em [TRUCO_ROADMAP_EVOLUCAO.md](file:///e:/11_Games/LiraQuest/doc/TRUCO_ROADMAP_EVOLUCAO.md) cobrindo o roadmap completo rumo ao Multiplayer Familiar via WebSockets (Etapa 5).
 
 9. **🧟‍♂️ Módulo Companheiro Investigativo de Tabuleiro: Marvel Zombies RPG (`/zombi`):**
