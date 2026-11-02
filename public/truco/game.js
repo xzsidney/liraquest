@@ -783,66 +783,44 @@ class TrucoExpertAgent {
     }
 
     // -------------------------------------------------------------------------
-    // ACEITAR OU CORRER:
+    // REGRAS OFICIAIS DO MESTRE PARA ACEITAR TRUCO (CRITÉRIO DE CARTAS BOAS):
+    // Carta Boa = Carta 3 (power === 10) ou qualquer Manilha (power >= 101)
     // -------------------------------------------------------------------------
+    const cardsToEvaluate = (ctx.teamCards && ctx.teamCards.length > 0) ? ctx.teamCards : availableCards;
+    const goodCards = cardsToEvaluate.filter(c => c.isManilha || (!c.isManilha && c.power === 10));
+    const numGoodCards = goodCards.length;
+    const highestOnTable = (ctx.highestPower !== undefined && ctx.highestPower > 0) ? ctx.highestPower : 0;
+    const canKillTrick = (highestOnTable === 0) || cardsToEvaluate.some(c => c.power > highestOnTable);
 
-    // A) MÃO DESARMADA / LIXO: Se não tem nada, CORRE direto!
-    if (manilhas.length === 0 && threeCards.length === 0 && availableCards.every(c => c.power <= 7)) {
-      return { action: 'refuse' };
-    }
-
-    // B) NA RODADA 3 (Última Rodada):
-    if (roundNumber === 3) {
-      const lastCard = availableCards[0];
-      if (!lastCard.isManilha && lastCard.power <= 8) {
-        return { action: 'refuse' };
-      }
-
-      if (firstWon) {
-        if (lastCard.isManilha) return { action: 'accept' };
-        if (scoreDiff >= 4) return { action: 'accept' };
-        return { action: 'refuse' };
-      }
-    }
-
-    // C) PÓS-CANGA NA RODADA 2 AO TOMAR SEIS:
-    if (roundNumber === 2 && firstDraw && requestedValue >= 6) {
-      if (hasZap) return { action: 'accept' };
-      if (hasCopeta) return { action: 'accept' };
-      if (hasEspadilha || hasPicafumo) {
-        return scoreDiff >= 0 ? { action: 'accept' } : { action: 'refuse' };
+    // 1. PRIMEIRA RODADA:
+    // Validar se a dupla tem dois ou mais cartas boas (3 ou manilha) -> aí aceita
+    if (roundNumber === 1) {
+      if (numGoodCards >= 2) {
+        return { action: 'accept' };
       }
       return { action: 'refuse' };
     }
 
-    // D) CRITÉRIO DA RODADA 2 (Regra do Zap com Rei):
+    // 2. SEGUNDA RODADA:
+    // Validar se a dupla tem dois ou mais cartas boas (3 ou manilha) E se consegue matar a carta da rodada -> aí aceita
     if (roundNumber === 2) {
-      if (hasZap && !hasCopeta && threeCards.length === 0 && availableCards.some(c => c.power <= 7)) {
-        const pSignal = handSignals ? handSignals[ctx.partnerId] : null;
-        if (pSignal && pSignal !== 'lixo') {
-          return { action: 'accept' };
-        }
-        return { action: 'refuse' };
-      }
-
-      if (manilhas.length >= 2 || (manilhas.length >= 1 && threeCards.length >= 1) || threeCards.length >= 2) {
+      if (numGoodCards >= 2 && canKillTrick) {
         return { action: 'accept' };
       }
-
-      if (firstWon && (manilhas.length >= 1 || threeCards.length >= 1)) {
+      // Se a 1ª rodada empatou (cangou) e está disputando Seis com Zap ou Copeta
+      if (firstDraw && requestedValue >= 6 && (hasZap || hasCopeta)) {
         return { action: 'accept' };
       }
-
       return { action: 'refuse' };
     }
 
-    // E) RODADA 1:
-    if (threeCards.length >= 2 || (manilhas.length >= 1 && threeCards.length >= 1) || manilhas.length >= 2) {
-      return { action: 'accept' };
-    }
-
-    if (hasPicafumo && manilhas.length === 1 && threeCards.length === 0) {
-      return Math.random() < 0.4 ? { action: 'accept' } : { action: 'refuse' };
+    // 3. TERCEIRA RODADA:
+    // Validar se a dupla tem carta boa (3 ou manilha) E se consegue matar a carta da rodada -> aí aceita
+    if (roundNumber === 3) {
+      if (numGoodCards >= 1 && canKillTrick) {
+        return { action: 'accept' };
+      }
+      return { action: 'refuse' };
     }
 
     return { action: 'refuse' };
@@ -1183,6 +1161,62 @@ class TrucoGame {
     this.botSay(botId, phrase);
   }
 
+  // Valida e envia o sinal do Tião para o jogador humano segundo a Cartilha do Mestre:
+  // - 1ª Rodada: valida se tem cartas boas (3 ou manilha) -> avisa o humano com sinal
+  // - 2ª Rodada: valida se tem cartas boas (3 ou manilha) E se consegue matar a carta da rodada -> avisa com sinal
+  // - 3ª Rodada: valida se tem cartas boas (3 ou manilha) -> avisa o humano com sinal
+  checkAndSendPartnerSignal(context = 'round') {
+    if (this.gameMode !== '4p' || this.isGameOver || this.isMaoDeFerro) return;
+
+    const partnerHand = (this.hands['bot_partner'] || []).filter(c => !c.played);
+    if (partnerHand.length === 0) return;
+
+    let currentTrick = this.tricks[this.roundNumber - 1];
+    let highestPower = 0;
+    if (currentTrick && currentTrick.plays) {
+      currentTrick.plays.forEach(p => {
+        const pwr = p.card.covered ? 0 : p.card.power;
+        if (pwr > highestPower) highestPower = pwr;
+      });
+    }
+
+    const goodCards = partnerHand.filter(c => c.isManilha || (!c.isManilha && c.power === 10));
+    let signalToSend = null;
+
+    if (this.roundNumber === 1) {
+      // 1. PRIMEIRA RODADA:
+      // Validar se tem cartas boas (3 ou manilha) -> avisa o humano com sinal
+      if (goodCards.length > 0) {
+        signalToSend = this.getBestSignalForHand(goodCards);
+      } else {
+        signalToSend = 'lixo';
+      }
+    } else if (this.roundNumber === 2) {
+      // 2. SEGUNDA RODADA:
+      // Validar se tem cartas boas (3 ou manilha) E se consegue matar a carta que está na rodada -> avisa o humano com sinal
+      const canKillCards = goodCards.filter(c => highestPower === 0 || c.power > highestPower);
+      if (canKillCards.length > 0) {
+        signalToSend = this.getBestSignalForHand(canKillCards);
+      } else if (goodCards.length > 0 && highestPower === 0) {
+        signalToSend = this.getBestSignalForHand(goodCards);
+      } else {
+        signalToSend = 'lixo';
+      }
+    } else if (this.roundNumber === 3) {
+      // 3. TERCEIRA RODADA:
+      // Validar se tem cartas boas (3 ou manilha) -> avisa o humano com sinal
+      if (goodCards.length > 0) {
+        signalToSend = this.getBestSignalForHand(goodCards);
+      } else {
+        signalToSend = 'lixo';
+      }
+    }
+
+    if (signalToSend) {
+      this.botSendSignal('bot_partner', signalToSend);
+    }
+  }
+
   scheduleHandSignals() {
     this.clearSignalTimeouts();
     if (this.gameMode !== '4p' || this.isMaoDe11 || this.isMaoDeFerro) return;
@@ -1228,15 +1262,12 @@ class TrucoGame {
       this.signalTimeouts.push(tEnemy);
     }
 
-    // 2. SINAL DO TIÃO (PARCEIRO) PARA O JOGADOR HUMANO
-    const tiaoSignal = this.getBestSignalForHand(this.hands['bot_partner']);
-    if (tiaoSignal && Math.random() < 0.85) {
-      const tTiao = setTimeout(() => {
-        if (this.isGameOver || this.roundNumber > 1) return;
-        this.botSendSignal('bot_partner', tiaoSignal);
-      }, 2300 + Math.random() * 900);
-      this.signalTimeouts.push(tTiao);
-    }
+    // 2. SINAL DO TIÃO (PARCEIRO) PARA O JOGADOR HUMANO SEGUNDO AS REGRAS DO MESTRE
+    const tTiao = setTimeout(() => {
+      if (this.isGameOver || this.roundNumber > 1) return;
+      this.checkAndSendPartnerSignal('deal');
+    }, 2200 + Math.random() * 800);
+    this.signalTimeouts.push(tTiao);
   }
 
   playerSendSignal(signalType) {
@@ -1490,8 +1521,11 @@ class TrucoGame {
 
     this.emitState();
 
-    // Diálogos táticos de posição e macetes do truco
+    // Diálogos táticos de posição e sinais do Tião
     if (this.gameMode === '4p' && !this.isGameOver) {
+      if (this.roundNumber === 2 || this.roundNumber === 3) {
+        setTimeout(() => this.checkAndSendPartnerSignal('trick_start'), 450);
+      }
       const roles = this.getTacticalRoles();
       if (this.roundNumber === 1) {
         if (roles['bot_partner']?.name === 'Pé') {
@@ -1615,6 +1649,11 @@ class TrucoGame {
 
     const isSlam = chosenCard.isManilha && !playCovered;
     window.trucoAudio.playCardPlay(isSlam);
+
+    // Se um adversário jogou carta na 2ª rodada, Tião reavalia se consegue matar e sinaliza o humano
+    if (this.gameMode === '4p' && this.roundNumber === 2 && botObj.team === 'them') {
+      setTimeout(() => this.checkAndSendPartnerSignal('enemy_play'), 300);
+    }
 
     // Diálogos de mesa
     if (chosenCard.isManilha && chosenCard.manilhaRank === 4) {
@@ -2267,13 +2306,16 @@ class TrucoGame {
     } else {
       this.notifyMessage(`⚠️ ${botName.toUpperCase()} GRITOU ${this.getBetLabel(nextVal)}! Como sua dupla responde?`, "warning");
 
-      // No modo 4p, o seu parceiro Tião te dá uma dica sobre as cartas dele (via TrucoExpertAgent)!
+      // No modo 4p, o seu parceiro Tião te dá o sinal e a dica sobre as cartas dele (via TrucoExpertAgent)!
       if (this.gameMode === '4p') {
         setTimeout(() => {
+          this.checkAndSendPartnerSignal('truco');
           const partnerCards = (this.hands['bot_partner'] || []).filter(c => !c.played);
           const advice = this.expertAgent.getPartnerAdvice(partnerCards);
+          this.lastPartnerAdvice = advice;
           this.botSay('bot_partner', advice);
-        }, 500);
+          this.emitState();
+        }, 400);
       }
 
       this.emitState();
@@ -2288,15 +2330,29 @@ class TrucoGame {
     const role = roles[leadBot.id]?.name || 'Meio';
     const scoreDiff = this.botScore - this.playerScore;
 
-    // Cartas disponíveis do bot adversário
-    const availableCards = (this.hands[leadBot.id] || []).filter(c => !c.played);
+    // Cartas disponíveis da dupla adversária
+    const leadCards = (this.hands[leadBot.id] || []).filter(c => !c.played);
+    const partnerBot = themPlayers[1];
+    const partnerCards = partnerBot ? (this.hands[partnerBot.id] || []).filter(c => !c.played) : [];
+    const teamCards = [...leadCards, ...partnerCards];
+
+    let currentTrick = this.tricks[this.roundNumber - 1];
+    let maxPower = 0;
+    if (currentTrick && currentTrick.plays) {
+      currentTrick.plays.forEach(p => {
+        const pwr = p.card.covered ? 0 : p.card.power;
+        if (pwr > maxPower) maxPower = pwr;
+      });
+    }
 
     const ctx = {
       requestedValue,
       botTeam: 'them',
       role,
       roundNumber: this.roundNumber,
-      availableCards,
+      availableCards: leadCards,
+      teamCards,
+      highestPower: maxPower,
       tricksHistory: this.tricks,
       handSignals: this.handSignals,
       scoreDiff,
@@ -2496,4 +2552,5 @@ class TrucoGame {
   }
 }
 
+window.BOT_SIGNALS = BOT_SIGNALS;
 window.TrucoGame = TrucoGame;

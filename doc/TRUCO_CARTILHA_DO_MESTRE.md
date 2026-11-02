@@ -193,26 +193,40 @@
 3. **Fator Placar (Diferença Acima de 7 Pontos):**
    - Quando a dupla possui uma **vantagem alta no placar (diferença de 7 pontos ou mais)**, a probabilidade e ousadia de "roubar pontos" no fecha aumenta consideravelmente: o risco para a dupla é mínimo e a pressão sobre os oponentes é esmagadora.
 
-### Critérios Profissionais para Aceitar ou Correr de Truco:
+### 🛡️ Critérios Profissionais Oficiais para ACEITAR ou CORRER de Truco (Regras Estritas do Mestre):
+*(Definição de Carta Boa: Carta 3 ou qualquer Manilha)*
 
-1. **Quando CORRER Sem Pestanejar:**
-   - Se a mão está desarmada (sem manilha nem cartas fortes), corre imediatamente.
-   - Na Rodada 3 (última carta), se a sua carta for apenas um Ás ou menor: **corre**, pois quem trucou na 3ª geralmente tem 3 ou manilha.
+1. **Se for a Primeira Rodada (Rodada 1):**
+   - Validar se a dupla tem **duas ou mais cartas boas** (3 ou manilha) -> se tiver, **ACEITA**!
+   - Caso contrário -> **CORRE**!
 
-2. **Mãos Padrão para ACEITAR Truco:**
-   - **Dois 3** (peso pesado nas cartas comuns).
-   - **Uma Manilha + um 3** (garantia de 1 vaza de manilha e pressão de 3 na outra).
+2. **Se for a Segunda Rodada (Rodada 2):**
+   - Validar se a dupla tem **duas ou mais cartas boas** (3 ou manilha) **E** se consegue **matar a carta que está na rodada** -> se tiver, **ACEITA**!
+   - Caso contrário -> **CORRE**!
+   *(Exceção pós-canga: ao tomar Seis com Zap ou Copeta, aceita).*
 
-3. **Aceitar Truco na Rodada 2 (A Regra do Zap com Rei):**
-   - Para aceitar truco na 2ª rodada, o bot **deve ter DUAS cartas fortes**.
-   - **Atenção Máxima:** Ter **Zap + Rei (ou Zap + carta baixa) NÃO é suficiente para aceitar**, mesmo possuindo a maior carta do jogo! Motivo: o Zap só ganha UMA vaza, o Rei perde a outra e a dupla perde os 3 pontos.
-   - **A Exceção do Parceiro:** Só se aceita com Zap + carta fraca se o **parceiro tiver dado sinal de que tem alguma coisinha para apoiar** (forcinha / manilha baixa).
+3. **Se for a Terceira Rodada (Rodada 3):**
+   - Validar se a dupla tem **carta boa** (3 ou manilha, 1 ou mais) **E** se consegue **matar a carta que está na rodada** -> se tiver, **ACEITA**!
+   - Caso contrário -> **CORRE**!
 
-4. **Aceitar Truco na Rodada 3 (A Vaza Final):**
-   - Tendo ganho a Rodada 1: **só aceita Truco na 3ª rodada se tiver carta acima de 3 (ou seja, MANILHA)**.
-   - Sem manilha na 3ª, a decisão depende rigorosamente do **placar**:
-     - **Diferença Positiva Folgada (Nós na frente por muito):** Dá para arriscar o aceite.
-     - **Diferença Negativa (Eles na frente / perigo de fechar o jogo):** **NÃO aceita de jeito nenhum**, corre para preservar os tentos.
+---
+
+## 8. Comunicação e Sinais do Parceiro Tião para o Jogador Humano
+*(Diretrizes Oficiais para o Parceiro do Humano)*
+
+1. **Se for a Primeira Rodada:**
+   - Validar se o Tião tem **cartas boas** (3 ou manilha).
+   - Se tiver, **avisa o humano com sinal** (Zap 😉, Copeta 😚, Espadilha 🤨, Picafumo 🤔 ou Três 😁).
+   - Se não tiver nenhuma carta boa, sinaliza mão podre / lixo (🥱).
+
+2. **Se for a Segunda Rodada:**
+   - Validar se o Tião tem **cartas boas** (3 ou manilha) **E** se consegue **matar a carta que está na rodada**.
+   - Se conseguir, **avisa o humano com sinal** imediatamente para encorajar a vitória!
+   - Se não conseguir matar ou só tiver lixo, sinaliza lixo (🥱).
+
+3. **Se for a Terceira Rodada:**
+   - Validar se o Tião tem **cartas boas** (3 ou manilha).
+   - Se tiver, **avisa o humano com sinal** indicando a força com que vai arrematar a partida!
 - **Possibilidade de Roubo no Pé:** Quando o bot é o Pé e sua mão só tem cartas abaixo de Rei (mão fraca), ele pode tentar roubar na 1ª, 2ª ou até na 3ª rodada.
 - **Atenção ao Rastro Deixado (Não Denunciar que Jogou o Teto):**
   - O blefe no Pé só cola se o bot **NÃO tiver demonstrado que já gastou a sua maior carta nas rodadas anteriores**.
