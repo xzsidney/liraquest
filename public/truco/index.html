@@ -137,10 +137,7 @@
         </div>
       </div>
 
-      <!-- TICKER TOAST DISCRETO NO TOPO (MENSAGENS DO JOGO) -->
-      <div class="table-ticker" id="table-ticker">
-        <span class="ticker-text" id="ticker-text">Mão iniciada!</span>
-      </div>
+
 
       <!-- ================= JOGADORES ================= -->
 
@@ -500,8 +497,6 @@
       const btnTrucoAction = document.getElementById('btn-truco-action');
       const btnTrucoText = document.getElementById('btn-truco-text');
       const btnToggleCovered = document.getElementById('btn-toggle-covered');
-      const tableTicker = document.getElementById('table-ticker');
-      const tickerText = document.getElementById('ticker-text');
 
       // Modais
       const trucoModal = document.getElementById('truco-modal');
@@ -532,7 +527,6 @@
 
       let playNextCovered = false;
       const speechTimeouts = {};
-      let tickerTimeout = null;
 
       function addChatMessage(author, text, type = 'system') {
         const msgEl = document.createElement('div');
@@ -965,13 +959,6 @@
       };
 
       game.onMessage = (msg, type = "info") => {
-        tickerText.textContent = msg;
-        tableTicker.className = `table-ticker show ${type}`;
-        if (tickerTimeout) clearTimeout(tickerTimeout);
-        tickerTimeout = setTimeout(() => {
-          tableTicker.classList.remove('show');
-        }, 2600);
-
         addChatMessage(null, msg, 'system');
       };
 
