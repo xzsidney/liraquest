@@ -349,7 +349,9 @@ class TrucoExpertAgent {
     const sorted = [...availableCards].sort((a, b) => a.power - b.power);
     const manilhas = sorted.filter(c => c.isManilha);
     const commons = sorted.filter(c => !c.isManilha);
-    const hasZap = manilhas.some(c => c.manilhaRank === 4);
+    const zapCard = manilhas.find(c => c.manilhaRank === 4);
+    const hasZap = Boolean(zapCard);
+    const nonZapCards = sorted.filter(c => !(c.isManilha && c.manilhaRank === 4));
     const hasCopeta = manilhas.some(c => c.manilhaRank === 3);
     const hasEspadilha = manilhas.some(c => c.manilhaRank === 2);
     const hasPicafumo = manilhas.some(c => c.manilhaRank === 1);
@@ -390,6 +392,25 @@ class TrucoExpertAgent {
     // RODADA 1: A BATALHA DA PRIMEIRA
     // =========================================================================
     if (roundNumber === 1) {
+      // -----------------------------------------------------------------------
+      // REGRA MESTRE DO ZAP (RODADA 1):
+      // Validar se está vindo um 3, ou outra manilha se estiver deve matar.
+      // Caso contrário, NÃO jogar o Zap!
+      // -----------------------------------------------------------------------
+      if (hasZap) {
+        const isEnemyThreat = isEnemyLeadingOrTied && (highestPower === 10 || highestPower >= 101);
+        if (isEnemyThreat) {
+          if (winningCards.length > 0) {
+            return winningCards[0]; // Mata com o suficiente (Espadilha se tiver ou o Zap)
+          }
+        }
+        // Caso contrário, NÃO jogar o Zap!
+        if (isMao) {
+          const threeCard = nonZapCards.find(c => c.power === 10);
+          if (threeCard) return threeCard; // Se for o Mão com um 3, chama sangue com ele
+        }
+        return nonZapCards.length > 0 ? nonZapCards[0] : sorted[0];
+      }
       // -----------------------------------------------------------------------
       // 1. O MÃO (1º a jogar da rodada)
       // -----------------------------------------------------------------------
@@ -532,6 +553,59 @@ class TrucoExpertAgent {
       const firstDraw = (firstTrick && firstTrick.winnerTeam === 'draw');
 
       // -----------------------------------------------------------------------
+      // REGRA MESTRE DO ZAP (RODADA 2):
+      // - Se já tiver uma rodada ganha (weWonFirst): NÃO JOGAR O ZAP!
+      // - Caso contrário (perdeu a 1ª ou empatou):
+      //     Validar se está vindo um 3, ou outra manilha. Se estiver, DEVE MATAR!
+      // -----------------------------------------------------------------------
+      if (hasZap) {
+        if (weWonFirst) {
+          // Se já tiver uma rodada ganha: NÃO jogar o ZAP de jeito nenhum!
+          // 1. Canga da vitória sem Zap: se empatar, leva a mão na hora!
+          const nonZapTieCards = tieCards.filter(c => !(c.isManilha && c.manilhaRank === 4));
+          if (nonZapTieCards.length > 0) {
+            return nonZapTieCards[0];
+          }
+
+          // 2. Se tiver outra carta vencedora sem ser o Zap (mata com 3 ou outra manilha):
+          const nonZapWinningCards = winningCards.filter(c => !(c.isManilha && c.manilhaRank === 4));
+          if (nonZapWinningCards.length > 0) {
+            return nonZapWinningCards[0];
+          }
+
+          // 3. Caso contrário: poupa o Zap para a 3ª vaza e joga o menor descarte!
+          return nonZapCards.length > 0 ? nonZapCards[0] : sorted[0];
+        } else {
+          // Caso contrário (perdeu a 1ª ou a 1ª cangou):
+          // Se a 1ª cangou e o bot é o primeiro a jogar (Mão): desce o Zap direto para garantir na canga!
+          if (firstDraw && previousPlays.length === 0) {
+            return zapCard;
+          }
+
+          // Validar se está vindo um 3, ou outra manilha de adversário:
+          const isEnemyThreat = isEnemyLeadingOrTied && (highestPower === 10 || highestPower >= 101);
+          if (isEnemyThreat) {
+            // Se estiver, DEVE MATAR!
+            if (winningCards.length > 0) {
+              return winningCards[0]; // Mata com o suficiente (inclui Zap se necessário)
+            }
+          }
+
+          // Se parceiro já está vencendo sozinho: poupa o Zap!
+          if (isPartnerLeadingAlone) {
+            return nonZapCards.length > 0 ? nonZapCards[0] : sorted[0];
+          }
+
+          // Se adversário jogou carta comum e bot pode matar com o que tiver:
+          if (winningCards.length > 0) {
+            return winningCards[0];
+          }
+
+          return nonZapCards.length > 0 ? nonZapCards[0] : sorted[0];
+        }
+      }
+
+      // -----------------------------------------------------------------------
       // CASO A: A RODADA 1 CANGOU (Empatou na primeira) -> VALE A VIDA!
       // -----------------------------------------------------------------------
       if (firstDraw) {
@@ -587,6 +661,7 @@ class TrucoExpertAgent {
     // RODADA 3: O DESFECHO FINAL
     // =========================================================================
     if (roundNumber === 3) {
+      if (hasZap) return zapCard;
       if (winningCards.length > 0) return winningCards[0];
       return sorted[0];
     }
@@ -598,7 +673,8 @@ class TrucoExpertAgent {
   shouldTruco(ctx) {
     const { botId, botTeam, role, roundNumber, availableCards, previousPlays, tricksHistory, handSignals, scoreDiff } = ctx;
     const manilhas = availableCards.filter(c => c.isManilha);
-    const hasZap = manilhas.some(c => c.manilhaRank === 4);
+    const zapCard = manilhas.find(c => c.manilhaRank === 4);
+    const hasZap = Boolean(zapCard);
     const hasCopeta = manilhas.some(c => c.manilhaRank === 3);
     const hasEspadilha = manilhas.some(c => c.manilhaRank === 2);
     const isPe = (role === 'Pé');
@@ -606,6 +682,11 @@ class TrucoExpertAgent {
     const firstTrick = tricksHistory[0];
     const firstWon = firstTrick && firstTrick.winnerTeam === botTeam;
     const firstDraw = firstTrick && firstTrick.winnerTeam === 'draw';
+
+    // Checagens de segurança básicas
+    if (this.game.isMaoDe11 || this.game.isMaoDeFerro || this.game.isGameOver || this.game.betState !== 'none') return false;
+    if (this.game.lastBettorTeam === botTeam) return false;
+    if (!this.game.getNextBetValue()) return false;
 
     // Top power na mesa atual
     let maxPower = -1;
@@ -628,6 +709,14 @@ class TrucoExpertAgent {
       return false; // Não tem carta para matar a manilha do oponente
     }
 
+    // =========================================================================
+    // REGRA DE OURO DO ZAP NA RODADA 3:
+    // Trucar, ou seis, ou nove ou doze ANTES de jogar!
+    // =========================================================================
+    if (roundNumber === 3 && hasZap) {
+      return true;
+    }
+
     // 1. PÓS-CANGA NA RODADA 2 (1ª rodada empatou):
     if (roundNumber === 2 && firstDraw) {
       if (manilhas.length > 0) {
@@ -643,7 +732,7 @@ class TrucoExpertAgent {
     }
 
     // 3. ROUBAR PONTOS NO FECHA (Pressão):
-    if (isPe && roundNumber >= 2) {
+    if (isPe && roundNumber >= 2 && botTeam !== 'us') {
       if (scoreDiff >= 7 && Math.random() < 0.45) {
         return true;
       }
@@ -678,13 +767,19 @@ class TrucoExpertAgent {
 
     // -------------------------------------------------------------------------
     // REGRA DE OURO DO MESTRE: NUNCA GRITAR SEIS/NOVE/DOZE SEM VER A CARTA!
-    // Exceções: 1) Ganhou 1ª com Zap; 2) Casal Maior; 3) Casal Preto no Pé
+    // Exceções: 1) Ganhou 1ª com Zap; 2) Casal Maior; 3) Casal Preto no Pé; 4) Zap na Rodada 3
     // -------------------------------------------------------------------------
     if (canRaise) {
       const authZapWin = (firstWon && hasZap);
-      if (isCasalMaior || isCasalPretoPe || authZapWin) {
+      const zapInRound3 = (roundNumber === 3 && hasZap);
+      if (isCasalMaior || isCasalPretoPe || authZapWin || zapInRound3) {
         return { action: 'raise', raiseVal };
       }
+    }
+
+    // Se tem o ZAP na Rodada 3, NUNCA corre! Aceita até 12 se não puder retrucar:
+    if (roundNumber === 3 && hasZap) {
+      return { action: 'accept' };
     }
 
     // -------------------------------------------------------------------------
@@ -1492,7 +1587,7 @@ class TrucoGame {
     };
 
     // 1. O bot consulta o TrucoExpertAgent para avaliar se deve pedir truco
-    if (botObj.team !== 'us' && this.expertAgent.shouldTruco(ctx)) {
+    if (this.expertAgent.shouldTruco(ctx)) {
       this.botInitiateTruco(botId);
       return;
     }
@@ -2145,9 +2240,12 @@ class TrucoGame {
     const nextVal = this.getNextBetValue();
     if (!nextVal) return;
 
-    this.lastBettorTeam = 'them';
+    const botObj = this.getPlayer(botId);
+    const isPartner = (botObj.team === 'us');
+
+    this.lastBettorTeam = botObj.team;
     this.lastBettorPlayerId = botId;
-    this.betState = 'waiting_player';
+    this.betState = isPartner ? 'waiting_bot' : 'waiting_player';
     window.trucoAudio.playTrucoAlert(nextVal);
 
     if (this.activeBluff.isBluff && this.activeBluff.botId === botId) {
@@ -2161,19 +2259,25 @@ class TrucoGame {
       else if (nextVal === 12) this.botSay(botId, this.pickRandom(BOT_QUOTES.doze));
     }
 
-    const botName = this.getPlayer(botId).name;
-    this.notifyMessage(`⚠️ ${botName.toUpperCase()} GRITOU ${this.getBetLabel(nextVal)}! Como sua dupla responde?`, "warning");
+    const botName = botObj.name;
+    if (isPartner) {
+      this.notifyMessage(`📣 SEU PARCEIRO ${botName.toUpperCase()} GRITOU ${this.getBetLabel(nextVal)}! (${nextVal} pontos)`, "warning");
+      this.emitState();
+      setTimeout(() => this.botsRespondToTruco(nextVal), 1400);
+    } else {
+      this.notifyMessage(`⚠️ ${botName.toUpperCase()} GRITOU ${this.getBetLabel(nextVal)}! Como sua dupla responde?`, "warning");
 
-    // No modo 4p, o seu parceiro Tião te dá uma dica sobre as cartas dele (via TrucoExpertAgent)!
-    if (this.gameMode === '4p') {
-      setTimeout(() => {
-        const partnerCards = (this.hands['bot_partner'] || []).filter(c => !c.played);
-        const advice = this.expertAgent.getPartnerAdvice(partnerCards);
-        this.botSay('bot_partner', advice);
-      }, 500);
+      // No modo 4p, o seu parceiro Tião te dá uma dica sobre as cartas dele (via TrucoExpertAgent)!
+      if (this.gameMode === '4p') {
+        setTimeout(() => {
+          const partnerCards = (this.hands['bot_partner'] || []).filter(c => !c.played);
+          const advice = this.expertAgent.getPartnerAdvice(partnerCards);
+          this.botSay('bot_partner', advice);
+        }, 500);
+      }
+
+      this.emitState();
     }
-
-    this.emitState();
   }
 
   // Resposta dos robôs adversários quando Nós pedimos Truco (via TrucoExpertAgent)

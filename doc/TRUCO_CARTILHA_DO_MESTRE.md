@@ -135,6 +135,30 @@
 - **Posicionamento para Ser o PÉ na Rodada Seguinte:**
   - Quando o bot tem o ZAP (ou a dupla tem o Zap), a estratégia de condução da vaza atual deve tentar **fazer com que o dono do Zap caia na posição de PÉ na rodada seguinte**.
   - **Motivo:** O Zap no Pé é a arma mais rentável do Truco Paulista: tendo a certeza do fechamento com a maior carta do jogo e informação perfeita das 3 cartas jogadas antes dele, o bot pode extrair o máximo de tentos (forçar Truco, retrucar Seis ou cangar para a vitória).
+
+### ⚡ Regras Oficiais do ZAP por Rodada (Diretrizes Estritas do Mestre):
+*(Aplicável a todos os bots da mesa: tanto ao parceiro Tião quanto aos adversários Zé e Tonho)*
+
+1. **Se for a Primeira Rodada (Rodada 1):**
+   - **Checagem de Ameaça:** Validar se está vindo um **3** (`power === 10`) ou **outra Manilha** (`power >= 101` / Copeta, Espadilha, Picafumo) jogada por adversário liderando ou empatado na mesa.
+   - **Se Estiver Vindo:** **DEVE MATAR!** O bot desce a menor carta vencedora suficiente (se tiver outra manilha que mate usa ela, caso contrário desce o próprio ZAP para estancar a ameaça).
+   - **Caso Contrário:** **NÃO JOGAR O ZAP!** Guarda o Zap seguro na mão. Se for o Mão e tiver um 3, pode "chamar sangue" com ele; caso contrário, joga o menor descarte sem queimar o Zap.
+
+2. **Se for a Segunda Rodada (Rodada 2):**
+   - **Se já tiver uma rodada ganha (`weWonFirst`):**
+     - **NÃO JOGAR O ZAP SOB HIPÓTESE ALGUMA!**
+     - Se tiver carta comum ou outra manilha que empate a mesa ("Canga da Vitória"), empata e leva a mão inteira imediatamente sem gastar o Zap.
+     - Se tiver outra carta vencedora (3 ou outra manilha), mata e fecha 2x0.
+     - Caso contrário, descarta o menor lixo e preserva o Zap 100% no bolso para a Rodada 3!
+   - **Caso Contrário (perdeu a 1ª rodada ou a 1ª rodada empatou/cangou):**
+     - Se a 1ª rodada empatou (cangou) e o bot é o primeiro a jogar, desce o Zap direto para garantir a mão na canga.
+     - Validar se está vindo um **3** ou **outra Manilha** de adversário: se estiver, **DEVE MATAR** (usando o Zap se necessário).
+     - Se o parceiro já estiver vencendo a vaza sozinho, poupa o Zap e descarta lixo.
+
+3. **Se for a Terceira Rodada (Rodada 3):**
+   - **Aumento Obrigatório:** **TRUCAR, ou pedir SEIS, NOVE ou DOZE ANTES de jogar!**
+   - Ao ser trucado pelo adversário, o bot com Zap **RETRUCA** (pede Seis, Nove ou Doze); se a aposta já estiver no teto de 12, aceita.
+   - Desce o Zap supremo na mesa e garante a vitória absoluta da partida!
 - **Combinações:**
   - Copeta ♥ + Espadilha ♠ (2ª e 3ª forças)
   - Casal Vermelho: Copeta ♥ + Picafumo ♦ (2ª e 4ª forças)

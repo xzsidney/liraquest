@@ -295,6 +295,7 @@ O **Arcade de Lira** é o centro de diversão acessível pelo Terminal do Avatar
        - **Filtro Anti-Suicídio & Critérios de Truco:** IA nunca truca na 2ª vaza sem ter como vencer após o adversário descer Zap; critérios rígidos de aceitar truco baseados em manilha + carta forte ou liderança elástica no placar.
        - **Regra de Ouro:** Proibido gritar Seis/Nove/Doze no escuro sem ver a carta jogada primeiro, exceto com vaza ganha + Zap ou Casal Maior engatilhado no Pé.
        - **Mão de 11 Calibrada:** Critérios matemáticos mínimos para correr ou aceitar o desafio (Manilha + 3, dois 3s + 2/Ás, Zap + dois 2s ou qualquer Casal).
+       - **Diretrizes Estritas do Zap por Rodada:** Na Rodada 1 mata 3 ou manilha adversária (senão guarda); na Rodada 2 nunca joga Zap se a 1ª foi ganha; na Rodada 3 truca/pede 6/9/12 antes de descer o Zap garantido (válido para todos os bots).
        - Documentação completa em [TRUCO_CARTILHA_DO_MESTRE.md](file:///e:/11_Games/LiraQuest/doc/TRUCO_CARTILHA_DO_MESTRE.md).
    - **Plano de Evolução Arquitetural & IA:** Consulte o planejamento detalhado em [TRUCO_ROADMAP_EVOLUCAO.md](file:///e:/11_Games/LiraQuest/doc/TRUCO_ROADMAP_EVOLUCAO.md) cobrindo o roadmap completo rumo ao Multiplayer Familiar via WebSockets (Etapa 5).
 
