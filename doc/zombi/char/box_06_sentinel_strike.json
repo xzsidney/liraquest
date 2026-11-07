@@ -1,0 +1,120 @@
+[
+  {
+    "code": "nana",
+    "name": "Nana",
+    "box_name": "Expansão: Sentinel Strike",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Energy Beam",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Protection Protocol : You have 5 Health. When Enemies move into an adjacent Zone containing a Super Hero, you may spend 1 Poder to move into that Zone, ignoring Enemies.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Zombies Heroes starting their Turn within Range 1 lose 1 Action. When Nana would be eliminated, roll a die. On a 5+, it is not eliminated."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": false,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "Zombies Heroes starting their Turn within Range 1 lose 1 Action. When Nana would be eliminated, roll a die. On a 5+, it is not eliminated."
+  },
+  {
+    "code": "professor_x",
+    "name": "Professor X",
+    "box_name": "Expansão: Sentinel Strike",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Mind Bolt",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Telepathic Guidance : Once during your Turn, you may allow 1 other Super Hero to perform 1 free Move or Power-Up Action. Then, resume your Turn.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Mind Bolt",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Telepathic Hunting : Once during your Turn, you may allow 1 other Zombie Hero to perform 1 free Move Action, or move any 1 Bystander 1 Zone in any direction you choose.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Each Zombie Hero must roll a die at the end of each of their turns. On a 5+, they suffer 1 Wound."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Each Zombie Hero must roll a die at the end of each of their turns. On a 5+, they suffer 1 Wound."
+  },
+  {
+    "code": "professor_x",
+    "name": "Professor X",
+    "box_name": "Expansão: Sentinel Strike",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Mind Bolt",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Telepathic Guidance : Once during your Turn, you may allow 1 other Super Hero to perform 1 free Move or Power-Up Action. Then, resume your Turn.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Mind Bolt",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Telepathic Hunting : Once during your Turn, you may allow 1 other Zombie Hero to perform 1 free Move Action, or move any 1 Bystander 1 Zone in any direction you choose.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Each Zombie Hero must roll a die at the end of each of their turns. On a 5+, they suffer 1 Wound."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Each Zombie Hero must roll a die at the end of each of their turns. On a 5+, they suffer 1 Wound."
+  }
+]

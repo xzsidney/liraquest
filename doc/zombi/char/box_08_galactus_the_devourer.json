@@ -1,0 +1,24 @@
+[
+  {
+    "code": "silver_surfer",
+    "name": "Silver Surfer",
+    "box_name": "Expansão: Galactus the Devourer",
+    "profiles": {},
+    "has_super_hero": false,
+    "has_zombie_hero": false,
+    "has_boss_enemy": false,
+    "boss_health": null,
+    "boss_ability": null
+  },
+  {
+    "code": "silver_surfer",
+    "name": "Silver Surfer",
+    "box_name": "Expansão: Galactus the Devourer",
+    "profiles": {},
+    "has_super_hero": false,
+    "has_zombie_hero": false,
+    "has_boss_enemy": false,
+    "boss_health": null,
+    "boss_ability": null
+  }
+]

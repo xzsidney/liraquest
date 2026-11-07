@@ -1,0 +1,32 @@
+[
+  {
+    "code": "wong",
+    "name": "Wong",
+    "box_name": "Promos Exclusivas",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Martial Arts",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 3
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Kamar-Taj Technique : Each time you attack with Martial Arts, you may spend 1 * to have your Attack roll only a single die (no bonuses possible) but gain +2 to the die result. If successful, it deals 3 Hits.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Last in Target Priority. When he spawns, roll a die and place it on this card, representing a Mystic Shield. Each time a Hit is allocated to his Zone, reduce the Shield by 1. Enemies in his Zone cannot be allocated Hits until the Shield is eliminated."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": false,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Last in Target Priority. When he spawns, roll a die and place it on this card, representing a Mystic Shield. Each time a Hit is allocated to his Zone, reduce the Shield by 1. Enemies in his Zone cannot be allocated Hits until the Shield is eliminated."
+  }
+]

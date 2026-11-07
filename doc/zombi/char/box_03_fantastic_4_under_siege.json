@@ -1,0 +1,530 @@
+[
+  {
+    "code": "mister_fantastic",
+    "name": "Mister Fantastic",
+    "box_name": "Marvel Zombies fantastic 4 Under siege",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Ataque Padrão",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 3
+        },
+        "skills": {
+          "blue": "rowspan=\"6\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Elongation : When attacking with Elastic Punches, you may spend any amount of * to gain that much additional Range. This Attack doesn't require Line of Sight, being able to go around corners but not through walls.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Elastic Punches",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Elongation : Elastic Punches gain additionnal Range equal to your Hunger level. This Attack doesn't require Line of Sight, being able to go around corners but not through walls.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Instead of moving, if there are any Zombies Heroes in his Line of Sight, he spend his Action moving them ALL into his Zone."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Instead of moving, if there are any Zombies Heroes in his Line of Sight, he spend his Action moving them ALL into his Zone."
+  },
+  {
+    "code": "invisible_woman",
+    "name": "Invisible Woman",
+    "box_name": "Marvel Zombies fantastic 4 Under siege",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Psionic Blast",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 3
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Invisibility : Each time you perform a Move Action, you may spend 1 Poder. If you do, you ignore Enemies and may move 1 Super Hero in your Zone along with you.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Psionic Blast",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 3
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Invisibility : Each time you perform a Move Action, you may increase Hunger. If you do, you ignore Enemies and may move 1 Zombie Hero in your Zone along with you.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Her Zone cannot be targeted by Attacks from Zombie Heroes outside her Zone."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "Her Zone cannot be targeted by Attacks from Zombie Heroes outside her Zone."
+  },
+  {
+    "code": "human_torch",
+    "name": "Human Torch",
+    "box_name": "Marvel Zombies fantastic 4 Under siege",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Flame on!",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Pyrogenesis : Each time an Enemy moves into your Zone, you may spend up to 3 Poderes to deal that many Hits to that Enemy.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Flame On!",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "A Warm Meal : Each time you eliminate a Super Hero with Flame On!, you may decrease Hunger by 1 and draw 1 Zombie Trait.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Zombie Heroes ending their Turn in his Zone suffer 1 Wound."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Zombie Heroes ending their Turn in his Zone suffer 1 Wound."
+  },
+  {
+    "code": "the_thing",
+    "name": "The Thing",
+    "box_name": "Marvel Zombies fantastic 4 Under siege",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Pulverize",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 3
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Toughness and Willpower : You have 5 Health. When you would suffer a Wound, you may discard 1 Heroic Trait to ignore it.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Pulverize",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 3
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Rock Solid : Enemies suffer -1 Toughness against your Attacks (min 1). While Ravenous, you cannot suffer Wounds from Troopers or Specialists.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 5,
+        "ability": "Each time he would be eliminated, roll a die. On a 5+, he is not eliminated."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 5,
+    "boss_ability": "Each time he would be eliminated, roll a die. On a 5+, he is not eliminated."
+  },
+  {
+    "code": "super_skrull",
+    "name": "Super Skrull",
+    "box_name": "Marvel Zombies fantastic 4 Under siege",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Cosmic mimicry",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 3
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Elongation : When attacking with cosmic Mimicry, you may spend any amount of * to gain that much additional Range. This Attack doesn't require Line of Sight, being able to go around corners but not through walls.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Cosmic Mimicry",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 3
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Elongation : Cosmic Mimicry gain additionnal Range equal to your Hunger level. This Attack doesn't require Line of Sight, being able to go around corners but not through walls.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Can attack from 1 Zone away. If his Zone is attacked but he is not eliminated, the attacker suffers 1 Wound."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "Can attack from 1 Zone away. If his Zone is attacked but he is not eliminated, the attacker suffers 1 Wound."
+  },
+  {
+    "code": "doctor_doom",
+    "name": "Doctor Doom",
+    "box_name": "Marvel Zombies fantastic 4 Under siege",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Lightning",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Behold the Might of Doom : Each time you eliminate a Zombie Hero, draw 1 Heroic Trait. Once during your Turn, you may discard 1 Heroic Trait to gain 2 Poderes.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Lightning",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Doom Does Not Yield!!! : Each time you eliminate a Super Hero, draw 1 Zombie Trait. During your Turn, you may discard 2 Zombie Traits to reduce your Hunger by any amount.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 5,
+        "ability": "During each End Phase, shuffle all Extra Activation, Rush, and Special Action Spawn cards back into the deck."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 5,
+    "boss_ability": "During each End Phase, shuffle all Extra Activation, Rush, and Special Action Spawn cards back into the deck."
+  },
+  {
+    "code": "super_skrull",
+    "name": "Super Skrull",
+    "box_name": "Marvel Zombies fantastic 4 Under siege",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Cosmic mimicry",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 3
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Elongation : When attacking with cosmic Mimicry, you may spend any amount of * to gain that much additional Range. This Attack doesn't require Line of Sight, being able to go around corners but not through walls.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Cosmic Mimicry",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 3
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Elongation : Cosmic Mimicry gain additionnal Range equal to your Hunger level. This Attack doesn't require Line of Sight, being able to go around corners but not through walls.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Can attack from 1 Zone away. If his Zone is attacked but he is not eliminated, the attacker suffers 1 Wound."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "Can attack from 1 Zone away. If his Zone is attacked but he is not eliminated, the attacker suffers 1 Wound."
+  },
+  {
+    "code": "namor",
+    "name": "Namor",
+    "box_name": "Marvel Zombies fantastic 4 Under siege",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Deep Crush",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Vestigial Wings : You ignore Enemies when moving. You may spend 1 Poder when moving to move +1 Zone",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Crush",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Vestigial Wings : You ignore Enemies when moving. If your Hunger Level is 3 or more, move +1 Zone per Move Action",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 5,
+        "ability": "Performs a number of Actions per Activation equal to 1 plus the number of wounded Zombie Heroes in the game (max. 4 Actions)."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 5,
+    "boss_ability": "Performs a number of Actions per Activation equal to 1 plus the number of wounded Zombie Heroes in the game (max. 4 Actions)."
+  },
+  {
+    "code": "black_bolt",
+    "name": "Black Bolt",
+    "box_name": "Marvel Zombies fantastic 4 Under siege",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Particle Shot",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Particle Channel : Each time you attack with Particle Shot, you may automatically eliminate 1 Walker or Runner in the targeted Zone.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Particle Shot",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Medusa's Lash : Each time you attack with Particle Shot, you may automatically eliminate 1 Trooper or Specialist in the Target Zone.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Zombie Heroes within Range 2 and in Line of Sight lose their Skills beyond Blue Level."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "Zombie Heroes within Range 2 and in Line of Sight lose their Skills beyond Blue Level."
+  },
+  {
+    "code": "mister_fantastic",
+    "name": "Mister Fantastic",
+    "box_name": "Marvel Zombies fantastic 4 Under siege",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Ataque Padrão",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 3
+        },
+        "skills": {
+          "blue": "rowspan=\"6\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Elongation : When attacking with Elastic Punches, you may spend any amount of * to gain that much additional Range. This Attack doesn't require Line of Sight, being able to go around corners but not through walls.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Elastic Punches",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Elongation : Elastic Punches gain additionnal Range equal to your Hunger level. This Attack doesn't require Line of Sight, being able to go around corners but not through walls.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Instead of moving, if there are any Zombies Heroes in his Line of Sight, he spend his Action moving them ALL into his Zone."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Instead of moving, if there are any Zombies Heroes in his Line of Sight, he spend his Action moving them ALL into his Zone."
+  },
+  {
+    "code": "invisible_woman",
+    "name": "Invisible Woman",
+    "box_name": "Marvel Zombies fantastic 4 Under siege",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Psionic Blast",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 3
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Invisibility : Each time you perform a Move Action, you may spend 1 Poder. If you do, you ignore Enemies and may move 1 Super Hero in your Zone along with you.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Psionic Blast",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 3
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Invisibility : Each time you perform a Move Action, you may increase Hunger. If you do, you ignore Enemies and may move 1 Zombie Hero in your Zone along with you.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Her Zone cannot be targeted by Attacks from Zombie Heroes outside her Zone."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "Her Zone cannot be targeted by Attacks from Zombie Heroes outside her Zone."
+  },
+  {
+    "code": "the_thing",
+    "name": "The Thing",
+    "box_name": "Marvel Zombies fantastic 4 Under siege",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Pulverize",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 3
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Toughness and Willpower : You have 5 Health. When you would suffer a Wound, you may discard 1 Heroic Trait to ignore it.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Pulverize",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 3
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Rock Solid : Enemies suffer -1 Toughness against your Attacks (min 1). While Ravenous, you cannot suffer Wounds from Troopers or Specialists.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 5,
+        "ability": "Each time he would be eliminated, roll a die. On a 5+, he is not eliminated."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 5,
+    "boss_ability": "Each time he would be eliminated, roll a die. On a 5+, he is not eliminated."
+  }
+]

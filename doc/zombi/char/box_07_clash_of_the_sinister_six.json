@@ -1,0 +1,692 @@
+[
+  {
+    "code": "venom",
+    "name": "Venom",
+    "box_name": "Caixa Base: Marvel Zombies",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Rending Claws",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Symbiotic Enhancement : Once during your Turn, Enemies suffer -1 Toughness against your Rending Claws Attack (min 1). During each End Phase, heal 1 Health.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Rending Claws",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Symbiotic Control : Once during your Turn, Enemies suffer -1 Toughness against your Rending Claws Attack (min 1). While Ravenous, you may suffer 1 Wound to perform Action as usual.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "When he is eliminated, take this card as a Bystander. While you have it, your Attacks roll +1 die. If it is ever discarded, roll a die. On a 4+, suffer 2 Wounds."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "When he is eliminated, take this card as a Bystander. While you have it, your Attacks roll +1 die. If it is ever discarded, roll a die. On a 4+, suffer 2 Wounds."
+  },
+  {
+    "code": "mysterio",
+    "name": "Mysterio",
+    "box_name": "Caixa Base: Marvel Zombies",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Hand-to-Hand",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Illusionary Foes : During your Turn, you may spend 1 Action and 1 Poder to select 1 Zone within Range 2. Eliminate 2 Walkers or Runners there. If there is a Brute or Zombie Hero in that Zone, eliminate 1 additional Walker or Runner there.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Hand-to-Hand",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Illusionary Enemy : Once during your Turn, you may spend 1 Action and increase Hunger to select 1 Enemy within Range 1. That Enemy suffers 1 Hit for each other Enemy in their Zone.",
+          "red": "+1 action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Zombie Heroes must spend +1 Action whenever they attacks his Zone."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Zombie Heroes must spend +1 Action whenever they attacks his Zone."
+  },
+  {
+    "code": "scorpion",
+    "name": "Scorpion",
+    "box_name": "Expansão: Clash of the Sinister Six",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Ataque Padrão",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Impale : Once during your Turn, you may spend 1 Poder to automatically eliminate 1 Walker or Runner within Range 1, or spend 2 Poderes to eliminate 1 Brute.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Devour",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Skewer and Devour : After attacking with Scorpion's Tail, you may move 1 Enemy from the target Zone into your Zone. Then, perform 1 free Devour Attack targeting that Enemy. They suffer -1 Toughness against this Attack (min. 1)",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Can attack from 1 Zone away. Each time he attacks, roll a die. On a 4-5, he deals 2 Wounds among the targeted Zombie Heroes. On a 6, he deals 3 Wounds."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Can attack from 1 Zone away. Each time he attacks, roll a die. On a 4-5, he deals 2 Wounds among the targeted Zombie Heroes. On a 6, he deals 3 Wounds."
+  },
+  {
+    "code": "kraven",
+    "name": "Kraven",
+    "box_name": "Caixa Base: Marvel Zombies",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Spear",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Choice Prey : If there's a Zombie Hero within Range 2 at the start of your Turn, you may perform 1 free Power-Up Action. You may reroll any misses when attacking Zones containing Zombie Heroes.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "When moving and attacking, he exclusively targets the Zombie Hero with the most XP. If that Hero activates within Range 2, they Lose 1 Action."
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Devour",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Choice Prey : When you activate, if there are any Super Heroes within Range 2, you may draw 1 Zombie Trait. You may reroll any misses when attacking Zones containing Super Heroes.",
+          "red": "+1 Action"
+        }
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "When moving and attacking, he exclusively targets the Zombie Hero with the most XP. If that Hero activates within Range 2, they Lose 1 Action."
+  },
+  {
+    "code": "sandman",
+    "name": "Sandman",
+    "box_name": "Expansão: Clash of the Sinister Six",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Sand Fists",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Body Manipulation : Once during your Turn, when attacking with Sand Fists, you may spend 1 Poder to gain 1 of the following effects, or 2 Poderes to gain both : +1 Range Enemies suffer -1 Thougness. (min 1)",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Ignores walls when moving (does not trigger spawns when entering closed buildings). Does not lower Hunger when devoured."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": false,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "Ignores walls when moving (does not trigger spawns when entering closed buildings). Does not lower Hunger when devoured."
+  },
+  {
+    "code": "black_cat",
+    "name": "Black Cat",
+    "box_name": "Expansão: Clash of the Sinister Six",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Martial Arts",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Bad Luck : Once per Enemy Phase, when Enemies in a Zone of your choice within Range 1 would activate, you may spend 1 Poder. If you do, before they activate, roll 3 dice. For each 4+, deal 1 Hit to 1 Enemy in that Zone, ignoring Target Priority.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Cat Claws",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Bad Luck : Once per Enemy Phase, when Enemies move into a Zone within Range 1, you may increase Hunger by any number to eliminate the same number of Troopers in that Zone.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Zombie Heroes suffer -1 to dice results when attacking her Zone. If that Attack roll 1 or more bite(1), they suffer 1 Wound."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Zombie Heroes suffer -1 to dice results when attacking her Zone. If that Attack roll 1 or more bite(1), they suffer 1 Wound."
+  },
+  {
+    "code": "rhino",
+    "name": "Rhino",
+    "box_name": "Caixa Base: Marvel Zombies",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Horn",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Gore : Once during your Turn, you may spend up to 2 Poderes. For each * spent, deal 1 Hit to 1 Enemy in your Zone (both may be allocated to the same Enemy).",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Horn",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Undead Hide : Once per Round, when you would suffer a Wound, you may instead increase your Hunger by 1.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "If he enters a Zone with Zombie Heroes, they each suffer 1 Wound. Whenever a Rush! Spawn card is drawn, he moves 1 Zone."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "If he enters a Zone with Zombie Heroes, they each suffer 1 Wound. Whenever a Rush! Spawn card is drawn, he moves 1 Zone."
+  },
+  {
+    "code": "green_goblin",
+    "name": "Green Goblin",
+    "box_name": "Expansão: Clash of the Sinister Six",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Pumpkin Bomb",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Goblin Glider : Once during your Turn, you may spend 1 Poder when moving to move +1 Zone, ignoring Enemies.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Pumpkin Bomb",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Goblin Glider : Once during your Turn, you may increase Hunger when moving to move +1 Zone, ignoring Enemies.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Instead of attacking, he deals 1 Wound to each Zombie Hero in his Zone, then moves 1 Zone away."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Instead of attacking, he deals 1 Wound to each Zombie Hero in his Zone, then moves 1 Zone away."
+  },
+  {
+    "code": "green_goblin",
+    "name": "Green Goblin",
+    "box_name": "Expansão: Clash of the Sinister Six",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Pumpkin Bomb",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Goblin Glider : Once during your Turn, you may spend 1 Poder when moving to move +1 Zone, ignoring Enemies.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Pumpkin Bomb",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Goblin Glider : Once during your Turn, you may increase Hunger when moving to move +1 Zone, ignoring Enemies.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Instead of attacking, he deals 1 Wound to each Zombie Hero in his Zone, then moves 1 Zone away."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Instead of attacking, he deals 1 Wound to each Zombie Hero in his Zone, then moves 1 Zone away."
+  },
+  {
+    "code": "electro",
+    "name": "Electro",
+    "box_name": "Expansão: Clash of the Sinister Six",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Electric Bolts",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Arcing Bolt : Each time you Attack with Electric Bolts, you may eliminate 1 additional Walker or Runner within Range 1 of the target Zone.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Electric Bolts",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Arcing Bolt : Each time you attack with Electric Bolts, you may automatically eliminate 1 Trooper or Specialist, within Range 1",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "His Attacks wound all Zombies Heroes in his Zone, as well as in all Zones with Zombies Heroes adjacent to it, and all Zones with Zombies Heroes adjacent to those Zones, and so on."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "His Attacks wound all Zombies Heroes in his Zone, as well as in all Zones with Zombies Heroes adjacent to it, and all Zones with Zombies Heroes adjacent to those Zones, and so on."
+  },
+  {
+    "code": "vulture",
+    "name": "Vulture",
+    "box_name": "Expansão: Clash of the Sinister Six",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Wing Slash",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Flying Slash : Each time you perform a Move Action, eliminate 1 Walker in 1 Zone you entered or left.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Wing Slash",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Power Sapper : Once during your Turn, when you eliminate a Guard or Super Hero, you may perform 1 free Action.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Remove 2 Tropper within Range 1 when he activates (if possible). For each Trooper removed, he performs +1 Action this Activation."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Remove 2 Tropper within Range 1 when he activates (if possible). For each Trooper removed, he performs +1 Action this Activation."
+  },
+  {
+    "code": "lizard",
+    "name": "Lizard",
+    "box_name": "Expansão: Clash of the Sinister Six",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Fangs and Claws",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Lesser Regeneration : At the start of each of your Turns, you Heal 1 Wound or gain 1 Poder.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Hero Spawn",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Chomp : Once during your Turn, you may perform 1 free Devour Attack. This Attack rolls only 1 die (no bonuses possible), scoring a number of Hits equal to your Hunger level if successful.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Each time he is eliminated by a Devour Attack, spawn him in the same Zone during the next End Phase."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "Each time he is eliminated by a Devour Attack, spawn him in the same Zone during the next End Phase."
+  },
+  {
+    "code": "doctor_octopus",
+    "name": "Doctor Octopus",
+    "box_name": "Expansão: Clash of the Sinister Six",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Tentacles",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Genius Mastermind : Once during your Turn, you or another Super Hero within Range 2 may draw 1 heroic Trait",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Tentacles",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Undead Intellect : Once during your Turn, you or another Zombie Hero within Range 2 may draw 1 Zombie Trait.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Can attack from 1 Zone away. If his Zone is attacked but he is not eliminated, the attacker is moved 1 Zone away and suffers 1 Wound."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Can attack from 1 Zone away. If his Zone is attacked but he is not eliminated, the attacker is moved 1 Zone away and suffers 1 Wound."
+  },
+  {
+    "code": "rhino",
+    "name": "Rhino",
+    "box_name": "Caixa Base: Marvel Zombies",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Horn",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Gore : Once during your Turn, you may spend up to 2 Poderes. For each * spent, deal 1 Hit to 1 Enemy in your Zone (both may be allocated to the same Enemy).",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Horn",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Undead Hide : Once per Round, when you would suffer a Wound, you may instead increase your Hunger by 1.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "If he enters a Zone with Zombie Heroes, they each suffer 1 Wound. Whenever a Rush! Spawn card is drawn, he moves 1 Zone."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "If he enters a Zone with Zombie Heroes, they each suffer 1 Wound. Whenever a Rush! Spawn card is drawn, he moves 1 Zone."
+  },
+  {
+    "code": "mysterio",
+    "name": "Mysterio",
+    "box_name": "Caixa Base: Marvel Zombies",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Hand-to-Hand",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Illusionary Foes : During your Turn, you may spend 1 Action and 1 Poder to select 1 Zone within Range 2. Eliminate 2 Walkers or Runners there. If there is a Brute or Zombie Hero in that Zone, eliminate 1 additional Walker or Runner there.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Hand-to-Hand",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Illusionary Enemy : Once during your Turn, you may spend 1 Action and increase Hunger to select 1 Enemy within Range 1. That Enemy suffers 1 Hit for each other Enemy in their Zone.",
+          "red": "+1 action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Zombie Heroes must spend +1 Action whenever they attacks his Zone."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Zombie Heroes must spend +1 Action whenever they attacks his Zone."
+  },
+  {
+    "code": "venom",
+    "name": "Venom",
+    "box_name": "Caixa Base: Marvel Zombies",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Rending Claws",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Symbiotic Enhancement : Once during your Turn, Enemies suffer -1 Toughness against your Rending Claws Attack (min 1). During each End Phase, heal 1 Health.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Rending Claws",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Symbiotic Control : Once during your Turn, Enemies suffer -1 Toughness against your Rending Claws Attack (min 1). While Ravenous, you may suffer 1 Wound to perform Action as usual.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "When he is eliminated, take this card as a Bystander. While you have it, your Attacks roll +1 die. If it is ever discarded, roll a die. On a 4+, suffer 2 Wounds."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "When he is eliminated, take this card as a Bystander. While you have it, your Attacks roll +1 die. If it is ever discarded, roll a die. On a 4+, suffer 2 Wounds."
+  }
+]

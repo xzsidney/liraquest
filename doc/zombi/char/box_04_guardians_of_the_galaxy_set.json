@@ -1,0 +1,542 @@
+[
+  {
+    "code": "gamora",
+    "name": "Gamora",
+    "box_name": "Marvel Zombies Gardians of the galaxy set",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Ataque Padrão",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Critical Strike : When attacking, each die result of 6 count as 2 hits against a single Enemy.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Godslayer",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Critical Strike : When attacking with Godslayer, each roll of 6 deals 2 Hits to a single Enemy.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Once per activation, roll a die after she attacks. On a 4+, she performs 1 free Attack."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Once per activation, roll a die after she attacks. On a 4+, she performs 1 free Attack."
+  },
+  {
+    "code": "groot",
+    "name": "Groot",
+    "box_name": "Marvel Zombies Gardians of the galaxy set",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Ataque Padrão",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "I am Groot! : You have 4 health. Once during each Round, you may prevent 1 Wound you would suffer.",
+          "red": "+1 Action"
+        }
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": false,
+    "has_boss_enemy": false,
+    "boss_health": null,
+    "boss_ability": null
+  },
+  {
+    "code": "rocket",
+    "name": "Rocket",
+    "box_name": "Marvel Zombies Gardians of the galaxy set",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Ataque Padrão",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Overload Shot : Before attacking, you may spend any amount of *. If you do, roll only 1 die (no bonuses possible). A successful roll deal a number of Hit equal to the * spent.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Devour",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Gonna Need That Brain : Whenever another Zombie Hero within Range 2 discard a Zombie Trait, you may gain that Trait.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Spawns with 2 Specialists. He and all Specialists within Range 1 can attack from 1 Zone away."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Spawns with 2 Specialists. He and all Specialists within Range 1 can attack from 1 Zone away."
+  },
+  {
+    "code": "drax",
+    "name": "Drax",
+    "box_name": "Marvel Zombies Gardians of the galaxy set",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Ataque Padrão",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Tyrant Hunter : Each time you would suffer Wounds from Brutes, roll a die. On a 3+, prevent those Wounds. Brutes suffer -1 Toughness (minimum 1) against your Dual Knives Attacks.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Devour",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Tyrant Devourer : When devouring, you may reroll any misses if there is a Guard or a Super Hero in your Zone. Each time you devour a Guard or a Super Hero, draw 1 Zombie Trait.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Performs +1 Action for each Zombie Hero at Hunger level 3-4 within Range 2 when he activates."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "Performs +1 Action for each Zombie Hero at Hunger level 3-4 within Range 2 when he activates."
+  },
+  {
+    "code": "mantis",
+    "name": "Mantis",
+    "box_name": "Marvel Zombies Gardians of the galaxy set",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Ataque Padrão",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Meditate : Once during your Turn, you may gain 1 Poder or draw 1 Heroic Trait",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Devour",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Combat Reflexes : Each time Enemies move into your Zone, you may increase Hunger to perform 1 free Martial Arts Attack.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Zombie Heroes within Range 1 are considered Ravenous at Hunger 3."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Zombie Heroes within Range 1 are considered Ravenous at Hunger 3."
+  },
+  {
+    "code": "nebula",
+    "name": "Nebula",
+    "box_name": "Marvel Zombies Gardians of the galaxy set",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Ataque Padrão",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Sniper : You ignore Target Priority. Before attacking with Targeting Rifle, you may spend any amount of * to gain that much additional Range.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Devour",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Killing Strike: Before attacking with Electro-Staff, you may choose to roll only 1 die (no bonuses possible). Add +2 to the die results. A successful roll deals a number of Hits equals to your Hunger level.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Can attack from 1 Zone away. When eliminated, 1 Zombie Hero in her Zone suffers 1 Wound."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Can attack from 1 Zone away. When eliminated, 1 Zombie Hero in her Zone suffers 1 Wound."
+  },
+  {
+    "code": "nova",
+    "name": "Nova",
+    "box_name": "Marvel Zombies Gardians of the galaxy set",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Nova Shots",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Forcefield : Each time Enemies attack your Zone, you may spend 1 Poder. If you do, before assigning Wounds, roll 1 die for each Wound. On a 5+, prevent that wound.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Devour",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Cosmic Awareness : Each time Enemies spawns within Range 1, before any Rush, you may perform 1 free Nova Shots Attack.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Spawns with a number of Troopers according to the highest Danger Level among Zombie Heroes : Blue : 2 / Yellow : 3 / Orange : 4 / Red : 5"
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "Spawns with a number of Troopers according to the highest Danger Level among Zombie Heroes : Blue : 2 / Yellow : 3 / Orange : 4 / Red : 5"
+  },
+  {
+    "code": "star_lord",
+    "name": "Star Lord",
+    "box_name": "Marvel Zombies Gardians of the galaxy set",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Laser Pistols",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Boosters : Once during your Turn, you may spend 1 Poder to perform 1 Move Action, moving up to 3 Zones. You do not ignore Enemies.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Devour",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Boosters : Once during your Turn, you may spend 1 Action to perform 1 move Action, moving up to 3 Zones. You do not ignore Enemies.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Zombie Heroes activating within Line of Sight lose 1 Action."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Zombie Heroes activating within Line of Sight lose 1 Action."
+  },
+  {
+    "code": "rocket",
+    "name": "Rocket",
+    "box_name": "Marvel Zombies Gardians of the galaxy set",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Ataque Padrão",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Overload Shot : Before attacking, you may spend any amount of *. If you do, roll only 1 die (no bonuses possible). A successful roll deal a number of Hit equal to the * spent.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Devour",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Gonna Need That Brain : Whenever another Zombie Hero within Range 2 discard a Zombie Trait, you may gain that Trait.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Spawns with 2 Specialists. He and all Specialists within Range 1 can attack from 1 Zone away."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Spawns with 2 Specialists. He and all Specialists within Range 1 can attack from 1 Zone away."
+  },
+  {
+    "code": "drax",
+    "name": "Drax",
+    "box_name": "Marvel Zombies Gardians of the galaxy set",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Ataque Padrão",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Tyrant Hunter : Each time you would suffer Wounds from Brutes, roll a die. On a 3+, prevent those Wounds. Brutes suffer -1 Toughness (minimum 1) against your Dual Knives Attacks.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Devour",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Tyrant Devourer : When devouring, you may reroll any misses if there is a Guard or a Super Hero in your Zone. Each time you devour a Guard or a Super Hero, draw 1 Zombie Trait.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Performs +1 Action for each Zombie Hero at Hunger level 3-4 within Range 2 when he activates."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "Performs +1 Action for each Zombie Hero at Hunger level 3-4 within Range 2 when he activates."
+  },
+  {
+    "code": "nebula",
+    "name": "Nebula",
+    "box_name": "Marvel Zombies Gardians of the galaxy set",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Ataque Padrão",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Sniper : You ignore Target Priority. Before attacking with Targeting Rifle, you may spend any amount of * to gain that much additional Range.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Devour",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Killing Strike: Before attacking with Electro-Staff, you may choose to roll only 1 die (no bonuses possible). Add +2 to the die results. A successful roll deals a number of Hits equals to your Hunger level.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Can attack from 1 Zone away. When eliminated, 1 Zombie Hero in her Zone suffers 1 Wound."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Can attack from 1 Zone away. When eliminated, 1 Zombie Hero in her Zone suffers 1 Wound."
+  },
+  {
+    "code": "mantis",
+    "name": "Mantis",
+    "box_name": "Marvel Zombies Gardians of the galaxy set",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Ataque Padrão",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Meditate : Once during your Turn, you may gain 1 Poder or draw 1 Heroic Trait",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Devour",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Combat Reflexes : Each time Enemies move into your Zone, you may increase Hunger to perform 1 free Martial Arts Attack.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Zombie Heroes within Range 1 are considered Ravenous at Hunger 3."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Zombie Heroes within Range 1 are considered Ravenous at Hunger 3."
+  },
+  {
+    "code": "thanos",
+    "name": "Thanos",
+    "box_name": "Marvel Zombies HYDRA Resurection",
+    "profiles": {
+      "zombie_hero": {
+        "attack": {
+          "name": "Power Stone",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 3
+        },
+        "skills": {
+          "blue": "rowspan=\"10\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Mind Stone : Once during your Turn, you may increase Hunger to search the Zombie Trait deck for 1 Trait card. Then, shuffle the deck.",
+          "red": "Space Stone : +1 Action and move +1 Zone per Move."
+        }
+      },
+      "boss_enemy": {
+        "health": 5,
+        "ability": "Spawns with Infinity Stones : Blue: 1 / Yellow : 2 / Orange : 3 / Red : 4. Gains 1 additional infinity Stone at the start of each Enemy Phase. If he has all 6 Stones, the players lose at the end of the Player Phase."
+      }
+    },
+    "has_super_hero": false,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 5,
+    "boss_ability": "Spawns with Infinity Stones : Blue: 1 / Yellow : 2 / Orange : 3 / Red : 4. Gains 1 additional infinity Stone at the start of each Enemy Phase. If he has all 6 Stones, the players lose at the end of the Player Phase."
+  }
+]

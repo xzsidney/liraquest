@@ -1,0 +1,2532 @@
+[
+  {
+    "code": "baron_zemo",
+    "name": "Baron Zemo",
+    "box_name": "Caixa Promocional: Kickstarter Promos",
+    "profiles": {},
+    "has_super_hero": false,
+    "has_zombie_hero": false,
+    "has_boss_enemy": false,
+    "boss_health": null,
+    "boss_ability": null
+  },
+  {
+    "code": "beast",
+    "name": "Beast",
+    "box_name": "Marvel Zombies Stretch goal box",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Claw Swipe",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Genius Intellect : Once during your Turn, you or another Super Hero within Range 2 may draw 1 Heroic Trait.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Claw Swipe",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Zombie Genius : Once during your Turn, you or another Zombie Hero within Range 2 may draw 1 Zombie Trait.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Attacking his Zone at Range 0 suffers -1 to dice results. If his Zone is attacked but he is not eliminated, move him 1 Zone away."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Attacking his Zone at Range 0 suffers -1 to dice results. If his Zone is attacked but he is not eliminated, move him 1 Zone away."
+  },
+  {
+    "code": "beast",
+    "name": "Beast",
+    "box_name": "Marvel Zombies Stretch goal box",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Claw Swipe",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Genius Intellect : Once during your Turn, you or another Super Hero within Range 2 may draw 1 Heroic Trait.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Claw Swipe",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Zombie Genius : Once during your Turn, you or another Zombie Hero within Range 2 may draw 1 Zombie Trait.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Attacking his Zone at Range 0 suffers -1 to dice results. If his Zone is attacked but he is not eliminated, move him 1 Zone away."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Attacking his Zone at Range 0 suffers -1 to dice results. If his Zone is attacked but he is not eliminated, move him 1 Zone away."
+  },
+  {
+    "code": "black_bolt",
+    "name": "Black Bolt",
+    "box_name": "Marvel Zombies fantastic 4 Under siege",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Particle Shot",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Particle Channel : Each time you attack with Particle Shot, you may automatically eliminate 1 Walker or Runner in the targeted Zone.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Particle Shot",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Medusa's Lash : Each time you attack with Particle Shot, you may automatically eliminate 1 Trooper or Specialist in the Target Zone.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Zombie Heroes within Range 2 and in Line of Sight lose their Skills beyond Blue Level."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "Zombie Heroes within Range 2 and in Line of Sight lose their Skills beyond Blue Level."
+  },
+  {
+    "code": "black_cat",
+    "name": "Black Cat",
+    "box_name": "Expansão: Clash of the Sinister Six",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Martial Arts",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Bad Luck : Once per Enemy Phase, when Enemies in a Zone of your choice within Range 1 would activate, you may spend 1 Poder. If you do, before they activate, roll 3 dice. For each 4+, deal 1 Hit to 1 Enemy in that Zone, ignoring Target Priority.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Cat Claws",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Bad Luck : Once per Enemy Phase, when Enemies move into a Zone within Range 1, you may increase Hunger by any number to eliminate the same number of Troopers in that Zone.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Zombie Heroes suffer -1 to dice results when attacking her Zone. If that Attack roll 1 or more bite(1), they suffer 1 Wound."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Zombie Heroes suffer -1 to dice results when attacking her Zone. If that Attack roll 1 or more bite(1), they suffer 1 Wound."
+  },
+  {
+    "code": "black_knight",
+    "name": "Black Knight",
+    "box_name": "Caixa Promocional: Kickstarter Promos",
+    "profiles": {},
+    "has_super_hero": false,
+    "has_zombie_hero": false,
+    "has_boss_enemy": false,
+    "boss_health": null,
+    "boss_ability": null
+  },
+  {
+    "code": "blade",
+    "name": "Blade",
+    "box_name": "Caixa Promocional: Kickstarter Promos",
+    "profiles": {},
+    "has_super_hero": false,
+    "has_zombie_hero": false,
+    "has_boss_enemy": false,
+    "boss_health": null,
+    "boss_ability": null
+  },
+  {
+    "code": "bullseye",
+    "name": "Bullseye",
+    "box_name": "Marvel Zombies stretch goals box",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Dual Sai",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Worthy Target : Zombies Heroes have -1 toughness (min. 1) against your Dual Sai Attacks. Each time you eliminate a Zombie Hero, perform 1 free Action.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Throwing Knives",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "I Never Miss! : You ignore Target Priority when attacking with Throwing Knives. After rolling, you may increase Hunger to reroll any misses.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "His attacks have unlimited Range (but still require Line of Sight)."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "His attacks have unlimited Range (but still require Line of Sight)."
+  },
+  {
+    "code": "bullseye",
+    "name": "Bullseye",
+    "box_name": "Marvel Zombies stretch goals box",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Dual Sai",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Worthy Target : Zombies Heroes have -1 toughness (min. 1) against your Dual Sai Attacks. Each time you eliminate a Zombie Hero, perform 1 free Action.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Throwing Knives",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "I Never Miss! : You ignore Target Priority when attacking with Throwing Knives. After rolling, you may increase Hunger to reroll any misses.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "His attacks have unlimited Range (but still require Line of Sight)."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "His attacks have unlimited Range (but still require Line of Sight)."
+  },
+  {
+    "code": "captain_america",
+    "name": "Captain America",
+    "box_name": "Caixa Base: Marvel Zombies",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Vibranium Shield",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|230x230px",
+          "yellow": "-",
+          "orange": "I Can Do This All Day : Once during your Turn, you may spend 1 Poder to perform 1 free Move Action, or spend 3 Poderes to heal 1 Wound.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Vibranium Shield",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Shield Block : Each time Enemies attack your Zone, before assinging Wounds, roll 1 die for each Wound. On a 5+ Prevent that Wound.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Troopers and Guards activating within Range 1 perform +1 Action."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "Troopers and Guards activating within Range 1 perform +1 Action."
+  },
+  {
+    "code": "captain_marvel",
+    "name": "Captain Marvel",
+    "box_name": "Caixa Base: Marvel Zombies",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Mighty Punches",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Energy Focus : Enemies suffer -1 Toughness (min. 1) against your Mighty Punches Attack. When Attacking with Mighty Punches, you may spend 1 Poder to gain +1 Range.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Mighty Punches",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Energy Blast : Each time you attack with Mighty Punches, you may eliminate 1 Trooper or Specialist in your Zone.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "If a Zombie Hero enters a Zone with a Bystander, immediately place her in that Zone. All Zombie Heroes there suffer 1 wound."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "If a Zombie Hero enters a Zone with a Bystander, immediately place her in that Zone. All Zombie Heroes there suffer 1 wound."
+  },
+  {
+    "code": "carnage",
+    "name": "Carnage",
+    "box_name": "Caixa Promocional: Kickstarter Promos",
+    "profiles": {},
+    "has_super_hero": false,
+    "has_zombie_hero": false,
+    "has_boss_enemy": false,
+    "boss_health": null,
+    "boss_ability": null
+  },
+  {
+    "code": "colossus",
+    "name": "Colossus",
+    "box_name": "Marvel Zombies X-men Resistance core box",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Pummeling Fists",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Tough as Steel : Once during each Enemy Phase, you may ignore 1 Wound you would receive.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Pummeling Fists",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Tough as Steel : Once during each Enemy Phase, you may ignore 1 Wound you would receive.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "A successful Attack only eliminates him if another Super Hero in his Zone spends 2 Poderes."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "A successful Attack only eliminates him if another Super Hero in his Zone spends 2 Poderes."
+  },
+  {
+    "code": "crossbones",
+    "name": "Crossbones",
+    "box_name": "Caixa Promocional: Kickstarter Promos",
+    "profiles": {},
+    "has_super_hero": false,
+    "has_zombie_hero": false,
+    "has_boss_enemy": false,
+    "boss_health": null,
+    "boss_ability": null
+  },
+  {
+    "code": "cyclops",
+    "name": "Cyclops",
+    "box_name": "Marvel Zombies X-men Resistance core box",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Optic Blast",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Focused Shot : When you Attack with Optic Blast, you may spend 1 Poder to gain +1 Range and ignore Target Priority.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Optic Blast",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Focused Shot : When attacking with Optic Blast, you may increase Hunger to gain +1 Range and ignore Target Priority.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "His Attacks target the farthest Zombie Hero's Zone in Line of Sight, as well as all intervening Zones (including his own)."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "His Attacks target the farthest Zombie Hero's Zone in Line of Sight, as well as all intervening Zones (including his own)."
+  },
+  {
+    "code": "daredevil",
+    "name": "Daredevil",
+    "box_name": "Marvel Zombies stretch goals box",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Baton Strike",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Know Fear : Whenever you eliminate a Brute or a Zombie Hero, you may draw 1 Hero Trait.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "After a Bystander is devoured, Daredevil immediately performs 2 Actions."
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Baton Rush",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Beatdown : When attacking with Baton Rush, for each roll of 6, roll +1 die. These dice may generate additional dice.",
+          "red": "+1 Action"
+        }
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "After a Bystander is devoured, Daredevil immediately performs 2 Actions."
+  },
+  {
+    "code": "daredevil",
+    "name": "Daredevil",
+    "box_name": "Marvel Zombies stretch goals box",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Baton Strike",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Know Fear : Whenever you eliminate a Brute or a Zombie Hero, you may draw 1 Hero Trait.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "After a Bystander is devoured, Daredevil immediately performs 2 Actions."
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Baton Rush",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Beatdown : When attacking with Baton Rush, for each roll of 6, roll +1 die. These dice may generate additional dice.",
+          "red": "+1 Action"
+        }
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "After a Bystander is devoured, Daredevil immediately performs 2 Actions."
+  },
+  {
+    "code": "dark_phoenix",
+    "name": "Dark Phoenix",
+    "box_name": "Marvel Zombies X-men Resistance core box",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Psychic Bolts",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Telekinesis : Once during your Turn, you may spend 1 Poder to have yourself or another Super Hero within Range 1 perform 1 free Move Action.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Psychic bolts",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Telekinesis : Once during your Turn, you may select 1 Bystander, Enemy or Zombie Hero within Range 2 and move them 1 Zone.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Each time she is eliminated, spawn her on the First Spawn Point during the next End Phase."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "Each time she is eliminated, spawn her on the First Spawn Point during the next End Phase."
+  },
+  {
+    "code": "deadpool",
+    "name": "Deadpool",
+    "box_name": "Caixa Base: Marvel Zombies",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Dual Katanas",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 3
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Yeah, I Count as a Hero! : Once during your Turn, you may spend 1 Poder to draw 1 Heroic Trait. Each time you eliminate a Zombie Hero, draw 1 Heroic Trait.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Dual Katanas",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 3
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Adapting to the Hunger : Once during your Turn, you may increase Hunger to draw 1 Zombie Trait.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Unless he has been devoured, each time he is eliminated spawn him on the First Spawn Point during the next End Phase."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "Unless he has been devoured, each time he is eliminated spawn him on the First Spawn Point during the next End Phase."
+  },
+  {
+    "code": "doctor_doom",
+    "name": "Doctor Doom",
+    "box_name": "Marvel Zombies fantastic 4 Under siege",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Lightning",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Behold the Might of Doom : Each time you eliminate a Zombie Hero, draw 1 Heroic Trait. Once during your Turn, you may discard 1 Heroic Trait to gain 2 Poderes.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Lightning",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Doom Does Not Yield!!! : Each time you eliminate a Super Hero, draw 1 Zombie Trait. During your Turn, you may discard 2 Zombie Traits to reduce your Hunger by any amount.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 5,
+        "ability": "During each End Phase, shuffle all Extra Activation, Rush, and Special Action Spawn cards back into the deck."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 5,
+    "boss_ability": "During each End Phase, shuffle all Extra Activation, Rush, and Special Action Spawn cards back into the deck."
+  },
+  {
+    "code": "doctor_octopus",
+    "name": "Doctor Octopus",
+    "box_name": "Expansão: Clash of the Sinister Six",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Tentacles",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Genius Mastermind : Once during your Turn, you or another Super Hero within Range 2 may draw 1 heroic Trait",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Tentacles",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Undead Intellect : Once during your Turn, you or another Zombie Hero within Range 2 may draw 1 Zombie Trait.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Can attack from 1 Zone away. If his Zone is attacked but he is not eliminated, the attacker is moved 1 Zone away and suffers 1 Wound."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Can attack from 1 Zone away. If his Zone is attacked but he is not eliminated, the attacker is moved 1 Zone away and suffers 1 Wound."
+  },
+  {
+    "code": "doctor_strange",
+    "name": "Doctor Strange",
+    "box_name": "Caixa Base: Marvel Zombies",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Mystic Bolts",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Precognition : Once during each Enemy Phase, when a Spawn card is drawn, you may spend 2 Poderes to discard that card and draw a new one.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Mystic Bolts",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Precognition : Once during each Enemy Phase, when a Spawn card is drawn, you may increase Hunger to discard that card and draw a new one.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Acts as a Spawn Point during each Enemy Phase."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Acts as a Spawn Point during each Enemy Phase."
+  },
+  {
+    "code": "electro",
+    "name": "Electro",
+    "box_name": "Expansão: Clash of the Sinister Six",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Electric Bolts",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Arcing Bolt : Each time you Attack with Electric Bolts, you may eliminate 1 additional Walker or Runner within Range 1 of the target Zone.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Electric Bolts",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Arcing Bolt : Each time you attack with Electric Bolts, you may automatically eliminate 1 Trooper or Specialist, within Range 1",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "His Attacks wound all Zombies Heroes in his Zone, as well as in all Zones with Zombies Heroes adjacent to it, and all Zones with Zombies Heroes adjacent to those Zones, and so on."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "His Attacks wound all Zombies Heroes in his Zone, as well as in all Zones with Zombies Heroes adjacent to it, and all Zones with Zombies Heroes adjacent to those Zones, and so on."
+  },
+  {
+    "code": "elektra",
+    "name": "Elektra",
+    "box_name": "Marvel Zombies stretch goals box",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Baton Sai",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Woman Without Fear : Before attacking with Baton Sai, you may spend 1 Poder to eliminated 1 Brute in the target Zone OR score +1 Hit against a Zombie Hero.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Dual Sai",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Critical Strike : When attacking with Dual Sai, each roll of 6 deals 2 Hits to a single Enemy.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Whenever an Extra Activation card is drawn, all Zombie Heroes within Range 2 suffer 1 Wound."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Whenever an Extra Activation card is drawn, all Zombie Heroes within Range 2 suffer 1 Wound."
+  },
+  {
+    "code": "elektra",
+    "name": "Elektra",
+    "box_name": "Marvel Zombies stretch goals box",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Baton Sai",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Woman Without Fear : Before attacking with Baton Sai, you may spend 1 Poder to eliminated 1 Brute in the target Zone OR score +1 Hit against a Zombie Hero.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Dual Sai",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Critical Strike : When attacking with Dual Sai, each roll of 6 deals 2 Hits to a single Enemy.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Whenever an Extra Activation card is drawn, all Zombie Heroes within Range 2 suffer 1 Wound."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Whenever an Extra Activation card is drawn, all Zombie Heroes within Range 2 suffer 1 Wound."
+  },
+  {
+    "code": "emma_frost",
+    "name": "Emma Frost",
+    "box_name": "Caixa Promocional: Kickstarter Promos",
+    "profiles": {},
+    "has_super_hero": false,
+    "has_zombie_hero": false,
+    "has_boss_enemy": false,
+    "boss_health": null,
+    "boss_ability": null
+  },
+  {
+    "code": "gambit",
+    "name": "Gambit",
+    "box_name": "Caixa Promocional: Kickstarter Promos",
+    "profiles": {},
+    "has_super_hero": false,
+    "has_zombie_hero": false,
+    "has_boss_enemy": false,
+    "boss_health": null,
+    "boss_ability": null
+  },
+  {
+    "code": "gambit",
+    "name": "Gambit",
+    "box_name": "Caixa Promocional: Kickstarter Promos",
+    "profiles": {},
+    "has_super_hero": false,
+    "has_zombie_hero": false,
+    "has_boss_enemy": false,
+    "boss_health": null,
+    "boss_ability": null
+  },
+  {
+    "code": "gamora",
+    "name": "Gamora",
+    "box_name": "Marvel Zombies Gardians of the galaxy set",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Ataque Padrão",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Critical Strike : When attacking, each die result of 6 count as 2 hits against a single Enemy.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Godslayer",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Critical Strike : When attacking with Godslayer, each roll of 6 deals 2 Hits to a single Enemy.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Once per activation, roll a die after she attacks. On a 4+, she performs 1 free Attack."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Once per activation, roll a die after she attacks. On a 4+, she performs 1 free Attack."
+  },
+  {
+    "code": "ghost_rider",
+    "name": "Ghost Rider",
+    "box_name": "Caixa Promocional: Kickstarter Promos",
+    "profiles": {},
+    "has_super_hero": false,
+    "has_zombie_hero": false,
+    "has_boss_enemy": false,
+    "boss_health": null,
+    "boss_ability": null
+  },
+  {
+    "code": "giant_man",
+    "name": "Giant-Man",
+    "box_name": "Caixa Promocional: Kickstarter Promos",
+    "profiles": {},
+    "has_super_hero": false,
+    "has_zombie_hero": false,
+    "has_boss_enemy": false,
+    "boss_health": null,
+    "boss_ability": null
+  },
+  {
+    "code": "hawkeye",
+    "name": "Hawkeye",
+    "box_name": "Marvel Zombies HYDRA Resurection",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Bow & Arrow",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Covering Fire : Once during each other Super Hero's turn, if they are within Range 2, after they completed an Attack, you may eliminate 1 Walker in their Zone.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Arrows",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Expert Marksman : You ingore Target Priority. Each time you attack with Arrows, you may increase Hunger by 1 to increase Range by 1.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Can attack from 3 Zones away. After he attacks, roll a die. On a 5+, he performs a free Attack. This free Attack may trigger further free Attacks."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Can attack from 3 Zones away. After he attacks, roll a die. On a 5+, he performs a free Attack. This free Attack may trigger further free Attacks."
+  },
+  {
+    "code": "hulk",
+    "name": "Hulk",
+    "box_name": "Caixa Base: Marvel Zombies",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Ability : Smash!!!",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Gamma Rage : You have 5 Health. At the start of each of your Turns, gains 1 Poder for each Wound you have suffered.",
+          "red": "+1 action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Hero Spawn",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 3
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Strongest One There Is! : Enemies have -1 Toughness against your Attacks (to a minimum of 1). Unless using Thunderclap, you may reroll any dice if there is a Super Hero in your Zone.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 5,
+        "ability": "Can only be eliminated by Devour Attacks."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 5,
+    "boss_ability": "Can only be eliminated by Devour Attacks."
+  },
+  {
+    "code": "human_torch",
+    "name": "Human Torch",
+    "box_name": "Marvel Zombies fantastic 4 Under siege",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Flame on!",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Pyrogenesis : Each time an Enemy moves into your Zone, you may spend up to 3 Poderes to deal that many Hits to that Enemy.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Flame On!",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "A Warm Meal : Each time you eliminate a Super Hero with Flame On!, you may decrease Hunger by 1 and draw 1 Zombie Trait.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Zombie Heroes ending their Turn in his Zone suffer 1 Wound."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Zombie Heroes ending their Turn in his Zone suffer 1 Wound."
+  },
+  {
+    "code": "iceman",
+    "name": "Iceman",
+    "box_name": "Marvel Zombies X-men Resistance core box",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Ice Beams",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Ice Slide : Once during your Turn, you may spend 1 Poder to have yourself or another Super Hero within Range 1 perform 1 free Move Action.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Ice Beams",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Ice Slide : Once during your Turn, you may perform 1 free Move Action and move +1 Zone. (You stop if you enter a Zone with Enemies)",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Zombie Heroes within Range 1 must spend 1 extra Action to perform a Move Action."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Zombie Heroes within Range 1 must spend 1 extra Action to perform a Move Action."
+  },
+  {
+    "code": "iron_man",
+    "name": "Iron Man",
+    "box_name": "Marvel Zombies Core Box",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Repulsor",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Missile Barrage : When attacking with Repulsor, you may spend 1 Poder to replace your base Dice with 1 die for each Enemy in the Zone (before any bonuses), ignoring Zombie Heroes for this Attack.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Devour",
+          "range": "Range",
+          "dice": 3,
+          "accuracy": 3
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Repulsor Blast : After attacking with Missile Wave, you may push all Enemies in that Zone into an adjacent Zone.",
+          "red": "+1 action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Can attack from 2 Zones away. If his Zone is attacked but he is not eliminated, move him 1 Zone away and the attacker suffers 1 Wound."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "Can attack from 2 Zones away. If his Zone is attacked but he is not eliminated, move him 1 Zone away and the attacker suffers 1 Wound."
+  },
+  {
+    "code": "jessica_jones",
+    "name": "Jessica Jones",
+    "box_name": "Caixa Promocional: Kickstarter Promos",
+    "profiles": {},
+    "has_super_hero": false,
+    "has_zombie_hero": false,
+    "has_boss_enemy": false,
+    "boss_health": null,
+    "boss_ability": null
+  },
+  {
+    "code": "juggernaut",
+    "name": "Juggernaut",
+    "box_name": "Marvel Zombies X-men Resistance core box",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Body Slam",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Know Who I Am? : You have 5 Health. Once during your Turn, you may spend 1 Poder to perform 1 free Move Action and 1 free Open Door Action.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Body Slam",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Undead Stamina : Once during your Turn, you may increase Hunger to perform 1 free Melee Attack or Move Action.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Ativa na fase dos inimigos e executa suas habilidades de zumbi."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "Ativa na fase dos inimigos e executa suas habilidades de zumbi."
+  },
+  {
+    "code": "kingpin",
+    "name": "Kingpin",
+    "box_name": "Marvel Zombies Stretch goal box",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Cane and Fist",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "The Boss : Once during your Turn, you may have 1 other super Hero within Range 2 perform 1 free Attack Action. You gain 1 XP for each Enemy this eliminates. Then, resume your Turn.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Cane and Fist",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Zombie Boss : Once during your Turn, you may have 1 other Zombie Hero within Range 2 perform 1 free Attack Action. You gain 1 XP for each Enemy this eliminates. Then, resume your Turn.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "He is last in Target Priority. Spawn 2 Guards with him. Guards within Range 1 of him have +1 Toughness."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "He is last in Target Priority. Spawn 2 Guards with him. Guards within Range 1 of him have +1 Toughness."
+  },
+  {
+    "code": "kingpin",
+    "name": "Kingpin",
+    "box_name": "Marvel Zombies Stretch goal box",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Cane and Fist",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "The Boss : Once during your Turn, you may have 1 other super Hero within Range 2 perform 1 free Attack Action. You gain 1 XP for each Enemy this eliminates. Then, resume your Turn.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Cane and Fist",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Zombie Boss : Once during your Turn, you may have 1 other Zombie Hero within Range 2 perform 1 free Attack Action. You gain 1 XP for each Enemy this eliminates. Then, resume your Turn.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "He is last in Target Priority. Spawn 2 Guards with him. Guards within Range 1 of him have +1 Toughness."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "He is last in Target Priority. Spawn 2 Guards with him. Guards within Range 1 of him have +1 Toughness."
+  },
+  {
+    "code": "kitty_pryde",
+    "name": "Kitty Pryde",
+    "box_name": "Caixa Promocional: Kickstarter Promos",
+    "profiles": {},
+    "has_super_hero": false,
+    "has_zombie_hero": false,
+    "has_boss_enemy": false,
+    "boss_health": null,
+    "boss_ability": null
+  },
+  {
+    "code": "kraven",
+    "name": "Kraven",
+    "box_name": "Caixa Base: Marvel Zombies",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Spear",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Choice Prey : If there's a Zombie Hero within Range 2 at the start of your Turn, you may perform 1 free Power-Up Action. You may reroll any misses when attacking Zones containing Zombie Heroes.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "When moving and attacking, he exclusively targets the Zombie Hero with the most XP. If that Hero activates within Range 2, they Lose 1 Action."
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Devour",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Choice Prey : When you activate, if there are any Super Heroes within Range 2, you may draw 1 Zombie Trait. You may reroll any misses when attacking Zones containing Super Heroes.",
+          "red": "+1 Action"
+        }
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "When moving and attacking, he exclusively targets the Zombie Hero with the most XP. If that Hero activates within Range 2, they Lose 1 Action."
+  },
+  {
+    "code": "lizard",
+    "name": "Lizard",
+    "box_name": "Expansão: Clash of the Sinister Six",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Fangs and Claws",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Lesser Regeneration : At the start of each of your Turns, you Heal 1 Wound or gain 1 Poder.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Hero Spawn",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Chomp : Once during your Turn, you may perform 1 free Devour Attack. This Attack rolls only 1 die (no bonuses possible), scoring a number of Hits equal to your Hunger level if successful.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Each time he is eliminated by a Devour Attack, spawn him in the same Zone during the next End Phase."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "Each time he is eliminated by a Devour Attack, spawn him in the same Zone during the next End Phase."
+  },
+  {
+    "code": "loki",
+    "name": "Loki",
+    "box_name": "Marvel Zombies HYDRA Resurection",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Scepter",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Not Who You Expected : Once during your turn, you may spend 1 Poder to select 1 Super Hero or Bystander within Range 2. Switch the positions of Loki and that Super Hero/Bystander.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Scepter",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Shapeshift : At the end of your Turn, if there are no Enemies in your Zone, you may have all Enemies ignore you during the next Enemy Phase.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "If his Zone is attacked, but he is not eliminated, spawn 1 Trooper there. Then, move Loki 1 Zone away."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "If his Zone is attacked, but he is not eliminated, spawn 1 Trooper there. Then, move Loki 1 Zone away."
+  },
+  {
+    "code": "luke_cage",
+    "name": "Luke Cage",
+    "box_name": "Caixa Promocional: Kickstarter Promos",
+    "profiles": {},
+    "has_super_hero": false,
+    "has_zombie_hero": false,
+    "has_boss_enemy": false,
+    "boss_health": null,
+    "boss_ability": null
+  },
+  {
+    "code": "luke_cage",
+    "name": "Luke Cage",
+    "box_name": "Caixa Promocional: Kickstarter Promos",
+    "profiles": {},
+    "has_super_hero": false,
+    "has_zombie_hero": false,
+    "has_boss_enemy": false,
+    "boss_health": null,
+    "boss_ability": null
+  },
+  {
+    "code": "magneto",
+    "name": "Magneto",
+    "box_name": "Marvel Zombies X-men Resistance core box",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Shrapnel",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 3
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Crush : Once during your Turn, you may spend 1 Poder to automatically eliminate 1 Walker or Runner, or 2 Poderes to eliminate 1 Brute, in a Zone within Range 1.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Shrapnel",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Magnetic Pull : Once during your Turn, you may increase Hunger to select 1 Bystander, Enemy, or Zombie Hero within Range 2 and move them into your Zone.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "When he activates, move all Zombie Heroes within Range 2 into his Zone."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "When he activates, move all Zombie Heroes within Range 2 into his Zone."
+  },
+  {
+    "code": "miles_morales",
+    "name": "Miles Morales",
+    "box_name": "Caixa Promocional: Kickstarter Promos",
+    "profiles": {},
+    "has_super_hero": false,
+    "has_zombie_hero": false,
+    "has_boss_enemy": false,
+    "boss_health": null,
+    "boss_ability": null
+  },
+  {
+    "code": "moon_knight",
+    "name": "Moon Knight",
+    "box_name": "Marvel Zombies stretch goals box",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Crescent Darts",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Charging Throw: Once during your Turn, after completing a Move Action, you may spend 1 Poder to perform 1 free Crescent Darts Attack targeting your Zone.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Crescent Darts",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Personality Shift: Each time you devour a Bystander or Enemy, roll a die. On a 1, increase Hunger by 3. On a 2-4, draw 1 Zombie Trait. On a 5-6, perform a Free Action.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Ativa na fase dos inimigos e executa suas habilidades de zumbi."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "Ativa na fase dos inimigos e executa suas habilidades de zumbi."
+  },
+  {
+    "code": "moon_knight",
+    "name": "Moon Knight",
+    "box_name": "Marvel Zombies stretch goals box",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Crescent Darts",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Charging Throw: Once during your Turn, after completing a Move Action, you may spend 1 Poder to perform 1 free Crescent Darts Attack targeting your Zone.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Crescent Darts",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Personality Shift: Each time you devour a Bystander or Enemy, roll a die. On a 1, increase Hunger by 3. On a 2-4, draw 1 Zombie Trait. On a 5-6, perform a Free Action.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Ativa na fase dos inimigos e executa suas habilidades de zumbi."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "Ativa na fase dos inimigos e executa suas habilidades de zumbi."
+  },
+  {
+    "code": "morbius",
+    "name": "Morbius",
+    "box_name": "Caixa Promocional: Kickstarter Promos",
+    "profiles": {},
+    "has_super_hero": false,
+    "has_zombie_hero": false,
+    "has_boss_enemy": false,
+    "boss_health": null,
+    "boss_ability": null
+  },
+  {
+    "code": "ms_marvel",
+    "name": "Ms. Marvel",
+    "box_name": "Caixa Base: Marvel Zombies",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Ability",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Grab : Once during your Turn, you may spend 1 Poder to select 1 Bystander or Super Hero within Range 1 and move them into your Zone, ignoring Enemies.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Oversized Fist",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Grab : Once during your Turn, you may increase Hunger to select 1 Bystander, Enemy, or Zombie Hero within Range 1 and move them into your Zone.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Can Attack Zombie Heroes from 3 Zones away, regardless of Lines of Sight (walls still block it)."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Can Attack Zombie Heroes from 3 Zones away, regardless of Lines of Sight (walls still block it)."
+  },
+  {
+    "code": "mystique",
+    "name": "Mystique",
+    "box_name": "Marvel Zombies X-men Resistance core box",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Adaptative Weapons",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Shapeshift : At the end of your Turn, if there are no Enemies in your Zone, you may spend 1 Poder. If you do, Enemies ignore you during the next Enemy Phase.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Adaptative Weapons",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Shapeshift : At the end of your Turn, if there are no Enemies in your Zone, you may increase Hunger to have all Enemies ignore you during the next Enemy Phase.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Each time she activates, draw a Super Hero card. That is the ability she has until the start of the next Enemy Phase. At that point, reshuffle the extra card back into the Super Hero deck."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Each time she activates, draw a Super Hero card. That is the ability she has until the start of the next Enemy Phase. At that point, reshuffle the extra card back into the Super Hero deck."
+  },
+  {
+    "code": "namor",
+    "name": "Namor",
+    "box_name": "Marvel Zombies fantastic 4 Under siege",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Deep Crush",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Vestigial Wings : You ignore Enemies when moving. You may spend 1 Poder when moving to move +1 Zone",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Crush",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Vestigial Wings : You ignore Enemies when moving. If your Hunger Level is 3 or more, move +1 Zone per Move Action",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 5,
+        "ability": "Performs a number of Actions per Activation equal to 1 plus the number of wounded Zombie Heroes in the game (max. 4 Actions)."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 5,
+    "boss_ability": "Performs a number of Actions per Activation equal to 1 plus the number of wounded Zombie Heroes in the game (max. 4 Actions)."
+  },
+  {
+    "code": "nightcrawler",
+    "name": "Nightcrawler",
+    "box_name": "Caixa Promocional: Kickstarter Promos",
+    "profiles": {},
+    "has_super_hero": false,
+    "has_zombie_hero": false,
+    "has_boss_enemy": false,
+    "boss_health": null,
+    "boss_ability": null
+  },
+  {
+    "code": "nightcrawler",
+    "name": "Nightcrawler",
+    "box_name": "Caixa Promocional: Kickstarter Promos",
+    "profiles": {},
+    "has_super_hero": false,
+    "has_zombie_hero": false,
+    "has_boss_enemy": false,
+    "boss_health": null,
+    "boss_ability": null
+  },
+  {
+    "code": "nova",
+    "name": "Nova",
+    "box_name": "Marvel Zombies Gardians of the galaxy set",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Nova Shots",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Forcefield : Each time Enemies attack your Zone, you may spend 1 Poder. If you do, before assigning Wounds, roll 1 die for each Wound. On a 5+, prevent that wound.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Devour",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Cosmic Awareness : Each time Enemies spawns within Range 1, before any Rush, you may perform 1 free Nova Shots Attack.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Spawns with a number of Troopers according to the highest Danger Level among Zombie Heroes : Blue : 2 / Yellow : 3 / Orange : 4 / Red : 5"
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "Spawns with a number of Troopers according to the highest Danger Level among Zombie Heroes : Blue : 2 / Yellow : 3 / Orange : 4 / Red : 5"
+  },
+  {
+    "code": "psylocke",
+    "name": "Psylocke",
+    "box_name": "Marvel Zombies X-men Resistance core box",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Psionic Blade",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Psychic Bolt : Once during your Turn, you may automatically eliminate 1 Walker or Runner within Range 1.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Psionic Blade",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Psychic bolt : Once during your Turn, you may automatically eliminate 1 Trooper or Specialist within Range 1.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Zombie Heroes within Range 1 must increase Hunger by an additional +1 to use Zombie Traits."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Zombie Heroes within Range 1 must increase Hunger by an additional +1 to use Zombie Traits."
+  },
+  {
+    "code": "rogue",
+    "name": "Rogue",
+    "box_name": "Marvel Zombies X-men Resistance core box",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Ataque Padrão",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Knockout Punch : All Enemies suffer -1 Toughness (min 1) against your Mighty Punches Attack. Once during your Turn, you may perform 1 free Open Door Action.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Mighty Punches",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Undead Strength : All Enemies suffer -1 Toughness (min. 1) against your Attacks. Once during your Turn, you may perform 1 free Open Door Action.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "While in her Zone, Zombie Heroes lose all Skills."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "While in her Zone, Zombie Heroes lose all Skills."
+  },
+  {
+    "code": "sabretooth",
+    "name": "Sabretooth",
+    "box_name": "Marvel Zombies X-men Resistance core box",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Feral Claws",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Claw Frenzy : When attacking with Feral Claws, for each roll of 6, roll +1 die. These dice may generate additional dice.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Feral Claws",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Claw Frenzy : When attacking with Feral Claws (after any rerolls), for each roll of 6, roll +1 die. These dice may generate additional dice.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Zombie Heroes attacking in his Zone suffer 1 Wound for each 1 result."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "Zombie Heroes attacking in his Zone suffer 1 Wound for each 1 result."
+  },
+  {
+    "code": "scarlet_witch",
+    "name": "Scarlet Witch",
+    "box_name": "Caixa Base: Marvel Zombies",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Hex Blast",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 3
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Manipulate Probablity : After attacking, you may spend 1 Poder to reroll ALL dice",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Hex Blast",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 3
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Alternate Timelines : Once during your Turn, you may increase Hunger by any amount. For each level increased, 1 Zombie Hero may draw 1 Zombie Trait. Then, roll a die. On a 5+, each Zombie Hero who gained a Trait increases Hunger by 1.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Zombie Heroes in her Zone must reroll all Hits."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Zombie Heroes in her Zone must reroll all Hits."
+  },
+  {
+    "code": "scorpion",
+    "name": "Scorpion",
+    "box_name": "Expansão: Clash of the Sinister Six",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Ataque Padrão",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Impale : Once during your Turn, you may spend 1 Poder to automatically eliminate 1 Walker or Runner within Range 1, or spend 2 Poderes to eliminate 1 Brute.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Devour",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Skewer and Devour : After attacking with Scorpion's Tail, you may move 1 Enemy from the target Zone into your Zone. Then, perform 1 free Devour Attack targeting that Enemy. They suffer -1 Toughness against this Attack (min. 1)",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Can attack from 1 Zone away. Each time he attacks, roll a die. On a 4-5, he deals 2 Wounds among the targeted Zombie Heroes. On a 6, he deals 3 Wounds."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Can attack from 1 Zone away. Each time he attacks, roll a die. On a 4-5, he deals 2 Wounds among the targeted Zombie Heroes. On a 6, he deals 3 Wounds."
+  },
+  {
+    "code": "shang_chi",
+    "name": "Shang-Chi",
+    "box_name": "Caixa Promocional: Kickstarter Promos",
+    "profiles": {},
+    "has_super_hero": false,
+    "has_zombie_hero": false,
+    "has_boss_enemy": false,
+    "boss_health": null,
+    "boss_ability": null
+  },
+  {
+    "code": "spider_woman",
+    "name": "Spider-Woman",
+    "box_name": "Caixa Promocional: Kickstarter Promos",
+    "profiles": {},
+    "has_super_hero": false,
+    "has_zombie_hero": false,
+    "has_boss_enemy": false,
+    "boss_health": null,
+    "boss_ability": null
+  },
+  {
+    "code": "star_lord",
+    "name": "Star Lord",
+    "box_name": "Marvel Zombies Gardians of the galaxy set",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Laser Pistols",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Boosters : Once during your Turn, you may spend 1 Poder to perform 1 Move Action, moving up to 3 Zones. You do not ignore Enemies.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Devour",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Boosters : Once during your Turn, you may spend 1 Action to perform 1 move Action, moving up to 3 Zones. You do not ignore Enemies.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Zombie Heroes activating within Line of Sight lose 1 Action."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Zombie Heroes activating within Line of Sight lose 1 Action."
+  },
+  {
+    "code": "storm",
+    "name": "Storm",
+    "box_name": "Marvel Zombies X-men Resistance core box",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Lightning Bolt",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Gust : Once during your Turn, you may spend 1 Poder and select a Zone within Range 1. Move all Enemies in that Zone into a Zone adjacent to it.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Lightning Bolt",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Gust : Once during your Turn, you may increase Hunger and select a Zone within Range 1. Move all Enemies in that Zone into a Zone adjacent to it.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "She attacks from Range 1, dealing 1 Wound to ALL Zombie Heroes within Range 1 each time she attacks."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "She attacks from Range 1, dealing 1 Wound to ALL Zombie Heroes within Range 1 each time she attacks."
+  },
+  {
+    "code": "thor",
+    "name": "Thor",
+    "box_name": "Caixa Base: Marvel Zombies",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Mjolnir",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Hammer Throw : When attacking, you may spend 1 Poder to have Mjolnir gain +1 Range, or spend 2 Poderes to have Mjolnir gain +2 Range.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Imitation Hammer",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Not Worthy, Still Strong : Enemies suffer -1 Toughness (min. 1) against your Attacks. Each time a Super Hero ends their Move within Range 1, you may increase Hunger to perform 1 free Imitation Hammer Attack with Range 0-1.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 5,
+        "ability": "His attacks deals 2 Wounds."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 5,
+    "boss_ability": "His attacks deals 2 Wounds."
+  },
+  {
+    "code": "vulture",
+    "name": "Vulture",
+    "box_name": "Expansão: Clash of the Sinister Six",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Wing Slash",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Flying Slash : Each time you perform a Move Action, eliminate 1 Walker in 1 Zone you entered or left.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Wing Slash",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Power Sapper : Once during your Turn, when you eliminate a Guard or Super Hero, you may perform 1 free Action.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Remove 2 Tropper within Range 1 when he activates (if possible). For each Trooper removed, he performs +1 Action this Activation."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Remove 2 Tropper within Range 1 when he activates (if possible). For each Trooper removed, he performs +1 Action this Activation."
+  },
+  {
+    "code": "war_machine",
+    "name": "War Machine",
+    "box_name": "Caixa Promocional: Kickstarter Promos",
+    "profiles": {},
+    "has_super_hero": false,
+    "has_zombie_hero": false,
+    "has_boss_enemy": false,
+    "boss_health": null,
+    "boss_ability": null
+  },
+  {
+    "code": "wasp",
+    "name": "Wasp",
+    "box_name": "Caixa Base: Marvel Zombies",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Ability",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Diminutive Size : Ignore target priority when attacking. Do not spend extra actions when leaving Zones with enemies.",
+          "red": "+1 action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Devour",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Diminutive Size : You may ignore Target Priority when attacking with either Wasp's Sting or Devour.",
+          "red": "+1 action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Attacks against her Zone always have Accuracy 5+."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Attacks against her Zone always have Accuracy 5+."
+  },
+  {
+    "code": "winter_soldier",
+    "name": "Winter Soldier",
+    "box_name": "Marvel Zombies stretch goals box",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Combat Blade",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Assassinate : Each time you attack with Combat Blade, you may automatically eliminate 1 Walker or Runner in your Zone.",
+          "red": "+1 action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Spear",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Assassin's Reflexes : Each time you eliminate an Enemy or Bystander with a Devour Attack, you may also eliminate 1 Trooper in your Zone.",
+          "red": "+1 action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Ativa na fase dos inimigos e executa suas habilidades de zumbi."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "Ativa na fase dos inimigos e executa suas habilidades de zumbi."
+  },
+  {
+    "code": "winter_soldier",
+    "name": "Winter Soldier",
+    "box_name": "Marvel Zombies stretch goals box",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Combat Blade",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Assassinate : Each time you attack with Combat Blade, you may automatically eliminate 1 Walker or Runner in your Zone.",
+          "red": "+1 action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Spear",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Assassin's Reflexes : Each time you eliminate an Enemy or Bystander with a Devour Attack, you may also eliminate 1 Trooper in your Zone.",
+          "red": "+1 action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Ativa na fase dos inimigos e executa suas habilidades de zumbi."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "Ativa na fase dos inimigos e executa suas habilidades de zumbi."
+  },
+  {
+    "code": "wolverine",
+    "name": "Wolverine",
+    "box_name": "Marvel Zombies X-men Resistance core box",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Adamantium Claws",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Grizzled : Once during your Turn, you may spend 1 Poder to heal 1 Wound OR suffer 1 Wound to gain 4 Poderes.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Hero Spawn",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Undead Rage : When attacking with Adamantium Claws, add +1 to your dice results if you are wounded. For each roll of 6, roll +1 die. These dice may generate additional dice.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "If he is eliminated by a non-Devour Attack, lay his model on its side. During his next Activation he stands back up and performs no Actions."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "If he is eliminated by a non-Devour Attack, lay his model on its side. During his next Activation he stands back up and performs no Actions."
+  },
+  {
+    "code": "multiple_man",
+    "name": "Multiple Man",
+    "box_name": "Caixa Promocional: Kickstarter Promos",
+    "profiles": {},
+    "has_super_hero": false,
+    "has_zombie_hero": false,
+    "has_boss_enemy": false,
+    "boss_health": null,
+    "boss_ability": null
+  }
+]

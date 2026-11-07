@@ -1,0 +1,546 @@
+[
+  {
+    "code": "black_widow",
+    "name": "Black Widow",
+    "box_name": "Marvel Zombies HYDRA Resurection",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Ataque Padrão",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Assassinate : Each time you attack with Widow's bite, you may eliminate 1 Walker or Runner in the targeted Zone.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Devour",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Quick Bite : Each time you attack with Widow's Bite, you may eliminate 1 Trooper or Specialist in your Zone and reduce Hunger by 1.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Spawns in the Zone with the last Zombie Hero that activated, then rolls 1 die. On a 4+, they suffer 1 Wound."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Spawns in the Zone with the last Zombie Hero that activated, then rolls 1 die. On a 4+, they suffer 1 Wound."
+  },
+  {
+    "code": "ant_man",
+    "name": "Ant-Man",
+    "box_name": "Marvel Zombies HYDRA Resurection",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Bio-electric Blast",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Diminutive Size : You ignore Target Priority. Do not spend extra Actions when leaving Zones with Enemies.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Giant Fists",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Giant Size, Giant Hunger : You move +1 Zone per Move Action. Your Devour Attack rolls +2 dice and may eliminate multiple Enemies.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Always last in Target Priority. His Attacks target all Zombie Heroes in his Zone."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Always last in Target Priority. His Attacks target all Zombie Heroes in his Zone."
+  },
+  {
+    "code": "she_hulk",
+    "name": "She-Hulk",
+    "box_name": "Marvel Zombies HYDRA Resurection",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Gamma Punches",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Gamma Strength : You have 5 health. When attacking with Gamma Punches, you may spend 2 Poderes. If you do, roll only 1 die (no bonuses possible). A successful roll scores 4 Hits against a single Enemy.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Gamma Punches",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Gamma Strength : Enemies have -1 Toughness against your Attacks (to a minimum of 1). Once during your Turn, you may perform 1 free Open Door Action.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Has +1 Move Action per Activation. Her Attacks deal 2 Wounds."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "Has +1 Move Action per Activation. Her Attacks deal 2 Wounds."
+  },
+  {
+    "code": "vision",
+    "name": "Vision",
+    "box_name": "Marvel Zombies HYDRA Resurection",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Energy Beams",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 3
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Adaptive Strategy : When drawing Heroic Traits, you may draw 2 and select 1, shuffling the other into the Traits deck.",
+          "red": "+1 action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Can attack from 1 Zone away, not requiring Line of Sight and ignoring walls."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": false,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Can attack from 1 Zone away, not requiring Line of Sight and ignoring walls."
+  },
+  {
+    "code": "quicksilver",
+    "name": "Quicksilver",
+    "box_name": "Marvel Zombies HYDRA Resurection",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Rapid punches",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 3
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Super Speed : Once during your Turn, when you perform a Move Action, you ignore Enemies and may spend any amount of *. For each * spent, move +1 Zone.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Rapid Punches",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 3
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Super Speed : Once during your Turn, when you perform a Move Action, you ignore Enemies and may increase Hunger by any amount. Move +1 Zone for each Hunger Lever increased",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Each time a Rush or Extra Activation card is drawn, he moves 2 Zones. If a Zombie Hero leaves his Zone, he moves with them."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Each time a Rush or Extra Activation card is drawn, he moves 2 Zones. If a Zombie Hero leaves his Zone, he moves with them."
+  },
+  {
+    "code": "falcon",
+    "name": "Falcon",
+    "box_name": "Marvel Zombies HYDRA Resurection",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Ataque Padrão",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Redwing Scouting : Once during each Enemy Phase, before drawing a Spawn card, you may spend 1 Poder. If you do, draw 2 Spawn cards instead, choose 1, and discard the other.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Devour",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Redwing companion : You may reroll 1 die each time you Attack. Each time an Enemy or Bystander within Range 1 is Devoured, you may reduce Hunger by 1.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "When he spawns, he immediately moves up to 2 Zones, if possible. Ranged Attacks against his Zone suffer -1 to dice results."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "When he spawns, he immediately moves up to 2 Zones, if possible. Ranged Attacks against his Zone suffer -1 to dice results."
+  },
+  {
+    "code": "hawkeye",
+    "name": "Hawkeye",
+    "box_name": "Marvel Zombies HYDRA Resurection",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Bow & Arrow",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Covering Fire : Once during each other Super Hero's turn, if they are within Range 2, after they completed an Attack, you may eliminate 1 Walker in their Zone.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Arrows",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Expert Marksman : You ingore Target Priority. Each time you attack with Arrows, you may increase Hunger by 1 to increase Range by 1.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Can attack from 3 Zones away. After he attacks, roll a die. On a 5+, he performs a free Attack. This free Attack may trigger further free Attacks."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Can attack from 3 Zones away. After he attacks, roll a die. On a 5+, he performs a free Attack. This free Attack may trigger further free Attacks."
+  },
+  {
+    "code": "falcon",
+    "name": "Falcon",
+    "box_name": "Marvel Zombies HYDRA Resurection",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Ataque Padrão",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Redwing Scouting : Once during each Enemy Phase, before drawing a Spawn card, you may spend 1 Poder. If you do, draw 2 Spawn cards instead, choose 1, and discard the other.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Devour",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Redwing companion : You may reroll 1 die each time you Attack. Each time an Enemy or Bystander within Range 1 is Devoured, you may reduce Hunger by 1.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "When he spawns, he immediately moves up to 2 Zones, if possible. Ranged Attacks against his Zone suffer -1 to dice results."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "When he spawns, he immediately moves up to 2 Zones, if possible. Ranged Attacks against his Zone suffer -1 to dice results."
+  },
+  {
+    "code": "quicksilver",
+    "name": "Quicksilver",
+    "box_name": "Marvel Zombies HYDRA Resurection",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Rapid punches",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 3
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Super Speed : Once during your Turn, when you perform a Move Action, you ignore Enemies and may spend any amount of *. For each * spent, move +1 Zone.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Rapid Punches",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 3
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Super Speed : Once during your Turn, when you perform a Move Action, you ignore Enemies and may increase Hunger by any amount. Move +1 Zone for each Hunger Lever increased",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Each time a Rush or Extra Activation card is drawn, he moves 2 Zones. If a Zombie Hero leaves his Zone, he moves with them."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Each time a Rush or Extra Activation card is drawn, he moves 2 Zones. If a Zombie Hero leaves his Zone, he moves with them."
+  },
+  {
+    "code": "loki",
+    "name": "Loki",
+    "box_name": "Marvel Zombies HYDRA Resurection",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Scepter",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Not Who You Expected : Once during your turn, you may spend 1 Poder to select 1 Super Hero or Bystander within Range 2. Switch the positions of Loki and that Super Hero/Bystander.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Scepter",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Shapeshift : At the end of your Turn, if there are no Enemies in your Zone, you may have all Enemies ignore you during the next Enemy Phase.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "If his Zone is attacked, but he is not eliminated, spawn 1 Trooper there. Then, move Loki 1 Zone away."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "If his Zone is attacked, but he is not eliminated, spawn 1 Trooper there. Then, move Loki 1 Zone away."
+  },
+  {
+    "code": "black_widow",
+    "name": "Black Widow",
+    "box_name": "Marvel Zombies HYDRA Resurection",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Ataque Padrão",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Assassinate : Each time you attack with Widow's bite, you may eliminate 1 Walker or Runner in the targeted Zone.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Devour",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Quick Bite : Each time you attack with Widow's Bite, you may eliminate 1 Trooper or Specialist in your Zone and reduce Hunger by 1.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Spawns in the Zone with the last Zombie Hero that activated, then rolls 1 die. On a 4+, they suffer 1 Wound."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Spawns in the Zone with the last Zombie Hero that activated, then rolls 1 die. On a 4+, they suffer 1 Wound."
+  },
+  {
+    "code": "she_hulk",
+    "name": "She-Hulk",
+    "box_name": "Marvel Zombies HYDRA Resurection",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Gamma Punches",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Gamma Strength : You have 5 health. When attacking with Gamma Punches, you may spend 2 Poderes. If you do, roll only 1 die (no bonuses possible). A successful roll scores 4 Hits against a single Enemy.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Gamma Punches",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Gamma Strength : Enemies have -1 Toughness against your Attacks (to a minimum of 1). Once during your Turn, you may perform 1 free Open Door Action.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Has +1 Move Action per Activation. Her Attacks deal 2 Wounds."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "Has +1 Move Action per Activation. Her Attacks deal 2 Wounds."
+  },
+  {
+    "code": "red_skull",
+    "name": "Red Skull",
+    "box_name": "Marvel Zombies Hydra Resurrection",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Cosmic Cube",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Teleport : Once during your Turn, you may spend 1 Poder to select 1 Bystander or Super Hero within Range 2 and move them 1 Zone, ignoring Enemies.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 5,
+        "ability": "At the end of each Enemy Phase, spawn 2 Hydra Soldiers in his Zone."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": false,
+    "has_boss_enemy": true,
+    "boss_health": 5,
+    "boss_ability": "At the end of each Enemy Phase, spawn 2 Hydra Soldiers in his Zone."
+  }
+]

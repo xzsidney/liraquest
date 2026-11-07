@@ -1,0 +1,252 @@
+[
+  {
+    "code": "daredevil",
+    "name": "Daredevil",
+    "box_name": "Marvel Zombies stretch goals box",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Baton Strike",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Know Fear : Whenever you eliminate a Brute or a Zombie Hero, you may draw 1 Hero Trait.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "After a Bystander is devoured, Daredevil immediately performs 2 Actions."
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Baton Rush",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Beatdown : When attacking with Baton Rush, for each roll of 6, roll +1 die. These dice may generate additional dice.",
+          "red": "+1 Action"
+        }
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "After a Bystander is devoured, Daredevil immediately performs 2 Actions."
+  },
+  {
+    "code": "old_man_hawkeye",
+    "name": "Old Man Hawkeye",
+    "box_name": "Marvel Zombies HYDRA Resurection",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Bow & Arrow",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Covering Fire : Once during each other Super Hero's turn, if they are within Range 2, after they completed an Attack, you may eliminate 1 Walker in their Zone.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Arrows",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Expert Marksman : You ingore Target Priority. Each time you attack with Arrows, you may increase Hunger by 1 to increase Range by 1.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Can attack from 3 Zones away. After he attacks, roll a die. On a 5+, he performs a free Attack. This free Attack may trigger further free Attacks."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Can attack from 3 Zones away. After he attacks, roll a die. On a 5+, he performs a free Attack. This free Attack may trigger further free Attacks."
+  },
+  {
+    "code": "marshall_bullseye",
+    "name": "Marshall Bullseye",
+    "box_name": "Marvel Zombies stretch goals box",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Dual Sai",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Worthy Target : Zombies Heroes have -1 toughness (min. 1) against your Dual Sai Attacks. Each time you eliminate a Zombie Hero, perform 1 free Action.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Throwing Knives",
+          "range": "Distance",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "I Never Miss! : You ignore Target Priority when attacking with Throwing Knives. After rolling, you may increase Hunger to reroll any misses.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "His attacks have unlimited Range (but still require Line of Sight)."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "His attacks have unlimited Range (but still require Line of Sight)."
+  },
+  {
+    "code": "spider_man",
+    "name": "Spider-Man",
+    "box_name": "Caixa Base: Marvel Zombies",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Acrobatics",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Web-Shooters : Once during each Enemy Phase, When the Enemies in a Zone of your choice within Range 2 would move, you may spend 2 Poderes to prevent them from moving.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 4,
+        "ability": "Spawns in the closest zone with a Zombie Hero."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": false,
+    "has_boss_enemy": true,
+    "boss_health": 4,
+    "boss_ability": "Spawns in the closest zone with a Zombie Hero."
+  },
+  {
+    "code": "daredevil_elektra",
+    "name": "Daredevil Elektra",
+    "box_name": "Marvel Zombies stretch goals box",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Baton Sai",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Woman Without Fear : Before attacking with Baton Sai, you may spend 1 Poder to eliminated 1 Brute in the target Zone OR score +1 Hit against a Zombie Hero.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Dual Sai",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Critical Strike : When attacking with Dual Sai, each roll of 6 deals 2 Hits to a single Enemy.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "Whenever an Extra Activation card is drawn, all Zombie Heroes within Range 2 suffer 1 Wound."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "Whenever an Extra Activation card is drawn, all Zombie Heroes within Range 2 suffer 1 Wound."
+  },
+  {
+    "code": "old_man_logan",
+    "name": "Old Man Logan",
+    "box_name": "Marvel Zombies X-men Resistance core box",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "Adamantium Claws",
+          "range": "0",
+          "dice": 3,
+          "accuracy": 4
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Grizzled : Once during your Turn, you may spend 1 Poder to heal 1 Wound OR suffer 1 Wound to gain 4 Poderes.",
+          "red": "+1 Action"
+        }
+      },
+      "zombie_hero": {
+        "attack": {
+          "name": "Hero Spawn",
+          "range": "Melee",
+          "dice": 3,
+          "accuracy": 1
+        },
+        "skills": {
+          "blue": "rowspan=\"8\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Undead Rage : When attacking with Adamantium Claws, add +1 to your dice results if you are wounded. For each roll of 6, roll +1 die. These dice may generate additional dice.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 3,
+        "ability": "If he is eliminated by a non-Devour Attack, lay his model on its side. During his next Activation he stands back up and performs no Actions."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": true,
+    "has_boss_enemy": true,
+    "boss_health": 3,
+    "boss_ability": "If he is eliminated by a non-Devour Attack, lay his model on its side. During his next Activation he stands back up and performs no Actions."
+  }
+]

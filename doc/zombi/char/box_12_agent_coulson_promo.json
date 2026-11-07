@@ -1,0 +1,32 @@
+[
+  {
+    "code": "agent_coulson",
+    "name": "Agent Coulson",
+    "box_name": "Promos Exclusivas",
+    "profiles": {
+      "super_hero": {
+        "attack": {
+          "name": "S.H.I.E.L.D. Rifle",
+          "range": "Range",
+          "dice": 3,
+          "accuracy": 2
+        },
+        "skills": {
+          "blue": "rowspan=\"5\" style=\"width: 20%;\" |center|200px",
+          "yellow": "-",
+          "orange": "Tactical Reposition : Once during your Turn, you may spend 1 * so you or another Super Hero within Range 2 can perform 1 free Move Action. Then, resume your Turn.",
+          "red": "+1 Action"
+        }
+      },
+      "boss_enemy": {
+        "health": 2,
+        "ability": "Last in Target Priority. Spawns with 2 Specialists. All Specialists in his Zone gain +1 Toughness."
+      }
+    },
+    "has_super_hero": true,
+    "has_zombie_hero": false,
+    "has_boss_enemy": true,
+    "boss_health": 2,
+    "boss_ability": "Last in Target Priority. Spawns with 2 Specialists. All Specialists in his Zone gain +1 Toughness."
+  }
+]
