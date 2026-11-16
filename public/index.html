@@ -371,6 +371,194 @@
       margin-bottom: 56px;
     }
 
+    /* ======================================================== */
+    /* ⚒️ TELA DE FORJA DO REINO (EM CONSTRUÇÃO / EM BREVE)      */
+    /* ======================================================== */
+    .forge-wrapper {
+      max-width: 820px;
+      margin: 20px auto 40px auto;
+      text-align: center;
+      padding: 0 16px;
+    }
+
+    .forge-emblem {
+      width: 104px;
+      height: 104px;
+      margin: 0 auto 24px auto;
+      border-radius: 28px;
+      background: radial-gradient(circle at 35% 35%, rgba(212, 175, 55, 0.25), rgba(128, 0, 32, 0.5) 60%, rgba(30, 58, 138, 0.55) 100%);
+      border: 2px solid rgba(212, 175, 55, 0.65);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 35px rgba(212, 175, 55, 0.3), 0 20px 40px rgba(0, 0, 0, 0.8);
+      animation: forgePulse 3.5s infinite ease-in-out;
+    }
+
+    .forge-emblem-icons {
+      font-size: 2.8rem;
+      letter-spacing: -2px;
+      display: inline-block;
+      filter: drop-shadow(0 0 12px rgba(253, 224, 71, 0.6));
+    }
+
+    @keyframes forgePulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 30px rgba(212, 175, 55, 0.25), 0 20px 40px rgba(0, 0, 0, 0.8);
+        border-color: rgba(212, 175, 55, 0.65);
+      }
+      50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 50px rgba(212, 175, 55, 0.55), 0 0 30px rgba(128, 0, 32, 0.55), 0 20px 40px rgba(0, 0, 0, 0.9);
+        border-color: #fde047;
+      }
+    }
+
+    .forge-card {
+      background: linear-gradient(135deg, rgba(18, 23, 34, 0.95), rgba(11, 14, 20, 0.98));
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      border-radius: 24px;
+      padding: 32px 28px;
+      margin: 32px 0;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 30px rgba(30, 58, 138, 0.25);
+      text-align: left;
+    }
+
+    .forge-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .forge-card-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .forge-card-percent {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #fde047;
+      background: rgba(212, 175, 55, 0.15);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    .forge-track {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 9999px;
+      height: 18px;
+      overflow: hidden;
+      position: relative;
+      margin-bottom: 24px;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+    }
+
+    .forge-fill {
+      height: 100%;
+      width: 85%;
+      background: linear-gradient(90deg, #800020 0%, #1e3a8a 40%, #d4af37 80%, #fde047 100%);
+      border-radius: 9999px;
+      position: relative;
+      animation: forgeShimmer 3s infinite linear;
+      background-size: 200% 100%;
+      box-shadow: 0 0 16px rgba(212, 175, 55, 0.6);
+    }
+
+    @keyframes forgeShimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .forge-milestones {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+    }
+
+    .forge-milestone {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .forge-milestone.done {
+      border-color: rgba(34, 197, 94, 0.35);
+      background: rgba(34, 197, 94, 0.08);
+    }
+
+    .forge-milestone.done .milestone-status {
+      color: #4ade80;
+    }
+
+    .forge-milestone.active {
+      border-color: rgba(212, 175, 55, 0.45);
+      background: rgba(212, 175, 55, 0.1);
+    }
+
+    .forge-milestone.active .milestone-status {
+      color: #fde047;
+    }
+
+    .forge-milestone.pending {
+      opacity: 0.65;
+    }
+
+    .forge-milestone.pending .milestone-status {
+      color: #94a3b8;
+    }
+
+    .milestone-icon {
+      font-size: 1.3rem;
+    }
+
+    .milestone-text {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #e2e8f0;
+    }
+
+    .milestone-status {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .forge-login-btn {
+      font-size: 1.05rem;
+      padding: 16px 36px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #800020 0%, #9b111e 60%, #1e3a8a 100%);
+      border: 1.5px solid rgba(212, 175, 55, 0.5);
+      box-shadow: 0 12px 28px -6px rgba(128, 0, 32, 0.7), 0 0 20px rgba(212, 175, 55, 0.25);
+      cursor: pointer;
+      color: #ffffff;
+      font-weight: 800;
+      transition: all 0.25s ease;
+    }
+
+    .forge-login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 32px -6px rgba(155, 17, 30, 0.8), 0 0 30px rgba(212, 175, 55, 0.4);
+      border-color: #fde047;
+    }
+
     /* Vitrine dos 4 Pilares da Home */
     .home-features-grid {
       display: grid;
@@ -2013,11 +2201,11 @@
 
       <!-- Ações da Navbar quando deslogado -->
       <div id="nav-auth-guest" class="nav-actions">
-        <span class="nav-link" onclick="navigateTo('home')">Início</span>
-        <a href="/truco" class="nav-link" style="color: #f5b027; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">🃏 Truco</a>
-        <a href="/zombi" class="nav-link" style="color: #ef4444; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">🧟 Zombicide RPG</a>
-        <span class="nav-link" onclick="navigateTo('login')">Entrar</span>
-        <button class="btn btn-secondary btn-sm" onclick="navigateTo('register')">Criar Conta</button>
+        <button class="btn btn-secondary btn-sm" onclick="navigateTo('login')" style="border-color: rgba(212, 175, 55, 0.4); color: #fde047; font-weight: 700;">🔑 Entrar</button>
+
+
+
+
       </div>
 
       <!-- Ações da Navbar quando logado -->
@@ -2149,133 +2337,71 @@
   <!-- Conteúdo Principal Dinâmico (6 Telas) -->
   <main class="main-content">
 
-    <!-- ==================== TELA 1: HOME PÚBLICA ==================== -->
-    <section id="view-home" class="hero-section">
-      <div class="hero-badge">
-        <span>👑</span> Reino de LiraQuest • Gamificação Familiar & RPG
+    <!-- ==================== TELA 1: HOME PÚBLICA (FORJA DO REINO EM ANDAMENTO) ==================== -->
+    <section id="view-home" class="hero-section forge-wrapper">
+      
+      <!-- Ícone Épico com Brilho Dourado e Forja -->
+      <div class="forge-emblem">
+        <span class="forge-emblem-icons">🏰🔨✨</span>
       </div>
-      <h1 class="hero-title">Transforme a Rotina da Casa em uma Aventura Épica</h1>
+
+      <!-- Badge Nobre -->
+      <div class="hero-badge">
+        <span>👑</span> ACESSO ANTECIPADO • EM DESENVOLVIMENTO
+      </div>
+
+      <!-- Título Principal -->
+      <h1 class="hero-title">O Reino de LiraQuest está sendo Forjado...</h1>
+
+      <!-- Subtítulo Temático -->
       <p class="hero-desc">
-        O <strong>LiraQuest</strong> transforma lições de casa, organização e bons hábitos em pontos de experiência, ouro real e batalhas cooperativas inesquecíveis entre pais e filhos.
+        Nossos mestres e artesãos estão preparando as missões, recompensas e masmorras da nossa plataforma de gamificação familiar. Em breve, as portas do castelo se abrirão para todos os lares!
       </p>
 
-      <div class="hero-actions">
-        <button class="btn btn-primary" style="font-size: 1.05rem; padding: 14px 28px;" onclick="navigateTo('register')">
-          ⚔️ Começar Aventura (Criar Conta)
-        </button>
-        <button class="btn btn-secondary" style="font-size: 1.05rem; padding: 14px 28px;" onclick="navigateTo('login')">
-          🔑 Entrar no Reino (Login)
-        </button>
-        <a href="/truco" class="btn" style="font-size: 1.05rem; padding: 14px 28px; background: linear-gradient(135deg, #185a36 0%, #10b981 100%); border: 1.5px solid #6ee7b7; color: #fff; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);">
-          🃏 Jogar Truco Paulista
-        </a>
+      <!-- Barra Visual Temática de Progresso da Forja -->
+      <div class="forge-card">
+        <div class="forge-card-header">
+          <span class="forge-card-title">⚒️ Estado da Forja Real</span>
+          <span class="forge-card-percent">85% Concluído • Preparando os Salões</span>
+        </div>
+
+        <div class="forge-track">
+          <div class="forge-fill"></div>
+        </div>
+
+        <!-- Pilares em Forja -->
+        <div class="forge-milestones">
+          <div class="forge-milestone done">
+            <span class="milestone-icon">🛡️</span>
+            <span class="milestone-text">Mural de Missões</span>
+            <span class="milestone-status">Concluído</span>
+          </div>
+          <div class="forge-milestone done">
+            <span class="milestone-icon">🏪</span>
+            <span class="milestone-text">Loja do Lar & Vales</span>
+            <span class="milestone-status">Concluído</span>
+          </div>
+          <div class="forge-milestone active">
+            <span class="milestone-icon">⚔️</span>
+            <span class="milestone-text">Arenas & Masmorras</span>
+            <span class="milestone-status">Em Polimento</span>
+          </div>
+          <div class="forge-milestone pending">
+            <span class="milestone-icon">🚪</span>
+            <span class="milestone-text">Portões do Castelo</span>
+            <span class="milestone-status">Abertura em Breve</span>
+          </div>
+        </div>
       </div>
 
-      <!-- Vitrine dos 4 Pilares da Aventura Familiar -->
-      <div class="home-features-grid">
-        
-        <!-- Pilar 1: Missões -->
-        <div class="home-feature-card">
-          <div class="home-feature-header">
-            <div class="home-feature-icon-box">📋</div>
-            <div>
-              <span class="home-feature-tag">Mundo Real</span>
-              <h3 class="home-feature-title">Missões & Hábitos Reais</h3>
-            </div>
-          </div>
-          <p class="home-feature-text">
-            Os pais lançam tarefas da casa e de estudos. Os filhos cumprem, enviam fotos comprobatórias e recebem recompensas após aprovação dos guardiões.
-          </p>
-          <div class="home-preview-box">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-              <span style="font-size: 0.85rem; font-weight: 700; color: #ffffff;">🧹 Arrumar o Quarto & Lição</span>
-              <span class="reward-pill-xp" style="font-size: 0.75rem;">⭐ +50 XP</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-size: 0.75rem; color: #4ade80;">📸 Prova com Foto Enviada</span>
-              <span class="reward-pill-gold" style="font-size: 0.75rem;">💰 +15 Ouro</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Pilar 2: Heróis & RPG -->
-        <div class="home-feature-card">
-          <div class="home-feature-header">
-            <div class="home-feature-icon-box">🧙‍♂️</div>
-            <div>
-              <span class="home-feature-tag">Progressão</span>
-              <h3 class="home-feature-title">Heróis & Multi-Classe</h3>
-            </div>
-          </div>
-          <p class="home-feature-text">
-            Cada filho desperta seu próprio herói com 6 atributos fundamentais, árvore de talentos e alternância livre entre classes de batalha sem perder progresso.
-          </p>
-          <div class="home-preview-box">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-              <span style="font-size: 0.85rem; font-weight: 700; color: #fde047;">⚔️ Guardião do Lar • Nível 3</span>
-              <span style="font-size: 0.75rem; color: #93c5fd;">Mana: 100/100</span>
-            </div>
-            <div class="xp-progress-track" style="height: 6px;">
-              <div class="xp-progress-fill" style="width: 70%;"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Pilar 3: Loja de Recompensas -->
-        <div class="home-feature-card">
-          <div class="home-feature-header">
-            <div class="home-feature-icon-box">🛒</div>
-            <div>
-              <span class="home-feature-tag">Mérito & Conquistas</span>
-              <h3 class="home-feature-title">Loja & Baú de Prêmios</h3>
-            </div>
-          </div>
-          <p class="home-feature-text">
-            O ouro conquistado com esforço pode ser usado na Loja do Reino para adquirir itens do jogo ou resgatar prêmios do mundo real combinados com a família.
-          </p>
-          <div class="home-preview-box">
-            <div style="display: flex; gap: 8px; justify-content: space-between;">
-              <span style="font-size: 0.8rem; background: rgba(212, 175, 55, 0.15); color: #fde047; padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(212, 175, 55, 0.3);">🎟️ Vale Cinema</span>
-              <span style="font-size: 0.8rem; background: rgba(30, 58, 138, 0.3); color: #93c5fd; padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(59, 130, 246, 0.4);">🎮 +1h Videogame</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Pilar 4: Raids Cooperativas -->
-        <div class="home-feature-card">
-          <div class="home-feature-header">
-            <div class="home-feature-icon-box">🐉</div>
-            <div>
-              <span class="home-feature-tag">Tempo Real</span>
-              <h3 class="home-feature-title">Raids & Combate 2D</h3>
-            </div>
-          </div>
-          <p class="home-feature-text">
-            Junte a família em combates multiplayer cooperativos contra Chefes Colossais como o Gólem da Procrastinação e a Gosma da Desorganização!
-          </p>
-          <div class="home-preview-box">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-              <span style="font-size: 0.85rem; font-weight: 700; color: #f87171;">👾 Gólem da Procrastinação</span>
-              <span style="font-size: 0.75rem; color: #ef4444;">850 / 1000 HP</span>
-            </div>
-            <div class="xp-progress-track" style="height: 6px; background: rgba(239, 68, 68, 0.2);">
-              <div style="height: 100%; width: 85%; background: linear-gradient(90deg, #ef4444, #f59e0b); border-radius: 9999px;"></div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Banner de Chamada Inferior -->
-      <div class="home-cta-banner">
-        <div style="font-size: 2.5rem; margin-bottom: 8px;">🏰⚔️👑</div>
-        <h2 style="font-size: 1.8rem; color: #ffffff; margin-bottom: 8px;">Pronto para convocar seu Clã Familiar?</h2>
-        <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto 20px auto; font-size: 0.95rem;">
-          Cadastre sua família gratuitamente e dê o primeiro passo rumo a uma rotina de conquistas e diversão.
+      <!-- Botão Único & Discreto de Acesso Restrito -->
+      <div style="margin: 28px 0 16px 0;">
+        <button class="btn forge-login-btn" onclick="navigateTo('login')">
+          🔑 Acesso Restrito dos Guardiões (Login)
+        </button>
+        <p style="font-size: 0.82rem; color: var(--text-dim); margin-top: 14px;">
+          Área exclusiva para os guardiões e heróis fundadores com credenciais de acesso.
         </p>
-        <button class="btn btn-gold" style="font-size: 1.05rem; padding: 12px 32px;" onclick="navigateTo('register')">
-          👑 Criar Meu Clã Agora
-        </button>
       </div>
 
     </section>

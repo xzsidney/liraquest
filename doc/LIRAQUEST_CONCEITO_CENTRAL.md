@@ -314,3 +314,9 @@ O **Arcade de Lira** é o centro de diversão acessível pelo Terminal do Avatar
      - **82 Personagens Cadastrados no Banco:** Catálogo consolidado na tabela definition_mz_characters abrangendo a Caixa Base, X-Men Resistance, Heroes' Resistance, Hydra Resurrection, Promos do Kickstarter e expansões temáticas (Quarteto Fantástico, Guardiões da Galáxia, Sinister Six, Sentinelas, etc.).
      - **3 Modos de Ficha por Miniatura:** Super-Herói Vivo, Herói Zumbi (com mecânica de Fome) e Boss Inimigo da carta de Spawn.
      - **Recursos Interativos Táticos:** Visualização dos 4 patamares de habilidades por cor de XP (Azul, Amarelo, Laranja e Vermelho), simulador integrado de rolagem de dados de combate com animação de sacudida e áudio Web Audio API, e painel de controle e dano em tempo real para o HP de Boss Inimigo.
+
+
+10. **🏰 Landing Page Oficial: Modo Forja do Reino em Andamento (Em Breve):**
+    - **Conceito & Segurança:** Com o domínio de produção `https://liraquest.com.br` ativo, a página inicial pública (`#view-home`) foi convertida em uma tela nobre e imersiva de *Acesso Antecipado / Em Construção*.
+    - **Elementos Visuais:** Emblema com pulso e brilho dourado (`🏰🔨✨`), barra de progresso viva da forja real (85% concluído), marcos dos pilares da plataforma e botão único e discreto de *Acesso Restrito dos Guardiões (Login)*.
+    - **Proteção do Reino:** Oculta o formulário aberto de cadastro e links públicos externos, preservando os fluxos e terminais internos funcionais exclusivamente para as famílias fundadoras autenticadas.
