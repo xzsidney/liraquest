@@ -1583,9 +1583,6 @@ export function bindSaudeEvents() {
         if (res && res.success) {
           showToast(`✅ ${res.message}`, 'success');
           displayLastWaMessage(res.result?.formatted_message, res.result?.whatsapp_url);
-          if (res.result?.whatsapp_url && !res.result?.meta_configured) {
-            window.open(res.result.whatsapp_url, '_blank');
-          }
         }
       } catch (err) {
         showToast(err.message || 'Erro ao disparar mensagem.', 'error');
@@ -1614,9 +1611,6 @@ export function bindSaudeEvents() {
           showToast('✅ Mensagem enviada para a família com sucesso!', 'success');
           displayLastWaMessage(res.result?.formatted_message, res.result?.whatsapp_url);
           textInput.value = '';
-          if (res.result?.whatsapp_url && !res.result?.meta_configured) {
-            window.open(res.result.whatsapp_url, '_blank');
-          }
         }
       } catch (err) {
         showToast(err.message || 'Erro ao enviar mensagem personalizada.', 'error');

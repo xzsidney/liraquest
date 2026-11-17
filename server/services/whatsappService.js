@@ -74,7 +74,7 @@ export async function getFamilyMemberPhones(familyId) {
 export async function sendMetaCloudMessage({ phoneNumberId, accessToken, toPhone, messageBody }) {
   try {
     const cleanPhone = toPhone.replace(/\D/g, '');
-    const url = `https://graph.facebook.com/v18.0/${phoneNumberId}/messages`;
+    const url = `https://graph.facebook.com/v21.0/${phoneNumberId}/messages`;
 
     const payload = {
       messaging_product: 'whatsapp',
