@@ -1350,23 +1350,25 @@ export function bindSaudeEvents() {
   }
 
   // 12. Escuta de WebSockets em tempo real para Alarme das Refeições e WhatsApp
-  if (socket && socket.getSocket()) {
-    const rawSocket = socket.getSocket();
-    rawSocket.off('nutrition:meal_alert');
+  const rawSocket = typeof socket?.getSocket === 'function' ? socket.getSocket() : (socket?.instance || null);
+  if (rawSocket) {
+    if (typeof rawSocket.off === 'function') {
+      rawSocket.off('nutrition:meal_alert');
+      rawSocket.off('whatsapp:status');
+      rawSocket.off('whatsapp:message_sent');
+    }
     rawSocket.on('nutrition:meal_alert', (alarm) => {
       console.log('🔔 [Alarme de Refeição Recebido]:', alarm);
       showToast(`🔔 ${alarm.title}: ${alarm.message}`, 'warning', 6000);
       loadHealthData().then(updateView);
     });
 
-    rawSocket.off('whatsapp:status');
     rawSocket.on('whatsapp:status', (data) => {
       console.log('📱 [WhatsApp Status Changed]:', data);
       showToast(data.is_connected ? '🟢 WhatsApp conectado com sucesso!' : '⚪ WhatsApp desconectado.', data.is_connected ? 'success' : 'info');
       loadHealthData().then(updateView);
     });
 
-    rawSocket.off('whatsapp:message_sent');
     rawSocket.on('whatsapp:message_sent', (msg) => {
       console.log('📨 [WhatsApp Mensagem Despachada]:', msg);
       showToast(`📨 [WhatsApp] ${msg.title}`, 'info');

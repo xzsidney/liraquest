@@ -37,6 +37,16 @@ export const socket = {
     }
   },
 
+  getSocket() {
+    return this.instance || this.init();
+  },
+
+  off(event, callback) {
+    if (this.instance) {
+      this.instance.off(event, callback);
+    }
+  },
+
   on(event, callback) {
     if (!this.instance) this.init();
     if (this.instance) {
