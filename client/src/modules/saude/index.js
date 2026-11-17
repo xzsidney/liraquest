@@ -838,6 +838,7 @@ function renderShoppingItemRow(item) {
 // ─────────────────────────────────────────────────────────────────────────────
 function renderTabWhatsApp() {
   const isConnected = whatsappData?.is_connected || false;
+  const isMetaConfigured = Boolean(whatsappData?.meta_configured);
   const qrCodeUrl = whatsappData?.qr_code_data_url || null;
   const targetPhone = whatsappData?.group_id_or_phone || '';
   const notifyMeals = whatsappData?.notify_meals !== false;
