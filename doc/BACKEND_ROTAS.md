@@ -315,17 +315,16 @@ Rotas do Módulo Financeiro (`client/src/modules/financeiro/` e `/api/finance`),
 
 ---
 
-## 📱 20. Central de WhatsApp do Clã & Alarmes Automáticos (Fase 5)
-Rotas da Central de Mensageria (`client/src/modules/saude/` aba WhatsApp e `/api/whatsapp`), responsáveis pelo pareamento via QR Code com o WhatsApp do Guardião, configuração do grupo/telefone de destino, disparo de mensagens de teste e serviço de alarmes automáticos (Aviso Cozinha 11h15, Convocação Almoço 11h45, Lanche & Cura 16h00 e Jantar 19h45).
+## 📱 20. Central Oficial de WhatsApp do Clã (Meta Cloud API) & Alarmes Automáticos (Fase 5)
+Rotas da Central de Mensageria (`client/src/modules/saude/` aba WhatsApp e `/api/whatsapp`), responsáveis pela transmissão oficial via Meta Cloud API / links diretos, cadastro individual de telefones dos heróis (`family_users.phone`), envio de convocações rápidas dos pais (mensagens programadas XPTO) e alarmes automáticos (Aviso Cozinha 11h15, Convocação Almoço 11h45, Lanche & Mana 16h00 e Jantar 19h45).
 
 | Método | Rota | Autenticação | Descrição |
 |:---|:---|:---|:---|
-| `GET` | `/api/whatsapp/config` | JWT | Retorna a configuração de WhatsApp da família (status de conexão, destino, opções de notificação e QR code ativo) |
-| `POST` | `/api/whatsapp/config` | JWT (PARENT/ADMIN) | Salva o número ou ID do grupo e preferências (`notify_meals`, `notify_hydration`) |
-| `POST` | `/api/whatsapp/pair` | JWT (PARENT/ADMIN) | Inicia uma nova sessão de pareamento e gera o QR Code em Data URL (base64) para exibição imediata na tela |
-| `POST` | `/api/whatsapp/confirm-pair` | JWT (PARENT/ADMIN) | Confirma/simula a leitura do QR Code pelo celular do guardião, ativando a sessão (`is_connected: true`) |
-| `POST` | `/api/whatsapp/test` | JWT (PARENT/ADMIN) | Dispara mensagem de teste nobre e épica para o número/grupo cadastrado com emojis temáticos |
-| `POST` | `/api/whatsapp/disconnect` | JWT (PARENT/ADMIN) | Desconecta a sessão do WhatsApp e limpa as credenciais da família |
+| `GET` | `/api/whatsapp/config` | JWT | Retorna a configuração de WhatsApp da família (status de conexão, credenciais da Meta, opções de notificação e lista dos heróis com telefones) |
+| `POST` | `/api/whatsapp/config` | JWT (PARENT/ADMIN) | Salva número ou grupo adicional, credenciais da Meta Cloud API (`meta_phone_number_id`, `meta_access_token`) e preferências (`notify_meals`, `notify_hydration`) |
+| `POST` | `/api/whatsapp/update-phone` | JWT (PARENT/ADMIN) | Atualiza o telefone celular de um membro individual da família no banco de dados (`family_users.phone`) |
+| `POST` | `/api/whatsapp/send-template` | JWT (PARENT/ADMIN) | Dispara convocação rápida com mensagem programada XPTO (`BREAKFAST`, `KITCHEN`, `LUNCH`, `SNACK_WATER`, `DINNER`, `BEDTIME`) ou texto livre do pai para todos os heróis cadastrados |
+| `POST` | `/api/whatsapp/test` | JWT (PARENT/ADMIN) | Dispara mensagem de teste nobre e épica para os números cadastrados |
 | `POST` | `/api/whatsapp/alarm-test` | JWT (PARENT/ADMIN) | Permite simulação instantânea dos 4 alarmes programados (`KITCHEN`, `LUNCH`, `HYDRATION`, `DINNER`) |
 
 ### ⏰ Serviço de Alarme & Agendamento Contínuo (`server/services/alarmService.js`)

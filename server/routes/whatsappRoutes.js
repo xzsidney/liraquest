@@ -1,5 +1,5 @@
 /**
- * LiraQuest - Rotas da Central de WhatsApp (Fase 5)
+ * LiraQuest - Rotas da Central de WhatsApp (Meta Cloud API & Notificações Familiares)
  */
 
 import express from 'express';
@@ -7,10 +7,9 @@ import { authenticateToken, authorizeRoles } from '../middlewares/authMiddleware
 import {
   getConfig,
   saveConfig,
-  generatePairingQr,
-  confirmPairing,
+  updatePhone,
+  sendTemplate,
   sendTestMessage,
-  disconnect,
   triggerAlarmTest,
 } from '../controllers/whatsappController.js';
 
@@ -19,15 +18,14 @@ const router = express.Router();
 // Todas as rotas exigem autenticação de sessão
 router.use(authenticateToken);
 
-// Consulta de configuração (acessível por todos os membros para status)
+// Consulta de configuração e lista de membros
 router.get('/config', getConfig);
 
-// Gerenciamento e Disparo restritos aos Guardiões (Pai/Mãe/Admin)
+// Gerenciamento restrito aos Guardiões (Pai/Mãe/Admin)
 router.post('/config', authorizeRoles('ADMIN', 'PARENT'), saveConfig);
-router.post('/pair', authorizeRoles('ADMIN', 'PARENT'), generatePairingQr);
-router.post('/confirm-pair', authorizeRoles('ADMIN', 'PARENT'), confirmPairing);
+router.post('/update-phone', authorizeRoles('ADMIN', 'PARENT'), updatePhone);
+router.post('/send-template', authorizeRoles('ADMIN', 'PARENT'), sendTemplate);
 router.post('/test', authorizeRoles('ADMIN', 'PARENT'), sendTestMessage);
-router.post('/disconnect', authorizeRoles('ADMIN', 'PARENT'), disconnect);
 router.post('/alarm-test', authorizeRoles('ADMIN', 'PARENT'), triggerAlarmTest);
 
 export default router;
