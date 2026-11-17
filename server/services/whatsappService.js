@@ -8,6 +8,7 @@ import makeWASocket, {
   DisconnectReason,
   useMultiFileAuthState,
   fetchLatestBaileysVersion,
+  Browsers,
 } from '@whiskeysockets/baileys';
 import pino from 'pino';
 import QRCode from 'qrcode';
@@ -41,11 +42,22 @@ export async function initBaileysSession(familyId) {
     return { is_connected: true, qr_code: null };
   }
 
-  if (session && session.qrCode) {
-    return { is_connected: false, qr_code: session.qrCode };
+  // Se não estiver conectado, limpa o socket anterior para garantir um QR code limpo
+  if (session?.sock) {
+    try { session.sock.end(); } catch (e) {}
   }
 
   const authDir = path.join(SESSIONS_BASE_DIR, `auth_${familyId}`);
+  // Se não está conectado, limpamos arquivos de auth corrompidos para um aperto de mão 100% novo
+  if (!session?.isConnected && fs.existsSync(authDir)) {
+    try {
+      const files = fs.readdirSync(authDir);
+      for (const f of files) {
+        fs.unlinkSync(path.join(authDir, f));
+      }
+    } catch (e) {}
+  }
+
   if (!fs.existsSync(authDir)) {
     fs.mkdirSync(authDir, { recursive: true });
   }
@@ -54,14 +66,16 @@ export async function initBaileysSession(familyId) {
     const { state, saveCreds } = await useMultiFileAuthState(authDir);
     const { version } = await fetchLatestBaileysVersion().catch(() => ({ version: [2, 3000, 1015901307] }));
 
-    console.log(`📱 [WhatsApp Baileys] Inicializando sessão para a família ${familyId}...`);
+    console.log(`📱 [WhatsApp Baileys] Inicializando sessão limpa para a família ${familyId}...`);
 
     const sock = makeWASocket({
       version,
       auth: state,
       logger: pino({ level: 'silent' }),
       printQRInTerminal: false,
-      browser: ['LiraQuest Reino Familiar', 'Chrome', '1.0.0'],
+      browser: Browsers.windows('Desktop'),
+      syncFullHistory: false,
+      generateHighQualityLinkPreview: true,
       connectTimeoutMs: 60000,
       defaultQueryTimeoutMs: 60000,
     });
