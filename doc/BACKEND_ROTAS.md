@@ -315,8 +315,10 @@ Rotas do Módulo Financeiro (`client/src/modules/financeiro/` e `/api/finance`),
 
 ---
 
-## 📱 20. Central Oficial de WhatsApp do Clã (Meta Cloud API) & Alarmes Automáticos (Fase 5)
-Rotas da Central de Mensageria (`client/src/modules/saude/` aba WhatsApp e `/api/whatsapp`), responsáveis pela transmissão oficial via Meta Cloud API / links diretos, cadastro individual de telefones dos heróis (`family_users.phone`), envio de convocações rápidas dos pais (mensagens programadas XPTO) e alarmes automáticos (Aviso Cozinha 11h15, Convocação Almoço 11h45, Lanche & Mana 16h00 e Jantar 19h45).
+## 📱 20. Central de WhatsApp do Clã & Alarmes Automáticos (Fase 5 - Em Estudo / Oculto na UI)
+> **Nota de Arquitetura:** A aba visual do WhatsApp foi desativada da UI do módulo de Saúde (`client/src/modules/saude/index.js`) a pedido do usuário para estudos posteriores sobre as exigências da Meta (necessidade de verificação de empresa com CNPJ, número exclusivo não registrado no app WhatsApp e modelos de mensagens aprovados). As rotas de backend `/api/whatsapp` e os alarmes via WebSocket e `alarmService.js` continuam disponíveis como infraestrutura.
+
+Rotas da Central de Mensageria (`/api/whatsapp`), responsáveis pela transmissão oficial via Meta Cloud API / links diretos, cadastro individual de telefones dos heróis (`family_users.phone`), envio de convocações rápidas dos pais (mensagens programadas XPTO) e alarmes automáticos (Aviso Cozinha 11h15, Convocação Almoço 11h45, Lanche & Mana 16h00 e Jantar 19h45).
 
 | Método | Rota | Autenticação | Descrição |
 |:---|:---|:---|:---|

@@ -12,7 +12,7 @@ import { showToast } from '../../components/Toast.js';
 import { renderModuleNavbar, bindModuleNavbarEvents } from '../../components/ModuleNavbar.js';
 
 // Estado Local do Módulo de Saúde
-let currentTab = 'cardapio'; // 'cardapio', 'builder', 'validacao', 'compras', 'whatsapp'
+let currentTab = 'cardapio'; // 'cardapio', 'builder', 'validacao', 'compras'
 let currentSubView = 'today'; // 'today' ou 'week'
 let selectedMealType = 'almoco'; // refeição ativa na validação e construtor
 let todayData = null;
@@ -85,7 +85,6 @@ export async function renderSaudeView() {
     badges: [
       { label: `${waterGlasses}/8 Copos d'Água`, icon: '💧', bg: 'rgba(56, 189, 248, 0.15)', border: 'rgba(56, 189, 248, 0.35)', color: '#38bdf8' },
       { label: isFlexivel ? 'Rotina Flexível' : 'Rotina Certinha', icon: '⏰', bg: 'rgba(212, 175, 55, 0.15)', border: 'rgba(212, 175, 55, 0.35)', color: '#fde047' },
-      { label: isWaConnected ? 'WhatsApp Ativo' : 'WhatsApp Desconectado', icon: '📱', bg: isWaConnected ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)', border: isWaConnected ? 'rgba(16, 185, 129, 0.35)' : 'rgba(239, 68, 68, 0.35)', color: isWaConnected ? '#34d399' : '#f87171' },
     ],
   });
 
@@ -94,7 +93,7 @@ export async function renderSaudeView() {
       <!-- BARRA SUPERIOR NOBRE DE NAVEGAÇÃO (FASE 5) -->
       ${topNavbarHtml}
 
-      <!-- Barra de Navegação das 5 Abas Nobres -->
+      <!-- Barra de Navegação das 4 Abas Nobres -->
       <div class="saude-tabs-bar" style="display: flex; gap: 10px; margin-bottom: 24px; overflow-x: auto; padding-bottom: 6px;">
         <button class="btn-saude-tab ${currentTab === 'cardapio' ? 'active' : ''}" data-tab="cardapio">
           🍽️ Cardápio do Dia & Semana
@@ -113,9 +112,6 @@ export async function renderSaudeView() {
         `}
         <button class="btn-saude-tab ${currentTab === 'compras' ? 'active' : ''}" data-tab="compras">
           🛒 Lista de Compras Inteligente
-        </button>
-        <button class="btn-saude-tab ${currentTab === 'whatsapp' ? 'active' : ''}" data-tab="whatsapp">
-          📱 Conexão WhatsApp do Clã
         </button>
       </div>
 
@@ -140,8 +136,6 @@ function renderCurrentTabContent() {
       return renderTabValidacao();
     case 'compras':
       return renderTabCompras();
-    case 'whatsapp':
-      return renderTabWhatsApp();
     default:
       return renderTabCardapio();
   }

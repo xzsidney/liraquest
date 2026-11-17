@@ -395,18 +395,15 @@ O **Arcade de Lira** é o centro de diversão acessível pelo Terminal do Avatar
         - **16h00 (Lanche & Poção de Cura):** Lembrete de hidratação (1 copo grande de água fresca para restauração de mana) + 1 fruta ou iogurte natural da tarde para manter a estamina nos estudos e treinos.
         - **19h45 (Jantar do Clã):** Convocação para o jantar leve noturno e preparação para o sono reparador dos heróis, encerrando as missões do dia com disciplina.
       - **Respeito aos Modos de Rotina:** Verifica dinamicamente se o clã está em "Rotina Certinha" (dias úteis escolares) ou "Rotina Flexível" (finais de semana e férias) para respeitar as preferências da família.
-    - **📱 Central de Conexão com o WhatsApp do Clã (`/api/whatsapp` e Módulo Saúde):**
-      - **Aba "📱 Conexão WhatsApp do Clã":** Central nobre no Módulo Saúde para pareamento rápido da sessão com o celular do Guardião.
-      - **QR Code na Tela:** Geração automática de imagem QR Code em Data URL de alta definição para leitura direta pelo aplicativo do WhatsApp móvel (*Aparelhos conectados*).
-      - **Configuração de Destino dos Alertas:** Campo para cadastrar o número individual ou o ID do Grupo de WhatsApp da família, com checkboxes para habilitar/desabilitar alarmes de refeição e lembretes de hidratação.
-      - **Disparos de Teste em Tempo Real:** Botão para disparar mensagem de teste imediata e botões para simular qualquer um dos 4 alarmes programados com feedback sonoro e visual instantâneo.
-      - **Mensagens Épicas & Temáticas:** Notificações formatadas com emojis temáticos (🛡️, ⚔️, 🥗, 💧, 👑, 👨‍🍳) convocando o clã com honra e dinamismo.
+    - **📱 Central de Mensageria e Alarmes em Tempo Real:**
+      - **Alarmes e Notificações In-App:** O sistema de alarmes em tempo real via WebSockets (Socket.IO) e Toasts permanece ativo e operacional, avisando a família diretamente na tela do computador e dos celulares.
+      - **Status da Integração com WhatsApp:** A aba visual do WhatsApp no Módulo de Saúde foi temporariamente ocultada/desativada a pedido do usuário para estudos posteriores sobre os requisitos da Meta (exigência de conta Business no Meta Business Suite, verificação por CNPJ e obrigatoriedade de número exclusivo que não pode estar registrado no aplicativo WhatsApp padrão). As rotas de backend `/api/whatsapp` e a infraestrutura de mensageria permanecem preservadas no servidor.
     - **🏰 Polimento de Navegação do Grande Salão (Experiência 5 Estrelas):**
       - **Barra Superior Nobre Padronizada (`ModuleNavbar.js`):** Implementada em todos os 6 módulos (Casa, Estudos, Saúde, Diversão, Jogos e Financeiro) com o botão de destaque `🏰 Voltar ao Grande Salão` (1 clique imediato com transição suave) e pílulas de alternância rápida direta entre qualquer uma das 6 áreas.
       - **Resumo do Clã em Tempo Real no Grande Salão:** Cards superiores dinâmicos conectados aos endpoints do backend, exibindo:
         1. Quantidade exata de comprovações de missões aguardando o visto dos pais (ou pendentes do herói).
         2. Nome e horário do próximo prato saudável do dia cadastrado no cardápio de nutrição.
         3. Saldo financeiro acumulado no cofre dos grandes sonhos da família.
-        4. Status de conexão em tempo real do WhatsApp do clã (🟢 Conectado / 🟡 Parear Sessão).
+        4. Indicadores nobres de hidratação e disciplina alimentar.
 
 

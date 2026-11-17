@@ -779,7 +779,8 @@ Armazena o cofrinho e mesada gamificada dos filhos, vinculando ouro poupado à c
 
 ---
 
-## 14. Módulo de Comunicação: Central de WhatsApp do Clã (Fase 5)
+## 14. Módulo de Comunicação: Central de WhatsApp do Clã (Fase 5 - Em Estudo / Oculto na UI)
+> **Nota de Arquitetura:** A estrutura de dados e modelo da tabela estão preservados no banco de dados. A interface visual no módulo de Saúde foi ocultada temporariamente para estudos posteriores sobre as políticas cadastrais da Meta.
 
 ### 📱 `family_whatsapp_configs`
 Armazena as configurações de conexão, destinos e preferências de envio de alarmes do WhatsApp para cada família do reino.
