@@ -7,6 +7,8 @@ import {
   updateFamilyConfig,
   updateMemberPhone,
   sendClanMessage,
+  initBaileysSession,
+  disconnectBaileysSession,
 } from '../services/whatsappService.js';
 import { triggerManualAlarm } from '../services/alarmService.js';
 import { findOrCreateUserFamily } from './userProgressController.js';
@@ -214,6 +216,43 @@ export async function triggerAlarmTest(req, res) {
   }
 }
 
+export async function pairSession(req, res) {
+  try {
+    const familyId = await resolveFamilyId(req.user);
+    if (!familyId) {
+      return res.status(400).json({ success: false, message: 'Família não identificada na sessão.' });
+    }
+
+    const sessionResult = await initBaileysSession(familyId);
+    return res.json({
+      success: true,
+      is_connected: sessionResult?.is_connected || false,
+      qr_code: sessionResult?.qr_code || null,
+      message: sessionResult?.is_connected 
+        ? 'Sessão do WhatsApp já conectada!' 
+        : 'QR Code gerado. Aponte a câmera do WhatsApp para parear.',
+    });
+  } catch (err) {
+    console.error('Erro ao parear WhatsApp Baileys:', err);
+    return res.status(500).json({ success: false, message: 'Erro ao gerar QR Code do WhatsApp.' });
+  }
+}
+
+export async function disconnectSession(req, res) {
+  try {
+    const familyId = await resolveFamilyId(req.user);
+    if (!familyId) {
+      return res.status(400).json({ success: false, message: 'Família não identificada na sessão.' });
+    }
+
+    await disconnectBaileysSession(familyId);
+    return res.json({ success: true, message: 'WhatsApp desconectado com sucesso.' });
+  } catch (err) {
+    console.error('Erro ao desconectar WhatsApp:', err);
+    return res.status(500).json({ success: false, message: 'Erro ao desconectar WhatsApp.' });
+  }
+}
+
 export default {
   getConfig,
   saveConfig,
@@ -221,4 +260,6 @@ export default {
   sendTemplate,
   sendTestMessage,
   triggerAlarmTest,
+  pairSession,
+  disconnectSession,
 };

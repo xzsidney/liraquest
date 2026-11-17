@@ -11,6 +11,8 @@ import {
   sendTemplate,
   sendTestMessage,
   triggerAlarmTest,
+  pairSession,
+  disconnectSession,
 } from '../controllers/whatsappController.js';
 
 const router = express.Router();
@@ -20,6 +22,10 @@ router.use(authenticateToken);
 
 // Consulta de configuração e lista de membros
 router.get('/config', getConfig);
+
+// Conexão via QR Code e desconexão
+router.post('/pair', authorizeRoles('ADMIN', 'PARENT'), pairSession);
+router.post('/disconnect', authorizeRoles('ADMIN', 'PARENT'), disconnectSession);
 
 // Gerenciamento dos Guardiões e Disparos da Família
 router.post('/config', authorizeRoles('ADMIN', 'PARENT'), saveConfig);

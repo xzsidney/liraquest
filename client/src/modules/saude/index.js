@@ -837,7 +837,8 @@ function renderShoppingItemRow(item) {
 // ABA 5: CENTRAL DE CONEXÃO COM O WHATSAPP DO CLÃ (FASE 5)
 // ─────────────────────────────────────────────────────────────────────────────
 function renderTabWhatsApp() {
-  const isMetaConfigured = whatsappData?.meta_configured || false;
+  const isConnected = whatsappData?.is_connected || false;
+  const qrCodeUrl = whatsappData?.qr_code_data_url || null;
   const targetPhone = whatsappData?.group_id_or_phone || '';
   const notifyMeals = whatsappData?.notify_meals !== false;
   const notifyHydration = whatsappData?.notify_hydration !== false;
@@ -855,16 +856,65 @@ function renderTabWhatsApp() {
               <h3 class="cinzel gold-gradient-text" style="margin: 0; font-size: 1.45rem;">
                 Central Oficial de WhatsApp do Clã
               </h3>
-              <span class="whatsapp-status-pill ${isMetaConfigured ? 'connected' : 'waiting'}" style="font-size: 0.8rem; padding: 4px 12px; border-radius: 20px;">
-                ${isMetaConfigured ? '🟢 Meta Cloud API Ativa (Envio Silencioso Automático)' : '🟡 Modo Direto / Link Oficial Ativo (1-Toque)'}
+              <span class="whatsapp-status-pill ${isConnected ? 'connected' : 'waiting'}" style="font-size: 0.8rem; padding: 4px 12px; border-radius: 20px;">
+                ${isConnected ? '🟢 WhatsApp do Clã Conectado & Operacional' : '🟡 Desconectado (Aguardando Conexão)'}
               </span>
             </div>
             <p style="color: #cbd5e1; font-size: 0.9rem; margin: 0; max-width: 780px;">
-              O sistema lê automaticamente o número de telefone de cada herói cadastrado na família e transmite os alarmes das refeições e as convocações dos Guardiões.
+              Apenas o celular do Guardião Pai conecta uma única vez via QR Code. O LiraQuest envia os alarmes de refeição e as convocações diretamente para o WhatsApp de toda a família.
             </p>
           </div>
         </div>
       </div>
+
+      <!-- SEÇÃO 0: CARD DE CONEXÃO DIRETA VIA QR CODE -->
+      ${isConnected ? `
+        <div class="noble-card" style="background: rgba(16, 185, 129, 0.15); border: 1.5px solid rgba(16, 185, 129, 0.45); border-radius: 14px; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <span style="font-size: 2.2rem;">🛡️</span>
+            <div>
+              <h4 style="color: #34d399; margin: 0 0 4px 0; font-size: 1.1rem;">WhatsApp do Guardião Conectado & Operacional!</h4>
+              <p style="color: #cbd5e1; font-size: 0.85rem; margin: 0;">
+                O LiraQuest está autorizado a disparar convocações e alarmes de refeição para todos os heróis da família em segundo plano.
+              </p>
+            </div>
+          </div>
+          <button id="btn-wa-disconnect" class="btn-noble btn-noble-sm" style="background: rgba(239, 68, 68, 0.25); border: 1px solid #ef4444; color: #fca5a5; cursor: pointer; padding: 8px 16px;">
+            🔴 Desconectar Aparelho
+          </button>
+        </div>
+      ` : `
+        <div class="noble-card" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 58, 138, 0.3)); border: 1.5px dashed rgba(212, 175, 55, 0.45); border-radius: 16px; padding: 24px; text-align: center;">
+          <div style="font-size: 2.6rem; margin-bottom: 8px;">📲✨</div>
+          <h4 class="cinzel gold-gradient-text" style="margin: 0 0 6px 0; font-size: 1.25rem;">
+            Conectar WhatsApp do Clã (Envio 100% Automático)
+          </h4>
+          <p style="color: #cbd5e1; font-size: 0.88rem; max-width: 580px; margin: 0 auto 18px auto; line-height: 1.5;">
+            Conecte o seu celular em 5 segundos igual ao WhatsApp Web. Ninguém mais da família precisa escanear nada — eles apenas recebem as mensagens!
+          </p>
+
+          ${qrCodeUrl ? `
+            <div style="display: inline-block; padding: 14px; background: #ffffff; border-radius: 14px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); margin-bottom: 16px;">
+              <img src="${qrCodeUrl}" alt="QR Code WhatsApp" style="width: 240px; height: 240px; display: block; border-radius: 8px;">
+            </div>
+            <p style="color: #fde047; font-weight: 700; font-size: 0.95rem; margin-bottom: 8px;">
+              📸 Aponte o WhatsApp do seu celular para o código acima:
+            </p>
+            <ol style="color: #cbd5e1; font-size: 0.85rem; max-width: 400px; text-align: left; margin: 0 auto 16px auto; line-height: 1.6;">
+              <li>No celular, abra o <strong>WhatsApp</strong>.</li>
+              <li>Toque em <strong>Aparelhos conectados</strong> &gt; <strong>Conectar um aparelho</strong>.</li>
+              <li>Aponte a câmera para o QR Code acima.</li>
+            </ol>
+            <button id="btn-wa-generate-qr" class="btn-noble btn-noble-secondary btn-noble-sm" style="cursor: pointer;">
+              🔄 Atualizar QR Code
+            </button>
+          ` : `
+            <button id="btn-wa-generate-qr" class="btn-noble btn-noble-gold" style="font-size: 1rem; padding: 12px 28px; font-weight: 800; cursor: pointer;">
+              🔑 Gerar QR Code de Conexão do WhatsApp
+            </button>
+          `}
+        </div>
+      `}
 
       <!-- SEÇÃO 1: HERÓIS DA FAMÍLIA & TELEFONES CADASTRADOS -->
       <div class="noble-card" style="border-color: rgba(212, 175, 55, 0.4); background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 58, 138, 0.2));">
@@ -1510,6 +1560,7 @@ export function bindSaudeEvents() {
     if (typeof rawSocket.off === 'function') {
       rawSocket.off('nutrition:meal_alert');
       rawSocket.off('whatsapp:status');
+      rawSocket.off('whatsapp:qr_generated');
       rawSocket.off('whatsapp:message_sent');
     }
     rawSocket.on('nutrition:meal_alert', (alarm) => {
@@ -1518,9 +1569,22 @@ export function bindSaudeEvents() {
       loadHealthData().then(updateView);
     });
 
+    rawSocket.on('whatsapp:qr_generated', (data) => {
+      console.log('📸 [WhatsApp QR Code Recebido]:', data);
+      if (!whatsappData) whatsappData = {};
+      whatsappData.qr_code_data_url = data.qr_code;
+      whatsappData.is_connected = false;
+      updateView();
+    });
+
     rawSocket.on('whatsapp:status', (data) => {
       console.log('📱 [WhatsApp Status Changed]:', data);
       showToast(data.is_connected ? '🟢 WhatsApp conectado com sucesso!' : '⚪ WhatsApp desconectado.', data.is_connected ? 'success' : 'info');
+      if (!whatsappData) whatsappData = {};
+      whatsappData.is_connected = data.is_connected;
+      if (data.is_connected) {
+        whatsappData.qr_code_data_url = null;
+      }
       loadHealthData().then(updateView);
     });
 
@@ -1667,6 +1731,59 @@ export function bindSaudeEvents() {
         }
       } catch (err) {
         showToast(err.message || 'Erro ao salvar credenciais da Meta.', 'error');
+      }
+    });
+  }
+
+  // 18. Gerar QR Code do WhatsApp (Baileys Conexão Direta)
+  const btnGenQr = document.getElementById('btn-wa-generate-qr');
+  if (btnGenQr) {
+    btnGenQr.addEventListener('click', async () => {
+      try {
+        showToast('Gerando QR Code de pareamento do WhatsApp...', 'info');
+        btnGenQr.disabled = true;
+        btnGenQr.textContent = '⏳ Gerando QR Code...';
+
+        const res = await api.post('/api/whatsapp/pair', {});
+        if (res && res.success) {
+          if (!whatsappData) whatsappData = {};
+          whatsappData.qr_code_data_url = res.qr_code;
+          whatsappData.is_connected = res.is_connected;
+
+          if (res.is_connected) {
+            showToast('🎉 WhatsApp do Clã já está conectado!', 'success');
+          } else {
+            showToast('📸 QR Code pronto! Aponte a câmera do WhatsApp.', 'success');
+          }
+          updateView();
+        }
+      } catch (err) {
+        showToast(err.message || 'Erro ao gerar QR Code.', 'error');
+        btnGenQr.disabled = false;
+        btnGenQr.textContent = '🔑 Gerar QR Code de Conexão do WhatsApp';
+      }
+    });
+  }
+
+  // 19. Desconectar Sessão do WhatsApp
+  const btnDisconnect = document.getElementById('btn-wa-disconnect');
+  if (btnDisconnect) {
+    btnDisconnect.addEventListener('click', async () => {
+      if (!confirm('Deseja realmente desconectar o WhatsApp do Clã?')) return;
+      try {
+        showToast('Desconectando WhatsApp...', 'info');
+        const res = await api.post('/api/whatsapp/disconnect', {});
+        if (res && res.success) {
+          showToast('WhatsApp desconectado com sucesso.', 'info');
+          if (whatsappData) {
+            whatsappData.is_connected = false;
+            whatsappData.qr_code_data_url = null;
+          }
+          await loadHealthData();
+          updateView();
+        }
+      } catch (err) {
+        showToast(err.message || 'Erro ao desconectar WhatsApp.', 'error');
       }
     });
   }

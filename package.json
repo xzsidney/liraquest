@@ -21,6 +21,7 @@
   "author": "Sidney Lira",
   "license": "ISC",
   "dependencies": {
+    "@whiskeysockets/baileys": "^7.0.0-rc14",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
@@ -29,6 +30,7 @@
     "multer": "^2.3.0",
     "mysql2": "^3.24.2",
     "node-cron": "^4.6.0",
+    "pino": "^10.4.0",
     "qrcode": "^1.5.4",
     "sequelize": "^6.37.8",
     "socket.io": "^4.8.3"
