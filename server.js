@@ -22,6 +22,8 @@ import battleRoutes from './server/routes/battleRoutes.js';
 import trucoRoutes from './server/routes/trucoRoutes.js';
 import zombiRoutes from './server/routes/zombiRoutes.js';
 import nutritionRoutes from './server/routes/nutritionRoutes.js';
+import funRoutes from './server/routes/funRoutes.js';
+import financeRoutes from './server/routes/financeRoutes.js';
 import { initChameleonSocket } from './server/sockets/chameleonSocket.js';
 import { initDuelSocket } from './server/sockets/duelSocket.js';
 import { initNutritionCron } from './server/services/nutritionCron.js';
@@ -74,6 +76,8 @@ app.use('/api/battle', battleRoutes);
 app.use('/api/truco', trucoRoutes);
 app.use('/api/zombi', zombiRoutes);
 app.use('/api/nutrition', nutritionRoutes);
+app.use('/api/fun', funRoutes);
+app.use('/api/finance', financeRoutes);
 
 
 // Health check & status

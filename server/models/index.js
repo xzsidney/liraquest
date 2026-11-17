@@ -36,6 +36,12 @@ import { FamilyMeal } from './FamilyMeal.js';
 import { FamilyMealItem } from './FamilyMealItem.js';
 import { FamilyMealCheckin } from './FamilyMealCheckin.js';
 import { FamilyShoppingItem } from './FamilyShoppingItem.js';
+import { FamilyEvent } from './FamilyEvent.js';
+import { FamilyPoll } from './FamilyPoll.js';
+import { FamilyPollVote } from './FamilyPollVote.js';
+import { FamilyBill } from './FamilyBill.js';
+import { FamilyClanVault } from './FamilyClanVault.js';
+import { FamilyChildVault } from './FamilyChildVault.js';
 
 // ==========================================
 // 1. Associações de Usuário & Família
@@ -202,6 +208,48 @@ FamilyMealCheckin.belongsTo(Character, { foreignKey: 'character_id', as: 'charac
 Family.hasMany(FamilyShoppingItem, { foreignKey: 'family_id', as: 'shopping_items' });
 FamilyShoppingItem.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
 
+// ==========================================
+// 12. Associações de Diversão & Eventos (Fase 4)
+// ==========================================
+Family.hasMany(FamilyEvent, { foreignKey: 'family_id', as: 'clan_events' });
+FamilyEvent.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
+
+FamilyUser.hasMany(FamilyEvent, { foreignKey: 'created_by', as: 'created_clan_events' });
+FamilyEvent.belongsTo(FamilyUser, { foreignKey: 'created_by', as: 'creator' });
+
+Family.hasMany(FamilyPoll, { foreignKey: 'family_id', as: 'polls' });
+FamilyPoll.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
+
+FamilyUser.hasMany(FamilyPoll, { foreignKey: 'created_by', as: 'created_polls' });
+FamilyPoll.belongsTo(FamilyUser, { foreignKey: 'created_by', as: 'creator' });
+
+FamilyPoll.hasMany(FamilyPollVote, { foreignKey: 'poll_id', as: 'votes', onDelete: 'CASCADE' });
+FamilyPollVote.belongsTo(FamilyPoll, { foreignKey: 'poll_id', as: 'poll' });
+
+FamilyUser.hasMany(FamilyPollVote, { foreignKey: 'user_id', as: 'poll_votes' });
+FamilyPollVote.belongsTo(FamilyUser, { foreignKey: 'user_id', as: 'voter' });
+
+// ==========================================
+// 13. Associações de Finanças & Cofres (Fase 4)
+// ==========================================
+Family.hasMany(FamilyBill, { foreignKey: 'family_id', as: 'bills' });
+FamilyBill.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
+
+FamilyUser.hasMany(FamilyBill, { foreignKey: 'created_by', as: 'created_bills' });
+FamilyBill.belongsTo(FamilyUser, { foreignKey: 'created_by', as: 'creator' });
+
+Family.hasMany(FamilyClanVault, { foreignKey: 'family_id', as: 'vaults' });
+FamilyClanVault.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
+
+FamilyUser.hasMany(FamilyClanVault, { foreignKey: 'created_by', as: 'created_vaults' });
+FamilyClanVault.belongsTo(FamilyUser, { foreignKey: 'created_by', as: 'creator' });
+
+Family.hasMany(FamilyChildVault, { foreignKey: 'family_id', as: 'child_vaults' });
+FamilyChildVault.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
+
+FamilyUser.hasOne(FamilyChildVault, { foreignKey: 'user_id', as: 'child_vault' });
+FamilyChildVault.belongsTo(FamilyUser, { foreignKey: 'user_id', as: 'user' });
+
 export {
   sequelize,
   FamilyUser,
@@ -240,4 +288,10 @@ export {
   FamilyMealItem,
   FamilyMealCheckin,
   FamilyShoppingItem,
+  FamilyEvent,
+  FamilyPoll,
+  FamilyPollVote,
+  FamilyBill,
+  FamilyClanVault,
+  FamilyChildVault,
 };

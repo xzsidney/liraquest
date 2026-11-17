@@ -78,6 +78,13 @@ export const api = {
     });
   },
 
+  patch(endpoint, body = {}) {
+    return this.request(endpoint, {
+      method: 'PATCH',
+      body: body instanceof FormData ? body : JSON.stringify(body),
+    });
+  },
+
   delete(endpoint) {
     return this.request(endpoint, { method: 'DELETE' });
   },

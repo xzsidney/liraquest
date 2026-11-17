@@ -267,6 +267,53 @@ Rotas REST e WebSockets do Módulo Saúde (`client/src/modules/saude/` e `/api/n
 - **Serviço Node-Cron (`server/services/nutritionCron.js`):** Monitora minuto a minuto os horários ativos no MySQL.
 - **Evento `nutrition:meal_alert` (Socket.IO):** Dispara alerta na tela quando faltam X minutos para a refeição (`PRE_ALERT`) ou na hora exata em que a refeição é servida (`MEAL_NOW`), preparando o terreno para envio automático via WhatsApp.
 
+---
+
+## 🎡 18. Módulo Diversão, Eventos & Vales da Família (Fase 4)
+Rotas do Módulo Diversão (`client/src/modules/diversao/` e `/api/fun`), contemplando a agenda de eventos e aniversários do clã, votação democrática de passeios no celular e resgate de vales da vida real com Fichas do Lar.
+
+| Método | Rota | Autenticação | Descrição |
+|:---|:---|:---|:---|
+| `GET` | `/api/fun/events` | JWT | Lista todos os eventos ativos da família com ordenação cronológica e contadores regressivos |
+| `POST` | `/api/fun/events` | JWT (PARENT/ADMIN) | Cadastra novo evento, aniversário ou passeio com título, data, horário, ícone, categoria e recorrência anual |
+| `PUT` | `/api/fun/events/:eventId` | JWT (PARENT/ADMIN) | Atualiza os detalhes de um evento da agenda familiar |
+| `DELETE` | `/api/fun/events/:eventId` | JWT (PARENT/ADMIN) | Remove um evento do calendário do clã |
+| `GET` | `/api/fun/polls` | JWT | Lista as votações de passeios (abertas e concluídas) com opções, contagem de votos, % e indicação do voto do usuário |
+| `POST` | `/api/fun/polls` | JWT (PARENT/ADMIN) | Cria nova votação de passeio familiar com título e opções personalizadas com ícones |
+| `POST` | `/api/fun/polls/:pollId/vote` | JWT | Registra ou atualiza o voto de qualquer membro da família na opção selecionada |
+| `POST` | `/api/fun/polls/:pollId/close` | JWT (PARENT/ADMIN) | Encerra a votação, computa votos e proclama a opção campeã da família |
+| `DELETE` | `/api/fun/polls/:pollId` | JWT (PARENT/ADMIN) | Exclui uma votação do clã |
+| `GET` | `/api/rewards` | JWT | Consulta a vitrine de vales do lar disponíveis para troca com Fichas do Lar |
+| `POST` | `/api/rewards/:rewardId/redeem` | JWT | Solicita o resgate de um vale da vida real, debitando Fichas do Lar (`user_progress.family_tokens`) |
+| `GET` | `/api/rewards/redemptions/my` | JWT | Consulta os vales resgatados pelo usuário e seu status de visto |
+| `GET` | `/api/rewards/redemptions/family` | JWT (PARENT/ADMIN) | Lista todos os pedidos de resgate da família para avaliação dos pais |
+| `POST` | `/api/rewards/redemptions/:redemptionId/review` | JWT (PARENT/ADMIN) | Guardião dá o visto de liberação e confirma a entrega do vale na vida real |
+
+---
+
+## 💰 19. Módulo Financeiro, Contas & Tesouro do Clã (Fase 4)
+Rotas do Módulo Financeiro (`client/src/modules/financeiro/` e `/api/finance`), integrando controle de contas domésticas dos pais, cofre coletivo dos grandes sonhos do clã e cofre/mesada gamificada dos filhos com educação financeira.
+
+| Método | Rota | Autenticação | Descrição |
+|:---|:---|:---|:---|
+| `GET` | `/api/finance/bills` | JWT (PARENT/ADMIN) | Lista todas as contas domésticas do mês com sumário de totais (mês, pendente, pago e vencidas) |
+| `POST` | `/api/finance/bills` | JWT (PARENT/ADMIN) | Cadastra nova conta com nome, categoria, valor em R$, data de vencimento, método e notas |
+| `PUT` | `/api/finance/bills/:billId` | JWT (PARENT/ADMIN) | Atualiza informações de uma despesa doméstica |
+| `PATCH` | `/api/finance/bills/:billId/toggle` | JWT (PARENT/ADMIN) | Alterna status entre `PAID` (Paga) e `PENDING` (Pendente), registrando data de quitação |
+| `DELETE` | `/api/finance/bills/:billId` | JWT (PARENT/ADMIN) | Exclui uma despesa do controle doméstico |
+| `GET` | `/api/finance/vaults` | JWT | Consulta as metas de sonhos do clã (Viagem, Reforma, Compras) com barras de progresso duplo (R$ e Missões) |
+| `POST` | `/api/finance/vaults` | JWT (PARENT/ADMIN) | Cria uma nova meta de sonho coletivo da família |
+| `POST` | `/api/finance/vaults/:vaultId/deposit` | JWT | Registra aporte financeiro em Reais no cofre do clã, recalculando % e comemorando ao bater 100% |
+| `PUT` | `/api/finance/vaults/:vaultId` | JWT (PARENT/ADMIN) | Atualiza meta do cofre do clã |
+| `DELETE` | `/api/finance/vaults/:vaultId` | JWT (PARENT/ADMIN) | Exclui uma meta familiar |
+| `GET` | `/api/finance/child-vault` | JWT | Retorna o cofrinho do herói (saldo de ouro na bolsa, ouro poupado, mesada acumulada e meta). Se for pai, lista todos os filhos |
+| `POST` | `/api/finance/child-vault/deposit` | JWT | Transfere moedas de ouro da bolsa de aventuras para a poupança trancada do cofrinho |
+| `POST` | `/api/finance/child-vault/withdraw` | JWT | Transfere ouro da poupança de volta para a bolsa de combate |
+| `POST` | `/api/finance/child-vault/convert` | JWT | Converte ouro poupado em saldo de mesada real em Reais (R$) com taxa combinada (10 Ouro = R$ 1,00) |
+| `POST` | `/api/finance/child-vault/goal` | JWT | Atualiza o sonho pessoal de consumo do filho (título e valor em R$) |
+| `POST` | `/api/finance/child-vault/pay` | JWT (PARENT/ADMIN) | Registra a quitação/pagamento da mesada entregue ao filho na vida real, dando baixa no saldo acumulado |
+
+
 
 
 

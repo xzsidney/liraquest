@@ -666,6 +666,118 @@ Armazena a lista de compras inteligente do clã dividida entre abastecimento men
 | `is_purchased` | `BOOLEAN` | Não | Status de compra marcado na lista (Padrão: `false`) |
 | `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
 
+---
+
+## 12. Módulo de Expansão: Diversão & Conexão Familiar (Fase 4)
+
+### 📅 `family_events`
+Armazena a agenda de eventos, aniversários e encontros da casa com data, horário, ícone e contagem regressiva.
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único UUIDv4 |
+| `family_id` | `UUID` (FK) | Não | Referência a `families.id` |
+| `created_by` | `UUID` (FK) | Não | Referência a `family_users.id` (Criador) |
+| `title` | `VARCHAR(150)` | Não | Título do evento (ex: "Noite da Pizza & Jogos") |
+| `description` | `TEXT` | Sim | Detalhes e instruções do evento |
+| `event_date` | `DATEONLY` | Não | Data do evento ('YYYY-MM-DD') |
+| `event_time` | `VARCHAR(10)` | Sim | Horário previsto ('HH:MM', padrão: "12:00") |
+| `category` | `ENUM('BIRTHDAY','FAMILY_OUTING','MEETING','PARTY','SPECIAL_LUNCH','OTHER')` | Não | Categoria do evento |
+| `icon` | `VARCHAR(30)` | Não | Ícone temático (ex: '🍕', '🎂', '🌳') |
+| `color` | `VARCHAR(20)` | Não | Cor de destaque em hexadecimal |
+| `is_recurring_yearly` | `BOOLEAN` | Não | Se o evento se repete anualmente (aniversário) |
+| `is_active` | `BOOLEAN` | Não | Status ativo na agenda (Padrão: `true`) |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+
+### 🗳️ `family_polls`
+Armazena as votações familiares para escolha democrática dos passeios de fim de semana com múltiplas opções cadastradas pelos pais.
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único UUIDv4 |
+| `family_id` | `UUID` (FK) | Não | Referência a `families.id` |
+| `created_by` | `UUID` (FK) | Não | Referência a `family_users.id` (Guardião criador) |
+| `title` | `VARCHAR(150)` | Não | Pergunta da votação (ex: "Qual o passeio do fim de semana?") |
+| `description` | `TEXT` | Sim | Contexto e orientações para a família |
+| `options` | `JSON` | Não | Array JSON contendo as opções (`id`, `title`, `description`, `icon`) |
+| `status` | `ENUM('OPEN','CLOSED')` | Não | Status da votação (Padrão: `OPEN`) |
+| `closes_at` | `DATETIME` | Sim | Data e horário limite de votação |
+| `winner_option_id` | `VARCHAR(50)` | Sim | Identificador da opção vencedora proclamada |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+
+### 🗳️ `family_poll_votes`
+Registra os votos individuais de cada membro da família nas enquetes de passeios.
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único UUIDv4 |
+| `poll_id` | `UUID` (FK) | Não | Referência a `family_polls.id` (CASCADE) |
+| `user_id` | `UUID` (FK) | Não | Referência a `family_users.id` (Membro votante) |
+| `option_id` | `VARCHAR(50)` | Não | ID da opção escolhida |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps (Índice único: `poll_id` + `user_id`) |
+
+---
+
+## 13. Módulo de Expansão: Financeiro & Tesouro do Clã (Fase 4)
+
+### 📑 `family_bills`
+Armazena as contas domésticas e despesas mensais dos pais com valores, vencimentos, forma de pagamento e status de liquidação.
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único UUIDv4 |
+| `family_id` | `UUID` (FK) | Não | Referência a `families.id` |
+| `created_by` | `UUID` (FK) | Não | Referência a `family_users.id` (Guardião) |
+| `title` | `VARCHAR(150)` | Não | Nome da despesa (ex: "Conta de Energia Elétrica") |
+| `category` | `ENUM('ENERGY','WATER','INTERNET','HOUSING','SUPERMARKET','STREAMING','EDUCATION','HEALTH','OTHER')` | Não | Categoria da conta |
+| `amount` | `DECIMAL(10,2)` | Não | Valor da conta em Reais (R$) |
+| `due_date` | `DATEONLY` | Não | Data de vencimento ('YYYY-MM-DD') |
+| `status` | `ENUM('PENDING','PAID','OVERDUE')` | Não | Status de pagamento |
+| `paid_at` | `DATETIME` | Sim | Data e hora em que a conta foi liquidada |
+| `payment_method` | `VARCHAR(50)` | Sim | Meio de pagamento ('PIX', 'Boleto', etc.) |
+| `barcode_or_pix` | `TEXT` | Sim | Código de barras ou chave/código Copia e Cola |
+| `notes` | `TEXT` | Sim | Observações adicionais do guardião |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+
+### 🏰 `family_clan_vaults`
+Armazena as metas coletivas dos grandes sonhos do clã (ex: Viagem de Férias, Reforma do Lar, Console de Jogos) com progresso financeiro e de missões.
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único UUIDv4 |
+| `family_id` | `UUID` (FK) | Não | Referência a `families.id` |
+| `created_by` | `UUID` (FK) | Não | Referência a `family_users.id` |
+| `title` | `VARCHAR(150)` | Não | Nome do grande sonho (ex: "Viagem de Férias na Praia") |
+| `description` | `TEXT` | Sim | Motivação e detalhes do objetivo familiar |
+| `category` | `ENUM('TRIP','RENOVATION','PURCHASE','EXPERIENCE','SAVINGS','OTHER')` | Não | Categoria da meta |
+| `icon` | `VARCHAR(30)` | Não | Ícone temático (ex: '🏖️', '🛠️', '🎮') |
+| `target_amount` | `DECIMAL(10,2)` | Não | Valor financeiro alvo em Reais (R$) |
+| `current_amount` | `DECIMAL(10,2)` | Não | Valor total acumulado e economizado |
+| `target_tasks` | `INT` | Não | Meta opcional de tarefas coletivas do clã |
+| `current_tasks` | `INT` | Não | Tarefas totais concluídas pela família |
+| `target_date` | `DATEONLY` | Sim | Data planejada para realização do sonho |
+| `status` | `ENUM('ACTIVE','ACHIEVED','PAUSED')` | Não | Status da meta (Padrão: `ACTIVE`) |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+
+### 🪙 `family_child_vaults`
+Armazena o cofrinho e mesada gamificada dos filhos, vinculando ouro poupado à conversão em dinheiro real com registro de objetivos de compra.
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único UUIDv4 |
+| `family_id` | `UUID` (FK) | Não | Referência a `families.id` |
+| `user_id` | `UUID` (FK) | Não | Referência a `family_users.id` (Filho / Herói) |
+| `character_id` | `UUID` (FK) | Sim | Referência a `characters.id` (Personagem RPG) |
+| `saved_gold` | `INT` | Não | Ouro guardado no cofrinho de poupança |
+| `allowance_balance_brl` | `DECIMAL(10,2)` | Não | Saldo de mesada real acumulada (R$) |
+| `gold_to_brl_rate` | `DECIMAL(6,2)` | Não | Taxa de conversão (Padrão: 10 Ouro = R$ 1,00) |
+| `goal_title` | `VARCHAR(150)` | Sim | Brinquedo ou jogo que o herói quer comprar |
+| `goal_amount_brl` | `DECIMAL(10,2)` | Não | Valor do objetivo do herói em Reais (R$) |
+| `total_withdrawn_brl` | `DECIMAL(10,2)` | Não | Total de mesada já paga na vida real pelos pais |
+| `notes` | `TEXT` | Sim | Anotações ou combinados de educação financeira |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps (Índice único: `family_id` + `user_id`) |
+
+
 
 
 
