@@ -9,6 +9,16 @@
   <title>Truco Paulista Mobile - LiraQuest</title>
   <base href="/truco/">
   <link rel="stylesheet" href="style.css">
+  <script>
+    // Proteção de Acesso: Apenas membros autenticados do LiraQuest
+    (function() {
+      const token = localStorage.getItem('liraquest_token');
+      if (!token) {
+        alert('🔒 Acesso Restrito: O Truco Paulista é exclusivo para membros autenticados do Reino LiraQuest. Por favor, faça login.');
+        window.location.href = '/login';
+      }
+    })();
+  </script>
 </head>
 <body>
   <div class="mobile-viewport-container">
@@ -69,7 +79,7 @@
           <button class="start-footer-btn" id="btn-start-sound">
             <span id="start-mute-icon">🔊</span> Som Ativo
           </button>
-          <a href="/" class="start-footer-btn back-lira">🏰 Voltar ao LiraQuest</a>
+          <a href="/jogos" class="start-footer-btn back-lira">🏰 Voltar ao Salão de Jogos</a>
         </div>
       </div>
     </div>

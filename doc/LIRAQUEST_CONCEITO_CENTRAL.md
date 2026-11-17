@@ -318,5 +318,27 @@ O **Arcade de Lira** é o centro de diversão acessível pelo Terminal do Avatar
 
 10. **🏰 Landing Page Oficial: Modo Forja do Reino em Andamento (Em Breve):**
     - **Conceito & Segurança:** Com o domínio de produção `https://liraquest.com.br` ativo, a página inicial pública (`#view-home`) foi convertida em uma tela nobre e imersiva de *Acesso Antecipado / Em Construção*.
-    - **Elementos Visuais:** Emblema com pulso e brilho dourado (`🏰🔨✨`), barra de progresso viva da forja real (85% concluído), marcos dos pilares da plataforma e botão único e discreto de *Acesso Restrito dos Guardiões (Login)*.
+    - **Elementos Visuais:** Emblema com pulso e brilho dourado (`🏰🔨✨`), barra de progresso viva da forja real (92% concluído), marcos dos pilares da plataforma e botão único e discreto de *Acesso Restrito dos Guardiões (Login)*.
     - **Proteção do Reino:** Oculta o formulário aberto de cadastro e links públicos externos, preservando os fluxos e terminais internos funcionais exclusivamente para as famílias fundadoras autenticadas.
+
+11. **🏛️ O Grande Salão do Reino (Hub Central Pós-Login) & Matriz dos 6 Módulos Familiares:**
+    - **Arquitetura de Monorepo Modular (`client/`):**
+      - Estruturação desacoplada em ES Modules nativos no navegador com SPA Routing:
+        - `client/index.html`: Shell leve e semântico com tipografia Google Fonts (*Cinzel* e *Plus Jakarta Sans*).
+        - `client/src/core/`: Camada de autenticação JWT (`auth.js`), cliente HTTP resiliente com injeção automática de Bearer Token (`api.js`), WebSockets (`socket.js`) e roteamento por History API (`router.js`).
+        - `client/src/components/`: Navbar Nobre oficial (`Navbar.js`), Toasts imperiais (`Toast.js`), Modais polivalentes (`Modal.js`) e HUD do Herói (`HUD.js`).
+        - `client/src/modules/`: Diretórios autocontidos para cada área da vida familiar.
+    - **O Grande Salão do Reino (Hub Central 5 Estrelas):**
+      - **Saudação Nobre:** Banner imersivo com avatar, nome, classe de combate, clã familiar e papel do guardião/herói.
+      - **Resumo do Clã:** 3 Indicadores dinâmicos do dia (Missões Pendentes da Casa, Próxima Refeição da Saúde e Status da Sequência do Clã).
+      - **Matriz dos 6 Portais Nobres (Acesso em 1 Clique):**
+        1. 🏡 **Casa (Missões & Organização):** Mural de tarefas do lar, hábitos diários, envio de fotos de comprovação pelo filho e validação pedagógica com visto do guardião.
+        2. 📚 **Estudos (Pomodoro Gamificado & Matérias):** Temporizador de foco (25 min de foco / 5 min de descanso), deveres de casa, matérias escolares e bônus de XP e Ouro para o herói.
+        3. 🥗 **Saúde (Vitalidade & Cardápio):** Horários das refeições, cardápio familiar da semana, controle interativo de copos d'água (💧 meta de 8 copos diários) e alarmes de bem-estar.
+        4. 🎡 **Diversão (Lazer & Vales da Família):** Agenda de eventos do fim de semana (Noite da Pizza, Cinema, Parque) e Loja do Lar para resgate de vales reais utilizando Fichas do Lar.
+        5. 🎮 **Jogos (Salão Nobre de Jogos):** Lobby arcade integrado com Truco Paulista Mobile, Marvel Zombies RPG, Duelo de Arqueiros 1v1, Esconde-Esconde Camaleão e Quests/Masmorras.
+        6. 💰 **Financeiro (Tesouro do Clã & Economia):** Cofre/mesada gamificada dos heróis com poupança de Ouro, meta coletiva de grande sonho familiar (Parque Temático) e controle de contas e provisões do lar para os pais.
+    - **Proteção e Fim do Acesso Visitante a Jogos:**
+      - Rotas `/truco` e `/zombi` passam a contar com barreira estrita de verificação de autenticação JWT no cliente e no servidor, garantindo que apenas membros cadastrados e logados do LiraQuest possam desfrutar dos jogos.
+    - **Integração Total com o Backend (`server.js`):**
+      - O servidor Express serve estáticos primários da pasta `client/` e ativos legados/jogos da pasta `public/`, mantendo 100% de estabilidade nas rotas de API (`/api/...`) e nos canais de WebSockets.

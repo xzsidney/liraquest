@@ -49,7 +49,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Servir arquivos estáticos do frontend (pasta public)
+// Servir arquivos estáticos do frontend (Monorepo Modular em client/ e legado/assets em public/)
+app.use(express.static(path.join(__dirname, 'client')));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Rotas da API
@@ -140,9 +141,9 @@ app.get(['/zombi', '/zombi/*'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'zombi', 'index.html'));
 });
 
-// Fallback para SPA (Single Page Application)
+// Fallback para SPA (Single Page Application - Monorepo Modular client/)
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'client', 'index.html'));
 });
 
 // Inicialização Robusta do Servidor (Proteção contra Erro 503 na Hostinger)

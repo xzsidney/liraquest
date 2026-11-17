@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>LiraQuest - O Grande Salão do Reino Familiar & RPG</title>
+
+  <!-- Google Fonts Oficiais: Cinzel & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Estilos Oficiais do LiraQuest (Paleta Nobre) -->
+  <link rel="stylesheet" href="/src/styles/main.css">
+</head>
+<body>
+
+  <!-- Ponto de Montagem da Navbar Nobre -->
+  <header id="navbar-mount"></header>
+
+  <!-- Ponto de Montagem da Aplicação SPA (#app) -->
+  <main id="app" class="app-container">
+    <div style="text-align: center; padding: 60px;">
+      <div style="font-size: 2.8rem; margin-bottom: 12px;">🏰✨</div>
+      <p style="color: #cbd5e1;">Adentrando os portões do LiraQuest...</p>
+    </div>
+  </main>
+
+  <!-- Container de Toasts -->
+  <div id="toast-container"></div>
+
+  <!-- Rodapé Nobre -->
+  <footer style="text-align: center; padding: 24px 16px; color: var(--text-dim); font-size: 0.8rem; border-top: 1px solid rgba(255, 255, 255, 0.05); margin-top: auto;">
+    &copy; 2026 <strong>LiraQuest</strong> — Plataforma de RPG e Gamificação Familiar. Todos os direitos reservados ao Clã.
+  </footer>
+
+  <!-- WebSockets & Core da Aplicação Modular -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

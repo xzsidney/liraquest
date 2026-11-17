@@ -8,6 +8,16 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Rajdhani:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <script>
+    // Proteção de Acesso: Apenas membros autenticados do LiraQuest
+    (function() {
+      const token = localStorage.getItem('liraquest_token');
+      if (!token) {
+        alert('🔒 Acesso Restrito: Marvel Zombies é exclusivo para membros autenticados do Reino LiraQuest. Por favor, faça login.');
+        window.location.href = '/login';
+      }
+    })();
+  </script>
 </head>
 <body>
 
@@ -27,6 +37,9 @@
       </div>
 
       <div class="top-nav-right">
+        <a href="/jogos" class="util-btn" style="text-decoration: none; background: rgba(212, 175, 55, 0.25); border-color: #d4af37; color: #fde047; font-weight: 700;">
+          🏰 Salão de Jogos
+        </a>
         <a href="characters.html" class="util-btn" style="text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
           🦸 Fichas (82)
         </a>
