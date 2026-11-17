@@ -313,6 +313,36 @@ Rotas do Módulo Financeiro (`client/src/modules/financeiro/` e `/api/finance`),
 | `POST` | `/api/finance/child-vault/goal` | JWT | Atualiza o sonho pessoal de consumo do filho (título e valor em R$) |
 | `POST` | `/api/finance/child-vault/pay` | JWT (PARENT/ADMIN) | Registra a quitação/pagamento da mesada entregue ao filho na vida real, dando baixa no saldo acumulado |
 
+---
+
+## 📱 20. Central de WhatsApp do Clã & Alarmes Automáticos (Fase 5)
+Rotas da Central de Mensageria (`client/src/modules/saude/` aba WhatsApp e `/api/whatsapp`), responsáveis pelo pareamento via QR Code com o WhatsApp do Guardião, configuração do grupo/telefone de destino, disparo de mensagens de teste e serviço de alarmes automáticos (Aviso Cozinha 11h15, Convocação Almoço 11h45, Lanche & Cura 16h00 e Jantar 19h45).
+
+| Método | Rota | Autenticação | Descrição |
+|:---|:---|:---|:---|
+| `GET` | `/api/whatsapp/config` | JWT | Retorna a configuração de WhatsApp da família (status de conexão, destino, opções de notificação e QR code ativo) |
+| `POST` | `/api/whatsapp/config` | JWT (PARENT/ADMIN) | Salva o número ou ID do grupo e preferências (`notify_meals`, `notify_hydration`) |
+| `POST` | `/api/whatsapp/pair` | JWT (PARENT/ADMIN) | Inicia uma nova sessão de pareamento e gera o QR Code em Data URL (base64) para exibição imediata na tela |
+| `POST` | `/api/whatsapp/confirm-pair` | JWT (PARENT/ADMIN) | Confirma/simula a leitura do QR Code pelo celular do guardião, ativando a sessão (`is_connected: true`) |
+| `POST` | `/api/whatsapp/test` | JWT (PARENT/ADMIN) | Dispara mensagem de teste nobre e épica para o número/grupo cadastrado com emojis temáticos |
+| `POST` | `/api/whatsapp/disconnect` | JWT (PARENT/ADMIN) | Desconecta a sessão do WhatsApp e limpa as credenciais da família |
+| `POST` | `/api/whatsapp/alarm-test` | JWT (PARENT/ADMIN) | Permite simulação instantânea dos 4 alarmes programados (`KITCHEN`, `LUNCH`, `HYDRATION`, `DINNER`) |
+
+### ⏰ Serviço de Alarme & Agendamento Contínuo (`server/services/alarmService.js`)
+Monitora minuto a minuto (`* * * * *`) via `node-cron`:
+1. **11h15 (Aviso Cozinha):** Cardápio real do almoço com ingredientes em gramas e dicas de preparo saudável sem óleo.
+2. **11h45 (Convocação Almoço):** Convocação dos heróis para o almoço em família antes dos filhos irem para a escola (Check-in liberado com +30 XP e +10 Ouro).
+3. **16h00 (Lanche & Poção de Cura):** Lembrete de hidratação (1 copo de água pura) + fruta/iogurte da tarde para restaurar estamina.
+4. **19h45 (Jantar do Clã):** Chamada para o jantar leve noturno e preparação para o descanso e sono restaurador dos heróis.
+5. **Horários Dinâmicos:** Monitora as programações ativas cadastradas em `family_meal_schedules`, respeitando o modo de rotina do dia (`certinho` vs `flexivel`).
+
+### 🔔 Eventos de WebSocket em Tempo Real (Socket.IO)
+- `whatsapp:qr_generated`: Transmite a nova imagem Data URL do QR code gerado para a tela dos guardiões.
+- `whatsapp:status`: Atualiza o status de pareamento (`CONNECTED` / `DISCONNECTED`) em tempo real.
+- `whatsapp:message_sent`: Notifica o frontend quando uma mensagem temática é despachada para o WhatsApp.
+- `alarm:trigger`: Dispara o alerta unificado na interface com toast e atualização de dados.
+
+
 
 
 

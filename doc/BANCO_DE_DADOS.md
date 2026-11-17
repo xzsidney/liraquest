@@ -777,6 +777,25 @@ Armazena o cofrinho e mesada gamificada dos filhos, vinculando ouro poupado à c
 | `notes` | `TEXT` | Sim | Anotações ou combinados de educação financeira |
 | `created_at` / `updated_at` | `DATETIME` | Não | Timestamps (Índice único: `family_id` + `user_id`) |
 
+---
+
+## 14. Módulo de Comunicação: Central de WhatsApp do Clã (Fase 5)
+
+### 📱 `family_whatsapp_configs`
+Armazena as configurações de conexão, destinos e preferências de envio de alarmes do WhatsApp para cada família do reino.
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único UUIDv4 |
+| `family_id` | `UUID` (FK) | Não | Referência a `families.id` (Único / 1:1) |
+| `group_id_or_phone` | `VARCHAR(255)` | Sim | Número individual ou ID do Grupo no WhatsApp |
+| `is_connected` | `BOOLEAN` | Não | Indica se a sessão do WhatsApp está pareada e ativa |
+| `notify_meals` | `BOOLEAN` | Não | Habilita os alarmes das refeições (11h15, 11h45, 19h45) |
+| `notify_hydration` | `BOOLEAN` | Não | Habilita os lembretes de hidratação e mana (16h00) |
+| `session_data` | `TEXT` | Sim | Metadados da sessão pareada (dispositivo, data, auth) |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+
+
 
 
 

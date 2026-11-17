@@ -1,7 +1,7 @@
 /**
- * LiraQuest - Módulo 2: Saúde, Nutrição & Hábitos Alimentares (Fase 2)
+ * LiraQuest - Módulo 2: Saúde, Nutrição & Hábitos Alimentares (Fase 5)
  * Cardápio dinâmico, Pesos/Gramas, Controle de Horários & Alarmes,
- * Validação de Presença dos Heróis (Mecânica do Paulinho) e Lista de Compras.
+ * Central de WhatsApp do Clã, Validação de Presença dos Heróis e Lista de Compras.
  */
 
 import { auth } from '../../core/auth.js';
@@ -9,14 +9,16 @@ import { router } from '../../core/router.js';
 import { api } from '../../core/api.js';
 import { socket } from '../../core/socket.js';
 import { showToast } from '../../components/Toast.js';
+import { renderModuleNavbar, bindModuleNavbarEvents } from '../../components/ModuleNavbar.js';
 
 // Estado Local do Módulo de Saúde
-let currentTab = 'cardapio'; // 'cardapio', 'builder', 'validacao', 'compras'
+let currentTab = 'cardapio'; // 'cardapio', 'builder', 'validacao', 'compras', 'whatsapp'
 let currentSubView = 'today'; // 'today' ou 'week'
 let selectedMealType = 'almoco'; // refeição ativa na validação e construtor
 let todayData = null;
 let weekData = null;
 let shoppingData = null;
+let whatsappData = null;
 let waterGlasses = parseInt(localStorage.getItem('liraquest_water_count') || '3', 10);
 
 // Nomes e Ícones Amigáveis das Refeições
@@ -44,9 +46,10 @@ const CATEGORY_META = {
  */
 async function loadHealthData() {
   try {
-    const [todayRes, shoppingRes] = await Promise.all([
+    const [todayRes, shoppingRes, waRes] = await Promise.all([
       api.get('/api/nutrition/today').catch(() => null),
       api.get('/api/nutrition/shopping').catch(() => null),
+      api.get('/api/whatsapp/config').catch(() => null),
     ]);
 
     if (todayRes && todayRes.success) {
@@ -55,8 +58,11 @@ async function loadHealthData() {
     if (shoppingRes && shoppingRes.success) {
       shoppingData = shoppingRes;
     }
+    if (waRes && waRes.success) {
+      whatsappData = waRes.config;
+    }
   } catch (err) {
-    console.error('Erro ao carregar dados de nutrição:', err);
+    console.error('Erro ao carregar dados de nutrição e WhatsApp:', err);
   }
 }
 
@@ -69,28 +75,26 @@ export async function renderSaudeView() {
   const isParent = auth.isParent();
   const routineMode = todayData?.routine_mode || 'certinho';
   const isFlexivel = routineMode === 'flexivel';
+  const isWaConnected = whatsappData?.is_connected || false;
+
+  const topNavbarHtml = renderModuleNavbar({
+    currentModule: 'saude',
+    title: 'Módulo Saúde, Nutrição & Hábitos',
+    subtitle: 'Cardápio sob medida com gramas, horários de refeição, controle de presença dos filhos e alarmes automáticos.',
+    icon: '🥗',
+    badges: [
+      { label: `${waterGlasses}/8 Copos d'Água`, icon: '💧', bg: 'rgba(56, 189, 248, 0.15)', border: 'rgba(56, 189, 248, 0.35)', color: '#38bdf8' },
+      { label: isFlexivel ? 'Rotina Flexível' : 'Rotina Certinha', icon: '⏰', bg: 'rgba(212, 175, 55, 0.15)', border: 'rgba(212, 175, 55, 0.35)', color: '#fde047' },
+      { label: isWaConnected ? 'WhatsApp Ativo' : 'WhatsApp Desconectado', icon: '📱', bg: isWaConnected ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)', border: isWaConnected ? 'rgba(16, 185, 129, 0.35)' : 'rgba(239, 68, 68, 0.35)', color: isWaConnected ? '#34d399' : '#f87171' },
+    ],
+  });
 
   return `
     <div class="module-saude-view" style="animation: fadeIn 0.3s ease;">
-      <!-- Cabeçalho Nobre do Módulo -->
-      <div class="module-header-noble" style="border-color: rgba(212, 175, 55, 0.35); background: linear-gradient(135deg, rgba(128, 0, 32, 0.4), rgba(30, 58, 138, 0.4));">
-        <div class="module-title-box">
-          <span class="icon" style="filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.5));">🥗</span>
-          <div>
-            <h2 class="cinzel gold-gradient-text">Módulo Saúde, Nutrição & Hábitos</h2>
-            <p style="color: #cbd5e1; font-size: 0.88rem;">
-              Cardápio sob medida com gramas, horários de refeição, controle de presença dos filhos e compras inteligentes.
-            </p>
-          </div>
-        </div>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-          <button id="btn-back-salao-saude" class="btn-noble btn-noble-secondary btn-noble-sm">
-            ⬅️ Voltar ao Grande Salão
-          </button>
-        </div>
-      </div>
+      <!-- BARRA SUPERIOR NOBRE DE NAVEGAÇÃO (FASE 5) -->
+      ${topNavbarHtml}
 
-      <!-- Barra de Navegação das 4 Abas Nobres -->
+      <!-- Barra de Navegação das 5 Abas Nobres -->
       <div class="saude-tabs-bar" style="display: flex; gap: 10px; margin-bottom: 24px; overflow-x: auto; padding-bottom: 6px;">
         <button class="btn-saude-tab ${currentTab === 'cardapio' ? 'active' : ''}" data-tab="cardapio">
           🍽️ Cardápio do Dia & Semana
@@ -109,6 +113,9 @@ export async function renderSaudeView() {
         `}
         <button class="btn-saude-tab ${currentTab === 'compras' ? 'active' : ''}" data-tab="compras">
           🛒 Lista de Compras Inteligente
+        </button>
+        <button class="btn-saude-tab ${currentTab === 'whatsapp' ? 'active' : ''}" data-tab="whatsapp">
+          📱 Conexão WhatsApp do Clã
         </button>
       </div>
 
@@ -133,6 +140,8 @@ function renderCurrentTabContent() {
       return renderTabValidacao();
     case 'compras':
       return renderTabCompras();
+    case 'whatsapp':
+      return renderTabWhatsApp();
     default:
       return renderTabCardapio();
   }
@@ -825,10 +834,173 @@ function renderShoppingItemRow(item) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// ABA 5: CENTRAL DE CONEXÃO COM O WHATSAPP DO CLÃ (FASE 5)
+// ─────────────────────────────────────────────────────────────────────────────
+function renderTabWhatsApp() {
+  const isConnected = whatsappData?.is_connected || false;
+  const qrCodeUrl = whatsappData?.qr_code_data_url || null;
+  const targetPhone = whatsappData?.group_id_or_phone || '';
+  const notifyMeals = whatsappData?.notify_meals !== false;
+  const notifyHydration = whatsappData?.notify_hydration !== false;
+
+  return `
+    <div class="tab-content-whatsapp" style="animation: fadeIn 0.3s ease;">
+      
+      <!-- Banner de Status & Instruções -->
+      <div class="whatsapp-noble-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+              <span style="font-size: 2rem;">📱</span>
+              <h3 class="cinzel gold-gradient-text" style="margin: 0; font-size: 1.4rem;">Central de Mensageria do Clã</h3>
+              <span class="whatsapp-status-pill ${isConnected ? 'connected' : (qrCodeUrl ? 'waiting' : 'disconnected')}">
+                ${isConnected ? '🟢 Sessão Conectada' : (qrCodeUrl ? '🟡 Aguardando Leitura' : '⚪ Desconectado')}
+              </span>
+            </div>
+            <p style="color: #cbd5e1; font-size: 0.9rem; margin: 0;">
+              Conecte o WhatsApp dos Guardiões para envio automático de convocações de almoço, cardápio para a cozinha e lembretes de hidratação.
+            </p>
+          </div>
+
+          <div>
+            ${isConnected ? `
+              <button id="btn-wa-disconnect" class="btn-noble btn-noble-sm" style="background: rgba(239, 68, 68, 0.25); border: 1px solid #ef4444; color: #fca5a5;">
+                🔴 Desconectar WhatsApp
+              </button>
+            ` : `
+              <button id="btn-wa-generate-qr" class="btn-noble btn-noble-gold btn-noble-sm">
+                ⚡ Gerar / Renovar QR Code
+              </button>
+            `}
+          </div>
+        </div>
+
+        <!-- Seção do QR Code (Quando Desconectado ou Aguardando Leitura) -->
+        ${!isConnected ? `
+          <div style="display: flex; justify-content: center; align-items: center; flex-direction: column; padding: 24px 16px; background: rgba(0, 0, 0, 0.35); border-radius: 16px; border: 1px dashed rgba(212, 175, 55, 0.3); margin-bottom: 24px;">
+            ${qrCodeUrl ? `
+              <div class="whatsapp-qr-frame">
+                <img src="${qrCodeUrl}" alt="QR Code WhatsApp" style="width: 240px; height: 240px; display: block; border-radius: 8px;">
+              </div>
+              <p style="margin-top: 14px; color: #fde047; font-weight: 700; font-size: 0.95rem;">
+                📸 Aponte a câmera do WhatsApp no celular para parear:
+              </p>
+              <ol style="color: #cbd5e1; font-size: 0.85rem; max-width: 380px; text-align: left; margin: 8px 0 16px 20px; line-height: 1.5;">
+                <li>No celular, abra o <strong>WhatsApp</strong>.</li>
+                <li>Toque em <strong>Configurações ⚙️</strong> &gt; <strong>Aparelhos conectados</strong>.</li>
+                <li>Toque em <strong>Conectar um aparelho</strong> e aponte para o código acima.</li>
+              </ol>
+              <button id="btn-wa-confirm-simulated" class="btn-noble btn-noble-primary" style="background: linear-gradient(135deg, #10b981, #059669); border-color: #34d399; font-weight: 800;">
+                📲 Confirmar Leitura com Celular
+              </button>
+            ` : `
+              <div style="font-size: 3rem; margin-bottom: 12px; filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.4));">📸✨</div>
+              <h4 class="cinzel" style="color: #ffffff; margin-bottom: 6px;">Nenhuma Sessão Ativa</h4>
+              <p style="color: #94a3b8; font-size: 0.88rem; max-width: 420px; text-align: center; margin-bottom: 16px;">
+                Clique no botão abaixo para gerar o QR Code de pareamento oficial do WhatsApp do Clã Lira.
+              </p>
+              <button id="btn-wa-start-qr" class="btn-noble btn-noble-gold">
+                🔑 Gerar QR Code do WhatsApp
+              </button>
+            `}
+          </div>
+        ` : `
+          <div style="padding: 16px 20px; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 14px; margin-bottom: 24px; display: flex; align-items: center; gap: 14px;">
+            <span style="font-size: 2.2rem;">🛡️</span>
+            <div>
+              <h4 style="color: #34d399; margin: 0 0 4px 0;">Sessão Pareada & Operacional!</h4>
+              <p style="color: #cbd5e1; font-size: 0.85rem; margin: 0;">
+                O LiraQuest está autorizado a enviar os alertas automáticos para o grupo ou número da família cadastrado abaixo.
+              </p>
+            </div>
+          </div>
+        `}
+
+        <!-- Configuração de Destino & Notificações -->
+        <div style="background: rgba(15, 23, 42, 0.65); padding: 20px; border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.08); margin-bottom: 24px;">
+          <h4 class="cinzel gold-gradient-text" style="margin-bottom: 14px; font-size: 1.1rem;">⚙️ Configuração de Destino dos Alertas</h4>
+          
+          <form id="form-wa-config">
+            <div style="margin-bottom: 16px;">
+              <label style="display: block; font-size: 0.85rem; color: #cbd5e1; margin-bottom: 6px; font-weight: 600;">
+                Número ou ID do Grupo da Família:
+              </label>
+              <div style="display: flex; gap: 10px;">
+                <input 
+                  type="text" 
+                  id="wa-target-input" 
+                  class="noble-input" 
+                  placeholder="Ex: 5511999998888 ou 12036304...-group@g.us" 
+                  value="${targetPhone}"
+                  style="flex: 1; padding: 10px 14px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 10px; color: #ffffff;"
+                >
+                <button type="submit" class="btn-noble btn-noble-gold btn-noble-sm">
+                  💾 Salvar
+                </button>
+              </div>
+              <small style="color: #94a3b8; font-size: 0.78rem; display: block; margin-top: 4px;">
+                Insira o DDI + DDD + Número com dígito 9 ou o ID de Grupo do WhatsApp do Clã.
+              </small>
+            </div>
+
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: #cbd5e1; font-size: 0.85rem;">
+                <input type="checkbox" id="wa-notify-meals" ${notifyMeals ? 'checked' : ''} style="accent-color: #d4af37; width: 18px; height: 18px;">
+                <span>🔔 Notificar Alarme de Refeições (11h15, 11h45 e 19h45)</span>
+              </label>
+
+              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: #cbd5e1; font-size: 0.85rem;">
+                <input type="checkbox" id="wa-notify-hydration" ${notifyHydration ? 'checked' : ''} style="accent-color: #38bdf8; width: 18px; height: 18px;">
+                <span>💧 Notificar Poção de Cura & Hidratação (16h00)</span>
+              </label>
+            </div>
+          </form>
+        </div>
+
+        <!-- Painel de Disparo de Testes Imediatos -->
+        <div style="background: rgba(30, 58, 138, 0.25); padding: 20px; border-radius: 14px; border: 1px solid rgba(59, 130, 246, 0.35);">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;">
+            <h4 class="cinzel" style="color: #93c5fd; margin: 0; font-size: 1.1rem;">🧪 Disparos de Teste em Tempo Real</h4>
+            <button id="btn-wa-send-test" class="btn-noble btn-noble-primary btn-noble-sm" style="display: flex; align-items: center; gap: 6px;">
+              <span>⚡</span>
+              <span>Disparar Mensagem de Teste</span>
+            </button>
+          </div>
+          
+          <p style="color: #cbd5e1; font-size: 0.82rem; margin-bottom: 12px;">
+            Clique nos botões abaixo para simular os 4 alarmes programados pelo Plano Mestre de Engenharia:
+          </p>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+            <button class="btn-noble btn-noble-secondary btn-noble-sm btn-test-alarm" data-alarm="KITCHEN" style="border-color: rgba(245, 158, 11, 0.4); text-align: left;">
+              👨‍🍳 11h15: Aviso Cozinha
+            </button>
+            <button class="btn-noble btn-noble-secondary btn-noble-sm btn-test-alarm" data-alarm="LUNCH" style="border-color: rgba(16, 185, 129, 0.4); text-align: left;">
+              ⚔️ 11h45: Almoço dos Heróis
+            </button>
+            <button class="btn-noble btn-noble-secondary btn-noble-sm btn-test-alarm" data-alarm="HYDRATION" style="border-color: rgba(56, 189, 248, 0.4); text-align: left;">
+              💧 16h00: Lanche & Mana
+            </button>
+            <button class="btn-noble btn-noble-secondary btn-noble-sm btn-test-alarm" data-alarm="DINNER" style="border-color: rgba(168, 85, 247, 0.4); text-align: left;">
+              🍲 19h45: Jantar do Clã
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  `;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // BINDINGS DE EVENTOS & INTERATIVIDADE
 // ─────────────────────────────────────────────────────────────────────────────
 export function bindSaudeEvents() {
-  // 1. Voltar ao Grande Salão
+  // 1. Barra Superior Nobre de Navegação (Fase 5)
+  bindModuleNavbarEvents();
+
+  // 1.1 Voltar ao Grande Salão (compatibilidade)
   const btnBack = document.getElementById('btn-back-salao-saude');
   if (btnBack) {
     btnBack.addEventListener('click', () => {
@@ -1177,7 +1349,7 @@ export function bindSaudeEvents() {
     });
   }
 
-  // 12. Escuta de WebSockets em tempo real para Alarme das Refeições
+  // 12. Escuta de WebSockets em tempo real para Alarme das Refeições e WhatsApp
   if (socket && socket.getSocket()) {
     const rawSocket = socket.getSocket();
     rawSocket.off('nutrition:meal_alert');
@@ -1186,7 +1358,140 @@ export function bindSaudeEvents() {
       showToast(`🔔 ${alarm.title}: ${alarm.message}`, 'warning', 6000);
       loadHealthData().then(updateView);
     });
+
+    rawSocket.off('whatsapp:status');
+    rawSocket.on('whatsapp:status', (data) => {
+      console.log('📱 [WhatsApp Status Changed]:', data);
+      showToast(data.is_connected ? '🟢 WhatsApp conectado com sucesso!' : '⚪ WhatsApp desconectado.', data.is_connected ? 'success' : 'info');
+      loadHealthData().then(updateView);
+    });
+
+    rawSocket.off('whatsapp:message_sent');
+    rawSocket.on('whatsapp:message_sent', (msg) => {
+      console.log('📨 [WhatsApp Mensagem Despachada]:', msg);
+      showToast(`📨 [WhatsApp] ${msg.title}`, 'info');
+    });
   }
+
+  // 13. Gerar QR Code do WhatsApp
+  const handleGenerateQr = async () => {
+    try {
+      showToast('Gerando QR Code de pareamento...', 'info');
+      const res = await api.post('/api/whatsapp/pair', {});
+      if (res && res.success) {
+        if (!whatsappData) whatsappData = {};
+        whatsappData.qr_code_data_url = res.qr_code;
+        showToast('QR Code pronto! Aponte o WhatsApp do celular.', 'success');
+        updateView();
+      }
+    } catch (err) {
+      showToast(err.message || 'Erro ao gerar QR Code.', 'error');
+    }
+  };
+
+  const btnStartQr = document.getElementById('btn-wa-start-qr');
+  if (btnStartQr) btnStartQr.addEventListener('click', handleGenerateQr);
+
+  const btnGenQr = document.getElementById('btn-wa-generate-qr');
+  if (btnGenQr) btnGenQr.addEventListener('click', handleGenerateQr);
+
+  // 14. Confirmar Pareamento Simulado / Celular
+  const btnConfirmPair = document.getElementById('btn-wa-confirm-simulated');
+  if (btnConfirmPair) {
+    btnConfirmPair.addEventListener('click', async () => {
+      try {
+        const res = await api.post('/api/whatsapp/confirm-pair', {
+          device: 'WhatsApp Celular Guardião (Sidney)',
+        });
+        if (res && res.success) {
+          showToast('🎉 WhatsApp pareado e conectado com sucesso!', 'success');
+          await loadHealthData();
+          updateView();
+        }
+      } catch (err) {
+        showToast(err.message || 'Erro ao confirmar pareamento.', 'error');
+      }
+    });
+  }
+
+  // 15. Desconectar WhatsApp
+  const btnDisconnect = document.getElementById('btn-wa-disconnect');
+  if (btnDisconnect) {
+    btnDisconnect.addEventListener('click', async () => {
+      if (!confirm('Deseja realmente desconectar o WhatsApp do Clã?')) return;
+      try {
+        const res = await api.post('/api/whatsapp/disconnect', {});
+        if (res && res.success) {
+          showToast('Sessão do WhatsApp desconectada.', 'info');
+          await loadHealthData();
+          updateView();
+        }
+      } catch (err) {
+        showToast(err.message || 'Erro ao desconectar WhatsApp.', 'error');
+      }
+    });
+  }
+
+  // 16. Salvar Configuração de Destino e Preferências
+  const formWaConfig = document.getElementById('form-wa-config');
+  if (formWaConfig) {
+    formWaConfig.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const targetPhone = document.getElementById('wa-target-input')?.value;
+      const notifyMeals = document.getElementById('wa-notify-meals')?.checked;
+      const notifyHydration = document.getElementById('wa-notify-hydration')?.checked;
+
+      try {
+        const res = await api.post('/api/whatsapp/config', {
+          group_id_or_phone: targetPhone ? targetPhone.trim() : '',
+          notify_meals: notifyMeals,
+          notify_hydration: notifyHydration,
+        });
+
+        if (res && res.success) {
+          showToast('Configurações do WhatsApp salvas com sucesso!', 'success');
+          await loadHealthData();
+          updateView();
+        }
+      } catch (err) {
+        showToast(err.message || 'Erro ao salvar configurações.', 'error');
+      }
+    });
+  }
+
+  // 17. Disparar Mensagem de Teste
+  const btnSendTest = document.getElementById('btn-wa-send-test');
+  if (btnSendTest) {
+    btnSendTest.addEventListener('click', async () => {
+      try {
+        showToast('Enviando mensagem de teste para o WhatsApp...', 'info');
+        const res = await api.post('/api/whatsapp/test', {});
+        if (res && res.success) {
+          showToast('✅ Mensagem de teste enviada com sucesso ao clã!', 'success');
+        }
+      } catch (err) {
+        showToast(err.message || 'Erro no envio de teste.', 'error');
+      }
+    });
+  }
+
+  // 18. Disparar Testes dos 4 Alarmes Programados
+  document.querySelectorAll('.btn-test-alarm').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const alarmType = btn.getAttribute('data-alarm');
+      try {
+        showToast(`Disparando simulação do alarme ${alarmType}...`, 'info');
+        const res = await api.post('/api/whatsapp/alarm-test', {
+          alarm_type: alarmType,
+        });
+        if (res && res.success) {
+          showToast(`🔔 Alarme ${alarmType} disparado com sucesso!`, 'success');
+        }
+      } catch (err) {
+        showToast(err.message || 'Erro ao disparar alarme.', 'error');
+      }
+    });
+  });
 }
 
 /**

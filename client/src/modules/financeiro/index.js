@@ -8,6 +8,7 @@ import { router } from '../../core/router.js';
 import { api } from '../../core/api.js';
 import { showToast } from '../../components/Toast.js';
 import { showModal } from '../../components/Modal.js';
+import { renderModuleNavbar, bindModuleNavbarEvents } from '../../components/ModuleNavbar.js';
 
 // Estado Local do Módulo Financeiro
 let currentFinanceiroTab = 'cofre_filhos'; // 'cofre_filhos', 'sonhos_cla', 'contas_pais'
@@ -88,28 +89,23 @@ export async function renderFinanceiroView() {
     return true;
   });
 
+  const topNavbarHtml = renderModuleNavbar({
+    currentModule: 'financeiro',
+    title: 'Módulo Tesouro & Finanças do Clã',
+    subtitle: 'Educação financeira dos heróis com poupança e mesada gamificada, metas coletivas dos sonhos da casa e provisão dos pais.',
+    icon: '💰',
+    badges: [
+      { label: `${heroGold} Ouro na Bolsa`, icon: '🪙', bg: 'rgba(212, 175, 55, 0.15)', border: 'rgba(212, 175, 55, 0.35)', color: '#fde047' },
+      { label: `${cachedVaults.length} Metas do Clã`, icon: '🏰', bg: 'rgba(30, 58, 138, 0.2)', border: 'rgba(30, 58, 138, 0.4)', color: '#93c5fd' },
+      { label: `${cachedBillsSummary.count_pending} Contas Pendentes`, icon: '📑', bg: 'rgba(239, 68, 68, 0.15)', border: 'rgba(239, 68, 68, 0.35)', color: '#fca5a5' },
+    ],
+  });
+
   return `
     <div class="module-financeiro-view">
       
-      <!-- Cabeçalho Nobre do Módulo -->
-      <div class="module-header-noble" style="border-color: rgba(212, 175, 55, 0.45); background: linear-gradient(135deg, rgba(30, 58, 138, 0.4), rgba(128, 0, 32, 0.35));">
-        <div class="module-title-box">
-          <span class="icon">💰</span>
-          <div>
-            <h2 class="cinzel gold-gradient-text">Módulo Tesouro & Finanças do Clã</h2>
-            <p>Educação financeira dos heróis com poupança e mesada gamificada, metas coletivas dos sonhos da casa e provisão dos pais.</p>
-          </div>
-        </div>
-        <div style="display: flex; gap: 10px; align-items: center;">
-          <div style="background: rgba(212, 175, 55, 0.15); border: 1px solid rgba(212, 175, 55, 0.35); padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 800; color: #fde047; display: flex; align-items: center; gap: 6px;">
-            <span>🪙</span>
-            <span>${heroGold} Ouro na Bolsa</span>
-          </div>
-          <button id="btn-back-salao-financeiro" class="btn-noble btn-noble-secondary btn-noble-sm">
-            ⬅️ Voltar ao Salão
-          </button>
-        </div>
-      </div>
+      <!-- BARRA SUPERIOR NOBRE DE NAVEGAÇÃO (FASE 5) -->
+      ${topNavbarHtml}
 
       <!-- Abas de Navegação Interna -->
       <div class="submodules-tabs" style="display: flex; gap: 10px; margin-bottom: 24px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 12px; overflow-x: auto;">
@@ -458,7 +454,10 @@ export async function renderFinanceiroView() {
  * Vincula eventos interativos aos elementos do DOM
  */
 export function bindFinanceiroEvents() {
-  // Voltar ao Grande Salão
+  // Barra Superior Nobre de Navegação (Fase 5)
+  bindModuleNavbarEvents();
+
+  // Voltar ao Grande Salão (compatibilidade)
   const btnBack = document.getElementById('btn-back-salao-financeiro');
   if (btnBack) {
     btnBack.onclick = () => router.navigate('salao');

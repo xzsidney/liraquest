@@ -74,10 +74,11 @@ A cada funcionalidade concluída, a IA **DEVE OBRIGATORIAMENTE** avisar no chat 
 Somente após a autorização explícita do usuário, a IA executará os comandos de commit e push para o repositório Git (`https://github.com/xzsidney/liraquest.git`), acionando o deploy automático para a Hostinger.
 
 ## Automação de Comandos de Terminal e Git (Anti Pop-ups da IDE)
-Para evitar que a IDE fique travando a execução com caixas de diálogo a cada commit:
-1. A IA está **PROIBIDA** de rodar comandos manuais de `git commit -m "frase longa..."` diretamente no terminal, pois mensagens dinâmicas quebram o auto-approve do sandbox da IDE.
-2. Todo deploy para o Git DEVE ser executado obrigatoriamente através do script padronizado: `npm run deploy`.
-3. Comandos locais preparatórios de git (como `git status` e `git diff`) devem ser executados em modo Sandbox padrão (`BypassSandbox: false`), sem solicitar privilégios desnecessários.
+Para evitar que a IDE fique travando a execução com caixas de diálogo a cada commit ou script:
+1. A IA está **PROIBIDA** de rodar comandos com `BypassSandbox: true` desnecessariamente. Todos os scripts de teste, migrações e comandos do Node.js (ex: `node scripts/...`) DEVEM ser executados obrigatoriamente no modo Sandbox padrão (`BypassSandbox: false`), que roda 100% automático sem exigir aprovação manual do usuário.
+2. A IA está **PROIBIDA** de rodar comandos manuais de `git commit -m "frase longa..."` diretamente no terminal, pois mensagens dinâmicas quebram o auto-approve do sandbox da IDE.
+3. Todo deploy para o Git DEVE ser executado obrigatoriamente através do script padronizado: `npm run deploy`.
+4. Comandos locais preparatórios de git (como `git status` e `git diff`) devem ser executados em modo Sandbox padrão (`BypassSandbox: false`), sem solicitar privilégios desnecessários.
 
 ## Regra de Ferramentas
 A IA está proibida de usar comandos de terminal (como `powershell`, `cat`, etc) para ler ou buscar conteúdos de arquivos. Ela DEVE obrigatoriamente usar suas ferramentas nativas (`view_file`, `grep_search`) para evitar bloqueios de permissão do sistema.

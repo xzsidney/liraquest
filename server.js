@@ -24,9 +24,12 @@ import zombiRoutes from './server/routes/zombiRoutes.js';
 import nutritionRoutes from './server/routes/nutritionRoutes.js';
 import funRoutes from './server/routes/funRoutes.js';
 import financeRoutes from './server/routes/financeRoutes.js';
+import whatsappRoutes from './server/routes/whatsappRoutes.js';
 import { initChameleonSocket } from './server/sockets/chameleonSocket.js';
 import { initDuelSocket } from './server/sockets/duelSocket.js';
 import { initNutritionCron } from './server/services/nutritionCron.js';
+import { initAlarmService } from './server/services/alarmService.js';
+import { setWhatsAppSocketIO } from './server/services/whatsappService.js';
 
 dotenv.config();
 
@@ -46,8 +49,9 @@ const io = new Server(httpServer, {
 initChameleonSocket(io);
 initDuelSocket(io);
 
-// Inicializar Monitoramento e Alarme das Refeições com node-cron (Preparado para WhatsApp)
-initNutritionCron(io);
+// Inicializar Central de WhatsApp e Serviço de Alarmes Automáticos com node-cron (Fase 5)
+setWhatsAppSocketIO(io);
+initAlarmService(io);
 
 const PORT = process.env.PORT || 3000;
 
@@ -78,6 +82,7 @@ app.use('/api/zombi', zombiRoutes);
 app.use('/api/nutrition', nutritionRoutes);
 app.use('/api/fun', funRoutes);
 app.use('/api/finance', financeRoutes);
+app.use('/api/whatsapp', whatsappRoutes);
 
 
 // Health check & status

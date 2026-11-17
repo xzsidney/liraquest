@@ -8,6 +8,7 @@ import { router } from '../../core/router.js';
 import { api } from '../../core/api.js';
 import { showToast } from '../../components/Toast.js';
 import { showModal } from '../../components/Modal.js';
+import { renderModuleNavbar, bindModuleNavbarEvents } from '../../components/ModuleNavbar.js';
 
 // Estado Local do Módulo Casa
 let currentCasaTab = 'mural'; // 'mural', 'validador', 'patentes'
@@ -110,37 +111,27 @@ export async function renderCasaView() {
     filteredTasks = filteredTasks.filter(t => t.submissions?.some(s => s.status === 'APPROVED'));
   }
 
+  const topNavbarHtml = renderModuleNavbar({
+    currentModule: 'casa',
+    title: 'Módulo Casa & Hábitos do Lar',
+    subtitle: 'Mural diário dividido por períodos, envio de fotos de comprovação, visto dos pais e evolução de patentes.',
+    icon: '🏡',
+    badges: [
+      { label: `Streak: ${streak} Dias`, icon: '🔥', bg: 'rgba(245, 158, 11, 0.2)', border: 'rgba(245, 158, 11, 0.4)', color: '#fbbf24' },
+      { label: rankTitle, icon: '🛡️', bg: 'rgba(59, 130, 246, 0.2)', border: 'rgba(59, 130, 246, 0.4)', color: '#93c5fd' },
+    ],
+    extraActionsHtml: isParent ? `
+      <button id="btn-new-task" class="btn-noble btn-noble-gold btn-noble-sm">
+        ➕ Nova Missão
+      </button>
+    ` : '',
+  });
+
   return `
     <div class="module-casa-view" style="animation: fadeIn 0.3s ease;">
       
-      <!-- CABEÇALHO NOBRE DO MÓDULO -->
-      <div class="module-header-noble" style="border-color: rgba(245, 158, 11, 0.45); margin-bottom: 20px;">
-        <div class="module-title-box">
-          <span class="icon">🏡</span>
-          <div>
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
-              <h2 class="cinzel gold-gradient-text" style="margin: 0;">Módulo Casa & Hábitos do Lar</h2>
-              <span style="background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.4); color: #fbbf24; font-size: 0.75rem; font-weight: 800; padding: 2px 10px; border-radius: 20px;">
-                🔥 Streak: ${streak} Dias
-              </span>
-            </div>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">
-              Mural diário dividido por períodos, envio de fotos de comprovação, visto dos pais e evolução de patentes.
-            </p>
-          </div>
-        </div>
-
-        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-          <button id="btn-back-salao" class="btn-noble btn-noble-secondary btn-noble-sm">
-            ⬅️ Grande Salão
-          </button>
-          ${isParent ? `
-            <button id="btn-new-task" class="btn-noble btn-noble-gold btn-noble-sm">
-              ➕ Nova Missão
-            </button>
-          ` : ''}
-        </div>
-      </div>
+      <!-- BARRA SUPERIOR NOBRE DE NAVEGAÇÃO (FASE 5) -->
+      ${topNavbarHtml}
 
       <!-- BARRA DE ABAS DO MÓDULO -->
       <div style="display: flex; gap: 10px; margin-bottom: 22px; flex-wrap: wrap; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 12px;">
@@ -464,7 +455,10 @@ export async function renderCasaView() {
  * Vinculação dos Eventos Interativos do Módulo Casa
  */
 export function bindCasaEvents() {
-  // Voltar ao Grande Salão
+  // Barra Superior Nobre de Navegação (Fase 5)
+  bindModuleNavbarEvents();
+
+  // Voltar ao Grande Salão (compatibilidade)
   const btnBack = document.getElementById('btn-back-salao');
   if (btnBack) {
     btnBack.onclick = () => router.navigate('salao');

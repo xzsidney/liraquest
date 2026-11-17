@@ -42,6 +42,7 @@ import { FamilyPollVote } from './FamilyPollVote.js';
 import { FamilyBill } from './FamilyBill.js';
 import { FamilyClanVault } from './FamilyClanVault.js';
 import { FamilyChildVault } from './FamilyChildVault.js';
+import { FamilyWhatsappConfig } from './FamilyWhatsappConfig.js';
 
 // ==========================================
 // 1. Associações de Usuário & Família
@@ -250,6 +251,12 @@ FamilyChildVault.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
 FamilyUser.hasOne(FamilyChildVault, { foreignKey: 'user_id', as: 'child_vault' });
 FamilyChildVault.belongsTo(FamilyUser, { foreignKey: 'user_id', as: 'user' });
 
+// ==========================================
+// 10. Associações de Comunicação & WhatsApp
+// ==========================================
+Family.hasOne(FamilyWhatsappConfig, { foreignKey: 'family_id', as: 'whatsapp_config' });
+FamilyWhatsappConfig.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
+
 export {
   sequelize,
   FamilyUser,
@@ -294,4 +301,5 @@ export {
   FamilyBill,
   FamilyClanVault,
   FamilyChildVault,
+  FamilyWhatsappConfig,
 };

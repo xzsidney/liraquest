@@ -8,6 +8,7 @@ import { router } from '../../core/router.js';
 import { api } from '../../core/api.js';
 import { showToast } from '../../components/Toast.js';
 import { showModal } from '../../components/Modal.js';
+import { renderModuleNavbar, bindModuleNavbarEvents } from '../../components/ModuleNavbar.js';
 
 // Estado Local do Módulo de Estudos
 let pomodoroTimer = null;
@@ -141,35 +142,23 @@ export async function renderEstudosView() {
   const seconds = (pomodoroSeconds % 60).toString().padStart(2, '0');
   const schoolTasks = getStoredSchoolTasks();
 
+  const topNavbarHtml = renderModuleNavbar({
+    currentModule: 'estudos',
+    title: 'Módulo Estudos & Sabedoria',
+    subtitle: 'Temporizador gamificado de foco Pomodoro, modo AFK de meditação arcana e quadro de lições escolares.',
+    icon: '📚',
+    badges: [
+      { label: `INT: ${intValue}`, icon: '🧠', bg: 'rgba(59, 130, 246, 0.2)', border: 'rgba(59, 130, 246, 0.4)', color: '#93c5fd' },
+      { label: `${energy} Energia`, icon: '⚡', bg: 'rgba(16, 185, 129, 0.15)', border: 'rgba(16, 185, 129, 0.3)', color: '#6ee7b7' },
+      { label: `${gold} Ouro`, icon: '💰', bg: 'rgba(212, 175, 55, 0.15)', border: 'rgba(212, 175, 55, 0.35)', color: '#fde047' },
+    ],
+  });
+
   return `
     <div class="module-estudos-view" style="animation: fadeIn 0.3s ease;">
       
-      <!-- CABEÇALHO NOBRE DO MÓDULO -->
-      <div class="module-header-noble" style="border-color: rgba(59, 130, 246, 0.45); margin-bottom: 22px;">
-        <div class="module-title-box">
-          <span class="icon">📚</span>
-          <div>
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
-              <h2 class="cinzel gold-gradient-text" style="margin: 0;">Módulo Estudos & Sabedoria</h2>
-              <span style="background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.4); color: #93c5fd; font-size: 0.75rem; font-weight: 800; padding: 2px 10px; border-radius: 20px;">
-                🧠 INT: ${intValue}
-              </span>
-            </div>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">
-              Temporizador gamificado de foco Pomodoro, modo AFK de meditação arcana e quadro de lições escolares.
-            </p>
-          </div>
-        </div>
-
-        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-          <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); padding: 6px 12px; border-radius: 10px; font-weight: 700; color: #6ee7b7; font-size: 0.82rem;">
-            ⚡ ${energy} Energia
-          </div>
-          <button id="btn-back-salao-estudos" class="btn-noble btn-noble-secondary btn-noble-sm">
-            ⬅️ Grande Salão
-          </button>
-        </div>
-      </div>
+      <!-- BARRA SUPERIOR NOBRE DE NAVEGAÇÃO (FASE 5) -->
+      ${topNavbarHtml}
 
       <!-- GRID PRINCIPAL: POMODORO AFK + QUADRO DE LIÇÕES -->
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px;">
@@ -305,7 +294,10 @@ export async function renderEstudosView() {
  * Vinculação dos Eventos Interativos do Módulo de Estudos
  */
 export function bindEstudosEvents() {
-  // Voltar ao Grande Salão
+  // Barra Superior Nobre de Navegação (Fase 5)
+  bindModuleNavbarEvents();
+
+  // Voltar ao Grande Salão (compatibilidade)
   const btnBack = document.getElementById('btn-back-salao-estudos');
   if (btnBack) {
     btnBack.onclick = () => router.navigate('salao');

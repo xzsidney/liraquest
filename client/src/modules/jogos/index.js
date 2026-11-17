@@ -9,6 +9,7 @@ import { router } from '../../core/router.js';
 import { api } from '../../core/api.js';
 import { showToast } from '../../components/Toast.js';
 import { showModal } from '../../components/Modal.js';
+import { renderModuleNavbar, bindModuleNavbarEvents } from '../../components/ModuleNavbar.js';
 
 // Estado Local do Módulo de Jogos
 let selectedGameCategory = 'TODOS'; // 'TODOS', 'CARTAS', 'SABER', 'COMBATE'
@@ -49,50 +50,23 @@ export async function renderJogosView() {
   const user = auth.getUser();
   const character = auth.getCharacter();
 
+  const topNavbarHtml = renderModuleNavbar({
+    currentModule: 'jogos',
+    title: 'Salão de Jogos & Arcade do Reino',
+    subtitle: 'Lobby nobre de games familiares. Consomem ⚡ Energia de Aventura gerada nos hábitos e estudos e creditam 💰 Ouro e ⭐ XP!',
+    icon: '🎮',
+    badges: [
+      { label: `${currentEnergy} Energia`, icon: '⚡', bg: 'rgba(16, 185, 129, 0.15)', border: 'rgba(16, 185, 129, 0.4)', color: '#6ee7b7' },
+      { label: `${currentGold} Ouro`, icon: '🪙', bg: 'rgba(212, 175, 55, 0.15)', border: 'rgba(212, 175, 55, 0.4)', color: '#fde047' },
+      { label: '7 Jogos Conectados', icon: '🕹️', bg: 'rgba(139, 92, 246, 0.2)', border: 'rgba(139, 92, 246, 0.4)', color: '#c4b5fd' },
+    ],
+  });
+
   return `
     <div class="module-jogos-view" style="animation: fadeIn 0.3s ease;">
       
-      <!-- CABEÇALHO NOBRE DO ARCADE -->
-      <div class="module-header-noble" style="border-color: rgba(139, 92, 246, 0.45); margin-bottom: 20px;">
-        <div class="module-title-box">
-          <span class="icon">🎮</span>
-          <div>
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
-              <h2 class="cinzel gold-gradient-text" style="margin: 0;">Salão de Jogos & Arcade do Reino</h2>
-              <span style="background: rgba(139, 92, 246, 0.2); border: 1px solid rgba(139, 92, 246, 0.4); color: #c4b5fd; font-size: 0.75rem; font-weight: 800; padding: 2px 10px; border-radius: 20px;">
-                7 Jogos Conectados
-              </span>
-            </div>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">
-              Lobby nobre de games familiares. Os jogos consomem ⚡ Energia de Aventura gerada nos hábitos e estudos e creditam 💰 Ouro e ⭐ XP na ficha do herói!
-            </p>
-          </div>
-        </div>
-
-        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-          <!-- Indicador de Energia de Aventura -->
-          <div style="background: rgba(16, 185, 129, 0.15); border: 1.5px solid rgba(16, 185, 129, 0.4); padding: 8px 14px; border-radius: 12px; display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 1.3rem;">⚡</span>
-            <div>
-              <span style="display: block; font-size: 0.7rem; color: #6ee7b7; text-transform: uppercase; font-weight: 700;">Energia</span>
-              <strong style="color: #ffffff; font-size: 1.1rem; line-height: 1;">${currentEnergy}</strong>
-            </div>
-          </div>
-
-          <!-- Indicador de Ouro Real -->
-          <div style="background: rgba(212, 175, 55, 0.15); border: 1.5px solid rgba(212, 175, 55, 0.4); padding: 8px 14px; border-radius: 12px; display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 1.3rem;">🪙</span>
-            <div>
-              <span style="display: block; font-size: 0.7rem; color: #fde047; text-transform: uppercase; font-weight: 700;">Ouro</span>
-              <strong style="color: #ffffff; font-size: 1.1rem; line-height: 1;">${currentGold}</strong>
-            </div>
-          </div>
-
-          <button id="btn-back-salao-jogos" class="btn-noble btn-noble-secondary btn-noble-sm">
-            ⬅️ Grande Salão
-          </button>
-        </div>
-      </div>
+      <!-- BARRA SUPERIOR NOBRE DE NAVEGAÇÃO (FASE 5) -->
+      ${topNavbarHtml}
 
       <!-- BANNER DE ALERTA SE ENERGIA ESTIVER BAIXA -->
       ${currentEnergy < 3 ? `
@@ -332,7 +306,10 @@ function shouldShowGame(cat) {
  * Vinculação dos Eventos Interativos do Salão de Jogos
  */
 export function bindJogosEvents() {
-  // Voltar ao Grande Salão
+  // Barra Superior Nobre de Navegação (Fase 5)
+  bindModuleNavbarEvents();
+
+  // Voltar ao Grande Salão (compatibilidade)
   const btnBack = document.getElementById('btn-back-salao-jogos');
   if (btnBack) {
     btnBack.onclick = () => router.navigate('salao');

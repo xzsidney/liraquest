@@ -20,15 +20,62 @@ export async function renderSalaoView() {
   const avatar = character?.avatar_icon || (user?.role === 'PARENT' ? '👑' : '⚔️');
   const clanName = family?.name || 'Clã Lira';
 
-  // Buscar tarefas pendentes para o resumo do dia
+  // Buscar dados em tempo real dos 6 módulos para o resumo épico do dia
   let pendingTasksCount = 0;
+  let isAwaitingReview = false;
+  let nextMealLabel = 'Almoço dos Heróis (12:00)';
+  let nextMealDish = 'Patinho Moído Magro';
+  let clanVaultBalance = 'R$ 0,00';
+  let waConnected = false;
+
   try {
-    const tasksRes = await api.get('/api/tasks').catch(() => null);
-    if (tasksRes && tasksRes.tasks) {
+    const [tasksRes, pendingReviewsRes, nutritionRes, financeRes, waRes] = await Promise.all([
+      api.get('/api/tasks').catch(() => null),
+      user?.role === 'PARENT' || user?.role === 'ADMIN' ? api.get('/api/tasks/submissions/pending').catch(() => null) : null,
+      api.get('/api/nutrition/today').catch(() => null),
+      api.get('/api/finance/vault').catch(() => null),
+      api.get('/api/whatsapp/config').catch(() => null),
+    ]);
+
+    // 1. Casa & Missões
+    if (pendingReviewsRes && pendingReviewsRes.submissions) {
+      pendingTasksCount = pendingReviewsRes.submissions.length;
+      isAwaitingReview = true;
+    } else if (tasksRes && tasksRes.tasks) {
       pendingTasksCount = tasksRes.tasks.filter(t => !t.submissions || !t.submissions.some(s => s.status === 'APPROVED')).length;
     }
+
+    // 2. Saúde & Próximo Prato
+    if (nutritionRes && nutritionRes.meals) {
+      const now = new Date();
+      const currentH = now.getHours();
+      let targetMeal = null;
+      if (currentH < 10) targetMeal = nutritionRes.meals.find(m => m.meal_type === 'cafe');
+      else if (currentH < 14) targetMeal = nutritionRes.meals.find(m => m.meal_type === 'almoco');
+      else if (currentH < 18) targetMeal = nutritionRes.meals.find(m => m.meal_type === 'lanche');
+      else targetMeal = nutritionRes.meals.find(m => m.meal_type === 'jantar');
+
+      if (!targetMeal && nutritionRes.meals.length > 0) targetMeal = nutritionRes.meals[0];
+
+      if (targetMeal) {
+        const typeNames = { cafe: 'Café', almoco: 'Almoço', lanche: 'Lanche', jantar: 'Jantar', ceia: 'Ceia' };
+        nextMealLabel = `${typeNames[targetMeal.meal_type] || 'Refeição'} do Clã`;
+        nextMealDish = targetMeal.title || 'Cardápio Saudável';
+      }
+    }
+
+    // 3. Financeiro & Saldo do Cofre
+    if (financeRes && financeRes.vaults) {
+      const totalVault = financeRes.vaults.reduce((sum, v) => sum + Number(v.current_amount || 0), 0);
+      clanVaultBalance = `R$ ${totalVault.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+    }
+
+    // 4. WhatsApp
+    if (waRes && waRes.config) {
+      waConnected = waRes.config.is_connected;
+    }
   } catch (e) {
-    console.warn('Erro ao carregar tarefas para resumo do clã:', e);
+    console.warn('Erro ao carregar dados em tempo real para resumo do clã:', e);
   }
 
   return `
@@ -62,33 +109,46 @@ export async function renderSalaoView() {
       </header>
 
       <!-- ========================================================
-           2. RESUMO DO CLÃ (INDICADORES RÁPIDOS DO DIA)
+           2. RESUMO DO CLÃ (INDICADORES RÁPIDOS EM TEMPO REAL)
            ======================================================== -->
-      <section class="clan-summary-ribbon">
+      <section class="clan-summary-ribbon" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 30px;">
         <!-- Indicador 1: Casa -->
-        <div class="summary-chip" id="summary-chip-casa" style="cursor: pointer;">
+        <div class="summary-chip" id="summary-chip-casa" style="cursor: pointer;" title="Abrir Módulo Casa">
           <div class="summary-chip-icon" style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35);">🏡</div>
           <div class="summary-chip-content">
-            <h4>Missões da Casa</h4>
-            <div class="summary-chip-val" style="color: #fde047;">${pendingTasksCount} Pendente${pendingTasksCount === 1 ? '' : 's'}</div>
+            <h4>${isAwaitingReview ? 'Visto dos Pais' : 'Missões da Casa'}</h4>
+            <div class="summary-chip-val" style="color: #fde047;">${pendingTasksCount} ${isAwaitingReview ? 'a Aprovar' : 'Pendente(s)'}</div>
           </div>
         </div>
 
         <!-- Indicador 2: Saúde -->
-        <div class="summary-chip" id="summary-chip-saude" style="cursor: pointer;">
+        <div class="summary-chip" id="summary-chip-saude" style="cursor: pointer;" title="Abrir Módulo Saúde">
           <div class="summary-chip-icon" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35);">🥗</div>
           <div class="summary-chip-content">
-            <h4>Próxima Refeição</h4>
-            <div class="summary-chip-val" style="color: #6ee7b7;">Jantar Saudável (19:30)</div>
+            <h4>${nextMealLabel}</h4>
+            <div class="summary-chip-val" style="color: #6ee7b7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px;" title="${nextMealDish}">
+              ${nextMealDish}
+            </div>
           </div>
         </div>
 
-        <!-- Indicador 3: Status do Clã -->
-        <div class="summary-chip" id="summary-chip-status" style="cursor: pointer;">
-          <div class="summary-chip-icon" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35);">⚡</div>
+        <!-- Indicador 3: Financeiro -->
+        <div class="summary-chip" id="summary-chip-financeiro" style="cursor: pointer;" title="Abrir Módulo Financeiro">
+          <div class="summary-chip-icon" style="background: rgba(212, 175, 55, 0.15); border: 1px solid rgba(212, 175, 55, 0.35);">💰</div>
           <div class="summary-chip-content">
-            <h4>Status do Clã</h4>
-            <div class="summary-chip-val" style="color: #93c5fd;">🔥 Sequência Ativa • Unido</div>
+            <h4>Cofre do Clã</h4>
+            <div class="summary-chip-val" style="color: #fde047;">${clanVaultBalance}</div>
+          </div>
+        </div>
+
+        <!-- Indicador 4: WhatsApp do Clã -->
+        <div class="summary-chip" id="summary-chip-whatsapp" style="cursor: pointer;" title="Abrir Central WhatsApp">
+          <div class="summary-chip-icon" style="background: rgba(37, 211, 102, 0.15); border: 1px solid rgba(37, 211, 102, 0.35);">📱</div>
+          <div class="summary-chip-content">
+            <h4>WhatsApp do Clã</h4>
+            <div class="summary-chip-val" style="color: ${waConnected ? '#34d399' : '#fbbf24'};">
+              ${waConnected ? '🟢 Conectado' : '🟡 Parear Sessão'}
+            </div>
           </div>
         </div>
       </section>
@@ -238,5 +298,6 @@ export function bindSalaoEvents() {
   // Vínculo dos Chips Rápidos
   setupPortal('summary-chip-casa', 'casa');
   setupPortal('summary-chip-saude', 'saude');
-  setupPortal('summary-chip-status', 'casa');
+  setupPortal('summary-chip-financeiro', 'financeiro');
+  setupPortal('summary-chip-whatsapp', 'saude');
 }

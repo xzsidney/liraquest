@@ -387,3 +387,26 @@ O **Arcade de Lira** é o centro de diversão acessível pelo Terminal do Avatar
       - **🏰 Cofre dos Sonhos do Clã (Compartilhado):** Metas coletivas da casa (ex: "Viagem de Férias na Praia / Parque Temático", "Reforma do Quarto") com dupla barra de progresso visual (financeira em R$ acumulado e missões coletivas cumpridas pela família). Permite que os membros realizem aportes no cofre para celebrar a conquista coletiva.
       - **🪙 Cofre & Mesada dos Filhos (Educação Financeira Lúdica):** Central de poupança do herói. Conecta o ouro ganho nas batalhas e tarefas a um cofrinho fechado seguro (`saved_gold`). Permite a conversão das moedas em saldo de mesada real em Reais (R$) através de uma taxa transparente (10 Ouro = R$ 1,00). O herói cadastra seu sonho pessoal de consumo (ex: Lego, jogo de videogame) e acompanha a barra de progresso, enquanto os pais dispõem de um painel unificado de todos os filhos com botão 1-clique para registrar a entrega da mesada na vida real.
 
+14. **🏰 Fase 5: Alarme das Refeições, Integração com WhatsApp e Polimento Final de Navegação (Conclusão do Plano Mestre de Engenharia):**
+    - **⏰ Serviço de Alarme & Agendamento Contínuo (`server/services/alarmService.js`):**
+      - Integrado com `node-cron`, monitora minuto a minuto os horários de hábitos da família no MySQL:
+        - **11h15 (Aviso Cozinha):** Dispara alerta com o cardápio real cadastrado para o almoço, exibindo ingredientes em gramas e dicas de preparo saudável (cebola batida no mixer, alho dourado e preparo sem óleo para manter a nutrição e segurança gástrica).
+        - **11h45 (Convocação Almoço):** Chamada oficial de todos os heróis à mesa antes da jornada escolar, ativando o Check-in de presença com bonificação imediata de +30 XP e +10 Ouro.
+        - **16h00 (Lanche & Poção de Cura):** Lembrete de hidratação (1 copo grande de água fresca para restauração de mana) + 1 fruta ou iogurte natural da tarde para manter a estamina nos estudos e treinos.
+        - **19h45 (Jantar do Clã):** Convocação para o jantar leve noturno e preparação para o sono reparador dos heróis, encerrando as missões do dia com disciplina.
+      - **Respeito aos Modos de Rotina:** Verifica dinamicamente se o clã está em "Rotina Certinha" (dias úteis escolares) ou "Rotina Flexível" (finais de semana e férias) para respeitar as preferências da família.
+    - **📱 Central de Conexão com o WhatsApp do Clã (`/api/whatsapp` e Módulo Saúde):**
+      - **Aba "📱 Conexão WhatsApp do Clã":** Central nobre no Módulo Saúde para pareamento rápido da sessão com o celular do Guardião.
+      - **QR Code na Tela:** Geração automática de imagem QR Code em Data URL de alta definição para leitura direta pelo aplicativo do WhatsApp móvel (*Aparelhos conectados*).
+      - **Configuração de Destino dos Alertas:** Campo para cadastrar o número individual ou o ID do Grupo de WhatsApp da família, com checkboxes para habilitar/desabilitar alarmes de refeição e lembretes de hidratação.
+      - **Disparos de Teste em Tempo Real:** Botão para disparar mensagem de teste imediata e botões para simular qualquer um dos 4 alarmes programados com feedback sonoro e visual instantâneo.
+      - **Mensagens Épicas & Temáticas:** Notificações formatadas com emojis temáticos (🛡️, ⚔️, 🥗, 💧, 👑, 👨‍🍳) convocando o clã com honra e dinamismo.
+    - **🏰 Polimento de Navegação do Grande Salão (Experiência 5 Estrelas):**
+      - **Barra Superior Nobre Padronizada (`ModuleNavbar.js`):** Implementada em todos os 6 módulos (Casa, Estudos, Saúde, Diversão, Jogos e Financeiro) com o botão de destaque `🏰 Voltar ao Grande Salão` (1 clique imediato com transição suave) e pílulas de alternância rápida direta entre qualquer uma das 6 áreas.
+      - **Resumo do Clã em Tempo Real no Grande Salão:** Cards superiores dinâmicos conectados aos endpoints do backend, exibindo:
+        1. Quantidade exata de comprovações de missões aguardando o visto dos pais (ou pendentes do herói).
+        2. Nome e horário do próximo prato saudável do dia cadastrado no cardápio de nutrição.
+        3. Saldo financeiro acumulado no cofre dos grandes sonhos da família.
+        4. Status de conexão em tempo real do WhatsApp do clã (🟢 Conectado / 🟡 Parear Sessão).
+
+
