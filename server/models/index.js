@@ -43,10 +43,18 @@ import { FamilyBill } from './FamilyBill.js';
 import { FamilyClanVault } from './FamilyClanVault.js';
 import { FamilyChildVault } from './FamilyChildVault.js';
 import { FamilyWhatsappConfig } from './FamilyWhatsappConfig.js';
+import { FamilyPushSubscription } from './FamilyPushSubscription.js';
 
 // ==========================================
 // 1. Associações de Usuário & Família
 // ==========================================
+
+// Inscrições de Web Push Notifications
+FamilyUser.hasMany(FamilyPushSubscription, { foreignKey: 'user_id', as: 'pushSubscriptions' });
+FamilyPushSubscription.belongsTo(FamilyUser, { foreignKey: 'user_id', as: 'user' });
+
+Family.hasMany(FamilyPushSubscription, { foreignKey: 'family_id', as: 'pushSubscriptions' });
+FamilyPushSubscription.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
 
 // Progresso do Terminal do Usuário (1:1)
 FamilyUser.hasOne(UserProgress, { foreignKey: 'user_id', as: 'progress' });
@@ -302,4 +310,5 @@ export {
   FamilyClanVault,
   FamilyChildVault,
   FamilyWhatsappConfig,
+  FamilyPushSubscription,
 };

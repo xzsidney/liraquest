@@ -14,6 +14,7 @@ import { renderSaudeView, bindSaudeEvents } from './modules/saude/index.js';
 import { renderDiversaoView, bindDiversaoEvents } from './modules/diversao/index.js';
 import { renderJogosView, bindJogosEvents } from './modules/jogos/index.js';
 import { renderFinanceiroView, bindFinanceiroEvents } from './modules/financeiro/index.js';
+import { registerServiceWorker } from './core/pushManager.js';
 
 // Função para renderizar a Navbar global
 function updateGlobalNavbar() {
@@ -81,6 +82,9 @@ async function initApp() {
 
   // 4. Inicia roteador
   router.init();
+
+  // 5. Registra o Service Worker para Notificações Web Push
+  registerServiceWorker();
 }
 
 window.addEventListener('DOMContentLoaded', initApp);

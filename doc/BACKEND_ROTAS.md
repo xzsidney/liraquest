@@ -343,6 +343,20 @@ Monitora minuto a minuto (`* * * * *`) via `node-cron`:
 - `whatsapp:message_sent`: Notifica o frontend quando uma mensagem temática é despachada para o WhatsApp.
 - `alarm:trigger`: Dispara o alerta unificado na interface com toast e atualização de dados.
 
+---
+
+## 🔔 21. Notificações Web Push do Clã (PWA) (`/api/push`)
+Rotas responsáveis pela entrega de alarmes e avisos direto na tela de bloqueio dos celulares Android e iOS em segundo plano (mesmo com navegador fechado), utilizando a tecnologia nativa de Service Worker e o protocolo VAPID / Web Push.
+
+| Método | Rota | Autenticação | Descrição |
+|:---|:---|:---|:---|
+| `GET` | `/api/push/public-key` | JWT | Retorna a chave pública VAPID para o navegador subscrever o push |
+| `POST` | `/api/push/subscribe` | JWT | Cadastra o endpoint e chaves criptográficas (`p256dh`, `auth`) do celular no banco (`family_push_subscriptions`) |
+| `POST` | `/api/push/unsubscribe` | JWT | Cancela a inscrição de um aparelho |
+| `GET` | `/api/push/status` | JWT | Retorna estatísticas de celulares conectados no clã e se o dispositivo atual está ativo |
+| `POST` | `/api/push/test` | JWT | Dispara uma notificação de teste imediata com vibração para o próprio aparelho |
+| `POST` | `/api/push/broadcast` | JWT (PARENT/ADMIN) | Dispara comunicado livre ou convocação programada (`BREAKFAST`, `KITCHEN`, `LUNCH`, `SNACK_WATER`, `DINNER`, `BEDTIME`) para todos os celulares da família |
+
 
 
 

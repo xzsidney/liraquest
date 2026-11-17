@@ -796,6 +796,25 @@ Armazena as configurações de conexão, destinos e preferências de envio de al
 | `session_data` | `TEXT` | Sim | Metadados da sessão pareada (dispositivo, data, auth) |
 | `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
 
+---
+
+## 15. Módulo de Comunicação: Notificações Web Push do Clã (PWA)
+
+### 🔔 `family_push_subscriptions`
+Armazena as credenciais de entrega dos aparelhos móveis (celulares Android/iOS e computadores) inscritos nas notificações Web Push do LiraQuest via Service Worker.
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único UUIDv4 |
+| `family_id` | `UUID` (FK) | Não | Referência a `families.id` |
+| `user_id` | `UUID` (FK) | Não | Referência a `family_users.id` |
+| `endpoint` | `TEXT` | Não | URL do endpoint criptografado do dispositivo (Google/Apple/Mozilla) |
+| `p256dh` | `TEXT` | Não | Chave pública ECDH do cliente para cifragem da mensagem |
+| `auth` | `VARCHAR(255)` | Não | Chave secreta de autenticação do PushManager |
+| `user_agent` | `VARCHAR(255)` | Sim | Identificação do navegador/aparelho |
+| `is_active` | `BOOLEAN` | Não | Indica se a subscrição está ativa (desativa em caso de 410 Gone) |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+
 
 
 

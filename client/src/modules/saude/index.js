@@ -10,15 +10,17 @@ import { api } from '../../core/api.js';
 import { socket } from '../../core/socket.js';
 import { showToast } from '../../components/Toast.js';
 import { renderModuleNavbar, bindModuleNavbarEvents } from '../../components/ModuleNavbar.js';
+import { isPushSupported, getPermissionState, subscribeDeviceToPush, unsubscribeDeviceFromPush } from '../../core/pushManager.js';
 
 // Estado Local do Módulo de Saúde
-let currentTab = 'cardapio'; // 'cardapio', 'builder', 'validacao', 'compras'
+let currentTab = 'cardapio'; // 'cardapio', 'builder', 'validacao', 'compras', 'notificacoes'
 let currentSubView = 'today'; // 'today' ou 'week'
 let selectedMealType = 'almoco'; // refeição ativa na validação e construtor
 let todayData = null;
 let weekData = null;
 let shoppingData = null;
 let whatsappData = null;
+let pushStatus = null;
 let waterGlasses = parseInt(localStorage.getItem('liraquest_water_count') || '3', 10);
 
 // Nomes e Ícones Amigáveis das Refeições
@@ -46,10 +48,10 @@ const CATEGORY_META = {
  */
 async function loadHealthData() {
   try {
-    const [todayRes, shoppingRes, waRes] = await Promise.all([
+    const [todayRes, shoppingRes, pushRes] = await Promise.all([
       api.get('/api/nutrition/today').catch(() => null),
       api.get('/api/nutrition/shopping').catch(() => null),
-      api.get('/api/whatsapp/config').catch(() => null),
+      api.get('/api/push/status').catch(() => null),
     ]);
 
     if (todayRes && todayRes.success) {
@@ -58,11 +60,11 @@ async function loadHealthData() {
     if (shoppingRes && shoppingRes.success) {
       shoppingData = shoppingRes;
     }
-    if (waRes && waRes.success) {
-      whatsappData = waRes.config;
+    if (pushRes && pushRes.success) {
+      pushStatus = pushRes;
     }
   } catch (err) {
-    console.error('Erro ao carregar dados de nutrição e WhatsApp:', err);
+    console.error('Erro ao carregar dados de saúde e push:', err);
   }
 }
 
@@ -85,6 +87,7 @@ export async function renderSaudeView() {
     badges: [
       { label: `${waterGlasses}/8 Copos d'Água`, icon: '💧', bg: 'rgba(56, 189, 248, 0.15)', border: 'rgba(56, 189, 248, 0.35)', color: '#38bdf8' },
       { label: isFlexivel ? 'Rotina Flexível' : 'Rotina Certinha', icon: '⏰', bg: 'rgba(212, 175, 55, 0.15)', border: 'rgba(212, 175, 55, 0.35)', color: '#fde047' },
+      { label: pushStatus?.hasActiveSubscription ? 'Celular Conectado' : `${pushStatus?.totalDevices || 0} Aparelhos no Clã`, icon: '🔔', bg: pushStatus?.hasActiveSubscription ? 'rgba(16, 185, 129, 0.15)' : 'rgba(212, 175, 55, 0.15)', border: pushStatus?.hasActiveSubscription ? 'rgba(16, 185, 129, 0.35)' : 'rgba(212, 175, 55, 0.35)', color: pushStatus?.hasActiveSubscription ? '#34d399' : '#fbbf24' },
     ],
   });
 
@@ -93,7 +96,7 @@ export async function renderSaudeView() {
       <!-- BARRA SUPERIOR NOBRE DE NAVEGAÇÃO (FASE 5) -->
       ${topNavbarHtml}
 
-      <!-- Barra de Navegação das 4 Abas Nobres -->
+      <!-- Barra de Navegação das 5 Abas Nobres -->
       <div class="saude-tabs-bar" style="display: flex; gap: 10px; margin-bottom: 24px; overflow-x: auto; padding-bottom: 6px;">
         <button class="btn-saude-tab ${currentTab === 'cardapio' ? 'active' : ''}" data-tab="cardapio">
           🍽️ Cardápio do Dia & Semana
@@ -112,6 +115,9 @@ export async function renderSaudeView() {
         `}
         <button class="btn-saude-tab ${currentTab === 'compras' ? 'active' : ''}" data-tab="compras">
           🛒 Lista de Compras Inteligente
+        </button>
+        <button class="btn-saude-tab ${currentTab === 'notificacoes' ? 'active' : ''}" data-tab="notificacoes">
+          🔔 Notificações do Clã (Web Push)
         </button>
       </div>
 
@@ -136,6 +142,8 @@ function renderCurrentTabContent() {
       return renderTabValidacao();
     case 'compras':
       return renderTabCompras();
+    case 'notificacoes':
+      return renderTabNotificacoes();
     default:
       return renderTabCardapio();
   }
@@ -828,365 +836,226 @@ function renderShoppingItemRow(item) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ABA 5: CENTRAL DE CONEXÃO COM O WHATSAPP DO CLÃ (FASE 5)
+// ABA 5: CENTRAL DE NOTIFICAÇÕES DO CLÃ (WEB PUSH - PWA)
 // ─────────────────────────────────────────────────────────────────────────────
-function renderTabWhatsApp() {
-  const isConnected = whatsappData?.is_connected || false;
-  const isMetaConfigured = Boolean(whatsappData?.meta_configured);
-  const qrCodeUrl = whatsappData?.qr_code_data_url || null;
-  const targetPhone = whatsappData?.group_id_or_phone || '';
-  const notifyMeals = whatsappData?.notify_meals !== false;
-  const notifyHydration = whatsappData?.notify_hydration !== false;
-  const members = whatsappData?.members || [];
+function renderTabNotificacoes() {
+  const isParent = auth.isParent();
+  const supported = isPushSupported();
+  const hasActiveSub = Boolean(pushStatus?.hasActiveSubscription);
+  const totalDevices = pushStatus?.totalDevices || 0;
+  const membersWithDevices = pushStatus?.membersWithDevices || 0;
 
   return `
-    <div class="tab-content-whatsapp" style="animation: fadeIn 0.3s ease; display: flex; flex-direction: column; gap: 24px;">
+    <div class="tab-content-notificacoes" style="animation: fadeIn 0.3s ease; display: flex; flex-direction: column; gap: 24px;">
 
-      <!-- BANNER DE STATUS DA CENTRAL DE WHATSAPP -->
-      <div class="whatsapp-noble-card">
+      <!-- BANNER DE STATUS DA CENTRAL DE NOTIFICAÇÕES -->
+      <div class="noble-card" style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.35), rgba(15, 23, 42, 0.95)); border: 1.5px solid rgba(212, 175, 55, 0.4); padding: 22px; border-radius: 16px;">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
           <div>
             <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px;">
-              <span style="font-size: 2.2rem;">📱</span>
+              <span style="font-size: 2.2rem;">🔔</span>
               <h3 class="cinzel gold-gradient-text" style="margin: 0; font-size: 1.45rem;">
-                Central Oficial de WhatsApp do Clã
+                Notificações do Clã no Celular (Web Push)
               </h3>
-              <span class="whatsapp-status-pill ${isConnected ? 'connected' : 'waiting'}" style="font-size: 0.8rem; padding: 4px 12px; border-radius: 20px;">
-                ${isConnected ? '🟢 WhatsApp do Clã Conectado & Operacional' : '🟡 Desconectado (Aguardando Conexão)'}
+              <span class="whatsapp-status-pill ${hasActiveSub ? 'connected' : 'waiting'}" style="font-size: 0.8rem; padding: 4px 12px; border-radius: 20px;">
+                ${hasActiveSub ? '🟢 Notificações Ativas Neste Aparelho' : '🟡 Aparelho Não Cadastrado'}
               </span>
             </div>
-            <p style="color: #cbd5e1; font-size: 0.9rem; margin: 0; max-width: 780px;">
-              Apenas o celular do Guardião Pai conecta uma única vez via QR Code. O LiraQuest envia os alarmes de refeição e as convocações diretamente para o WhatsApp de toda a família.
+            <p style="color: #cbd5e1; font-size: 0.9rem; margin: 0; max-width: 800px; line-height: 1.5;">
+              Receba os alarmes de refeição, avisos de água e convocações dos guardiões direto na tela do seu celular, 
+              <strong>mesmo com o navegador fechado e a tela bloqueada</strong>, sem depender de WhatsApp ou apps de terceiros!
             </p>
+          </div>
+
+          <div style="background: rgba(0, 0, 0, 0.4); padding: 10px 18px; border-radius: 12px; border: 1px solid rgba(212, 175, 55, 0.25); text-align: center;">
+            <div style="font-size: 1.4rem; font-weight: 800; color: #fde047;">${totalDevices}</div>
+            <span style="font-size: 0.78rem; color: #94a3b8;">Aparelhos Ativos no Clã</span>
           </div>
         </div>
       </div>
 
-      <!-- SEÇÃO 0: CARD DE CONEXÃO DIRETA VIA QR CODE -->
-      ${isConnected ? `
-        <div class="noble-card" style="background: rgba(16, 185, 129, 0.15); border: 1.5px solid rgba(16, 185, 129, 0.45); border-radius: 14px; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
-          <div style="display: flex; align-items: center; gap: 14px;">
-            <span style="font-size: 2.2rem;">🛡️</span>
-            <div>
-              <h4 style="color: #34d399; margin: 0 0 4px 0; font-size: 1.1rem;">WhatsApp do Guardião Conectado & Operacional!</h4>
-              <p style="color: #cbd5e1; font-size: 0.85rem; margin: 0;">
-                O LiraQuest está autorizado a disparar convocações e alarmes de refeição para todos os heróis da família em segundo plano.
-              </p>
-            </div>
-          </div>
-          <button id="btn-wa-disconnect" class="btn-noble btn-noble-sm" style="background: rgba(239, 68, 68, 0.25); border: 1px solid #ef4444; color: #fca5a5; cursor: pointer; padding: 8px 16px;">
-            🔴 Desconectar Aparelho
-          </button>
-        </div>
-      ` : `
-        <div class="noble-card" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 58, 138, 0.3)); border: 1.5px dashed rgba(212, 175, 55, 0.45); border-radius: 16px; padding: 24px; text-align: center;">
-          <div style="font-size: 2.6rem; margin-bottom: 8px;">📲✨</div>
-          <h4 class="cinzel gold-gradient-text" style="margin: 0 0 6px 0; font-size: 1.25rem;">
-            Conectar WhatsApp do Clã (Envio 100% Automático)
-          </h4>
-          <p style="color: #cbd5e1; font-size: 0.88rem; max-width: 580px; margin: 0 auto 18px auto; line-height: 1.5;">
-            Conecte o seu celular em 5 segundos igual ao WhatsApp Web. Ninguém mais da família precisa escanear nada — eles apenas recebem as mensagens!
-          </p>
-
-          ${qrCodeUrl ? `
-            <div style="display: inline-block; padding: 14px; background: #ffffff; border-radius: 14px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); margin-bottom: 16px;">
-              <img src="${qrCodeUrl}" alt="QR Code WhatsApp" style="width: 240px; height: 240px; display: block; border-radius: 8px;">
-            </div>
-            <p style="color: #fde047; font-weight: 700; font-size: 0.95rem; margin-bottom: 8px;">
-              📸 Aponte o WhatsApp do seu celular para o código acima:
-            </p>
-            <ol style="color: #cbd5e1; font-size: 0.85rem; max-width: 400px; text-align: left; margin: 0 auto 16px auto; line-height: 1.6;">
-              <li>No celular, abra o <strong>WhatsApp</strong>.</li>
-              <li>Toque em <strong>Aparelhos conectados</strong> &gt; <strong>Conectar um aparelho</strong>.</li>
-              <li>Aponte a câmera para o QR Code acima.</li>
-            </ol>
-            <button id="btn-wa-generate-qr" class="btn-noble btn-noble-secondary btn-noble-sm" style="cursor: pointer;">
-              🔄 Atualizar QR Code
-            </button>
-          ` : `
-            <button id="btn-wa-generate-qr" class="btn-noble btn-noble-gold" style="font-size: 1rem; padding: 12px 28px; font-weight: 800; cursor: pointer;">
-              🔑 Gerar QR Code de Conexão do WhatsApp
-            </button>
-          `}
-        </div>
-      `}
-
-      <!-- SEÇÃO 1: HERÓIS DA FAMÍLIA & TELEFONES CADASTRADOS -->
-      <div class="noble-card" style="border-color: rgba(212, 175, 55, 0.4); background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 58, 138, 0.2));">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
-          <div>
-            <h4 class="cinzel gold-gradient-text" style="margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
-              <span>👥</span> Heróis da Família & Telefones Cadastrados
-            </h4>
-            <p style="color: #94a3b8; font-size: 0.82rem; margin: 4px 0 0 0;">
-              Cadastre o WhatsApp de cada membro para receber os alarmes e convocações automáticas:
-            </p>
-          </div>
-          <span style="font-size: 0.82rem; color: var(--gold); background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(212,175,55,0.2);">
-            ${members.filter(m => m.has_phone).length} de ${members.length} membros com WhatsApp
-          </span>
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 12px;">
-          ${members.length === 0 ? `
-            <p style="color: #cbd5e1; font-size: 0.88rem; font-style: italic;">Nenhum membro encontrado na família.</p>
-          ` : members.map((m) => {
-            const roleBadge = m.role === 'PARENT' ? '👑 Guardião (Pai/Mãe)' : '🛡️ Herói (Filho)';
-            const phoneDisplay = m.raw_phone || '';
-            return `
-              <div class="member-phone-card" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 12px 16px; background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px;">
-                <div style="min-width: 200px;">
-                  <div style="font-weight: 700; color: #ffffff; font-size: 0.95rem;">${m.name}</div>
-                  <span style="font-size: 0.75rem; color: ${m.role === 'PARENT' ? 'var(--gold)' : '#38bdf8'};">${roleBadge}</span>
-                </div>
-
-                <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 280px; max-width: 480px;">
-                  <input 
-                    type="text" 
-                    class="noble-input member-phone-input" 
-                    data-user-id="${m.user_id}" 
-                    placeholder="Ex: 11967003082" 
-                    value="${phoneDisplay}"
-                    style="flex: 1; padding: 8px 12px; font-size: 0.88rem; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 8px; color: #ffffff;"
-                  >
-                  <button 
-                    class="btn-noble btn-noble-gold btn-noble-sm btn-save-member-phone" 
-                    data-user-id="${m.user_id}" 
-                    data-user-name="${m.name}"
-                    style="white-space: nowrap; padding: 8px 14px; font-size: 0.82rem; cursor: pointer;"
-                  >
-                    💾 Salvar
-                  </button>
-                  ${m.phone ? `
-                    <a 
-                      href="https://api.whatsapp.com/send?phone=${m.phone}" 
-                      target="_blank" 
-                      class="btn-noble btn-noble-sm" 
-                      style="background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #34d399; text-decoration: none; padding: 8px 12px; font-size: 0.82rem; display: flex; align-items: center; gap: 4px;"
-                      title="Abrir conversa direta com este herói"
-                    >
-                      💬 Chat
-                    </a>
-                  ` : ''}
-                </div>
-              </div>
-            `;
-          }).join('')}
-        </div>
-      </div>
-
-      <!-- SEÇÃO 2: BOTÕES DE CONVOCAÇÃO RÁPIDA DO PAI (MENSAGENS PROGRAMADAS XPTO) -->
-      <div class="noble-card" style="border-color: rgba(59, 130, 246, 0.4); background: linear-gradient(135deg, rgba(30, 58, 138, 0.3), rgba(15, 23, 42, 0.85));">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
-          <div>
-            <h4 class="cinzel" style="color: #93c5fd; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
-              <span>⚔️</span> Botões de Convocação Rápida dos Guardiões
-            </h4>
-            <p style="color: #cbd5e1; font-size: 0.82rem; margin: 4px 0 0 0;">
-              Clique em qualquer botão para disparar a convocação oficial para os celulares cadastrados:
-            </p>
-          </div>
-        </div>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 20px;">
-          
-          <!-- Botão 1: Café da Manhã -->
-          <button class="btn-noble btn-noble-secondary btn-send-template" data-template="BREAKFAST" style="border-color: rgba(245, 158, 11, 0.4); text-align: left; padding: 14px; display: flex; flex-direction: column; gap: 4px; background: rgba(15, 23, 42, 0.7); cursor: pointer;">
-            <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #fbbf24; font-size: 0.95rem;">
-              <span style="font-size: 1.3rem;">🍳</span> Vamos tomar Café da Manhã!
-            </div>
-            <span style="font-size: 0.78rem; color: #94a3b8;">
-              Mesa de café posta! Energia e preparo matinal para os heróis.
-            </span>
-          </button>
-
-          <!-- Botão 2: Aviso Cozinha -->
-          <button class="btn-noble btn-noble-secondary btn-send-template" data-template="KITCHEN" style="border-color: rgba(217, 119, 6, 0.4); text-align: left; padding: 14px; display: flex; flex-direction: column; gap: 4px; background: rgba(15, 23, 42, 0.7); cursor: pointer;">
-            <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #f59e0b; font-size: 0.95rem;">
-              <span style="font-size: 1.3rem;">👨‍🍳</span> Aviso Cozinha (11h15)
-            </div>
-            <span style="font-size: 0.78rem; color: #94a3b8;">
-              Faltam 30 min para o almoço: cebola batida, sem óleo e carnes magras.
-            </span>
-          </button>
-
-          <!-- Botão 3: Almoço dos Heróis -->
-          <button class="btn-noble btn-noble-secondary btn-send-template" data-template="LUNCH" style="border-color: rgba(16, 185, 129, 0.4); text-align: left; padding: 14px; display: flex; flex-direction: column; gap: 4px; background: rgba(15, 23, 42, 0.7); cursor: pointer;">
-            <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #34d399; font-size: 0.95rem;">
-              <span style="font-size: 1.3rem;">⚔️</span> Vamos Almoçar! (11h45)
-            </div>
-            <span style="font-size: 0.78rem; color: #94a3b8;">
-              Convocação para a mesa antes da escola! Check-in (+30 XP e +10 Ouro).
-            </span>
-          </button>
-
-          <!-- Botão 4: Lanche e Água -->
-          <button class="btn-noble btn-noble-secondary btn-send-template" data-template="SNACK_WATER" style="border-color: rgba(56, 189, 248, 0.4); text-align: left; padding: 14px; display: flex; flex-direction: column; gap: 4px; background: rgba(15, 23, 42, 0.7); cursor: pointer;">
-            <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #38bdf8; font-size: 0.95rem;">
-              <span style="font-size: 1.3rem;">💧</span> Hora da Água & Lanche (16h00)
-            </div>
-            <span style="font-size: 0.78rem; color: #94a3b8;">
-              Pausa de regeneração de mana: 1 copo d'água grande e fruta fresca.
-            </span>
-          </button>
-
-          <!-- Botão 5: Jantar do Clã -->
-          <button class="btn-noble btn-noble-secondary btn-send-template" data-template="DINNER" style="border-color: rgba(168, 85, 247, 0.4); text-align: left; padding: 14px; display: flex; flex-direction: column; gap: 4px; background: rgba(15, 23, 42, 0.7); cursor: pointer;">
-            <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #c084fc; font-size: 0.95rem;">
-              <span style="font-size: 1.3rem;">🍲</span> Vamos Jantar em Família! (19h45)
-            </div>
-            <span style="font-size: 0.78rem; color: #94a3b8;">
-              Jantar leve noturno, convívio da família e descanso merecido.
-            </span>
-          </button>
-
-          <!-- Botão 6: Hora do Descanso -->
-          <button class="btn-noble btn-noble-secondary btn-send-template" data-template="BEDTIME" style="border-color: rgba(244, 63, 94, 0.4); text-align: left; padding: 14px; display: flex; flex-direction: column; gap: 4px; background: rgba(15, 23, 42, 0.7); cursor: pointer;">
-            <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #fda4af; font-size: 0.95rem;">
-              <span style="font-size: 1.3rem;">🛏️</span> Hora do Descanso dos Heróis (21h30)
-            </div>
-            <span style="font-size: 0.78rem; color: #94a3b8;">
-              Missões diárias cumpridas! Desligar telas, escovar dentes e dormir.
-            </span>
-          </button>
-
-        </div>
-
-        <!-- MENSAGEM LIVRE PERSONALIZADA DO PAI -->
-        <div style="background: rgba(0, 0, 0, 0.4); padding: 16px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.08);">
-          <label style="display: block; font-size: 0.85rem; color: #cbd5e1; margin-bottom: 8px; font-weight: 700;">
-            ✍️ Ou Escreva um Comunicado Personalizado Imediato:
-          </label>
-          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <input 
-              type="text" 
-              id="input-custom-broadcast-text" 
-              class="noble-input" 
-              placeholder="Ex: Pessoal, chego em 20 minutos! Aqueçam o jantar dos heróis." 
-              style="flex: 1; min-width: 260px; padding: 10px 14px; font-size: 0.9rem; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 8px; color: #ffffff;"
-            >
-            <button 
-              id="btn-send-custom-broadcast" 
-              class="btn-noble btn-noble-gold" 
-              style="padding: 10px 18px; font-weight: 800; display: flex; align-items: center; gap: 8px; cursor: pointer;"
-            >
-              <span>📢</span>
-              <span>Disparar para a Família</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- CAIXA DE PRÉ-VISUALIZAÇÃO / RESULTADO DO DISPARO -->
-        <div id="wa-last-dispatch-container" style="display: none; background: rgba(15, 23, 42, 0.95); border: 1.5px solid #10b981; border-radius: 12px; padding: 16px; margin-top: 16px; animation: fadeIn 0.3s ease;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
-            <span style="color: #34d399; font-weight: 700; font-size: 0.9rem;">✅ Mensagem Gerada com Sucesso:</span>
-            <a id="btn-wa-open-direct" href="#" target="_blank" class="btn-noble btn-noble-sm" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; font-weight: 800; text-decoration: none; display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px;">
-              <span>📲 Abrir no WhatsApp do Celular</span>
-            </a>
-          </div>
-          <pre id="wa-last-dispatch-text" style="background: rgba(0, 0, 0, 0.6); padding: 12px; border-radius: 8px; color: #cbd5e1; font-size: 0.84rem; white-space: pre-wrap; font-family: monospace; max-height: 160px; overflow-y: auto; border: 1px solid rgba(255, 255, 255, 0.08);"></pre>
-        </div>
-
-      </div>
-
-      <!-- SEÇÃO 3: CONFIGURAÇÃO DE ALARMES AUTOMÁTICOS & GRUPO ADICIONAL -->
-      <div class="noble-card" style="background: rgba(15, 23, 42, 0.65); padding: 20px; border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.08);">
-        <h4 class="cinzel gold-gradient-text" style="margin-bottom: 14px; font-size: 1.1rem;">
-          ⚙️ Configuração dos Alarmes Automáticos da Rotina
+      <!-- SEÇÃO 1: STATUS E CONTROLE DESTE APARELHO -->
+      <div class="noble-card" style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); padding: 22px; border-radius: 14px;">
+        <h4 class="cinzel" style="color: #ffffff; margin: 0 0 12px 0; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
+          <span>📱</span> Seu Dispositivo Atual
         </h4>
-        
-        <form id="form-wa-config">
-          <div style="margin-bottom: 16px;">
-            <label style="display: block; font-size: 0.85rem; color: #cbd5e1; margin-bottom: 6px; font-weight: 600;">
-              Telefone Adicional ou ID do Grupo da Família (Opcional):
-            </label>
-            <div style="display: flex; gap: 10px;">
-              <input 
-                type="text" 
-                id="wa-target-input" 
-                class="noble-input" 
-                placeholder="Ex: 5511967003082 ou ID do Grupo" 
-                value="${targetPhone}"
-                style="flex: 1; padding: 10px 14px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 10px; color: #ffffff;"
-              >
-              <button type="submit" class="btn-noble btn-noble-gold btn-noble-sm" style="cursor: pointer;">
-                💾 Salvar Preferências
+
+        ${!supported ? `
+          <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 10px; padding: 16px; color: #fca5a5; font-size: 0.9rem;">
+            ⚠️ Este navegador não possui suporte à tecnologia de Notificações Web Push em segundo plano. 
+            Recomendamos utilizar o <strong>Google Chrome</strong> (no Android/PC) ou <strong>Safari</strong> (no iPhone adicionando à Tela de Início).
+          </div>
+        ` : hasActiveSub ? `
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.4); padding: 16px; border-radius: 12px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <span style="font-size: 2rem;">🛡️</span>
+              <div>
+                <strong style="color: #34d399; font-size: 1rem; display: block;">Este celular/computador está conectado com sucesso!</strong>
+                <span style="color: #cbd5e1; font-size: 0.85rem;">Ele vibrará e mostrará o aviso do LiraQuest sempre que houver alarme ou convocação.</span>
+              </div>
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <button id="btn-push-test" class="btn-noble btn-noble-gold btn-noble-sm" style="cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                <span>🧪</span>
+                <span>Testar Notificação Agora</span>
+              </button>
+              <button id="btn-push-unsubscribe" class="btn-noble btn-noble-sm" style="background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fca5a5; cursor: pointer;">
+                🔕 Desativar Neste Aparelho
               </button>
             </div>
-            <small style="color: #94a3b8; font-size: 0.78rem; display: block; margin-top: 4px;">
-              Além dos números individuais dos heróis acima, você pode definir um número extra ou grupo de WhatsApp.
-            </small>
           </div>
-
-          <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: #cbd5e1; font-size: 0.85rem;">
-              <input type="checkbox" id="wa-notify-meals" ${notifyMeals ? 'checked' : ''} style="accent-color: #d4af37; width: 18px; height: 18px;">
-              <span>🔔 Disparar Alarmes Automáticos nos Horários (11h15, 11h45 e 19h45)</span>
-            </label>
-
-            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: #cbd5e1; font-size: 0.85rem;">
-              <input type="checkbox" id="wa-notify-hydration" ${notifyHydration ? 'checked' : ''} style="accent-color: #38bdf8; width: 18px; height: 18px;">
-              <span>💧 Disparar Lembrete Automático de Hidratação (16h00)</span>
-            </label>
+        ` : `
+          <div style="text-align: center; padding: 24px 16px; background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 58, 138, 0.25)); border: 1.5px dashed rgba(212, 175, 55, 0.45); border-radius: 12px;">
+            <div style="font-size: 2.4rem; margin-bottom: 8px;">📲✨</div>
+            <h5 class="cinzel gold-gradient-text" style="margin: 0 0 6px 0; font-size: 1.15rem;">
+              Ative os Alarmes do Reino no seu Celular
+            </h5>
+            <p style="color: #cbd5e1; font-size: 0.88rem; max-width: 540px; margin: 0 auto 16px auto; line-height: 1.5;">
+              Toque no botão abaixo e selecione <strong>"Permitir"</strong> no aviso do navegador. É 100% gratuito, não precisa instalar nada de loja de aplicativos e você não perde nenhum almoço ou missão!
+            </p>
+            <button id="btn-push-subscribe" class="btn-noble btn-noble-gold" style="font-size: 1rem; padding: 12px 28px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+              <span>🔔</span>
+              <span>Ativar Notificações no meu Celular</span>
+            </button>
           </div>
-        </form>
+        `}
       </div>
 
-      <!-- SEÇÃO 4: CONFIGURAÇÕES DA META CLOUD API (ENVIO 100% SILENCIOSO SEM INTERVENÇÃO) -->
-      <div class="noble-card" style="background: rgba(15, 23, 42, 0.5); padding: 20px; border-radius: 14px; border: 1px solid rgba(212, 175, 55, 0.2);">
-        <details ${isMetaConfigured ? 'open' : ''}>
-          <summary style="cursor: pointer; font-size: 1rem; font-weight: 700; color: #fde047; outline: none; list-style: none; display: flex; align-items: center; justify-content: space-between;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span>🔑</span>
-              <span>Configuração da Meta Cloud API (WhatsApp Business Oficial — Envio 100% Silencioso)</span>
+      <!-- SEÇÃO 2: DISPAROS DOS GUARDIÕES (EXCLUSIVO PARA OS PAIS) -->
+      ${isParent ? `
+        <div class="noble-card" style="border-color: rgba(59, 130, 246, 0.4); background: linear-gradient(135deg, rgba(30, 58, 138, 0.25), rgba(15, 23, 42, 0.85)); padding: 22px; border-radius: 14px;">
+          <div style="margin-bottom: 16px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+              <div>
+                <h4 class="cinzel" style="color: #93c5fd; margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
+                  <span>⚔️</span> Central de Convocação Rápida dos Guardiões
+                </h4>
+                <p style="color: #cbd5e1; font-size: 0.84rem; margin: 4px 0 0 0;">
+                  Clique em qualquer botão para fazer o celular de todos os heróis da família apitar e vibrar instantaneamente:
+                </p>
+              </div>
+              <span style="font-size: 0.8rem; color: #fbbf24; background: rgba(0,0,0,0.4); padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(212,175,55,0.25);">
+                ${totalDevices} aparelho(s) cadastrados
+              </span>
             </div>
-            <span style="font-size: 0.82rem; color: #94a3b8;">${isMetaConfigured ? '🟢 Configurado' : '👉 Clique para Abrir / Configurar'}</span>
-          </summary>
-
-          <div style="margin-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 16px;">
-            <p style="color: #cbd5e1; font-size: 0.85rem; line-height: 1.5; margin-bottom: 14px;">
-              A Meta (dona do WhatsApp) oferece <strong>1.000 conversas gratuitas por mês</strong> para desenvolvedores. 
-              Ao preencher suas 2 credenciais do portal <em>developers.facebook.com</em> abaixo, as mensagens chegam direto no celular dos filhos e da esposa em segundo plano, sem você precisar abrir nenhuma tela do WhatsApp:
-            </p>
-
-            <form id="form-meta-creds">
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 14px;">
-                <div>
-                  <label style="display: block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 4px;">
-                    Phone Number ID da Meta:
-                  </label>
-                  <input 
-                    type="text" 
-                    id="meta-phone-number-id" 
-                    class="noble-input" 
-                    placeholder="Ex: 104829384729182" 
-                    value="${whatsappData?.meta_phone_number_id || ''}"
-                    style="width: 100%; padding: 8px 12px; font-size: 0.85rem; background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #fff;"
-                  >
-                </div>
-                <div>
-                  <label style="display: block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 4px;">
-                    Access Token Permanente da Meta:
-                  </label>
-                  <input 
-                    type="password" 
-                    id="meta-access-token" 
-                    class="noble-input" 
-                    placeholder="${whatsappData?.meta_configured ? '••••••••••••••••••••••••' : 'Cole aqui o Token de Acesso da Meta'}"
-                    value=""
-                    style="width: 100%; padding: 8px 12px; font-size: 0.85rem; background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #fff;"
-                  >
-                </div>
-              </div>
-
-              <div style="display: flex; justify-content: flex-end;">
-                <button type="submit" class="btn-noble btn-noble-gold btn-noble-sm" style="cursor: pointer;">
-                  💾 Salvar Credenciais da Meta API
-                </button>
-              </div>
-            </form>
           </div>
-        </details>
+
+          <!-- 6 BOTÕES DE CONVOCAÇÃO RÁPIDA -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-bottom: 20px;">
+            
+            <button class="btn-noble btn-noble-secondary btn-push-template" data-template="BREAKFAST" style="border-color: rgba(245, 158, 11, 0.4); text-align: left; padding: 12px; display: flex; flex-direction: column; gap: 4px; background: rgba(15, 23, 42, 0.7); cursor: pointer;">
+              <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #fbbf24; font-size: 0.95rem;">
+                <span style="font-size: 1.3rem;">🍳</span> Café da Manhã!
+              </div>
+              <span style="font-size: 0.78rem; color: #94a3b8;">
+                Mesa de desjejum posta! Energia matinal para os heróis.
+              </span>
+            </button>
+
+            <button class="btn-noble btn-noble-secondary btn-push-template" data-template="KITCHEN" style="border-color: rgba(217, 119, 6, 0.4); text-align: left; padding: 12px; display: flex; flex-direction: column; gap: 4px; background: rgba(15, 23, 42, 0.7); cursor: pointer;">
+              <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #f59e0b; font-size: 0.95rem;">
+                <span style="font-size: 1.3rem;">👨‍🍳</span> Aviso Cozinha (11h15)
+              </div>
+              <span style="font-size: 0.78rem; color: #94a3b8;">
+                Faltam 30 min: cebola batida, sem óleo e refeição nutritiva.
+              </span>
+            </button>
+
+            <button class="btn-noble btn-noble-secondary btn-push-template" data-template="LUNCH" style="border-color: rgba(16, 185, 129, 0.4); text-align: left; padding: 12px; display: flex; flex-direction: column; gap: 4px; background: rgba(15, 23, 42, 0.7); cursor: pointer;">
+              <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #34d399; font-size: 0.95rem;">
+                <span style="font-size: 1.3rem;">⚔️</span> Almoço dos Heróis! (11h45)
+              </div>
+              <span style="font-size: 0.78rem; color: #94a3b8;">
+                Convocação à mesa antes da escola! Check-in (+30 XP e +10 Ouro).
+              </span>
+            </button>
+
+            <button class="btn-noble btn-noble-secondary btn-push-template" data-template="SNACK_WATER" style="border-color: rgba(56, 189, 248, 0.4); text-align: left; padding: 12px; display: flex; flex-direction: column; gap: 4px; background: rgba(15, 23, 42, 0.7); cursor: pointer;">
+              <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #38bdf8; font-size: 0.95rem;">
+                <span style="font-size: 1.3rem;">💧</span> Hora da Água & Lanche (16h00)
+              </div>
+              <span style="font-size: 0.78rem; color: #94a3b8;">
+                Regeneração de mana: 1 copo d'água grande e fruta fresca.
+              </span>
+            </button>
+
+            <button class="btn-noble btn-noble-secondary btn-push-template" data-template="DINNER" style="border-color: rgba(168, 85, 247, 0.4); text-align: left; padding: 12px; display: flex; flex-direction: column; gap: 4px; background: rgba(15, 23, 42, 0.7); cursor: pointer;">
+              <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #c084fc; font-size: 0.95rem;">
+                <span style="font-size: 1.3rem;">🍲</span> Jantar em Família! (19h45)
+              </div>
+              <span style="font-size: 0.78rem; color: #94a3b8;">
+                Jantar leve noturno, convívio da família e descanso merecido.
+              </span>
+            </button>
+
+            <button class="btn-noble btn-noble-secondary btn-push-template" data-template="BEDTIME" style="border-color: rgba(244, 63, 94, 0.4); text-align: left; padding: 12px; display: flex; flex-direction: column; gap: 4px; background: rgba(15, 23, 42, 0.7); cursor: pointer;">
+              <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #fda4af; font-size: 0.95rem;">
+                <span style="font-size: 1.3rem;">🛏️</span> Hora do Descanso (21h30)
+              </div>
+              <span style="font-size: 0.78rem; color: #94a3b8;">
+                Missões cumpridas! Desligar telas, escovar dentes e dormir.
+              </span>
+            </button>
+
+          </div>
+
+          <!-- MENSAGEM LIVRE PERSONALIZADA DO PAI -->
+          <div style="background: rgba(0, 0, 0, 0.4); padding: 16px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.08);">
+            <label style="display: block; font-size: 0.85rem; color: #cbd5e1; margin-bottom: 8px; font-weight: 700;">
+              ✍️ Ou Escreva um Comunicado Livre Imediato para Todos os Celulares:
+            </label>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <input 
+                type="text" 
+                id="input-push-custom-text" 
+                class="noble-input" 
+                placeholder="Ex: Pessoal, chego em 15 minutos! Aqueçam o jantar dos heróis." 
+                style="flex: 1; min-width: 260px; padding: 10px 14px; font-size: 0.9rem; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 8px; color: #ffffff;"
+              >
+              <button 
+                id="btn-push-send-custom" 
+                class="btn-noble btn-noble-gold" 
+                style="padding: 10px 18px; font-weight: 800; display: flex; align-items: center; gap: 8px; cursor: pointer;"
+              >
+                <span>📢</span>
+                <span>Disparar Alerta Imediato</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- FEEDBACK DE ENVIO -->
+          <div id="push-dispatch-feedback" style="display: none; margin-top: 14px; padding: 12px 16px; border-radius: 10px; background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; color: #34d399; font-size: 0.88rem; animation: fadeIn 0.3s ease;"></div>
+
+        </div>
+      ` : ''}
+
+      <!-- SEÇÃO 3: CRONOGRAMA DE ALARMES AUTOMÁTICOS DA ROTINA -->
+      <div class="noble-card" style="background: rgba(15, 23, 42, 0.5); padding: 20px; border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.08);">
+        <h4 class="cinzel gold-gradient-text" style="margin: 0 0 10px 0; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
+          <span>⏰</span> Alarmes Automáticos Programados no Servidor
+        </h4>
+        <p style="color: #cbd5e1; font-size: 0.84rem; line-height: 1.5; margin-bottom: 14px;">
+          Além dos disparos manuais acima, o servidor do LiraQuest envia notificações sozinho para todos os celulares nos seguintes horários da rotina familiar:
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;">
+          <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 10px; border-left: 3px solid #f59e0b;">
+            <strong style="color: #fbbf24; font-size: 0.9rem;">11h15 — Aviso da Cozinha</strong>
+            <span style="display: block; font-size: 0.78rem; color: #94a3b8; margin-top: 2px;">Preparo do almoço e cardápio saudável</span>
+          </div>
+          <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 10px; border-left: 3px solid #10b981;">
+            <strong style="color: #34d399; font-size: 0.9rem;">11h45 — Almoço dos Heróis</strong>
+            <span style="display: block; font-size: 0.78rem; color: #94a3b8; margin-top: 2px;">Convocação à mesa antes da escola</span>
+          </div>
+          <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 10px; border-left: 3px solid #38bdf8;">
+            <strong style="color: #38bdf8; font-size: 0.9rem;">16h00 — Água & Mana</strong>
+            <span style="display: block; font-size: 0.78rem; color: #94a3b8; margin-top: 2px;">Lembrete de hidratação e fruta da tarde</span>
+          </div>
+          <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 10px; border-left: 3px solid #c084fc;">
+            <strong style="color: #c084fc; font-size: 0.9rem;">19h45 — Jantar do Clã</strong>
+            <span style="display: block; font-size: 0.78rem; color: #94a3b8; margin-top: 2px;">Jantar leve noturno e descanso</span>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -1563,222 +1432,121 @@ export function bindSaudeEvents() {
       showToast(`🔔 ${alarm.title}: ${alarm.message}`, 'warning', 6000);
       loadHealthData().then(updateView);
     });
+  }
 
-    rawSocket.on('whatsapp:qr_generated', (data) => {
-      console.log('📸 [WhatsApp QR Code Recebido]:', data);
-      if (!whatsappData) whatsappData = {};
-      whatsappData.qr_code_data_url = data.qr_code;
-      whatsappData.is_connected = false;
-      updateView();
-    });
+  // 13. Ativar Notificações Web Push no Dispositivo Atual
+  const btnPushSubscribe = document.getElementById('btn-push-subscribe');
+  if (btnPushSubscribe) {
+    btnPushSubscribe.addEventListener('click', async () => {
+      try {
+        btnPushSubscribe.disabled = true;
+        btnPushSubscribe.textContent = '⏳ Ativando no Navegador...';
+        showToast('Solicitando permissão no seu navegador...', 'info');
 
-    rawSocket.on('whatsapp:status', (data) => {
-      console.log('📱 [WhatsApp Status Changed]:', data);
-      showToast(data.is_connected ? '🟢 WhatsApp conectado com sucesso!' : '⚪ WhatsApp desconectado.', data.is_connected ? 'success' : 'info');
-      if (!whatsappData) whatsappData = {};
-      whatsappData.is_connected = data.is_connected;
-      if (data.is_connected) {
-        whatsappData.qr_code_data_url = null;
+        const res = await subscribeDeviceToPush();
+        showToast('🎉 Notificações do Clã ativadas com sucesso neste aparelho!', 'success');
+        await loadHealthData();
+        updateView();
+      } catch (err) {
+        showToast(err.message || 'Erro ao ativar notificações.', 'error');
+        btnPushSubscribe.disabled = false;
+        btnPushSubscribe.innerHTML = '<span>🔔</span><span>Ativar Notificações no meu Celular</span>';
       }
-      loadHealthData().then(updateView);
-    });
-
-    rawSocket.on('whatsapp:message_sent', (msg) => {
-      console.log('📨 [WhatsApp Mensagem Despachada]:', msg);
-      showToast(`📨 [WhatsApp] ${msg.title}`, 'info');
-      displayLastWaMessage(msg.formattedMessage, msg.whatsapp_url);
     });
   }
 
-  // Função para exibir caixa de pré-visualização e link direto
-  const displayLastWaMessage = (messageText, waUrl) => {
-    const box = document.getElementById('wa-last-dispatch-container');
-    const textEl = document.getElementById('wa-last-dispatch-text');
-    const linkEl = document.getElementById('btn-wa-open-direct');
-    if (box && textEl && linkEl) {
-      box.style.display = 'block';
-      textEl.textContent = messageText;
-      linkEl.href = waUrl || `https://api.whatsapp.com/send?text=${encodeURIComponent(messageText)}`;
-      box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-  };
-
-  // 13. Salvar Telefone de Membro Individual da Família
-  document.querySelectorAll('.btn-save-member-phone').forEach((btn) => {
-    btn.addEventListener('click', async () => {
-      const userId = btn.getAttribute('data-user-id');
-      const userName = btn.getAttribute('data-user-name');
-      const input = document.querySelector(`.member-phone-input[data-user-id="${userId}"]`);
-      const phoneVal = input?.value || '';
-
+  // 14. Testar Notificação Imediata
+  const btnPushTest = document.getElementById('btn-push-test');
+  if (btnPushTest) {
+    btnPushTest.addEventListener('click', async () => {
       try {
-        showToast(`Salvando telefone de ${userName}...`, 'info');
-        const res = await api.post('/api/whatsapp/update-phone', {
-          user_id: userId,
-          phone: phoneVal.trim(),
-        });
+        btnPushTest.disabled = true;
+        showToast('Enviando notificação de teste...', 'info');
 
+        const res = await api.post('/api/push/test', {});
         if (res && res.success) {
-          showToast(`✅ Telefone de ${userName} salvo com sucesso!`, 'success');
-          await loadHealthData();
-          updateView();
+          showToast(`✅ ${res.message}`, 'success');
         }
       } catch (err) {
-        showToast(err.message || 'Erro ao salvar telefone.', 'error');
+        showToast(err.message || 'Erro ao disparar teste.', 'error');
+      } finally {
+        btnPushTest.disabled = false;
       }
     });
-  });
+  }
 
-  // 14. Botões de Convocação Rápida dos Guardiões (Templates Programados XPTO)
-  document.querySelectorAll('.btn-send-template').forEach((btn) => {
+  // 15. Desativar Notificações no Dispositivo Atual
+  const btnPushUnsub = document.getElementById('btn-push-unsubscribe');
+  if (btnPushUnsub) {
+    btnPushUnsub.addEventListener('click', async () => {
+      if (!confirm('Deseja realmente desativar as notificações neste aparelho?')) return;
+      try {
+        await unsubscribeDeviceFromPush();
+        showToast('Notificações desativadas para este aparelho.', 'info');
+        await loadHealthData();
+        updateView();
+      } catch (err) {
+        showToast(err.message || 'Erro ao desativar notificações.', 'error');
+      }
+    });
+  }
+
+  // 16. Disparo de Templates Rápidos dos Guardiões
+  document.querySelectorAll('.btn-push-template').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const templateCode = btn.getAttribute('data-template');
+      if (!templateCode) return;
+
       try {
-        showToast('Disparando convocação da família...', 'info');
-        const res = await api.post('/api/whatsapp/send-template', {
-          template_code: templateCode,
-        });
+        showToast('Disparando alarme para os celulares da família...', 'info');
+        const res = await api.post('/api/push/broadcast', { template_code: templateCode });
 
         if (res && res.success) {
           showToast(`✅ ${res.message}`, 'success');
-          displayLastWaMessage(res.result?.formatted_message, res.result?.whatsapp_url);
+          const fb = document.getElementById('push-dispatch-feedback');
+          if (fb) {
+            fb.style.display = 'block';
+            fb.innerHTML = `<strong>✅ Disparo Concluído:</strong> Notificação enviada para ${res.details?.sent || 0} celular(es) ativo(s)!`;
+            fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
         }
       } catch (err) {
-        showToast(err.message || 'Erro ao disparar mensagem.', 'error');
+        showToast(err.message || 'Erro ao disparar alarme.', 'error');
       }
     });
   });
 
-  // 15. Disparar Comunicado Livre Personalizado do Pai
-  const btnCustomBroadcast = document.getElementById('btn-send-custom-broadcast');
-  if (btnCustomBroadcast) {
-    btnCustomBroadcast.addEventListener('click', async () => {
-      const textInput = document.getElementById('input-custom-broadcast-text');
-      const text = textInput?.value;
+  // 17. Disparo de Comunicado Livre Personalizado do Pai
+  const btnPushSendCustom = document.getElementById('btn-push-send-custom');
+  if (btnPushSendCustom) {
+    btnPushSendCustom.addEventListener('click', async () => {
+      const input = document.getElementById('input-push-custom-text');
+      const text = input?.value;
+
       if (!text || text.trim().length === 0) {
-        showToast('Digite uma mensagem antes de disparar.', 'warning');
+        showToast('Digite uma mensagem antes de disparar o alerta.', 'warning');
         return;
       }
 
       try {
-        showToast('Enviando mensagem para todos os membros...', 'info');
-        const res = await api.post('/api/whatsapp/send-template', {
-          custom_text: text.trim(),
-        });
+        btnPushSendCustom.disabled = true;
+        showToast('Enviando comunicado para todos os celulares...', 'info');
 
+        const res = await api.post('/api/push/broadcast', { custom_text: text.trim() });
         if (res && res.success) {
-          showToast('✅ Mensagem enviada para a família com sucesso!', 'success');
-          displayLastWaMessage(res.result?.formatted_message, res.result?.whatsapp_url);
-          textInput.value = '';
-        }
-      } catch (err) {
-        showToast(err.message || 'Erro ao enviar mensagem personalizada.', 'error');
-      }
-    });
-  }
-
-  // 16. Salvar Preferências de Alarmes Automáticos da Rotina
-  const formWaConfig = document.getElementById('form-wa-config');
-  if (formWaConfig) {
-    formWaConfig.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const targetPhone = document.getElementById('wa-target-input')?.value;
-      const notifyMeals = document.getElementById('wa-notify-meals')?.checked;
-      const notifyHydration = document.getElementById('wa-notify-hydration')?.checked;
-
-      try {
-        const res = await api.post('/api/whatsapp/config', {
-          group_id_or_phone: targetPhone ? targetPhone.trim() : '',
-          notify_meals: notifyMeals,
-          notify_hydration: notifyHydration,
-        });
-
-        if (res && res.success) {
-          showToast('✅ Preferências de alarme salvas com sucesso!', 'success');
-          await loadHealthData();
-          updateView();
-        }
-      } catch (err) {
-        showToast(err.message || 'Erro ao salvar preferências.', 'error');
-      }
-    });
-  }
-
-  // 17. Salvar Credenciais da Meta Cloud API (Envio 100% Silencioso)
-  const formMetaCreds = document.getElementById('form-meta-creds');
-  if (formMetaCreds) {
-    formMetaCreds.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const phoneId = document.getElementById('meta-phone-number-id')?.value;
-      const token = document.getElementById('meta-access-token')?.value;
-
-      try {
-        showToast('Salvando credenciais da Meta API...', 'info');
-        const res = await api.post('/api/whatsapp/config', {
-          meta_phone_number_id: phoneId ? phoneId.trim() : undefined,
-          meta_access_token: token ? token.trim() : undefined,
-        });
-
-        if (res && res.success) {
-          showToast('✅ Credenciais da Meta API salvas com sucesso!', 'success');
-          await loadHealthData();
-          updateView();
-        }
-      } catch (err) {
-        showToast(err.message || 'Erro ao salvar credenciais da Meta.', 'error');
-      }
-    });
-  }
-
-  // 18. Gerar QR Code do WhatsApp (Baileys Conexão Direta)
-  const btnGenQr = document.getElementById('btn-wa-generate-qr');
-  if (btnGenQr) {
-    btnGenQr.addEventListener('click', async () => {
-      try {
-        showToast('Gerando QR Code de pareamento do WhatsApp...', 'info');
-        btnGenQr.disabled = true;
-        btnGenQr.textContent = '⏳ Gerando QR Code...';
-
-        const res = await api.post('/api/whatsapp/pair', {});
-        if (res && res.success) {
-          if (!whatsappData) whatsappData = {};
-          whatsappData.qr_code_data_url = res.qr_code;
-          whatsappData.is_connected = res.is_connected;
-
-          if (res.is_connected) {
-            showToast('🎉 WhatsApp do Clã já está conectado!', 'success');
-          } else {
-            showToast('📸 QR Code pronto! Aponte a câmera do WhatsApp.', 'success');
+          showToast(`✅ ${res.message}`, 'success');
+          input.value = '';
+          const fb = document.getElementById('push-dispatch-feedback');
+          if (fb) {
+            fb.style.display = 'block';
+            fb.innerHTML = `<strong>📢 Alerta Enviado:</strong> Mensagem recebida em ${res.details?.sent || 0} celular(es) da família!`;
+            fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
           }
-          updateView();
         }
       } catch (err) {
-        showToast(err.message || 'Erro ao gerar QR Code.', 'error');
-        btnGenQr.disabled = false;
-        btnGenQr.textContent = '🔑 Gerar QR Code de Conexão do WhatsApp';
-      }
-    });
-  }
-
-  // 19. Desconectar Sessão do WhatsApp
-  const btnDisconnect = document.getElementById('btn-wa-disconnect');
-  if (btnDisconnect) {
-    btnDisconnect.addEventListener('click', async () => {
-      if (!confirm('Deseja realmente desconectar o WhatsApp do Clã?')) return;
-      try {
-        showToast('Desconectando WhatsApp...', 'info');
-        const res = await api.post('/api/whatsapp/disconnect', {});
-        if (res && res.success) {
-          showToast('WhatsApp desconectado com sucesso.', 'info');
-          if (whatsappData) {
-            whatsappData.is_connected = false;
-            whatsappData.qr_code_data_url = null;
-          }
-          await loadHealthData();
-          updateView();
-        }
-      } catch (err) {
-        showToast(err.message || 'Erro ao desconectar WhatsApp.', 'error');
+        showToast(err.message || 'Erro ao enviar comunicado.', 'error');
+      } finally {
+        btnPushSendCustom.disabled = false;
       }
     });
   }

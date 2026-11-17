@@ -7,6 +7,7 @@
 import cron from 'node-cron';
 import { FamilyMealSchedule, FamilyMeal, FamilyMealItem, FamilyWhatsappConfig } from '../models/index.js';
 import { sendClanMessage } from './whatsappService.js';
+import { sendPushToFamily } from './pushNotificationService.js';
 
 let cronTask = null;
 let ioInstance = null;
@@ -108,7 +109,20 @@ async function dispatchAlarm({ familyId, title, message, type, mealType, schedul
     ioInstance.emit('alarm:trigger', payload);
   }
 
-  // 2. Notifica via WhatsApp (se a família tiver WhatsApp conectado e permissão)
+  // 2. Notifica via Web Push (para todos os celulares da família, mesmo com a tela bloqueada / navegador fechado)
+  try {
+    const cleanBody = (message || '').replace(/\*/g, '').replace(/•/g, '-');
+    await sendPushToFamily(familyId, {
+      title,
+      body: cleanBody.length > 180 ? cleanBody.substring(0, 177) + '...' : cleanBody,
+      tag: `alarm-${type ? type.toLowerCase() : 'routine'}-${mealType || 'clan'}`,
+      url: '/#saude',
+    });
+  } catch (pushErr) {
+    console.error('Erro ao despachar alarme para Web Push:', pushErr.message);
+  }
+
+  // 3. Notifica via WhatsApp (se a família tiver WhatsApp conectado e permissão)
   let sendResult = null;
   try {
     const config = await FamilyWhatsappConfig.findOne({ where: { family_id: familyId } });

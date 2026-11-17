@@ -25,6 +25,7 @@ import nutritionRoutes from './server/routes/nutritionRoutes.js';
 import funRoutes from './server/routes/funRoutes.js';
 import financeRoutes from './server/routes/financeRoutes.js';
 import whatsappRoutes from './server/routes/whatsappRoutes.js';
+import pushRoutes from './server/routes/pushRoutes.js';
 import { initChameleonSocket } from './server/sockets/chameleonSocket.js';
 import { initDuelSocket } from './server/sockets/duelSocket.js';
 import { initNutritionCron } from './server/services/nutritionCron.js';
@@ -83,6 +84,7 @@ app.use('/api/nutrition', nutritionRoutes);
 app.use('/api/fun', funRoutes);
 app.use('/api/finance', financeRoutes);
 app.use('/api/whatsapp', whatsappRoutes);
+app.use('/api/push', pushRoutes);
 
 
 // Health check & status
