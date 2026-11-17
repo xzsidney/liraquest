@@ -21,11 +21,11 @@ router.use(authenticateToken);
 // Consulta de configuração e lista de membros
 router.get('/config', getConfig);
 
-// Gerenciamento restrito aos Guardiões (Pai/Mãe/Admin)
+// Gerenciamento dos Guardiões e Disparos da Família
 router.post('/config', authorizeRoles('ADMIN', 'PARENT'), saveConfig);
 router.post('/update-phone', authorizeRoles('ADMIN', 'PARENT'), updatePhone);
-router.post('/send-template', authorizeRoles('ADMIN', 'PARENT'), sendTemplate);
-router.post('/test', authorizeRoles('ADMIN', 'PARENT'), sendTestMessage);
-router.post('/alarm-test', authorizeRoles('ADMIN', 'PARENT'), triggerAlarmTest);
+router.post('/send-template', authorizeRoles('ADMIN', 'PARENT', 'CHILD'), sendTemplate);
+router.post('/test', authorizeRoles('ADMIN', 'PARENT', 'CHILD'), sendTestMessage);
+router.post('/alarm-test', authorizeRoles('ADMIN', 'PARENT', 'CHILD'), triggerAlarmTest);
 
 export default router;

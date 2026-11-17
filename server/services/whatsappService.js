@@ -142,7 +142,7 @@ export async function getFamilyConfig(familyId) {
     notify_meals: config.notify_meals,
     notify_hydration: config.notify_hydration,
     meta_configured: metaCreds.isConfigured,
-    meta_phone_number_id: metaCreds.phoneNumberId ? `${metaCreds.phoneNumberId.substring(0, 4)}...${metaCreds.phoneNumberId.slice(-4)}` : '',
+    meta_phone_number_id: metaCreds.phoneNumberId || '',
     members,
     updated_at: config.updated_at,
   };
@@ -177,8 +177,8 @@ export async function updateFamilyConfig(familyId, { group_id_or_phone, notify_m
         if (config.session_data) currentSession = JSON.parse(config.session_data);
       } catch (e) {}
 
-      if (meta_phone_number_id) currentSession.meta_phone_number_id = meta_phone_number_id.trim();
-      if (meta_access_token) currentSession.meta_access_token = meta_access_token.trim();
+      if (meta_phone_number_id && !meta_phone_number_id.includes('...')) currentSession.meta_phone_number_id = meta_phone_number_id.trim();
+      if (meta_access_token && !meta_access_token.includes('•') && !meta_access_token.includes('*')) currentSession.meta_access_token = meta_access_token.trim();
 
       config.session_data = JSON.stringify(currentSession);
     }
