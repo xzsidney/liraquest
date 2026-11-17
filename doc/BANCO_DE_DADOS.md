@@ -589,6 +589,83 @@ Catálogo global imutável com os **82 personagens oficiais** de Marvel Zombies 
 | `profiles` | `JSON` | Não | Objeto estruturado com todas as facetas (`attack`: nome, alcance, dados, precisão; `skills`: azul, amarelo, laranja, vermelho; `boss_enemy`) |
 | `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
 
+---
+
+## 11. Módulo Saúde, Nutrição & Hábitos Alimentares (Fase 2)
+
+### ⏰ `family_meal_schedules`
+Armazena a grade de horários, modo de rotina e minutos de antecedência para alarmes de cada refeição da família.
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único UUIDv4 |
+| `family_id` | `UUID` (FK) | Não | Referência a `families.id` |
+| `meal_type` | `ENUM('cafe','almoco','lanche','jantar','ceia')` | Não | Tipo da refeição nobre |
+| `scheduled_time` | `VARCHAR(10)` | Não | Horário planejado em HH:MM (ex: "11:45", "12:00") |
+| `routine_mode` | `ENUM('certinho','flexivel')` | Não | Modo de rotina ativa (Padrão: `certinho`) |
+| `alert_minutes_before` | `INT` | Não | Minutos de aviso sonoro/notificação prévia (Padrão: 15) |
+| `is_active` | `BOOLEAN` | Não | Status de monitoramento pelo node-cron (Padrão: `true`) |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+
+### 🍽️ `family_meals`
+Armazena o cardápio dos pratos cadastrados por dia e refeição da família com orientações para a cozinha.
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único UUIDv4 |
+| `family_id` | `UUID` (FK) | Não | Referência a `families.id` |
+| `meal_date` | `DATEONLY` | Não | Data da refeição ('YYYY-MM-DD') |
+| `meal_type` | `ENUM('cafe','almoco','lanche','jantar','ceia')` | Não | Tipo da refeição nobre |
+| `title` | `VARCHAR(255)` | Não | Título do prato (ex: "Patinho Moído com Cenoura Invisível") |
+| `cooking_notes` | `TEXT` | Sim | Dicas de preparo para a cozinha (ex: "zero óleo, cebola batida no mixer") |
+| `routine_mode` | `ENUM('certinho','flexivel')` | Não | Modo de rotina associado |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+
+### ⚖️ `family_meal_items`
+Armazena os alimentos, proporções em gramas e tags de saúde de cada prato.
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único UUIDv4 |
+| `meal_id` | `UUID` (FK) | Não | Referência a `family_meals.id` (CASCADE) |
+| `name` | `VARCHAR(255)` | Não | Nome do alimento/ingrediente (ex: "Arroz Integral Cozido") |
+| `quantity_grams` | `VARCHAR(100)` | Sim | Porção / Peso (ex: "80g", "150g", "À vontade") |
+| `category` | `VARCHAR(50)` | Não | Categoria (proteina, carboidrato, salada, legume, fruta, bebida) |
+| `health_tags` | `VARCHAR(255)` | Sim | Tags funcionais (ex: "vesicula_segura", "baixo_indice_glicemico", "zero_oleo") |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+
+### 👑 `family_meal_checkins`
+Registra a presença dos filhos na mesa, pontuação e penalidades de pontualidade (Mecânica do Paulinho).
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único UUIDv4 |
+| `meal_id` | `UUID` (FK) | Sim | Referência opcional a `family_meals.id` |
+| `family_id` | `UUID` (FK) | Não | Referência a `families.id` |
+| `user_id` | `UUID` (FK) | Não | Referência a `family_users.id` (Filho) |
+| `character_id` | `UUID` (FK) | Sim | Referência a `characters.id` (Herói do filho) |
+| `meal_date` | `DATEONLY` | Não | Data da refeição ('YYYY-MM-DD') |
+| `meal_type` | `VARCHAR(50)` | Não | Tipo da refeição avaliada |
+| `status` | `ENUM('no_horario','atrasado','faltou')` | Não | Resultado da validação |
+| `xp_awarded` | `INT` | Não | XP creditado (+30 se no horário, +10 se atrasou, 0 se faltou) |
+| `gold_awarded` | `INT` | Não | Ouro creditado (+10 se no horário, 0 caso contrário) |
+| `penalty_note` | `TEXT` | Sim | Advertência/motivo registrado se faltou ou atrasou |
+| `validated_by` | `UUID` (FK) | Sim | Referência a `family_users.id` (Guardião que validou) |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+
+### 🛒 `family_shopping_items`
+Armazena a lista de compras inteligente do clã dividida entre abastecimento mensal e feira semanal.
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único UUIDv4 |
+| `family_id` | `UUID` (FK) | Não | Referência a `families.id` |
+| `name` | `VARCHAR(255)` | Não | Nome do item (ex: "Patinho bovino moído") |
+| `quantity` | `VARCHAR(100)` | Sim | Quantidade / volume (ex: "2 kg", "2 maços") |
+| `category` | `ENUM('mensal_abastecimento','semanal_feira')` | Não | Coluna de compra |
+| `is_purchased` | `BOOLEAN` | Não | Status de compra marcado na lista (Padrão: `false`) |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+
 
 
 

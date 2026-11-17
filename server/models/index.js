@@ -31,6 +31,11 @@ import { FamilyZombiCampaign } from './FamilyZombiCampaign.js';
 import { FamilyZombiMission } from './FamilyZombiMission.js';
 import { FamilyZombiToken } from './FamilyZombiToken.js';
 import { DefinitionMzCharacter } from './DefinitionMzCharacter.js';
+import { FamilyMealSchedule } from './FamilyMealSchedule.js';
+import { FamilyMeal } from './FamilyMeal.js';
+import { FamilyMealItem } from './FamilyMealItem.js';
+import { FamilyMealCheckin } from './FamilyMealCheckin.js';
+import { FamilyShoppingItem } from './FamilyShoppingItem.js';
 
 // ==========================================
 // 1. Associações de Usuário & Família
@@ -167,6 +172,36 @@ FamilyZombiMission.belongsTo(FamilyZombiCampaign, { foreignKey: 'campaign_id', a
 FamilyZombiMission.hasMany(FamilyZombiToken, { foreignKey: 'mission_id', as: 'tokens', onDelete: 'CASCADE' });
 FamilyZombiToken.belongsTo(FamilyZombiMission, { foreignKey: 'mission_id', as: 'mission' });
 
+// ==========================================
+// 11. Associações de Saúde, Nutrição & Compras (Fase 2)
+// ==========================================
+Family.hasMany(FamilyMealSchedule, { foreignKey: 'family_id', as: 'meal_schedules' });
+FamilyMealSchedule.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
+
+Family.hasMany(FamilyMeal, { foreignKey: 'family_id', as: 'meals' });
+FamilyMeal.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
+
+FamilyMeal.hasMany(FamilyMealItem, { foreignKey: 'meal_id', as: 'items', onDelete: 'CASCADE' });
+FamilyMealItem.belongsTo(FamilyMeal, { foreignKey: 'meal_id', as: 'meal' });
+
+FamilyMeal.hasMany(FamilyMealCheckin, { foreignKey: 'meal_id', as: 'checkins' });
+FamilyMealCheckin.belongsTo(FamilyMeal, { foreignKey: 'meal_id', as: 'meal' });
+
+Family.hasMany(FamilyMealCheckin, { foreignKey: 'family_id', as: 'meal_checkins' });
+FamilyMealCheckin.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
+
+FamilyUser.hasMany(FamilyMealCheckin, { foreignKey: 'user_id', as: 'meal_checkins' });
+FamilyMealCheckin.belongsTo(FamilyUser, { foreignKey: 'user_id', as: 'user' });
+
+FamilyUser.hasMany(FamilyMealCheckin, { foreignKey: 'validated_by', as: 'validated_checkins' });
+FamilyMealCheckin.belongsTo(FamilyUser, { foreignKey: 'validated_by', as: 'validator' });
+
+Character.hasMany(FamilyMealCheckin, { foreignKey: 'character_id', as: 'meal_checkins' });
+FamilyMealCheckin.belongsTo(Character, { foreignKey: 'character_id', as: 'character' });
+
+Family.hasMany(FamilyShoppingItem, { foreignKey: 'family_id', as: 'shopping_items' });
+FamilyShoppingItem.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
+
 export {
   sequelize,
   FamilyUser,
@@ -200,4 +235,9 @@ export {
   FamilyZombiMission,
   FamilyZombiToken,
   DefinitionMzCharacter,
+  FamilyMealSchedule,
+  FamilyMeal,
+  FamilyMealItem,
+  FamilyMealCheckin,
+  FamilyShoppingItem,
 };

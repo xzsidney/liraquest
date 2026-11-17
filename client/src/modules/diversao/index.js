@@ -10,7 +10,7 @@ import { showModal } from '../../components/Modal.js';
 export async function renderDiversaoView() {
   let rewards = [];
   try {
-    const res = await api.get('/api/rewards/list').catch(() => null);
+    const res = await api.get('/api/rewards').catch(() => null);
     if (res && res.rewards) rewards = res.rewards;
   } catch (e) {
     console.error('Erro ao buscar vales:', e);

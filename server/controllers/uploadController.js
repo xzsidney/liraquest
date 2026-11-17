@@ -8,16 +8,34 @@ import { FamilyUser } from '../models/FamilyUser.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Garante que o diretório de destino existe
+// Garante que o diretório de perfis existe
 const uploadDir = path.join(__dirname, '../../public/uploads/profiles');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Configuração de armazenamento com UUID único
+// Garante que o diretório de comprovações de tarefas existe
+const proofsDir = path.join(__dirname, '../../public/uploads/proofs');
+if (!fs.existsSync(proofsDir)) {
+  fs.mkdirSync(proofsDir, { recursive: true });
+}
+
+// Configuração de armazenamento com UUID único para perfis
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    const uniqueName = `${crypto.randomUUID()}${ext}`;
+    cb(null, uniqueName);
+  },
+});
+
+// Configuração de armazenamento para fotos de comprovação de tarefas
+const proofsStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, proofsDir);
   },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
@@ -42,6 +60,12 @@ export const uploadMiddleware = multer({
   storage,
   fileFilter,
   limits: { fileSize: 5 * 1024 * 1024 }, // Limite de 5MB
+});
+
+export const uploadProofMiddleware = multer({
+  storage: proofsStorage,
+  fileFilter,
+  limits: { fileSize: 10 * 1024 * 1024 }, // Limite de 10MB para fotos de câmera
 });
 
 /**
@@ -82,5 +106,27 @@ export async function uploadProfilePhoto(req, res) {
   } catch (error) {
     console.error('Erro no upload de foto de perfil:', error);
     return res.status(500).json({ success: false, message: 'Erro interno ao processar o upload da imagem.' });
+  }
+}
+
+/**
+ * Controller para upload de foto de comprovação de tarefas da casa
+ */
+export async function uploadTaskProof(req, res) {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'Nenhuma foto foi enviada.' });
+    }
+
+    const photoUrl = `/uploads/proofs/${req.file.filename}`;
+
+    return res.status(200).json({
+      success: true,
+      message: 'Foto de comprovação carregada com sucesso!',
+      photo_url: photoUrl,
+    });
+  } catch (error) {
+    console.error('Erro no upload de foto de comprovação:', error);
+    return res.status(500).json({ success: false, message: 'Erro ao processar imagem de comprovação.' });
   }
 }

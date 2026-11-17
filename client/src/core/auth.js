@@ -62,6 +62,7 @@ export const auth = {
       this.state.token = data.token;
       this.state.user = data.user;
       localStorage.setItem('liraquest_token', data.token);
+      localStorage.setItem('token', data.token);
       localStorage.setItem('liraquest_user', JSON.stringify(data.user));
       
       // Carregar dados complementares do personagem e família
@@ -77,6 +78,7 @@ export const auth = {
       this.state.token = data.token;
       this.state.user = data.user;
       localStorage.setItem('liraquest_token', data.token);
+      localStorage.setItem('token', data.token);
       localStorage.setItem('liraquest_user', JSON.stringify(data.user));
       
       await this.loadInitialUserData();
@@ -91,6 +93,7 @@ export const auth = {
     this.state.character = null;
     this.state.family = null;
     localStorage.removeItem('liraquest_token');
+    localStorage.removeItem('token');
     localStorage.removeItem('liraquest_user');
     this.notify();
   },

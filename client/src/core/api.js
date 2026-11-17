@@ -67,6 +67,10 @@ export const api = {
     });
   },
 
+  postForm(endpoint, formData) {
+    return this.post(endpoint, formData);
+  },
+
   put(endpoint, body) {
     return this.request(endpoint, {
       method: 'PUT',

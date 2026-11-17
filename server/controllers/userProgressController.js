@@ -7,6 +7,10 @@ import {
   TaskSubmission,
   FamilyMember,
   DefinitionTask,
+  Character,
+  CharacterClass,
+  CharacterAttribute,
+  DefinitionAttribute,
 } from '../models/index.js';
 import { Op } from 'sequelize';
 
@@ -416,6 +420,103 @@ export const getMyHeroDashboard = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Erro interno ao consultar painel do herói.',
+    });
+  }
+};
+
+/**
+ * Registra a conclusão de uma sessão de foco do Pomodoro gamificado
+ * Converte foco em Energia de Aventura, Ouro, XP e bônus de Inteligência (INT)
+ */
+export const completeFocusSession = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { minutes = 25, subject = 'Estudos Gerais' } = req.body;
+
+    const progress = await findOrCreateProgress(userId);
+
+    const energyEarned = 3;
+    const goldEarned = 15;
+    const xpEarned = 40;
+
+    // 1. Concede Energia de Aventura
+    await progress.update({
+      adventure_energy: (progress.adventure_energy || 0) + energyEarned,
+    });
+
+    // 2. Concede Ouro e XP ao Herói (se existir)
+    let currentGold = 0;
+    let newLevel = 1;
+    let newXP = 0;
+    let leveledUp = false;
+    let intBoosted = false;
+
+    const character = await Character.findOne({ where: { user_id: userId } });
+    if (character) {
+      await character.update({
+        gold: (character.gold || 0) + goldEarned,
+      });
+      currentGold = character.gold;
+
+      if (character.current_class_id) {
+        const classProgress = await CharacterClass.findOne({
+          where: { character_id: character.id, class_id: character.current_class_id },
+        });
+        if (classProgress) {
+          let cXP = (classProgress.xp || 0) + xpEarned;
+          let cLevel = classProgress.level || 1;
+          let reqXP = cLevel * 100;
+          while (cXP >= reqXP) {
+            cXP -= reqXP;
+            cLevel += 1;
+            leveledUp = true;
+            reqXP = cLevel * 100;
+          }
+          await classProgress.update({ xp: cXP, level: cLevel });
+          newLevel = cLevel;
+          newXP = cXP;
+        }
+      }
+
+      // 3. Conversão de Foco em Bônus de Atributo: +1 Inteligência (INT)
+      const intAttrDef = await DefinitionAttribute.findOne({ where: { code: 'int' } });
+      if (intAttrDef) {
+        const [charAttr] = await CharacterAttribute.findOrCreate({
+          where: {
+            character_id: character.id,
+            attribute_id: intAttrDef.id,
+          },
+          defaults: {
+            id: randomUUID().toLowerCase(),
+            base_value: 10,
+            bonus_value: 0,
+          },
+        });
+        await charAttr.increment('bonus_value', { by: 1 });
+        intBoosted = true;
+      }
+    }
+
+    return res.json({
+      success: true,
+      message: `Ciclo de foco de ${minutes}min concluído com louvor em ${subject}!`,
+      rewards: {
+        energy_earned: energyEarned,
+        gold_earned: goldEarned,
+        xp_earned: xpEarned,
+        int_boosted: intBoosted,
+        current_energy: progress.adventure_energy,
+        current_gold: currentGold,
+        current_xp: newXP,
+        current_level: newLevel,
+        leveled_up: leveledUp,
+      },
+    });
+  } catch (error) {
+    console.error('❌ Erro ao finalizar sessão de foco:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Erro interno ao processar recompensas de foco.',
     });
   }
 };

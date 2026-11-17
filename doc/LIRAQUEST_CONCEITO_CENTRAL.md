@@ -334,7 +334,18 @@ O **Arcade de Lira** é o centro de diversão acessível pelo Terminal do Avatar
       - **Matriz dos 6 Portais Nobres (Acesso em 1 Clique):**
         1. 🏡 **Casa (Missões & Organização):** Mural de tarefas do lar, hábitos diários, envio de fotos de comprovação pelo filho e validação pedagógica com visto do guardião.
         2. 📚 **Estudos (Pomodoro Gamificado & Matérias):** Temporizador de foco (25 min de foco / 5 min de descanso), deveres de casa, matérias escolares e bônus de XP e Ouro para o herói.
-        3. 🥗 **Saúde (Vitalidade & Cardápio):** Horários das refeições, cardápio familiar da semana, controle interativo de copos d'água (💧 meta de 8 copos diários) e alarmes de bem-estar.
+        3. 🥗 **Saúde (Vitalidade & Nutrição Familiar - Fase 2):**
+           - **Cardápio Dinâmico com Pesos & Gramas:** Exibição clara e pedagógica de cada refeição (Café, Almoço, Lanche, Jantar, Ceia) detalhando proporções e gramas exatas (ex: 150g proteína, 80g carbo bom, salada colorida).
+           - **Seletor de Modo da Rotina (1 Clique):** Alternância instantânea entre *Rotina Organizada (Horários Certinhos)* e *Rotina Flexível (Acordei Tarde)* para dias de descanso sem quebrar o ritmo da família.
+           - **Guia Imperial da Cozinha Nobre:** Avisos essenciais destacados (cebola e alho batidos no mixer para as crianças comerem sem reclamar, zero frituras na chapa antiaderente, diretrizes de digestão leve para vesícula segura e pré-operatório).
+           - **Construtor Dinâmico de Pratos:** Tela interativa onde os pais criam e ajustam pratos adicionando linhas de alimentos, pesos e tags de saúde com 1 clique.
+           - **Validação dos Heróis (Mecânica do Paulinho):** Painel rápido dos pais para validar a presença na refeição:
+             - *No Horário:* Bonificação máxima de +30 XP, +10 Moedas de Ouro e restauração total (100%) da Energia de Aventura.
+             - *Atrasou:* Bonificação reduzida para +10 XP (sem moedas).
+             - *Faltou:* Advertência e penalidade registradas no histórico do herói.
+           - **Lista de Compras Inteligente:** Checklist móvel dividido em *Abastecimento do Mês* (carnes, ovos, arroz, azeite) e *Feira da Semana* (frutas frescas, legumes no vapor, verduras), com caixas de seleção e salvamento em tempo real.
+           - **Monitoramento & Alarme com Node-Cron:** Monitoramento minuto a minuto dos horários ativos, disparando avisos sonoros e visuais prévios via WebSocket e preparando a conexão com bots de WhatsApp da família.
+           - **Controle de Hidratação:** Contador interativo de 8 copos d'água (2 litros) diários conferindo +5 XP por copo bebido.
         4. 🎡 **Diversão (Lazer & Vales da Família):** Agenda de eventos do fim de semana (Noite da Pizza, Cinema, Parque) e Loja do Lar para resgate de vales reais utilizando Fichas do Lar.
         5. 🎮 **Jogos (Salão Nobre de Jogos):** Lobby arcade integrado com Truco Paulista Mobile, Marvel Zombies RPG, Duelo de Arqueiros 1v1, Esconde-Esconde Camaleão e Quests/Masmorras.
         6. 💰 **Financeiro (Tesouro do Clã & Economia):** Cofre/mesada gamificada dos heróis com poupança de Ouro, meta coletiva de grande sonho familiar (Parque Temático) e controle de contas e provisões do lar para os pais.
@@ -342,3 +353,26 @@ O **Arcade de Lira** é o centro de diversão acessível pelo Terminal do Avatar
       - Rotas `/truco` e `/zombi` passam a contar com barreira estrita de verificação de autenticação JWT no cliente e no servidor, garantindo que apenas membros cadastrados e logados do LiraQuest possam desfrutar dos jogos.
     - **Integração Total com o Backend (`server.js`):**
       - O servidor Express serve estáticos primários da pasta `client/` e ativos legados/jogos da pasta `public/`, mantendo 100% de estabilidade nas rotas de API (`/api/...`) e nos canais de WebSockets.
+
+12. **🏰 Fase 3: Migração e Modularização de Casa, Estudos e Salão de Jogos (`client/src/modules/`):**
+    - **Módulo 🏡 Casa (`client/src/modules/casa/`):**
+      - **Mural de Missões do Dia:** Separação das tarefas da casa por períodos dinâmicos (☀️ Manhã, 🌤️ Tarde, 🌙 Noite, ✨ A Qualquer Hora) com filtros interativos em 1 clique. Cada card exibe de forma cristalina as recompensas: 💰 +Ouro, ⭐ +XP, ⚡ +Energia de Aventura e 🎟️ +Fichas do Lar.
+      - **Envio de Prova com Foto:** Componente móvel responsivo com disparo direto da câmera (`capture="environment"`) ou seleção de foto da galeria, com preview instantâneo via FileReader antes do upload. O arquivo é gravado com UUID único em `/uploads/proofs/` via `/api/upload/task-proof` e atrelado à submissão do herói.
+      - **Painel do Mestre (Validador dos Pais):** Exclusivo para perfis `PARENT` e `ADMIN`, exibindo as comprovações pendentes em tempo real com avatar e nome do herói, horário de envio, relato em texto, foto ampliada em alta resolução com lightbox, campo para mensagem de incentivo pedagógico e botões de ação 1-clique (🏆 Aprovar Missão com crédito automático de XP, Ouro e Energia ou ❌ Solicitar Correção). Inclui histórico recente de avaliações concluídas no clã.
+      - **Streak & Patentes do Lar:** Indicador vibrante da fogueira familiar com o contador de dias consecutivos cumprindo hábitos (🔥 Streak Atual e 🏆 Recorde Histórico), sincronizado com `/api/character/hero-dashboard`. Exibe a patente conquistada na vida real (*🌱 Recruta do Lar*, *⚔️ Herói Dedicado*, *🛡️ Guardião Exemplar*, *👑 Cavaleiro de Elite*, *🌟 Campeão Lendário da Família*) e a régua de progresso para a próxima patente.
+      - **Cadastro de Missões da Casa:** Modal dinâmico para os pais lançarem novas missões com definição de dificuldade, período, recompensas e exigência de foto.
+    - **Módulo 📚 Estudos (`client/src/modules/estudos/`):**
+      - **Temporizador de Foco (Pomodoro Gamificado):** Modos calibrados de concentração (25m Foco Padrão, 50m Foco Profundo e 5m Pausa Restauradora), com seleção da matéria escolar ativa (Matemática, Português, Ciências, História, Idiomas, Leitura Livre).
+      - **Modo AFK de Meditação Arcana:** Enquanto a criança ou jovem mantém o foco nas lições de casa ou leitura, o herói descansa e medita em modo AFK com a animação `afk-avatar-glow`, simbolizando a absorção do conhecimento na guilda.
+      - **Conversão de Foco em Bônus:** Ao zerar o cronômetro, uma fanfarra nobre sintetizada via Web Audio API celebra a conquista e dispara a rota `/api/progress/focus/finish`, creditando ⚡ +3 de Energia de Aventura, 🪙 +15 Moedas de Ouro, ⭐ +40 XP e +1 ponto permanente de Inteligência (INT) na ficha do herói!
+      - **Quadro de Lições e Provas:** Organizador integrado de deveres escolares e avaliações com persistência sincronizada no navegador. Permite cadastrar matéria, data de entrega, tipo de tarefa (dever, trabalho, prova, leitura) e marcar como concluída com fanfarra de áudio e feedback visual.
+    - **Módulo 🎮 Jogos (Lobby Central do Salão de Jogos / Arcade do Reino):**
+      - **Hub Visual Épico dos 7 Games:** Interface imersiva nobre com cards dinâmicos na paleta oficial (Bordô `#800020`, Azul Real `#1e3a8a` e Dourado Imperial `#d4af37`), exibindo o custo de Energia e as recompensas de cada jogo:
+        1. 🃏 **Truco Paulista Mobile:** Mão de 11, manilhas e blefe tático com IA de boteco, exigindo login seguro do LiraQuest e pontuando ouro e XP na ficha do herói.
+        2. 🧟 **Marvel Zombies RPG:** Companheiro digital com 82 heróis, 5 capítulos investigativos e persistência MySQL.
+        3. ⚔️ **Duelo de Arqueiros (1v1):** Partidas em tempo real via Socket.IO entre irmãos/membros da família no Canvas 2D.
+        4. 🏹 **O Arqueiro do Saber (Solo):** Quiz curricular por etapa escolar com tiro de flechas em alvos flutuantes.
+        5. 📜 **Aventuras em Quest (Masmorras):** RPG narrativo interativo com dado D20 animado contra os monstros da casa (Goblin da Sujeira, Titã da Procrastinação).
+        6. ⚔️ **Arena de Batalha 2D:** Arcade retrô CTB com sprites clássicos e motor WebGL PixiJS.
+        7. 🔦 **Esconde-Esconde Camaleão:** Jogo de reflexo e camuflagem rápida.
+      - **Regra de Conversão de Energia & Recompensas:** O Arcade monitora o saldo de ⚡ Energia de Aventura do usuário em tempo real. Caso o herói esteja com energia insuficiente, o sistema exibe um aviso acolhedor orientando-o a cumprir tarefas na Casa ou focar nos Estudos para recarregar suas energias, fechando o ciclo perfeito da gamificação familiar!

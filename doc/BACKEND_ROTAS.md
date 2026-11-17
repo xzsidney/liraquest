@@ -98,6 +98,7 @@ Este documento cataloga todos os endpoints REST e eventos de WebSocket (Socket.I
 | Método | Rota | Autenticação | Descrição |
 |:---|:---|:---|:---|
 | `POST` | `/api/upload/profile-photo` | JWT | Upload de foto real de perfil do usuário (Multipart/form-data com Multer, armazena em `/uploads/profiles/UUID.ext` e atualiza `profile_photo_url`) |
+| `POST` | `/api/upload/task-proof` | JWT | Upload de foto de comprovação de tarefa da casa (Multipart/form-data com Multer, armazena em `/uploads/proofs/UUID.ext` e retorna a URL) |
 
 ---
 
@@ -107,6 +108,7 @@ Este documento cataloga todos os endpoints REST e eventos de WebSocket (Socket.I
 |:---|:---|:---|:---|
 | `GET` | `/api/progress/me` | JWT | Retorna o registro de progresso (Energia, Fichas do Lar, Streak, estatísticas) |
 | `GET` | `/api/progress/dashboard` | JWT | Retorna pacote unificado para o Terminal do Usuário (progress + tarefas pendentes + aprovadas hoje + histórico) |
+| `POST` | `/api/progress/focus/finish` | JWT | Registra a conclusão de uma sessão de foco do Pomodoro gamificado (`minutes`, `subject`), creditando +3 de Energia de Aventura, +15 Ouro, +40 XP e +1 ponto de Inteligência (INT) permanente no Herói |
 
 ---
 
@@ -241,6 +243,30 @@ Módulo separado com interface web responsiva e persistência MySQL para apoiar 
 | `GET` | `/api/zombi/characters` | Pública | Lista os 82 personagens oficiais com suporte a filtros via query params (`?box=...`, `?mode=hero|zombie|boss`, `?search=...`) para abastecer dropdowns e filtros rápidos |
 | `GET` | `/api/zombi/characters/:code` | Pública | Retorna a ficha completa de um personagem específico por slug (`code`), incluindo todos os seus perfis (`super_hero`, `zombie_hero`, `boss_enemy`), ataques e habilidades |
 | `GET` | `/zombi/characters.html` | Pública | Entrega a interface oficial do Companion Tático de Personagens com simulador de dados e gerenciador de HP de Boss |
+
+---
+
+## 🥗 17. Módulo Saúde, Nutrição & Hábitos Alimentares (Fase 2)
+Rotas REST e WebSockets do Módulo Saúde (`client/src/modules/saude/` e `/api/nutrition`), integrando cardápio dinâmico com gramas, guia de preparo da cozinha, rotina diária (certinha vs flexível), validação de presença dos filhos com pontuação RPG e checklist de compras inteligente.
+
+| Método | Rota | Autenticação | Descrição |
+|:---|:---|:---|:---|
+| `GET` | `/api/nutrition/today` | JWT | Retorna o cardápio do dia atual (`meal_date`), os 5 horários programados, os pratos com seus ingredientes e gramas, os filhos da casa e o status de check-in de cada um |
+| `GET` | `/api/nutrition/week` | JWT | Retorna a grade semanal completa (Segunda a Domingo) com os pratos e horários associados |
+| `POST` | `/api/nutrition/meal` | JWT (PARENT/ADMIN) | Cria ou edita um prato nobre com nome, modo de rotina, dicas de preparo da cozinha e array dinâmico de ingredientes com porções e tags funcionais |
+| `DELETE` | `/api/nutrition/meal/:mealId` | JWT (PARENT/ADMIN) | Remove um prato do cardápio e seus ingredientes |
+| `POST` | `/api/nutrition/checkin` | JWT (PARENT/ADMIN) | **Mecânica do Paulinho:** Validação de presença do herói na refeição. Se `no_horario`: credita +30 XP, +10 Moedas de Ouro e restaura 100% da Energia de Aventura. Se `atrasado`: credita +10 XP. Se `faltou`: registra advertência no histórico |
+| `GET` | `/api/nutrition/shopping` | JWT | Retorna os itens de compras da família divididos em duas colunas: `mensal_abastecimento` e `semanal_feira` com contadores de progresso |
+| `POST` | `/api/nutrition/shopping` | JWT | Adiciona um novo item à lista de compras com nome, quantidade/volume e categoria |
+| `POST` | `/api/nutrition/shopping/toggle` | JWT | Alterna o status `is_purchased` (comprado/pendente) do item com salvamento instantâneo |
+| `DELETE` | `/api/nutrition/shopping/:itemId` | JWT | Exclui um item da lista de compras da família |
+| `GET` | `/api/nutrition/schedule` | JWT | Consulta os horários configurados das 5 refeições e o modo de rotina predominante (`certinho` ou `flexivel`) |
+| `PUT` | `/api/nutrition/schedule` | JWT (PARENT/ADMIN) | Atualiza o modo de rotina da família e/ou os horários e minutos de alerta de cada refeição |
+
+### 🔔 Eventos de WebSocket e Cron em Tempo Real
+- **Serviço Node-Cron (`server/services/nutritionCron.js`):** Monitora minuto a minuto os horários ativos no MySQL.
+- **Evento `nutrition:meal_alert` (Socket.IO):** Dispara alerta na tela quando faltam X minutos para a refeição (`PRE_ALERT`) ou na hora exata em que a refeição é servida (`MEAL_NOW`), preparando o terreno para envio automático via WhatsApp.
+
 
 
 

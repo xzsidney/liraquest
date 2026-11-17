@@ -23,9 +23,9 @@ export async function renderSalaoView() {
   // Buscar tarefas pendentes para o resumo do dia
   let pendingTasksCount = 0;
   try {
-    const tasksRes = await api.get('/api/tasks/list').catch(() => null);
+    const tasksRes = await api.get('/api/tasks').catch(() => null);
     if (tasksRes && tasksRes.tasks) {
-      pendingTasksCount = tasksRes.tasks.filter(t => !t.is_completed).length;
+      pendingTasksCount = tasksRes.tasks.filter(t => !t.submissions || !t.submissions.some(s => s.status === 'APPROVED')).length;
     }
   } catch (e) {
     console.warn('Erro ao carregar tarefas para resumo do clã:', e);

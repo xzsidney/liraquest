@@ -21,8 +21,10 @@ import dungeonRoutes from './server/routes/dungeonRoutes.js';
 import battleRoutes from './server/routes/battleRoutes.js';
 import trucoRoutes from './server/routes/trucoRoutes.js';
 import zombiRoutes from './server/routes/zombiRoutes.js';
+import nutritionRoutes from './server/routes/nutritionRoutes.js';
 import { initChameleonSocket } from './server/sockets/chameleonSocket.js';
 import { initDuelSocket } from './server/sockets/duelSocket.js';
+import { initNutritionCron } from './server/services/nutritionCron.js';
 
 dotenv.config();
 
@@ -41,6 +43,9 @@ const io = new Server(httpServer, {
 // Inicializar WebSockets do Esconde-Esconde e Duelo de Arqueiros
 initChameleonSocket(io);
 initDuelSocket(io);
+
+// Inicializar Monitoramento e Alarme das Refeições com node-cron (Preparado para WhatsApp)
+initNutritionCron(io);
 
 const PORT = process.env.PORT || 3000;
 
@@ -68,6 +73,7 @@ app.use('/api/dungeon', dungeonRoutes);
 app.use('/api/battle', battleRoutes);
 app.use('/api/truco', trucoRoutes);
 app.use('/api/zombi', zombiRoutes);
+app.use('/api/nutrition', nutritionRoutes);
 
 
 // Health check & status
