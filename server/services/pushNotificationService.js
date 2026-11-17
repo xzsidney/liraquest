@@ -1,5 +1,8 @@
-import webPush from 'web-push';
+import { createRequire } from 'module';
 import { FamilyPushSubscription, FamilyUser, FamilyMember } from '../models/index.js';
+
+const require = createRequire(import.meta.url);
+const webPush = require('web-push');
 
 // Chaves VAPID oficiais do LiraQuest (com fallback para produção)
 const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY || 'BH7NwlaSsMYnc2zfBEsrGAWVYMLPgAMnZ4LnRKxX-F1vjUXnvzFvFfg-GYSfk4fN83251GbZ3Ex8RnmX6yRO830';

@@ -71,3 +71,6 @@ export const authorizeRoles = (...allowedRoles) => {
     next();
   };
 };
+
+export const requireParent = authorizeRoles('PARENT', 'ADMIN');
+export const requireAdmin = authorizeRoles('ADMIN');
