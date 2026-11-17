@@ -971,7 +971,7 @@ function renderTabWhatsApp() {
             Clique nos botões abaixo para simular os 4 alarmes programados pelo Plano Mestre de Engenharia:
           </p>
 
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 16px;">
             <button class="btn-noble btn-noble-secondary btn-noble-sm btn-test-alarm" data-alarm="KITCHEN" style="border-color: rgba(245, 158, 11, 0.4); text-align: left;">
               👨‍🍳 11h15: Aviso Cozinha
             </button>
@@ -984,6 +984,17 @@ function renderTabWhatsApp() {
             <button class="btn-noble btn-noble-secondary btn-noble-sm btn-test-alarm" data-alarm="DINNER" style="border-color: rgba(168, 85, 247, 0.4); text-align: left;">
               🍲 19h45: Jantar do Clã
             </button>
+          </div>
+
+          <!-- Caixa de Pré-visualização e Envio Direto -->
+          <div id="wa-last-dispatch-container" style="display: none; background: rgba(15, 23, 42, 0.9); border: 1.5px solid #10b981; border-radius: 12px; padding: 16px; margin-top: 14px; animation: fadeIn 0.3s ease;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="color: #34d399; font-weight: 700; font-size: 0.9rem;">✅ Mensagem Gerada com Sucesso:</span>
+              <a id="btn-wa-open-direct" href="#" target="_blank" class="btn-noble btn-noble-sm" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; font-weight: 800; text-decoration: none; display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px;">
+                <span>📲 Abrir no WhatsApp do Celular</span>
+              </a>
+            </div>
+            <pre id="wa-last-dispatch-text" style="background: rgba(0, 0, 0, 0.5); padding: 12px; border-radius: 8px; color: #cbd5e1; font-size: 0.82rem; white-space: pre-wrap; font-family: monospace; max-height: 160px; overflow-y: auto; border: 1px solid rgba(255, 255, 255, 0.08);"></pre>
           </div>
         </div>
 
@@ -1372,8 +1383,22 @@ export function bindSaudeEvents() {
     rawSocket.on('whatsapp:message_sent', (msg) => {
       console.log('📨 [WhatsApp Mensagem Despachada]:', msg);
       showToast(`📨 [WhatsApp] ${msg.title}`, 'info');
+      displayLastWaMessage(msg.formattedMessage, msg.whatsapp_url);
     });
   }
+
+  // Função para exibir caixa de pré-visualização e link direto
+  const displayLastWaMessage = (messageText, waUrl) => {
+    const box = document.getElementById('wa-last-dispatch-container');
+    const textEl = document.getElementById('wa-last-dispatch-text');
+    const linkEl = document.getElementById('btn-wa-open-direct');
+    if (box && textEl && linkEl) {
+      box.style.display = 'block';
+      textEl.textContent = messageText;
+      linkEl.href = waUrl || `https://api.whatsapp.com/send?text=${encodeURIComponent(messageText)}`;
+      box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  };
 
   // 13. Gerar QR Code do WhatsApp
   const handleGenerateQr = async () => {
@@ -1469,7 +1494,12 @@ export function bindSaudeEvents() {
         showToast('Enviando mensagem de teste para o WhatsApp...', 'info');
         const res = await api.post('/api/whatsapp/test', {});
         if (res && res.success) {
-          showToast('✅ Mensagem de teste enviada com sucesso ao clã!', 'success');
+          showToast('✅ Mensagem de teste gerada! Abrindo WhatsApp...', 'success');
+          displayLastWaMessage(res.result?.formatted_message, res.result?.whatsapp_url);
+          const targetUrl = res.result?.whatsapp_url;
+          if (targetUrl) {
+            window.open(targetUrl, '_blank');
+          }
         }
       } catch (err) {
         showToast(err.message || 'Erro no envio de teste.', 'error');
@@ -1487,7 +1517,12 @@ export function bindSaudeEvents() {
           alarm_type: alarmType,
         });
         if (res && res.success) {
-          showToast(`🔔 Alarme ${alarmType} disparado com sucesso!`, 'success');
+          showToast(`🔔 Alarme ${alarmType} gerado! Abrindo WhatsApp...`, 'success');
+          displayLastWaMessage(res.result?.formatted_message, res.result?.whatsapp_url);
+          const targetUrl = res.result?.whatsapp_url;
+          if (targetUrl) {
+            window.open(targetUrl, '_blank');
+          }
         }
       } catch (err) {
         showToast(err.message || 'Erro ao disparar alarme.', 'error');

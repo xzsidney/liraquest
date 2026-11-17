@@ -208,6 +208,11 @@ export async function sendClanMessage(familyId, { text, title, type = 'ALERT', p
   console.log(`====================================================\n`);
 
   // Emissão via WebSocket para notificar o frontend em tempo real
+  const cleanTarget = (target || '').replace(/\D/g, '');
+  const whatsappUrl = cleanTarget 
+    ? `https://api.whatsapp.com/send?phone=${cleanTarget}&text=${encodeURIComponent(formattedMessage)}`
+    : `https://api.whatsapp.com/send?text=${encodeURIComponent(formattedMessage)}`;
+
   if (ioInstance) {
     ioInstance.emit('whatsapp:message_sent', {
       family_id: familyId,
@@ -215,6 +220,7 @@ export async function sendClanMessage(familyId, { text, title, type = 'ALERT', p
       title,
       type,
       formattedMessage,
+      whatsapp_url: whatsappUrl,
       timestamp: new Date().toISOString(),
       delivered: true,
     });
@@ -225,6 +231,7 @@ export async function sendClanMessage(familyId, { text, title, type = 'ALERT', p
     target: target || 'Grupo da Família',
     type,
     formatted_message: formattedMessage,
+    whatsapp_url: whatsappUrl,
     delivered_at: new Date().toISOString(),
   };
 }

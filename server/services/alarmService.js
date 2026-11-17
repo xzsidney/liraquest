@@ -109,19 +109,20 @@ async function dispatchAlarm({ familyId, title, message, type, mealType, schedul
   }
 
   // 2. Notifica via WhatsApp (se a família tiver WhatsApp conectado e permissão)
+  let sendResult = null;
   try {
     const config = await FamilyWhatsappConfig.findOne({ where: { family_id: familyId } });
     if (config && config.is_connected) {
       if (type === 'HYDRATION' && !config.notify_hydration) {
         // Ignora se notificações de hidratação estiverem desativadas
-        return;
+        return null;
       }
       if (type !== 'HYDRATION' && !config.notify_meals) {
         // Ignora se refeições estiverem desativadas
-        return;
+        return null;
       }
 
-      await sendClanMessage(familyId, {
+      sendResult = await sendClanMessage(familyId, {
         title,
         text: message,
         type: type === 'HYDRATION' ? 'HYDRATION' : (type === 'KITCHEN' ? 'KITCHEN' : 'MEAL'),
@@ -130,6 +131,8 @@ async function dispatchAlarm({ familyId, title, message, type, mealType, schedul
   } catch (err) {
     console.error('Erro ao despachar alarme para WhatsApp:', err.message);
   }
+
+  return sendResult;
 }
 
 /**
@@ -336,7 +339,7 @@ export async function triggerManualAlarm(familyId, alarmType = 'LUNCH_NOW') {
     mealType = 'jantar';
   }
 
-  await dispatchAlarm({
+  const dispatchResult = await dispatchAlarm({
     familyId,
     title,
     message,
@@ -346,7 +349,13 @@ export async function triggerManualAlarm(familyId, alarmType = 'LUNCH_NOW') {
     minutesLeft: 0,
   });
 
-  return { success: true, title, message };
+  return {
+    success: true,
+    title,
+    message,
+    whatsapp_url: dispatchResult?.whatsapp_url,
+    formatted_message: dispatchResult?.formatted_message,
+  };
 }
 
 export default {
