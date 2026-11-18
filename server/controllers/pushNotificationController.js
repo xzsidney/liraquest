@@ -7,6 +7,13 @@ import {
   PUSH_TEMPLATES,
 } from '../services/pushNotificationService.js';
 import { FamilyPushSubscription, FamilyMember } from '../models/index.js';
+import { findOrCreateUserFamily } from './userProgressController.js';
+
+async function resolveFamilyId(user) {
+  if (user?.family_id) return user.family_id;
+  const membership = await findOrCreateUserFamily(user.id);
+  return membership?.family_id || null;
+}
 
 /**
  * Retorna a chave pública VAPID necessária para o navegador registrar a subscrição
@@ -26,10 +33,10 @@ export async function getPublicKey(req, res) {
 export async function subscribe(req, res) {
   try {
     const userId = req.user?.id;
-    const familyId = req.user?.family_id;
+    const familyId = await resolveFamilyId(req.user);
 
     if (!userId || !familyId) {
-      return res.status(400).json({ success: false, message: 'Usuário sem família vinculada.' });
+      return res.status(400).json({ success: false, message: 'Família não encontrada para este usuário.' });
     }
 
     const { subscription, userAgent } = req.body;
@@ -87,10 +94,10 @@ export async function unsubscribe(req, res) {
 export async function getStatus(req, res) {
   try {
     const userId = req.user?.id;
-    const familyId = req.user?.family_id;
+    const familyId = await resolveFamilyId(req.user);
 
     if (!familyId) {
-      return res.json({ success: true, totalDevices: 0, myDevices: 0, membersWithDevices: 0 });
+      return res.json({ success: true, totalDevices: 0, myDevices: 0, membersWithDevices: 0, hasActiveSubscription: false });
     }
 
     const allSubs = await FamilyPushSubscription.findAll({
@@ -140,11 +147,11 @@ export async function testPush(req, res) {
  */
 export async function broadcastFamily(req, res) {
   try {
-    const familyId = req.user?.family_id;
+    const familyId = await resolveFamilyId(req.user);
     const { template_code, custom_text } = req.body;
 
     if (!familyId) {
-      return res.status(400).json({ success: false, message: 'Usuário sem família vinculada.' });
+      return res.status(400).json({ success: false, message: 'Família não encontrada para este usuário.' });
     }
 
     let payload = null;
