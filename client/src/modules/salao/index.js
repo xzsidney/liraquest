@@ -26,15 +26,16 @@ export async function renderSalaoView() {
   let nextMealLabel = 'Almoço dos Heróis (12:00)';
   let nextMealDish = 'Patinho Moído Magro';
   let clanVaultBalance = 'R$ 0,00';
-  let waConnected = false;
+  let pushActive = false;
+  let totalDevices = 0;
 
   try {
-    const [tasksRes, pendingReviewsRes, nutritionRes, financeRes, waRes] = await Promise.all([
+    const [tasksRes, pendingReviewsRes, nutritionRes, financeRes, pushRes] = await Promise.all([
       api.get('/api/tasks').catch(() => null),
       user?.role === 'PARENT' || user?.role === 'ADMIN' ? api.get('/api/tasks/submissions/pending').catch(() => null) : null,
       api.get('/api/nutrition/today').catch(() => null),
       api.get('/api/finance/vault').catch(() => null),
-      api.get('/api/whatsapp/config').catch(() => null),
+      api.get('/api/push/status').catch(() => null),
     ]);
 
     // 1. Casa & Missões
@@ -70,9 +71,10 @@ export async function renderSalaoView() {
       clanVaultBalance = `R$ ${totalVault.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
     }
 
-    // 4. WhatsApp
-    if (waRes && waRes.config) {
-      waConnected = waRes.config.is_connected;
+    // 4. Notificações do Clã (Web Push)
+    if (pushRes && pushRes.success) {
+      pushActive = Boolean(pushRes.hasActiveSubscription);
+      totalDevices = pushRes.totalDevices || 0;
     }
   } catch (e) {
     console.warn('Erro ao carregar dados em tempo real para resumo do clã:', e);
@@ -141,13 +143,13 @@ export async function renderSalaoView() {
           </div>
         </div>
 
-        <!-- Indicador 4: WhatsApp do Clã -->
-        <div class="summary-chip" id="summary-chip-whatsapp" style="cursor: pointer;" title="Abrir Central WhatsApp">
-          <div class="summary-chip-icon" style="background: rgba(37, 211, 102, 0.15); border: 1px solid rgba(37, 211, 102, 0.35);">📱</div>
+        <!-- Indicador 4: Notificações do Clã (Web Push) -->
+        <div class="summary-chip" id="summary-chip-whatsapp" style="cursor: pointer;" title="Abrir Notificações do Clã">
+          <div class="summary-chip-icon" style="background: rgba(212, 175, 55, 0.15); border: 1px solid rgba(212, 175, 55, 0.35);">🔔</div>
           <div class="summary-chip-content">
-            <h4>WhatsApp do Clã</h4>
-            <div class="summary-chip-val" style="color: ${waConnected ? '#34d399' : '#fbbf24'};">
-              ${waConnected ? '🟢 Conectado' : '🟡 Parear Sessão'}
+            <h4>Notificações do Clã</h4>
+            <div class="summary-chip-val" style="color: ${pushActive ? '#34d399' : '#fbbf24'};">
+              ${pushActive ? '🟢 Celular Conectado' : `${totalDevices} no Clã (Ativar)`}
             </div>
           </div>
         </div>
