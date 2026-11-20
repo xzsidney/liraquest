@@ -1,7 +1,11 @@
 // =============================================================================
-// TRUCOSTRATEGY.JS - MOTOR DE RISCO/RECOMPENSA, TRUCO, RETRUCO E BLEFES
-// Implementa filtros anti-suicídio, blefes de boteco e cálculo da Mão de 11
+// TRUCOSTRATEGY.JS - ROTEADOR DE RISCO/RECOMPENSA E APOSTAS POR RODADAS
+// Strategy Pattern: delega decisões de Truco, Retruco e Blefe por rodada
 // =============================================================================
+
+import { Round1Strategy } from './rounds/Round1Strategy.js';
+import { Round2Strategy } from './rounds/Round2Strategy.js';
+import { Round3Strategy } from './rounds/Round3Strategy.js';
 
 export class TrucoStrategy {
   constructor(difficultyConfig = null) {
@@ -13,33 +17,21 @@ export class TrucoStrategy {
   }
 
   /**
-   * Avalia se um bot deve pedir Truco (ou aumentar)
+   * Avalia se um bot deve pedir Truco (ou aumentar) delegando para a rodada certa
    * @param {Object} ctx 
    * @returns {boolean}
    */
   shouldTruco(ctx) {
     const {
-      botId, botTeam, role, roundNumber, availableCards, previousPlays,
-      tricksHistory, scoreDiff, isMaoDe11, isMaoDeFerro, isGameOver,
-      betState, lastBettorTeam, nextBetValue, playerFoldsCount, camaDeGato
+      botTeam, availableCards, previousPlays, isMaoDe11,
+      isMaoDeFerro, isGameOver, betState, lastBettorTeam, nextBetValue
     } = ctx;
-
-    const manilhas = availableCards.filter(c => c.isManilha);
-    const hasZap = manilhas.some(c => c.manilhaRank === 4);
-    const hasCopeta = manilhas.some(c => c.manilhaRank === 3);
-    const isPe = (role === 'Pé');
-
-    const firstTrick = tricksHistory[0];
-    const firstWon = firstTrick && firstTrick.winnerTeam === botTeam;
-    const firstDraw = firstTrick && firstTrick.winnerTeam === 'draw';
 
     // Regras básicas de bloqueio
     if (isMaoDe11 || isMaoDeFerro || isGameOver || betState !== 'none') return false;
     if (lastBettorTeam === botTeam) return false;
     if (!nextBetValue) return false;
-
-    // Se o bot for parceiro do humano ('us'), ele não truca sozinho
-    if (botTeam === 'us') return false;
+    if (botTeam === 'us') return false; // Parceiro não truca sozinho
 
     // Maior poder na mesa da vaza atual
     let maxPower = -1;
@@ -52,167 +44,50 @@ export class TrucoStrategy {
       }
     });
 
-    // -------------------------------------------------------------------------
-    // FILTRO ANTI-SUICÍDIO DO MESTRE:
-    // -------------------------------------------------------------------------
+    // Filtro anti-suicídio: não trucar se o adversário já jogou o Zap
     if (maxPower === 104 && topPlayTeam !== botTeam) {
-      return false; // Adversário jogou Zap
+      return false;
     }
+    // Não trucar se o oponente jogou manilha e não temos carta para matar
     if (topPlayTeam !== botTeam && maxPower >= 100 && !availableCards.some(c => c.power > maxPower)) {
-      return false; // Não tem carta para matar a manilha adversária
+      return false;
     }
 
-    const bluffBase = this.diffConfig?.bluffChance ?? 0.14;
-    const aggressiveness = this.diffConfig?.trucoAggressiveness ?? 0.65;
+    const round = ctx.roundNumber;
 
-    // -------------------------------------------------------------------------
-    // REGRA DE OURO DO ZAP NA RODADA 3:
-    // -------------------------------------------------------------------------
-    if (roundNumber === 3 && hasZap) {
-      return true;
+    if (round === 1) {
+      return Round1Strategy.shouldTruco(ctx, this.diffConfig);
     }
 
-    // -------------------------------------------------------------------------
-    // 1. FECHAMENTO DA CAMA DE GATO (VAZAS 2 E 3)
-    // -------------------------------------------------------------------------
-    if (camaDeGato?.them && camaDeGato.armador === botId && camaDeGato.baitPlayed && roundNumber >= 2) {
-      if (hasZap || hasCopeta) {
-        if (Math.random() < (this.diffConfig?.camaDeGatoChance ?? 0.75)) {
-          return true;
-        }
-      }
+    if (round === 2) {
+      return Round2Strategy.shouldTruco(ctx, this.diffConfig);
     }
 
-    // -------------------------------------------------------------------------
-    // 2. PÓS-CANGA NA RODADA 2 (1ª rodada empatou):
-    // -------------------------------------------------------------------------
-    if (roundNumber === 2 && firstDraw) {
-      if (manilhas.length > 0) {
-        return Math.random() < (aggressiveness + 0.15);
-      }
-    }
-
-    // -------------------------------------------------------------------------
-    // 3. O FECHA DA RODADA 2 COM MANILHA NO PÉ:
-    // -------------------------------------------------------------------------
-    if (roundNumber === 2 && firstWon && isPe) {
-      if (availableCards.some(c => c.isManilha && c.power > maxPower)) {
-        return Math.random() < aggressiveness;
-      }
-    }
-
-    // -------------------------------------------------------------------------
-    // 4. DUAS MANILHAS OU ZAP NA MÃO:
-    // -------------------------------------------------------------------------
-    if (manilhas.length >= 2 && roundNumber <= 2) {
-      return Math.random() < aggressiveness;
-    }
-
-    // -------------------------------------------------------------------------
-    // 5. BLEFE NA 3ª VAZA (JOGO 1 A 1):
-    // -------------------------------------------------------------------------
-    if (roundNumber === 3) {
-      const t1 = tricksHistory[0]?.winnerTeam;
-      const t2 = tricksHistory[1]?.winnerTeam;
-      const isOneAndOne = (t1 === 'them' && t2 === 'us') || (t1 === 'us' && t2 === 'them');
-
-      if (isOneAndOne && availableCards.length === 1) {
-        const lastCard = availableCards[0];
-        if (!lastCard.isManilha && lastCard.power <= 5) {
-          const foldsModifier = (playerFoldsCount || 0) * 0.10;
-          const dynamicBluff = Math.min(0.65, bluffBase + foldsModifier);
-          if (Math.random() < dynamicBluff) {
-            ctx.setBluffActive && ctx.setBluffActive(botId);
-            return true;
-          }
-        }
-      }
-    }
-
-    // 6. BLEFE CONTEXTUAL
-    if (Math.random() < (bluffBase * 0.5)) {
-      return true;
+    if (round === 3) {
+      return Round3Strategy.shouldTruco(ctx, this.diffConfig);
     }
 
     return false;
   }
 
   /**
-   * Avalia a resposta ao Truco ou Aumento
+   * Avalia a resposta ao Truco ou Aumento delegando para a rodada certa
    * @param {Object} ctx 
    * @returns {{ action: 'accept'|'raise'|'refuse', raiseVal?: number }}
    */
   respondToTruco(ctx) {
-    const { requestedValue, botTeam, role, roundNumber, availableCards, tricksHistory, camaDeGato } = ctx;
-    const manilhas = availableCards.filter(c => c.isManilha);
-    const hasZap = manilhas.some(c => c.manilhaRank === 4);
-    const hasCopeta = manilhas.some(c => c.manilhaRank === 3);
-    const hasEspadilha = manilhas.some(c => c.manilhaRank === 2);
+    const round = ctx.roundNumber;
 
-    const firstTrick = tricksHistory[0];
-    const firstWon = firstTrick && firstTrick.winnerTeam === botTeam;
-    const firstDraw = firstTrick && firstTrick.winnerTeam === 'draw';
-
-    const isCasalMaior = (hasZap && hasCopeta);
-    const isCasalPretoPe = (hasZap && hasEspadilha && role === 'Pé');
-
-    const canRaise = (requestedValue < 12);
-    const raiseVal = canRaise ? (requestedValue === 3 ? 6 : (requestedValue === 6 ? 9 : 12)) : null;
-
-    // Cama de gato armada e adversário trucou
-    if (camaDeGato?.them && camaDeGato.baitPlayed) {
-      if (canRaise && Math.random() < (this.diffConfig?.camaDeGatoChance ?? 0.6)) {
-        return { action: 'raise', raiseVal };
-      }
-      return { action: 'accept' };
+    if (round === 1) {
+      return Round1Strategy.respondToTruco(ctx);
     }
 
-    // Retruco com mão de ouro
-    if (canRaise) {
-      const authZapWin = (firstWon && hasZap);
-      const zapInRound3 = (roundNumber === 3 && hasZap);
-      if (isCasalMaior || isCasalPretoPe || authZapWin || zapInRound3) {
-        return { action: 'raise', raiseVal };
-      }
+    if (round === 2) {
+      return Round2Strategy.respondToTruco(ctx);
     }
 
-    // Zap na 3ª vaza nunca corre
-    if (roundNumber === 3 && hasZap) {
-      return { action: 'accept' };
-    }
-
-    // Critério de cartas boas (3 ou manilha)
-    const cardsToEvaluate = (ctx.teamCards && ctx.teamCards.length > 0) ? ctx.teamCards : availableCards;
-    const goodCards = cardsToEvaluate.filter(c => c.isManilha || (!c.isManilha && c.power === 10));
-    const numGoodCards = goodCards.length;
-    const highestOnTable = (ctx.highestPower !== undefined && ctx.highestPower > 0) ? ctx.highestPower : 0;
-    const canKillTrick = (highestOnTable === 0) || cardsToEvaluate.some(c => c.power > highestOnTable);
-
-    // 1. PRIMEIRA RODADA:
-    if (roundNumber === 1) {
-      if (numGoodCards >= 2) {
-        return { action: 'accept' };
-      }
-      return { action: 'refuse' };
-    }
-
-    // 2. SEGUNDA RODADA:
-    if (roundNumber === 2) {
-      if (numGoodCards >= 2 && canKillTrick) {
-        return { action: 'accept' };
-      }
-      if (firstDraw && requestedValue >= 6 && (hasZap || hasCopeta)) {
-        return { action: 'accept' };
-      }
-      return { action: 'refuse' };
-    }
-
-    // 3. TERCEIRA RODADA:
-    if (roundNumber === 3) {
-      if (numGoodCards >= 1 && canKillTrick) {
-        return { action: 'accept' };
-      }
-      return { action: 'refuse' };
+    if (round === 3) {
+      return Round3Strategy.respondToTruco(ctx);
     }
 
     return { action: 'refuse' };

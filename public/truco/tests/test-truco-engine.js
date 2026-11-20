@@ -8,6 +8,9 @@ import { buildDeck, shuffleDeck, getManilhaValue, enrichCards, BASE_RANKS, MANIL
 import { resolveTrickPlays, evaluateHandWinner, getNextBetValue, getBetLabel, checkIsMaoDe11, checkIsMaoDeFerro } from '../src/core/Rules.js';
 import { GameState } from '../src/core/GameState.js';
 import { TrucoExpertAgent } from '../src/ai/TrucoExpertAgent.js';
+import { Round1Strategy } from '../src/ai/rounds/Round1Strategy.js';
+import { Round2Strategy } from '../src/ai/rounds/Round2Strategy.js';
+import { Round3Strategy } from '../src/ai/rounds/Round3Strategy.js';
 import { TrucoGame } from '../src/TrucoGame.js';
 
 console.log('🃏 INICIANDO BATERIA DE TESTES DO TRUCO PAULISTA...\n');
@@ -193,6 +196,111 @@ console.log('🃏 INICIANDO BATERIA DE TESTES DO TRUCO PAULISTA...\n');
   assert.strictEqual(pCards.length, 3, 'Jogador deve receber 3 cartas');
 
   console.log('✅ Teste 6 APROVADO: Partida e distribuição inicial funcionando perfeitamente.');
+}
+
+// -----------------------------------------------------------------------------
+// TESTE 7: Estratégia Isolada da 1ª Rodada (Round1Strategy)
+// -----------------------------------------------------------------------------
+{
+  // Para-Pé com mesa baixa (< 8) joga a maior carta para sangrar o Pé adversário
+  const cardsParaPe = [
+    { power: 3, isManilha: false },
+    { power: 10, isManilha: false } // Carta 3
+  ];
+  const chosenParaPe = Round1Strategy.chooseCard({
+    botId: 'bot_partner',
+    botTeam: 'us',
+    role: 'Para-Pé',
+    availableCards: cardsParaPe,
+    previousPlays: [{ playerId: 'bot_left', card: { power: 5, covered: false } }], // mesa fraca
+    handSignals: {},
+    camaDeGato: {}
+  }, { perfectPlayPe: true });
+
+  assert.strictEqual(chosenParaPe.power, 10, 'Para-Pé deve arrochar com a maior carta (power 10) na 1ª vaza');
+  console.log('✅ Teste 7 APROVADO: Round1Strategy (Sangria do Para-Pé e Proteção).');
+}
+
+// -----------------------------------------------------------------------------
+// TESTE 8: Estratégia Isolada da 2ª Rodada (Round2Strategy)
+// -----------------------------------------------------------------------------
+{
+  // Regra do usuário: 1ª ganha e tem um 3 na mão -> Deve trucar!
+  const cardsWithThree = [
+    { power: 10, isManilha: false }, // Carta 3
+    { power: 2, isManilha: false }
+  ];
+  const shouldTrucoWithThree = Round2Strategy.shouldTruco({
+    botId: 'bot_left',
+    botTeam: 'them',
+    role: 'Meio',
+    availableCards: cardsWithThree,
+    previousPlays: [],
+    tricksHistory: [{ winnerTeam: 'them' }], // 1ª ganha
+    camaDeGato: {}
+  }, { trucoAggressiveness: 1.0 });
+
+  assert.strictEqual(shouldTrucoWithThree, true, 'Se a 1ª está ganha e o bot tem um 3, deve pedir Truco');
+
+  // Regra do usuário: 1ª ganha e tem Zap -> Truca, retruca (6, 9, 12) e NUNCA corre!
+  const cardsWithZap = [
+    { power: 104, isManilha: true, manilhaRank: 4 },
+    { power: 1, isManilha: false }
+  ];
+  const responseZap = Round2Strategy.respondToTruco({
+    requestedValue: 3,
+    botTeam: 'them',
+    role: 'Pé',
+    availableCards: cardsWithZap,
+    tricksHistory: [{ winnerTeam: 'them' }], // 1ª ganha
+    camaDeGato: {}
+  });
+
+  assert.strictEqual(responseZap.action, 'raise', 'Com Zap e 1ª ganha, deve retrucar');
+  assert.strictEqual(responseZap.raiseVal, 6, 'Deve pedir Seis');
+
+  // Ao receber pedido de 12 (teto máximo) com Zap e 1ª ganha -> NUNCA corre!
+  const response12 = Round2Strategy.respondToTruco({
+    requestedValue: 12,
+    botTeam: 'them',
+    role: 'Pé',
+    availableCards: cardsWithZap,
+    tricksHistory: [{ winnerTeam: 'them' }],
+    camaDeGato: {}
+  });
+  assert.strictEqual(response12.action, 'accept', 'Com Zap e 1ª ganha, nunca foge mesmo valendo 12');
+
+  console.log('✅ Teste 8 APROVADO: Round2Strategy (1ª ganha + 3 = Truco; 1ª ganha + Zap = Retruco até 12 sem correr).');
+}
+
+// -----------------------------------------------------------------------------
+// TESTE 9: Estratégia Isolada da 3ª Rodada (Round3Strategy)
+// -----------------------------------------------------------------------------
+{
+  // Regra do usuário: É o Pé na 3ª rodada, mesa veio carta baixa (< Ás, ex: Q=5 ou 7=4)
+  // Truca de qualquer jeito independentemente da carta que tiver (Blefe do arremate)!
+  const trashCard = [{ power: 1, isManilha: false }]; // Pior carta do jogo (4)
+  const shouldTrucoBluff = Round3Strategy.shouldTruco({
+    botId: 'bot_left',
+    botTeam: 'them',
+    role: 'Pé',
+    availableCards: trashCard,
+    previousPlays: [{ playerId: 'player', card: { power: 5, covered: false } }], // Q (abaixo de Ás)
+    tricksHistory: [{ winnerTeam: 'them' }, { winnerTeam: 'us' }],
+    playerFoldsCount: 0,
+    setBluffActive: () => {}
+  }, { bluffChance: 0.1 });
+
+  assert.strictEqual(shouldTrucoBluff, true, 'No Pé da 3ª rodada com mesa baixa (< Ás), deve trucar de qualquer jeito');
+
+  // Zap na 3ª rodada nunca corre
+  const zapFinal = Round3Strategy.respondToTruco({
+    requestedValue: 12,
+    availableCards: [{ power: 104, isManilha: true, manilhaRank: 4 }]
+  });
+  assert.strictEqual(zapFinal.action, 'accept', 'Com Zap na 3ª rodada, nunca corre');
+
+  console.log('✅ Teste 9 APROVADO: Round3Strategy (Blefe de Pé em mesa < Ás e Zap decisivo).');
 }
 
 console.log('\n🎉 TODOS OS TESTES PASSARAM COM 100% DE SUCESSO!\n');
