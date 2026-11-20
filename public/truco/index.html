@@ -67,6 +67,28 @@
           </button>
         </div>
 
+        <!-- SELEÇÃO DE NÍVEL DA IA (BOTECO CALIBRADO) -->
+        <div class="start-difficulty-wrapper">
+          <div class="start-difficulty-label">
+            <span>Dificuldade dos Robôs:</span>
+            <span id="start-diff-name" style="color: var(--gold); font-size: 0.74rem;">🟡 Normal (Boteco)</span>
+          </div>
+          <div class="start-difficulty-selection">
+            <button class="start-diff-btn diff-easy" id="start-diff-easy" type="button" data-diff="easy">
+              <span style="font-size: 1.1rem;">🟢</span>
+              <strong>Iniciante</strong>
+            </button>
+            <button class="start-diff-btn diff-normal active" id="start-diff-normal" type="button" data-diff="normal">
+              <span style="font-size: 1.1rem;">🟡</span>
+              <strong>Normal</strong>
+            </button>
+            <button class="start-diff-btn diff-hard" id="start-diff-hard" type="button" data-diff="hard">
+              <span style="font-size: 1.1rem;">🔴</span>
+              <strong>Mestre</strong>
+            </button>
+          </div>
+        </div>
+
         <!-- BOTÃO GIGANTE DE INICIAR -->
         <button class="btn-play-game" id="btn-start-play">
           <span class="btn-play-icon">🎴</span>
@@ -321,6 +343,14 @@
             <button class="mode-btn" id="btn-mode-1v1">👤 1 vs 1</button>
           </div>
         </div>
+        <div class="sheet-section" style="margin-top: 10px;">
+          <label class="sheet-label">Nível da IA:</label>
+          <div class="mode-selector-mobile" style="gap: 5px;">
+            <button class="mode-btn" id="btn-sheet-diff-easy" data-diff="easy">🟢 Fácil</button>
+            <button class="mode-btn active" id="btn-sheet-diff-normal" data-diff="normal">🟡 Normal</button>
+            <button class="mode-btn" id="btn-sheet-diff-hard" data-diff="hard">🔴 Mestre</button>
+          </div>
+        </div>
         <div class="sheet-actions-list">
           <button class="sheet-action-btn" id="btn-rules">📖 Regras do Jogo</button>
           <button class="sheet-action-btn" id="btn-mute">
@@ -472,10 +502,11 @@
     </div>
   </div>
 
-  <!-- SCRIPTS -->
-  <script src="audio.js"></script>
-  <script src="game.js"></script>
-  <script>
+  <!-- SCRIPTS MODULARES DO TRUCO PAULISTA -->
+  <script type="module" src="src/main.js"></script>
+  <script type="module">
+    import { TrucoGame } from './src/main.js';
+
     document.addEventListener('DOMContentLoaded', () => {
       const game = new TrucoGame();
 
@@ -1193,6 +1224,53 @@
         window.trucoAudio.playClick();
         mobileMenuModal.classList.remove('active');
         startScreen.classList.add('active');
+      });
+
+      // =========================================================================
+      // SELETOR DE DIFICULDADE DA IA (INICIANTE, NORMAL, MESTRE)
+      // =========================================================================
+      let selectedDifficulty = 'normal';
+      const diffButtons = [
+        { id: 'start-diff-easy', level: 'easy', label: '🟢 Iniciante (Previsível)' },
+        { id: 'start-diff-normal', level: 'normal', label: '🟡 Normal (Boteco Clássico)' },
+        { id: 'start-diff-hard', level: 'hard', label: '🔴 Mestre (Cartilha 40 Anos)' }
+      ];
+      const startDiffName = document.getElementById('start-diff-name');
+
+      const setDifficultyUI = (level) => {
+        selectedDifficulty = level;
+        game.setDifficulty(level);
+
+        diffButtons.forEach(b => {
+          const btnEl = document.getElementById(b.id);
+          const sheetBtn = document.getElementById(`btn-sheet-diff-${b.level}`);
+          if (b.level === level) {
+            btnEl?.classList.add('active');
+            sheetBtn?.classList.add('active');
+            if (startDiffName) startDiffName.textContent = b.label;
+          } else {
+            btnEl?.classList.remove('active');
+            sheetBtn?.classList.remove('active');
+          }
+        });
+      };
+
+      diffButtons.forEach(b => {
+        const btnEl = document.getElementById(b.id);
+        if (btnEl) {
+          btnEl.addEventListener('click', () => {
+            window.trucoAudio.playClick();
+            setDifficultyUI(b.level);
+          });
+        }
+        const sheetBtn = document.getElementById(`btn-sheet-diff-${b.level}`);
+        if (sheetBtn) {
+          sheetBtn.addEventListener('click', () => {
+            window.trucoAudio.playClick();
+            setDifficultyUI(b.level);
+            mobileMenuModal.classList.remove('active');
+          });
+        }
       });
 
       // =========================================================================

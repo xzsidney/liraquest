@@ -1725,6 +1725,78 @@ html, body {
   font-weight: bold;
 }
 
+/* Seletor de Dificuldade da IA */
+.start-difficulty-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.start-difficulty-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.start-difficulty-selection {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.start-diff-btn {
+  flex: 1;
+  background: rgba(8, 38, 20, 0.75);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 8px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  color: #fff;
+  font-size: 0.78rem;
+  backdrop-filter: blur(8px);
+}
+
+.start-diff-btn:hover {
+  background: rgba(14, 56, 32, 0.9);
+  border-color: rgba(245, 176, 39, 0.4);
+}
+
+.start-diff-btn.active {
+  border-color: var(--gold);
+  background: linear-gradient(135deg, rgba(128, 0, 32, 0.85) 0%, rgba(30, 58, 138, 0.85) 100%);
+  box-shadow: 0 3px 12px rgba(245, 176, 39, 0.25);
+  color: #fde047;
+  font-weight: 800;
+}
+
+.start-diff-btn.active.diff-easy {
+  border-color: #22c55e;
+  box-shadow: 0 3px 12px rgba(34, 197, 94, 0.3);
+}
+
+.start-diff-btn.active.diff-normal {
+  border-color: #f59e0b;
+  box-shadow: 0 3px 12px rgba(245, 158, 11, 0.3);
+}
+
+.start-diff-btn.active.diff-hard {
+  border-color: #ef4444;
+  box-shadow: 0 3px 12px rgba(239, 68, 68, 0.3);
+}
+
 /* Botão Grandioso de Jogar Agora */
 .btn-play-game {
   width: 100%;

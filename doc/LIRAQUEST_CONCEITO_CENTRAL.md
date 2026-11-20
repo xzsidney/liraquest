@@ -409,4 +409,25 @@ O **Arcade de Lira** é o centro de diversão acessível pelo Terminal do Avatar
         3. Saldo financeiro acumulado no cofre dos grandes sonhos da família.
         4. Indicadores nobres de hidratação e disciplina alimentar.
 
+15. **🎴 Fase 6: Refatoração Modular e Calibração da IA do Truco Paulista (`public/truco/`):**
+    - **Nova Arquitetura Modular Desacoplada (`public/truco/src/`):**
+      - **📁 `core/` (Regras de Negócio Puras):**
+        - `Cards.js`: Baralho oficial de 40 cartas, sequência circular de manilhas (4 a 3), poderes de manilhas (Picafumo 101, Espadilha 102, Copeta 103, Zap 104) e enriquecimento de cartas.
+        - `Rules.js`: Validador puro de rodadas. Compara poderes das cartas na mesa, resolve empates/canga, calcula pontuação da mão (1, 3, 6, 9, 12 tentos), critérios da Mão de 11 e Mão de Ferro (11x11 no escuro).
+        - `GameState.js`: Máquina de estados da partida (Turnos, Rodadas 1/2/3, Placar Nós vs Eles, Vazas ganhas, Histórico de jogadas, Papéis Táticos Mão/Meio/Para-Pé/Pé).
+      - **📁 `ai/` (O Cérebro dos Bots — 100% Isolado e Calibrável):**
+        - `DecisionEngine.js`: Heurística tática para jogar cartas baseada na posição do jogador na mesa (Mão, Meio, Para-Pé, Pé), regras de canga da vitória, casal maior e casal sem zap.
+        - `TrucoStrategy.js`: Motor matemático de risco/recompensa para pedir Truco, Retrucar (Seis/Nove/Doze), Aceitar ou Correr com filtros anti-suicídio rigorosos e cálculos de blefe.
+        - `Personalities.js`: Calibração individual do comportamento de cada bot (Tião parceiro leal, Zé Truqueiro agressivo e Tonho calculista) e sinais corporais tradicionais com frases de boteco.
+        - `DifficultySelector.js`: Seletor de níveis de IA calibráveis:
+          - 🟢 **Iniciante:** Joga de forma previsível, raramente blefa e com tolerância alta.
+          - 🟡 **Normal:** Segue a cartilha clássica de boteco com blefes moderados e leitura padrão.
+          - 🔴 **Mestre:** Lê os sinais da mesa, arma "Cama de Gato", executa Casal Maior e blefa com maestria técnica.
+      - **📁 `ui/` e `audio/`:**
+        - `TableRenderer.js`: Renderização dos elementos da mesa (cartas, vaza-dots, pílulas táticas, destaques de vez ativa e manilhas).
+        - `ModalManager.js`: Modais de Truco, Aceite/Recusa, Mão de 11 e tela de vitória com recompensas do LiraQuest.
+        - `SignalManager.js`: Interface de sinais corporais e balões de diálogo flutuantes.
+        - `AudioManager.js`: Gestão centralizada de sintetizador sonoro procedural via Web Audio API.
+    - **Zero Regressão & Integração com o Reino:** Preservação de 100% das regras clássicas do Truco Paulista, modos 1v1 e 2v2 em duplas, e persistência das recompensas de Ouro e XP da rota `/api/truco/finish`.
+
 
