@@ -28,19 +28,19 @@ DefinitionClass.init(
     },
     primary_attribute_id: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: true,
     },
     secondary_attribute_id: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: true,
     },
     combat_role: {
       type: DataTypes.STRING(100),
-      allowNull: false,
+      allowNull: true,
     },
     real_life_focus: {
       type: DataTypes.STRING(255),
-      allowNull: false,
+      allowNull: true,
     },
     icon: {
       type: DataTypes.STRING(100),

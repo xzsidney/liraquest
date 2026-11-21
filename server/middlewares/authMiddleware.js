@@ -1,11 +1,11 @@
 import jwt from 'jsonwebtoken';
-import { FamilyUser } from '../models/FamilyUser.js';
+import { FamilyMember } from '../models/FamilyMember.js';
 import { recordUserActivity } from '../utils/userPresence.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'liraquest_family_rpg_secret_key_2026';
 
 /**
- * Middleware para verificar e autenticar o token JWT
+ * Middleware para verificar e autenticar o token JWT (V2 Unificada - FamilyMember)
  */
 export const authenticateToken = async (req, res, next) => {
   try {
@@ -20,18 +20,21 @@ export const authenticateToken = async (req, res, next) => {
     const token = authHeader.split(' ')[1];
     const decoded = jwt.verify(token, JWT_SECRET);
 
-    const user = await FamilyUser.findByPk(decoded.id);
-    if (!user) {
+    const member = await FamilyMember.findByPk(decoded.id);
+    if (!member || !member.is_active) {
       return res.status(401).json({
         success: false,
-        message: 'Usuário associado ao token não foi encontrado.',
+        message: 'Membro associado ao token não foi encontrado ou está inativo.',
       });
     }
 
     // Registrar presença em tempo real
-    recordUserActivity(user.id);
+    if (typeof recordUserActivity === 'function') {
+      recordUserActivity(member.id);
+    }
 
-    req.user = user;
+    req.user = member; // Compatibilidade com controllers
+    req.member = member;
     next();
   } catch (error) {
     if (error.name === 'TokenExpiredError') {

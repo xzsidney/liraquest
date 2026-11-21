@@ -1,73 +1,101 @@
 # 🗄️ LiraQuest — Arquitetura e Mapa do Banco de Dados (MySQL)
 
-Este documento descreve todas as tabelas criadas no banco de dados MySQL de produção na Hostinger, seus propósitos, colunas e relacionamentos.
+Este documento descreve todas as tabelas criadas no banco de dados MySQL de produção na Hostinger (`u328169675_liraquest`), seus propósitos, colunas e relacionamentos.
 
 ---
 
 ## 📌 Padrão de Nomenclatura e Identificadores (UUID / GUID Obrigatório)
-- **Chaves Primárias (`id`) & Estrangeiras (`*_id`):** Todas as tabelas utilizam obrigatoriamente identificadores únicos do tipo **UUID** (UUIDv4) para evitar previsibilidade e garantir compatibilidade distribuída.
-- **Identificadores Amigáveis (`code`):** Tabelas de catálogo imutável (`definition_*`) utilizam chave primária UUID e possuem uma coluna adicional `code` (string única, ex: `'str'`, `'guardiao_do_lar'`) para facilitar buscas e referências legíveis por código.
+- **Chaves Primárias (`id`) & Estrangeiras (`*_id`, `family_id`):** Todas as tabelas utilizam obrigatoriamente identificadores únicos do tipo **UUID** (UUIDv4 gerados por `DataTypes.UUIDV4`) para compatibilidade distribuída entre Windows e Linux.
+- **Identificadores Amigáveis (`code`):** Tabelas de catálogo imutável (`definition_*`) utilizam chave primária UUID e possuem uma coluna adicional `code` (string única, ex: `'str'`, `'guardiao_do_lar'`) para buscas legíveis no código.
 - **Tabelas SQL:** `snake_case` minúsculo com prefixo oficial `family_`, `definition_` ou módulo nativo.
 - **Modelos Sequelize:** `PascalCase` nos arquivos JavaScript/Node.js com `tableName` e `underscored: true` configurados.
-- **Divisão Arquitetural Oficial (V2 Clean):** 
-  1. `definition_*` (Catálogo global imutável)
-  2. `family_characters` & `character_attributes` (Instâncias oficiais unificadas dos heróis)
-  3. `families` & `family_*` (Núcleo social e familiar multi-tenant)
-  4. `tasks` e `task_submissions` (Gameplay e gamificação da vida real)
+- **Arquitetura V2 Oficial (O Usuário É o Herói):** 
+  Elimina-se a antiga divisão de usuário versus personagem distante. A entidade viva `family_members` unifica credenciais, dados do mundo real e a ficha viva de RPG (atributos, classes, moedas, energia).
 
-> **🧹 FAXINA V2 CONCLUÍDA (Novembro/2026):**
-> Todas as 15 tabelas legadas e duplicadas foram dropadas com sucesso (`battles`, `characters`, `character_classes`, `character_inventory`, `character_skills`, `events`, `family_bills`, `family_child_vaults`, `family_clan_vaults`, `family_polls`, `family_poll_votes`, `family_dungeon_actions`, `family_dungeon_adventures`, `family_dungeon_runs`, `family_dungeon_scenes`).
-> O banco de dados agora possui estritamente as 30 tabelas oficiais ativas.
-
----
-
-## 1. Módulo de Contas e Usuários
-
-### 👤 `family_users`
-Armazena a conta de acesso ao sistema (Mundo Real).
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único do usuário |
-| `name` | `VARCHAR(100)` | Não | Nome real do usuário |
-| `hero_nickname` | `VARCHAR(100)` | Sim | Apelido heroico de RPG (ex: 'Paladino Sidney', 'Sir Paulinho') |
-| `email` | `VARCHAR(150)` | Sim | E-mail de login (Único) |
-| `password` | `VARCHAR(255)` | Sim | Hash seguro bcrypt |
-| `pin` | `VARCHAR(10)` | Sim | PIN de 4 dígitos para login rápido de crianças no tablet |
-| `role` | `ENUM('ADMIN','PARENT','CHILD')` | Não | Papel no sistema (Padrão: `CHILD`) |
-| `family_id` | `UUID` (FK) | Sim | Chave de isolamento multi-tenant vinculada a `families.id` |
-| `phone` | `VARCHAR(30)` | Sim | Telefone de contato real |
-| `school_or_work` | `VARCHAR(150)` | Sim | Instituição de estudo ou trabalho |
-| `profile_photo_url` | `VARCHAR(255)` | Sim | URL da foto real do usuário |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
-### 📈 `user_progress`
-Armazena o estado vivo, saldos do mundo real e estatísticas do usuário no Terminal do Usuário (relação 1:1 com `family_users`).
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único do progresso |
-| `user_id` | `UUID` (FK) | Não | Referência a `family_users.id` (Único / 1:1) |
-| `adventure_energy` | `INT` | Não | ⚡ Energia de Aventura para batalhas/masmorras |
-| `family_tokens` | `INT` | Não | 🏠 Fichas do Lar para recompensas da vida real |
-| `tasks_done_total` | `INT` | Não | 📊 Total acumulado de tarefas aprovadas |
-| `tasks_done_today` | `INT` | Não | 📅 Tarefas aprovadas no dia de hoje |
-| `streak_days` | `INT` | Não | 🔥 Dias consecutivos com tarefas completadas |
-| `best_streak_days` | `INT` | Não | 🏆 Maior streak histórica alcançada |
-| `last_active_date` | `DATEONLY` | Sim | 📆 Data da última tarefa aprovada ('YYYY-MM-DD') |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+> **🚀 RESET TOTAL & TRANSIÇÃO V2 CONCLUÍDOS (Novembro/2026):**
+> O banco de dados foi completamente resetado e inicializado com a arquitetura limpa V2 Core:
+> 1. `families`
+> 2. `family_members` (A Entidade Unificada)
+> 3. `definition_attributes`
+> 4. `definition_classes`
 
 ---
 
-
-## 2. Módulo Familiar (Clãs)
+## 1. Módulo Core Familiar & Aventureiros (V2 Unificada)
 
 ### 🏰 `families`
-Armazena os clãs/famílias criados pelos Guardiões (Pais).
+Armazena os clãs/famílias multi-tenant criados pelos Guardiões (Pais).
 
 | Coluna | Tipo | Nulo | Descrição |
 |:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único da família |
+| `id` | `UUID` (PK) | Não | Identificador único da família (UUIDv4) |
+| `name` | `VARCHAR(100)` | Não | Nome do Clã (ex: "Clã Lira") |
+| `invite_code` | `VARCHAR(10)` | Não | Código de convite único e nobre (ex: "LIRA-2026") |
+| `created_by` | `UUID` (FK) | Sim | ID do Guardião fundador (`family_members.id`) |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps de auditoria |
+
+---
+
+### 🛡️ `family_members` (A Entidade Unificada — O Usuário É o Herói)
+Armazena a identidade completa de cada membro do clã. Une a pessoa da vida real, suas credenciais de segurança e sua ficha viva de herói de RPG em uma única tabela atômica.
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único do membro (UUIDv4) |
+| `family_id` | `UUID` (FK) | Não | Vinculação direta com `families.id` (Multi-tenant) |
+| `name` | `VARCHAR(100)` | Não | Nome real da pessoa (usado em relatórios e aprovações) |
+| `email` | `VARCHAR(150)` | Sim | E-mail de login para pais/guardiões (Único) |
+| `password` | `VARCHAR(255)` | Sim | Hash seguro bcrypt para pais |
+| `pin` | `VARCHAR(10)` | Sim | PIN simples de 4 dígitos para login das crianças no tablet |
+| `role` | `ENUM('ADMIN','PARENT','CHILD')` | Não | Papel de autorização no sistema (Padrão: `CHILD`) |
+| `hero_nickname` | `VARCHAR(100)` | Não | Nome de Guerra / Apelido heroico de RPG (ex: 'Paladino Sidney', 'Sir Paulinho') |
+| `class_code` | `VARCHAR(50)` | Não | Código da classe heroica (Padrão: `guardiao_do_lar`) |
+| `skin_code` | `VARCHAR(50)` | Não | Código cosmético da skin ativa (Padrão: `default`) |
+| `level` | `INT` | Não | Nível de aventureiro (Padrão: `1`) |
+| `xp` | `INT` | Não | Pontos de experiência acumulados (Padrão: `0`) |
+| `adventure_energy` | `INT` | Não | ⚡ Energia de aventura para masmorras e combates (Padrão: `10`) |
+| `family_tokens` | `INT` | Não | 🎟️ Fichas do Lar para resgate de vales na vida real (Padrão: `0`) |
+| `gold` | `INT` | Não | 💰 Moedas de ouro virtuais do reino (Padrão: `50`) |
+| `streak_days` | `INT` | Não | 🔥 Dias consecutivos de disciplina e hábitos (Padrão: `1`) |
+| `str` | `INT` | Não | Força (Tarefas pesadas / Dano de Impacto) (Padrão: `10`) |
+| `agi` | `INT` | Não | Agilidade (Pontualidade / Esquiva e Velocidade) (Padrão: `10`) |
+| `con` | `INT` | Não | Constituição (Saúde e Nutrição / HP e Vigor) (Padrão: `10`) |
+| `int` | `INT` | Não | Inteligência (Estudos e Leitura / Magia e Tática) (Padrão: `10`) |
+| `cha` | `INT` | Não | Carisma (Harmonia Familiar / Suporte e Buffs) (Padrão: `10`) |
+| `luk` | `INT` | Não | Sorte (Recompensas Raras e Críticos) (Padrão: `10`) |
+| `is_active` | `BOOLEAN` | Não | Controle de desativação lógica (Padrão: `true`) |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps de auditoria |
+
+---
+
+## 2. Módulo de Catálogo Global Imutável
+
+### 📊 `definition_attributes`
+Catálogo dos 6 atributos fundamentais de RPG baseados nos pilares da vida real.
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único do atributo |
+| `code` | `VARCHAR(20)` | Não | Slug identificador (`str`, `agi`, `con`, `int`, `cha`, `luk`) |
+| `name` | `VARCHAR(50)` | Não | Nome de exibição (ex: Força, Inteligência) |
+| `description` | `TEXT` | Sim | Explicação imersiva |
+| `combat_role` | `VARCHAR(255)` | Sim | Papel no combate e masmorras RPG |
+| `real_life_role` | `VARCHAR(255)` | Sim | Correspondência com a rotina e hábitos da casa |
+
+---
+
+### 🛡️ `definition_classes`
+Catálogo oficial das classes heroicas disponíveis no ecossistema.
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único da classe |
+| `code` | `VARCHAR(50)` | Não | Slug da classe (`guardiao_do_lar`, `guardiao_da_harmonia`, `rastreador_veloz`, `artifice_criativo`, etc.) |
+| `name` | `VARCHAR(100)` | Não | Nome heroico da classe |
+| `description` | `TEXT` | Sim | Lore e perfil da vocação |
+| `combat_role` | `VARCHAR(100)` | Sim | Função no combate (Tanque, Dano, Suporte) |
+| `real_life_focus` | `VARCHAR(255)` | Sim | Foco na vida real |
+| `icon` | `VARCHAR(100)` | Sim | Ícone representativo |
 | `name` | `VARCHAR(100)` | Não | Nome da família (ex: "Clã Lira") |
 | `invite_code` | `VARCHAR(10)` | Não | Código único para entrada de membros |
 | `created_by` | `UUID` (FK) | Não | Referência a `family_users.id` (Guardião criador) |

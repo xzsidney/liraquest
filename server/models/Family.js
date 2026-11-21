@@ -31,7 +31,7 @@ Family.init(
     },
     created_by: {
       type: DataTypes.UUID,
-      allowNull: false,
+      allowNull: true,
     },
   },
   {

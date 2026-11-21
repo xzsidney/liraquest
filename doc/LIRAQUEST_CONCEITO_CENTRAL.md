@@ -16,26 +16,28 @@ Ao invés de uma abordagem punitiva ou de cobranças repetitivas, o LiraQuest in
 
 ---
 
-## 🌐 2. O Conceito Central: A Teoria dos Dois Terminais (Dois Mundos)
+## 🌐 2. O Conceito Central: A Teoria dos Dois Terminais & A Entidade Unificada (V2)
 
-O grande diferencial do LiraQuest é a **separação conceitual e visual rigorosa entre o plano da Vida Real e o plano do Reino Virtual**, mantendo entre eles um canal direto de conversão de energia e recompensas.
+No LiraQuest V2, implementou-se o princípio arquitetural onde **O Usuário É o Herói**:
+- Cada membro familiar possui uma ficha unificada (`family_members`) integrando tanto o mundo real (nome, responsabilidades, e-mail/PIN) quanto o reino da fantasia (apelido heroico, classe, atributos D20, moedas de ouro e energia de aventura).
+- A separação entre o plano da Vida Real e o plano do Reino Virtual é dinâmica: as tarefas cumpridas na casa geram Fichas do Lar e Energia de Aventura que habilitam batalhas, masmorras e resgates reais.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                              MUNDO REAL (USUÁRIO)                           │
-│  • Ações: Arrumar a cama, lição de casa, buscar pão, ler 20 minutos         │
-│  • Validação: Pai/Mãe confirma a conclusão da tarefa                        │
-│  • Moeda Gerada: Fichas do Lar (Tokens Reais) + Energia de Aventura         │
-│  • Loja: Escolher o sabor da pizza, tempo extra de videogame, passeios      │
+│                       A VIDA REAL ALIMENTA O JOGO                          │
+│  • Ações: Arrumar a cama, lição de casa, alimentação saudável, leitura      │
+│  • Validação: Guardiões (Pais) aprovam com 1 clique fotos e relatos         │
+│  • Moeda Gerada: Fichas do Lar (Vales Reais) + Energia de Aventura          │
+│  • Loja Real: Escolher o sabor da pizza, tempo extra de videogame, passeios │
 └──────────────────────────────────────┬──────────────────────────────────────┘
                                        │ CONVERSÃO DIRETA
                                        ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                            REINO VIRTUAL (AVATAR)                           │
+│                            REINO VIRTUAL (AVENTURA)                         │
 │  • Consumo: Energia de Aventura permite entrar em Masmorras e Batalhas      │
 │  • Ações: Enfrentar monstros temáticos, Raids cooperativas familiares       │
 │  • Moeda Gerada: Ouro do Reino (Gold) + Pontos de Experiência (XP)          │
-│  • Loja: Espadas lendárias, armaduras, feitiços, mascotes e cosméticos      │
+│  • Loja Virtual: Armaduras lendárias, feitiços, mascotes e cosméticos       │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 

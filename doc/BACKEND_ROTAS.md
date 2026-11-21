@@ -17,37 +17,26 @@ Este documento cataloga todos os endpoints REST e eventos de WebSocket (Socket.I
 
 | Método | Rota | Autenticação | Descrição |
 |:---|:---|:---|:---|
-| `POST` | `/api/auth/register` | Pública | Cadastra um novo usuário (sempre `CHILD` por padrão) |
-| `POST` | `/api/auth/login` | Pública | Autentica e retorna token JWT com dados do usuário |
-| `GET` | `/api/auth/me` | JWT | Retorna os dados do usuário autenticado atual |
-| `GET` | `/api/auth/users` | JWT (`ADMIN`) | Lista todos os usuários cadastrados no sistema |
+| `POST` | `/api/auth/login` | Pública | **Login Híbrido V2**: Autentica Pais (E-mail + Senha bcrypt) ou Heróis/Filhos (Apelido/Nome + PIN de 4 dígitos). Retorna Token JWT assinado contendo `{ id, familyId, role, heroNickname }` e o perfil formatado. |
+| `GET` | `/api/auth/me` | JWT | **Perfil Unificado**: Retorna a ficha viva completa do membro (nome real, apelido heroico, classe, nível, XP, ouro, energia, tokens, streak e os 6 atributos RPG `str/agi/con/int/cha/luk`) em um único JSON limpo. |
+| `POST` | `/api/auth/register-family` | Pública | **Onboarding Multi-Família**: Registra a nova família e o primeiro usuário Guardião (ADMIN) simultaneamente, gerando um código de convite nobre único (ex: `CLAN-1234`). |
+| `POST` | `/api/auth/register` | Pública | Alias de compatibilidade para onboarding de família. |
 | `GET` | `/testeBD` (ou `/api/testeBD`) | Pública | Rota diagnóstica que testa a conexão com o banco MySQL e retorna status em JSON |
 
-
 ---
 
-## 2. Módulo de Catálogo Global (`/api/catalog`)
+## 2. Módulo Familiar / Clã (`/api/family`)
 
 | Método | Rota | Autenticação | Descrição |
 |:---|:---|:---|:---|
-| `GET` | `/api/catalog/attributes` | Pública | Lista os 6 atributos fundamentais (`STR`, `AGI`, `CON`, `INT`, `CHA`, `LUK`) |
-| `GET` | `/api/catalog/classes` | Pública | Lista as 6 classes com atributos primários, secundários e habilidades |
-| `GET` | `/api/catalog/skills/:classId` | Pública | Lista as habilidades da Árvore de Talentos de uma classe específica |
-| `GET` | `/api/catalog/items` | Pública | Lista os itens e recompensas disponíveis na Loja do Reino |
-| `GET` | `/api/catalog/monsters` | Pública | Lista os monstros e chefes cadastrados |
-| `GET` | `/api/catalog/tasks` | Pública | Lista o catálogo oficial de 42 tarefas padrão da vida real |
-
-
----
-
-## 3. Módulo Familiar / Clã (`/api/family`)
-
-| Método | Rota | Autenticação | Descrição |
-|:---|:---|:---|:---|
+| `GET` | `/api/family/members` | JWT (`PARENT` / `ADMIN`) | **CRUD Heróis**: Lista todos os heróis da família do usuário logado (excluindo senhas). |
+| `POST` | `/api/family/members` | JWT (`PARENT` / `ADMIN`) | **CRUD Heróis**: Guardião recruta um novo herói (filho) com Nome Real, Apelido Heroico, Classe e PIN de acesso. |
+| `PUT` | `/api/family/members/:id` | JWT (`PARENT` / `ADMIN`) | **CRUD Heróis**: Atualiza apelido heroico, classe ativa, skin cosmética ou redefine o PIN da criança. |
+| `DELETE` | `/api/family/members/:id` | JWT (`PARENT` / `ADMIN`) | **CRUD Heróis**: Desativação lógica do herói no clã (`is_active: false`). |
 | `POST` | `/api/family/create` | JWT (`PARENT` / `ADMIN`) | Cria uma nova família e gera código único (ex: `LIRA-7842`) |
 | `POST` | `/api/family/join` | JWT | Ingressa em uma família através do código de convite |
 | `GET` | `/api/family/my-family` | JWT | Retorna dados da família do usuário, membros e heróis vinculados |
-| `GET` | `/api/family/analytics` | JWT (`PARENT` / `ADMIN`) | Retorna métricas enriquecidas do Painel do Clã: presença online em tempo real, Top Herói, Herói em Foco, totais consolidados, evolução de hábitos nos últimos 7 dias (`weeklyHabits`), distribuição por categorias (`categoryDistribution`), comparativo lado a lado entre heróis (`childrenComparison`), matriz comparativa de hábitos por categoria (`categoryMatrix`), extrato financeiro lúdico com resgates da Loja do Lar (`treasuryStatement`), insígnias coletivas (`clanAchievements`) e relatório pedagógico dinâmico (`pedagogicalInsights`). |
+| `GET` | `/api/family/analytics` | JWT (`PARENT` / `ADMIN`) | Retorna métricas do Painel do Clã para os pais. |
 
 
 

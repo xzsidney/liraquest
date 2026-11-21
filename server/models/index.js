@@ -45,14 +45,11 @@ FamilyPushSubscription.belongsTo(Family, { foreignKey: 'family_id', as: 'family'
 FamilyUser.hasOne(UserProgress, { foreignKey: 'user_id', as: 'progress' });
 UserProgress.belongsTo(FamilyUser, { foreignKey: 'user_id', as: 'user' });
 
-FamilyUser.hasMany(Family, { foreignKey: 'created_by', as: 'created_families' });
-Family.belongsTo(FamilyUser, { foreignKey: 'created_by', as: 'creator' });
+FamilyMember.hasMany(Family, { foreignKey: 'created_by', as: 'created_families', constraints: false });
+Family.belongsTo(FamilyMember, { foreignKey: 'created_by', as: 'creator', constraints: false });
 
 Family.hasMany(FamilyMember, { foreignKey: 'family_id', as: 'members' });
 FamilyMember.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
-
-FamilyUser.hasMany(FamilyMember, { foreignKey: 'user_id', as: 'family_memberships' });
-FamilyMember.belongsTo(FamilyUser, { foreignKey: 'user_id', as: 'user' });
 
 // Vínculo Multi-tenant Direto
 FamilyUser.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
@@ -76,8 +73,8 @@ CharacterAttribute.belongsTo(FamilyCharacter, { foreignKey: 'character_id', as: 
 // ==========================================
 // 3. Associações de Definições / Catálogo
 // ==========================================
-DefinitionClass.belongsTo(DefinitionAttribute, { foreignKey: 'primary_attribute_id', as: 'primary_attribute' });
-DefinitionClass.belongsTo(DefinitionAttribute, { foreignKey: 'secondary_attribute_id', as: 'secondary_attribute' });
+DefinitionClass.belongsTo(DefinitionAttribute, { foreignKey: 'primary_attribute_id', as: 'primary_attribute', constraints: false });
+DefinitionClass.belongsTo(DefinitionAttribute, { foreignKey: 'secondary_attribute_id', as: 'secondary_attribute', constraints: false });
 
 DefinitionClass.hasMany(DefinitionSkill, { foreignKey: 'class_id', as: 'skills' });
 DefinitionSkill.belongsTo(DefinitionClass, { foreignKey: 'class_id', as: 'hero_class' });

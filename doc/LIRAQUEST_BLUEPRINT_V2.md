@@ -98,25 +98,15 @@ O banco de dados limpo conterá nativamente a estrutura pré-configurada da fam�
 
 Para garantir conformidade entre o ambiente local (Windows) e o ambiente de produção (Linux/Hostinger MySQL):
 
-1. **UUIDv4 Obrigatório:**
-   - Todas as chaves primárias (`id`) e chaves estrangeiras (`*_id`) devem ser do tipo `UUID` (geradas por `DataTypes.UUIDV4`).
-2. **Nomenclatura de Tabelas:**
-   - Tabelas SQL em `snake_case` com prefixo `family_` (ex: `family_users`, `family_tasks`, `family_characters`, `family_health_logs`).
-   - Tabelas de catálogo imutável utilizam prefixo `definition_*` com `id` (UUID) e `code` único (ex: `'str'`, `'guardiao_do_lar'`).
-3. **Modelos Sequelize:**
-   - Nomes em `PascalCase` com propriedades explícitas:
-     ```javascript
-     {
-       sequelize,
-       modelName: 'FamilyUser',
-       tableName: 'family_users',
-       underscored: true,
-       timestamps: true
-     }
-     ```
-4. **Proteção de Dados:**
-   - Proibição de comandos destrutivos sem aprovação do usuário (`DROP TABLE`, `TRUNCATE`, `force: true` ou deletes em massa).
-   - Deletes de usuários ou tarefas sempre via desativação lógica (`is_active: false`).
+1. **A Entidade Unificada — O Usuário É o Herói (`family_members`):**
+   - Não existem tabelas separadas para usuário e personagem. Cada membro da família é o seu próprio herói com nome real, apelido heroico, credenciais de acesso, nível, XP, energia, ouro e atributos de RPG em uma única tabela atômica.
+2. **UUIDv4 Obrigatório:**
+   - Todas as chaves primárias (`id`) e chaves estrangeiras (`*_id`, `family_id`) devem ser do tipo `UUID` (geradas por `DataTypes.UUIDV4`).
+3. **Nomenclatura de Tabelas & Modelos:**
+   - Tabelas SQL em `snake_case` com prefixo `family_` (ex: `families`, `family_members`).
+   - Modelos Sequelize em `PascalCase` com `underscored: true` e `tableName` explícito.
+4. **Proteção de Dados & Desativação Lógica:**
+   - Deletes de membros ou registros sempre via desativação lógica (`is_active: false`).
 
 ---
 
@@ -129,19 +119,19 @@ A interface do LiraQuest adota uma estética nobre de RPG de fantasia medieval:
 
 ---
 
-## 🚀 9. Regra Operacional de Deploy Contínuo Imediato (Git / Hostinger)
+## 🚀 9. Regra Operacional de Execução e Deploy Contínuo (Modo FULL)
 
 Como a validação e os testes são realizados diretamente no ambiente de produção na Hostinger:
 
-> **REGRA MANDATÓRIA PARA OS EXECUTORES:**
-> A cada funcionalidade ou fase concluída por um prompt executor:
-> 1. O executor DEVE obrigatoriamente rodar os testes de integridade locais.
-> 2. O executor DEVE rodar o script de deploy automatizado:
->    ```bash
->    npm run deploy
->    ```
->    ou os comandos padronizados de commit e push para o repositório (`https://github.com/xzsidney/liraquest.git`), acionando o deploy imediato para a Hostinger.
-> 3. Entregar ao usuário a URL de teste em produção pronta para verificação.
+1. **Protocolo "MODO FULL" (Autonomia Total sem Interrupções):**
+   - Sempre que o usuário iniciar com a instrução `"executar em modo full"` ou o prompt contiver a diretriz de Modo Full, o executor recebe **SINAL VERDE ABSOLUTO**.
+   - É **proibido parar no meio do caminho para fazer perguntas**, pedir autorizações adicionais ou aguardar confirmações no chat. O executor deve realizar todas as tarefas do início ao fim de forma contínua.
+2. **Deploy Obrigatório Imediato:**
+   - Ao concluir a implementação e testes locais, o executor DEVE rodar automaticamente o deploy:
+     ```bash
+     npm run deploy
+     ```
+   - Entregar diretamente a URL de produção com o resumo final das tarefas realizadas.
 
 ---
 

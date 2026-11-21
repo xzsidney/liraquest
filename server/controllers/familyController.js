@@ -159,37 +159,13 @@ export const joinFamily = async (req, res) => {
 };
 
 /**
- * Retorna os dados da família do usuário atual, incluindo membros e heróis
+ * Retorna os dados da família do usuário atual, incluindo membros e heróis (V2 Unificada)
  */
 export const getMyFamily = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const familyId = req.user.family_id;
 
-    const membership = await FamilyMember.findOne({
-      where: { user_id: userId },
-      include: [
-        {
-          model: Family,
-          as: 'family',
-          include: [
-            {
-              model: FamilyMember,
-              as: 'members',
-              include: [
-                {
-                  model: FamilyUser,
-                  as: 'user',
-                  attributes: ['id', 'name', 'email', 'role', 'phone', 'school_or_work', 'profile_photo_url'],
-                  include: [{ model: Character, as: 'character' }],
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    });
-
-    if (!membership || !membership.family) {
+    if (!familyId) {
       return res.json({
         success: true,
         hasFamily: false,
@@ -197,17 +173,248 @@ export const getMyFamily = async (req, res) => {
       });
     }
 
+    const family = await Family.findByPk(familyId, {
+      include: [
+        {
+          model: FamilyMember,
+          as: 'members',
+          where: { is_active: true },
+          required: false,
+          attributes: { exclude: ['password'] },
+        },
+      ],
+    });
+
+    if (!family) {
+      return res.json({
+        success: true,
+        hasFamily: false,
+        message: 'Família não encontrada.',
+      });
+    }
+
     return res.json({
       success: true,
       hasFamily: true,
-      family: membership.family,
-      myRoleInFamily: membership.role_in_family,
+      family,
+      myRoleInFamily: req.user.role,
     });
   } catch (error) {
     console.error('❌ Erro ao buscar dados da família:', error);
     return res.status(500).json({
       success: false,
       message: 'Erro interno ao consultar dados da família.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * 4. CRUD de Membros da Família (V2 Unificada - Exclusivo PARENT / ADMIN)
+ */
+
+/**
+ * GET /api/family/members - Lista todos os heróis da família
+ */
+export const listFamilyMembers = async (req, res) => {
+  try {
+    const familyId = req.user.family_id;
+    if (!familyId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Usuário não possui família vinculada.',
+      });
+    }
+
+    const members = await FamilyMember.findAll({
+      where: {
+        family_id: familyId,
+        is_active: true,
+      },
+      order: [
+        ['role', 'ASC'],
+        ['name', 'ASC'],
+      ],
+      attributes: { exclude: ['password'] },
+    });
+
+    return res.status(200).json({
+      success: true,
+      count: members.length,
+      members,
+    });
+  } catch (error) {
+    console.error('❌ Erro ao listar membros da família:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Erro interno ao listar membros da família.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * POST /api/family/members - Adiciona um novo herói (filho/criança) à família
+ */
+export const addFamilyMember = async (req, res) => {
+  try {
+    const familyId = req.user.family_id;
+    const { name, hero_nickname, heroNickname, class_code, classCode, pin, skin_code, skinCode } = req.body;
+
+    const memberName = (name || '').trim();
+    const heroNick = (hero_nickname || heroNickname || memberName).trim();
+    const memberClass = class_code || classCode || 'guardiao_do_lar';
+    const memberSkin = skin_code || skinCode || 'default';
+    const memberPin = pin ? String(pin).trim() : '1234';
+
+    if (!memberName) {
+      return res.status(400).json({
+        success: false,
+        message: 'O nome da criança/herói é obrigatório.',
+      });
+    }
+
+    const newMember = await FamilyMember.create({
+      family_id: familyId,
+      name: memberName,
+      hero_nickname: heroNick,
+      class_code: memberClass,
+      skin_code: memberSkin,
+      pin: memberPin,
+      role: 'CHILD',
+      level: 1,
+      xp: 0,
+      adventure_energy: 10,
+      family_tokens: 0,
+      gold: 50,
+      streak_days: 1,
+      str: 10,
+      agi: 10,
+      con: 10,
+      int: 10,
+      cha: 10,
+      luk: 10,
+      is_active: true,
+    });
+
+    const memberData = newMember.toJSON();
+    delete memberData.password;
+
+    return res.status(201).json({
+      success: true,
+      message: `Herói "${newMember.hero_nickname}" recrutado com sucesso para o clã!`,
+      member: memberData,
+    });
+  } catch (error) {
+    console.error('❌ Erro ao adicionar membro à família:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Erro interno ao adicionar membro.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * PUT /api/family/members/:id - Atualiza apelido, classe ou redefine o PIN
+ */
+export const updateFamilyMember = async (req, res) => {
+  try {
+    const familyId = req.user.family_id;
+    const { id } = req.params;
+    const { name, hero_nickname, heroNickname, class_code, classCode, pin, skin_code, skinCode } = req.body;
+
+    const member = await FamilyMember.findOne({
+      where: {
+        id,
+        family_id: familyId,
+      },
+    });
+
+    if (!member) {
+      return res.status(404).json({
+        success: false,
+        message: 'Membro não encontrado nesta família.',
+      });
+    }
+
+    const updates = {};
+    if (name !== undefined) updates.name = String(name).trim();
+    if (hero_nickname !== undefined || heroNickname !== undefined) {
+      updates.hero_nickname = String(hero_nickname || heroNickname).trim();
+    }
+    if (class_code !== undefined || classCode !== undefined) {
+      updates.class_code = String(class_code || classCode).trim();
+    }
+    if (skin_code !== undefined || skinCode !== undefined) {
+      updates.skin_code = String(skin_code || skinCode).trim();
+    }
+    if (pin !== undefined) {
+      updates.pin = String(pin).trim();
+    }
+
+    await member.update(updates);
+
+    const memberData = member.toJSON();
+    delete memberData.password;
+
+    return res.status(200).json({
+      success: true,
+      message: `Herói "${member.hero_nickname}" atualizado com sucesso!`,
+      member: memberData,
+    });
+  } catch (error) {
+    console.error('❌ Erro ao atualizar membro da família:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Erro interno ao atualizar membro.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * DELETE /api/family/members/:id - Desativação lógica (is_active: false)
+ */
+export const deleteFamilyMember = async (req, res) => {
+  try {
+    const familyId = req.user.family_id;
+    const { id } = req.params;
+
+    const member = await FamilyMember.findOne({
+      where: {
+        id,
+        family_id: familyId,
+      },
+    });
+
+    if (!member) {
+      return res.status(404).json({
+        success: false,
+        message: 'Membro não encontrado nesta família.',
+      });
+    }
+
+    if (member.id === req.user.id) {
+      return res.status(400).json({
+        success: false,
+        message: 'Você não pode desativar sua própria conta pelo painel de membros.',
+      });
+    }
+
+    // Desativação lógica obrigatória
+    await member.update({ is_active: false });
+
+    return res.status(200).json({
+      success: true,
+      message: `Herói "${member.hero_nickname}" desativado do clã com sucesso.`,
+    });
+  } catch (error) {
+    console.error('❌ Erro ao desativar membro:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Erro interno ao desativar membro.',
+      error: error.message,
     });
   }
 };

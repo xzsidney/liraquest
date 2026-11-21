@@ -11,11 +11,12 @@ A partir de agora, a IA está PROIBIDA de executar ações destrutivas no banco 
 
 Qualquer alteração de esquema no banco (Sequelize/MySQL) que ofereça risco deve ser analisada cuidadosamente e apresentada ao usuário antes de rodar comandos no terminal.
 
-## Execução FULL de Planos (Override de Permissão)
-Se o usuário digitar exatamente o comando `"executar o [nome do plano] full"` (ex: *executar o plano X full*), a IA recebe **SINAL VERDE ABSOLUTO** para iniciar a execução do plano imediatamente e de forma autônoma, sem pedir NENHUMA confirmação no chat. 
-- Esta regra **sobrescreve** o "Fluxo de Deploy Automatizado via Git", ou seja, a IA já deve fazer o commit e push direto ao terminar as tarefas, sem perguntar.
-- **EXCEÇÃO: PROTEÇÃO DE DADOS.** Esta regra **NÃO** sobrescreve a "Proteção Contra Perda de Dados". Mesmo no modo FULL, se a IA precisar apagar dados, dropar tabelas ou rodar scripts destrutivos, ela DEVE obrigatoriamente parar e pedir permissão antes.
-- O objetivo desta regra é permitir que o usuário saia da sala e a IA faça todo o trabalho pesado sem ficar bloqueada aguardando respostas no chat, protegendo apenas o banco de dados.
+## Execução em MODO FULL (Autonomia Total sem Interrupções)
+Se o usuário digitar comandos como `"executar em modo full"`, `"executar o plano full"`, `"executar full"` ou indicar MODO FULL no prompt:
+- A IA recebe **SINAL VERDE ABSOLUTO E TOTAL** para executar todas as ações do plano de ponta a ponta sem pedir nenhuma confirmação, sem parar no meio do caminho para fazer perguntas e sem solicitar autorização no chat.
+- **Deploy Automático:** Ao concluir as alterações e testes, a IA executa o commit e push direto (`npm run deploy`) sem perguntar.
+- **Ações de Banco de Dados no Modo Full:** Se o prompt do modo full trouxer explicitamente comandos de reset, drop ou migração, a IA considera isso como a autorização expressa concedida pelo usuário e executa imediatamente sem pausar.
+- **Objetivo do Modo Full:** O usuário quer que a IA trabalhe com total autonomia para que ele possa sair da sala e encontrar a tarefa 100% concluída, testada e deployada ao retornar.
 
 ## Atualizações de Banco de Dados via Ambiente Local
 O ambiente local do backend está conectado diretamente ao banco de dados MySQL de produção na Hostinger através das credenciais no arquivo `.env`. 

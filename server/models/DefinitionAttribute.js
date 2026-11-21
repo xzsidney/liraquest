@@ -28,11 +28,11 @@ DefinitionAttribute.init(
     },
     combat_role: {
       type: DataTypes.STRING(255),
-      allowNull: false,
+      allowNull: true,
     },
     real_life_role: {
       type: DataTypes.STRING(255),
-      allowNull: false,
+      allowNull: true,
     },
   },
   {

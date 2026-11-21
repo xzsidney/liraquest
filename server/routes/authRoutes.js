@@ -1,17 +1,25 @@
 import { Router } from 'express';
-import { register, login, getMe, listAllUsers } from '../controllers/authController.js';
-import { authenticateToken, authorizeRoles } from '../middlewares/authMiddleware.js';
+import { login, getMe, registerFamily } from '../controllers/authController.js';
+import { authenticateToken } from '../middlewares/authMiddleware.js';
 
 const router = Router();
 
-// Rotas Públicas
-router.post('/register', register);
+// ==========================================
+// Rotas Públicas de Autenticação
+// ==========================================
+
+// 1. POST /api/auth/login (Login Híbrido: Pais via Email+Senha, Crianças via Apelido+PIN)
 router.post('/login', login);
 
-// Rotas Protegidas (Requer Token JWT)
-router.get('/me', authenticateToken, getMe);
+// 3. POST /api/auth/register-family (Onboarding Multi-Família)
+router.post('/register-family', registerFamily);
+router.post('/register', registerFamily); // Alias de compatibilidade
 
-// Rotas Exclusivas do Administrador
-router.get('/users', authenticateToken, authorizeRoles('ADMIN'), listAllUsers);
+// ==========================================
+// Rotas Protegidas (Requer Token JWT)
+// ==========================================
+
+// 2. GET /api/auth/me (Perfil Unificado do Herói)
+router.get('/me', authenticateToken, getMe);
 
 export default router;
