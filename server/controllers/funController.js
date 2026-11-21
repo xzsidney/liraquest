@@ -2,8 +2,6 @@ import { randomUUID } from 'node:crypto';
 import { Op } from 'sequelize';
 import {
   FamilyEvent,
-  FamilyPoll,
-  FamilyPollVote,
   FamilyUser,
   FamilyMember,
 } from '../models/index.js';
@@ -77,48 +75,10 @@ async function ensureDefaultEvents(familyId, creatorId) {
 }
 
 /**
- * Popula enquete padrão de passeios se a família não possuir nenhuma
+ * Enquetes de Passeios (Desativadas no V2 Oficial)
  */
 async function ensureDefaultPoll(familyId, creatorId) {
-  try {
-    const count = await FamilyPoll.count({ where: { family_id: familyId } });
-    if (count > 0) return;
-
-    const closesAt = new Date();
-    closesAt.setDate(closesAt.getDate() + 5);
-
-    await FamilyPoll.create({
-      id: randomUUID().toLowerCase(),
-      family_id: familyId,
-      created_by: creatorId,
-      title: 'Qual será o grande passeio da família neste fim de semana?',
-      description: 'Votação aberta para todos os heróis e guardiões do clã escolherem a melhor aventura.',
-      status: 'OPEN',
-      closes_at: closesAt,
-      options: [
-        {
-          id: 'opt_1',
-          title: 'Parque Ecológico & Piquenique',
-          description: 'Trilha verde, ar puro, patinete e lanche ao ar livre',
-          icon: '🌳',
-        },
-        {
-          id: 'opt_2',
-          title: 'Cinema & Sessão Pipoca',
-          description: 'Filme novo em tela gigante com balde de pipoca e refrigerante',
-          icon: '🍿',
-        },
-        {
-          id: 'opt_3',
-          title: 'Pizzaria ou Hamburgueria Artesanal',
-          description: 'Noite saborosa com rodízio e direito à sobremesa nobre',
-          icon: '🍕',
-        },
-      ],
-    });
-  } catch (err) {
-    console.error('Erro ao popular enquete padrão:', err);
-  }
+  return;
 }
 
 // ========================================================
@@ -261,241 +221,21 @@ export const deleteEvent = async (req, res) => {
 // ========================================================
 
 export const listPolls = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const membership = await findOrCreateUserFamily(userId);
-    if (!membership) {
-      return res.status(400).json({ success: false, message: 'Família não encontrada.' });
-    }
-
-    const familyId = membership.family_id;
-    await ensureDefaultPoll(familyId, userId);
-
-    const polls = await FamilyPoll.findAll({
-      where: { family_id: familyId },
-      include: [
-        {
-          model: FamilyPollVote,
-          as: 'votes',
-          include: [{ model: FamilyUser, as: 'voter', attributes: ['id', 'name', 'role'] }],
-        },
-      ],
-      order: [['created_at', 'DESC']],
-    });
-
-    // Formatar enquetes com contadores de votos por opção e indicação do voto do usuário
-    const formattedPolls = polls.map((p) => {
-      const votes = p.votes || [];
-      const totalVotes = votes.length;
-      const myVote = votes.find((v) => v.user_id === userId)?.option_id || null;
-
-      const optionsWithCounts = (p.options || []).map((opt) => {
-        const optionVotes = votes.filter((v) => v.option_id === opt.id);
-        const count = optionVotes.length;
-        const percentage = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
-        return {
-          ...opt,
-          votes_count: count,
-          percentage,
-          voters: optionVotes.map((v) => v.voter?.name).filter(Boolean),
-        };
-      });
-
-      return {
-        id: p.id,
-        title: p.title,
-        description: p.description,
-        status: p.status,
-        closes_at: p.closes_at,
-        winner_option_id: p.winner_option_id,
-        total_votes: totalVotes,
-        my_vote: myVote,
-        options: optionsWithCounts,
-        created_at: p.created_at,
-      };
-    });
-
-    return res.json({
-      success: true,
-      polls: formattedPolls,
-    });
-  } catch (err) {
-    console.error('Erro ao listar votações:', err);
-    return res.status(500).json({ success: false, message: 'Erro ao buscar enquetes.' });
-  }
+  return res.json({ success: true, polls: [] });
 };
 
 export const createPoll = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const membership = await findOrCreateUserFamily(userId);
-    if (!membership) {
-      return res.status(400).json({ success: false, message: 'Família não encontrada.' });
-    }
-
-    const { title, description, options, closes_at } = req.body;
-    if (!title || !Array.isArray(options) || options.length < 2) {
-      return res.status(400).json({
-        success: false,
-        message: 'Título e pelo menos 2 opções de passeio são obrigatórios.',
-      });
-    }
-
-    // Formatar opções com IDs únicos
-    const formattedOptions = options.map((opt, idx) => ({
-      id: opt.id || `opt_${idx + 1}_${Date.now().toString(36)}`,
-      title: (opt.title || `Opção ${idx + 1}`).trim(),
-      description: opt.description ? opt.description.trim() : '',
-      icon: opt.icon || '🎯',
-    }));
-
-    const poll = await FamilyPoll.create({
-      id: randomUUID().toLowerCase(),
-      family_id: membership.family_id,
-      created_by: userId,
-      title: title.trim(),
-      description: description ? description.trim() : null,
-      options: formattedOptions,
-      status: 'OPEN',
-      closes_at: closes_at ? new Date(closes_at) : null,
-    });
-
-    return res.status(201).json({
-      success: true,
-      message: 'Votação de passeio criada com sucesso!',
-      poll,
-    });
-  } catch (err) {
-    console.error('Erro ao criar enquete:', err);
-    return res.status(500).json({ success: false, message: 'Erro interno ao criar votação.' });
-  }
+  return res.json({ success: true, message: 'Enquetes desativadas na V2 oficial.' });
 };
 
 export const votePoll = async (req, res) => {
-  try {
-    const { pollId } = req.params;
-    const { option_id } = req.body;
-    const userId = req.user.id;
-    const membership = await findOrCreateUserFamily(userId);
-
-    if (!option_id) {
-      return res.status(400).json({ success: false, message: 'ID da opção escolhida é obrigatório.' });
-    }
-
-    const poll = await FamilyPoll.findOne({
-      where: { id: pollId, family_id: membership.family_id },
-    });
-
-    if (!poll) {
-      return res.status(404).json({ success: false, message: 'Votação não encontrada.' });
-    }
-
-    if (poll.status !== 'OPEN') {
-      return res.status(400).json({ success: false, message: 'Esta votação já foi encerrada.' });
-    }
-
-    // Verificar se a opção existe
-    const optionExists = (poll.options || []).some((o) => o.id === option_id);
-    if (!optionExists) {
-      return res.status(400).json({ success: false, message: 'Opção inválida para esta enquete.' });
-    }
-
-    // Registrar ou atualizar voto (Upsert)
-    const existingVote = await FamilyPollVote.findOne({
-      where: { poll_id: pollId, user_id: userId },
-    });
-
-    if (existingVote) {
-      await existingVote.update({ option_id });
-    } else {
-      await FamilyPollVote.create({
-        id: randomUUID().toLowerCase(),
-        poll_id: pollId,
-        user_id: userId,
-        option_id,
-      });
-    }
-
-    return res.json({
-      success: true,
-      message: 'Voto registrado com sucesso! 🎉',
-      voted_option_id: option_id,
-    });
-  } catch (err) {
-    console.error('Erro ao registrar voto:', err);
-    return res.status(500).json({ success: false, message: 'Erro interno ao processar voto.' });
-  }
+  return res.json({ success: true, message: 'Enquetes desativadas na V2 oficial.' });
 };
 
 export const closePoll = async (req, res) => {
-  try {
-    const { pollId } = req.params;
-    const userId = req.user.id;
-    const membership = await findOrCreateUserFamily(userId);
-
-    const poll = await FamilyPoll.findOne({
-      where: { id: pollId, family_id: membership.family_id },
-      include: [{ model: FamilyPollVote, as: 'votes' }],
-    });
-
-    if (!poll) {
-      return res.status(404).json({ success: false, message: 'Votação não encontrada.' });
-    }
-
-    // Contabilizar vencedor
-    const counts = {};
-    (poll.votes || []).forEach((v) => {
-      counts[v.option_id] = (counts[v.option_id] || 0) + 1;
-    });
-
-    let winnerId = null;
-    let maxVotes = -1;
-    for (const [optId, cnt] of Object.entries(counts)) {
-      if (cnt > maxVotes) {
-        maxVotes = cnt;
-        winnerId = optId;
-      }
-    }
-
-    await poll.update({
-      status: 'CLOSED',
-      winner_option_id: winnerId,
-    });
-
-    return res.json({
-      success: true,
-      message: 'Votação encerrada com sucesso!',
-      winner_option_id: winnerId,
-      poll,
-    });
-  } catch (err) {
-    console.error('Erro ao encerrar votação:', err);
-    return res.status(500).json({ success: false, message: 'Erro ao encerrar enquete.' });
-  }
+  return res.json({ success: true, message: 'Enquetes desativadas na V2 oficial.' });
 };
 
 export const deletePoll = async (req, res) => {
-  try {
-    const { pollId } = req.params;
-    const userId = req.user.id;
-    const membership = await findOrCreateUserFamily(userId);
-
-    const poll = await FamilyPoll.findOne({
-      where: { id: pollId, family_id: membership.family_id },
-    });
-
-    if (!poll) {
-      return res.status(404).json({ success: false, message: 'Votação não encontrada.' });
-    }
-
-    await poll.destroy();
-
-    return res.json({
-      success: true,
-      message: 'Votação excluída com sucesso.',
-    });
-  } catch (err) {
-    console.error('Erro ao excluir votação:', err);
-    return res.status(500).json({ success: false, message: 'Erro ao excluir enquete.' });
-  }
+  return res.json({ success: true, message: 'Enquetes desativadas na V2 oficial.' });
 };

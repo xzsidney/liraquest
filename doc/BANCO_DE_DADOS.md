@@ -7,13 +7,17 @@ Este documento descreve todas as tabelas criadas no banco de dados MySQL de prod
 ## 📌 Padrão de Nomenclatura e Identificadores (UUID / GUID Obrigatório)
 - **Chaves Primárias (`id`) & Estrangeiras (`*_id`):** Todas as tabelas utilizam obrigatoriamente identificadores únicos do tipo **UUID** (UUIDv4) para evitar previsibilidade e garantir compatibilidade distribuída.
 - **Identificadores Amigáveis (`code`):** Tabelas de catálogo imutável (`definition_*`) utilizam chave primária UUID e possuem uma coluna adicional `code` (string única, ex: `'str'`, `'guardiao_do_lar'`) para facilitar buscas e referências legíveis por código.
-- **Tabelas SQL:** `snake_case` minúsculo.
+- **Tabelas SQL:** `snake_case` minúsculo com prefixo oficial `family_`, `definition_` ou módulo nativo.
 - **Modelos Sequelize:** `PascalCase` nos arquivos JavaScript/Node.js com `tableName` e `underscored: true` configurados.
-- **Divisão Arquitetural:** 
+- **Divisão Arquitetural Oficial (V2 Clean):** 
   1. `definition_*` (Catálogo global imutável)
-  2. `characters` & `character_*` (Instâncias vivas do jogador / Multi-Classe)
-  3. `families` & `family_*` (Núcleo social e familiar)
-  4. `tasks`, `events`, `battles` (Gameplay e gamificação)
+  2. `family_characters` & `character_attributes` (Instâncias oficiais unificadas dos heróis)
+  3. `families` & `family_*` (Núcleo social e familiar multi-tenant)
+  4. `tasks` e `task_submissions` (Gameplay e gamificação da vida real)
+
+> **🧹 FAXINA V2 CONCLUÍDA (Novembro/2026):**
+> Todas as 15 tabelas legadas e duplicadas foram dropadas com sucesso (`battles`, `characters`, `character_classes`, `character_inventory`, `character_skills`, `events`, `family_bills`, `family_child_vaults`, `family_clan_vaults`, `family_polls`, `family_poll_votes`, `family_dungeon_actions`, `family_dungeon_adventures`, `family_dungeon_runs`, `family_dungeon_scenes`).
+> O banco de dados agora possui estritamente as 30 tabelas oficiais ativas.
 
 ---
 

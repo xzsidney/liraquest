@@ -9,25 +9,14 @@ import { DefinitionSkill } from './DefinitionSkill.js';
 import { DefinitionItem } from './DefinitionItem.js';
 import { DefinitionMonster } from './DefinitionMonster.js';
 import { DefinitionTask } from './DefinitionTask.js';
-import { Character } from './Character.js';
 import { FamilyCharacter } from './FamilyCharacter.js';
-
-import { CharacterClass } from './CharacterClass.js';
 import { CharacterAttribute } from './CharacterAttribute.js';
-import { CharacterSkill } from './CharacterSkill.js';
-import { CharacterInventory } from './CharacterInventory.js';
 import { Task } from './Task.js';
 import { TaskSubmission } from './TaskSubmission.js';
-import { Event } from './Event.js';
-import { Battle } from './Battle.js';
 import { FamilyReward } from './FamilyReward.js';
 import { FamilyRewardRedemption } from './FamilyRewardRedemption.js';
 import { FamilyQuizQuestion } from './FamilyQuizQuestion.js';
 import { FamilyQuizOption } from './FamilyQuizOption.js';
-import { FamilyDungeonAdventure } from './FamilyDungeonAdventure.js';
-import { FamilyDungeonScene } from './FamilyDungeonScene.js';
-import { FamilyDungeonAction } from './FamilyDungeonAction.js';
-import { FamilyDungeonRun } from './FamilyDungeonRun.js';
 import { FamilyZombiCampaign } from './FamilyZombiCampaign.js';
 import { FamilyZombiMission } from './FamilyZombiMission.js';
 import { FamilyZombiToken } from './FamilyZombiToken.js';
@@ -38,11 +27,6 @@ import { FamilyMealItem } from './FamilyMealItem.js';
 import { FamilyMealCheckin } from './FamilyMealCheckin.js';
 import { FamilyShoppingItem } from './FamilyShoppingItem.js';
 import { FamilyEvent } from './FamilyEvent.js';
-import { FamilyPoll } from './FamilyPoll.js';
-import { FamilyPollVote } from './FamilyPollVote.js';
-import { FamilyBill } from './FamilyBill.js';
-import { FamilyClanVault } from './FamilyClanVault.js';
-import { FamilyChildVault } from './FamilyChildVault.js';
 import { FamilyWhatsappConfig } from './FamilyWhatsappConfig.js';
 import { FamilyPushSubscription } from './FamilyPushSubscription.js';
 
@@ -61,9 +45,6 @@ FamilyPushSubscription.belongsTo(Family, { foreignKey: 'family_id', as: 'family'
 FamilyUser.hasOne(UserProgress, { foreignKey: 'user_id', as: 'progress' });
 UserProgress.belongsTo(FamilyUser, { foreignKey: 'user_id', as: 'user' });
 
-FamilyUser.hasOne(Character, { foreignKey: 'user_id', as: 'character' });
-Character.belongsTo(FamilyUser, { foreignKey: 'user_id', as: 'user' });
-
 FamilyUser.hasMany(Family, { foreignKey: 'created_by', as: 'created_families' });
 Family.belongsTo(FamilyUser, { foreignKey: 'created_by', as: 'creator' });
 
@@ -77,9 +58,14 @@ FamilyMember.belongsTo(FamilyUser, { foreignKey: 'user_id', as: 'user' });
 FamilyUser.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
 Family.hasMany(FamilyUser, { foreignKey: 'family_id', as: 'users' });
 
-// Associações do Herói do Clã (FamilyCharacter)
+// ==========================================
+// 2. Associações do Herói do Clã (FamilyCharacter)
+// ==========================================
 FamilyUser.hasOne(FamilyCharacter, { foreignKey: 'user_id', as: 'family_character' });
 FamilyCharacter.belongsTo(FamilyUser, { foreignKey: 'user_id', as: 'user' });
+
+// Alias de retrocompatibilidade para que includes 'character' continuem funcionando
+FamilyUser.hasOne(FamilyCharacter, { foreignKey: 'user_id', as: 'character' });
 
 Family.hasMany(FamilyCharacter, { foreignKey: 'family_id', as: 'family_characters' });
 FamilyCharacter.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
@@ -88,34 +74,13 @@ FamilyCharacter.hasOne(CharacterAttribute, { foreignKey: 'character_id', as: 'at
 CharacterAttribute.belongsTo(FamilyCharacter, { foreignKey: 'character_id', as: 'family_character', constraints: false });
 
 // ==========================================
-// 2. Associações de Definições / Catálogo
+// 3. Associações de Definições / Catálogo
 // ==========================================
 DefinitionClass.belongsTo(DefinitionAttribute, { foreignKey: 'primary_attribute_id', as: 'primary_attribute' });
 DefinitionClass.belongsTo(DefinitionAttribute, { foreignKey: 'secondary_attribute_id', as: 'secondary_attribute' });
 
 DefinitionClass.hasMany(DefinitionSkill, { foreignKey: 'class_id', as: 'skills' });
 DefinitionSkill.belongsTo(DefinitionClass, { foreignKey: 'class_id', as: 'hero_class' });
-
-// ==========================================
-// 3. Associações do Personagem
-// ==========================================
-Character.belongsTo(DefinitionClass, { foreignKey: 'current_class_id', as: 'current_class' });
-
-Character.hasMany(CharacterClass, { foreignKey: 'character_id', as: 'classes_progress' });
-CharacterClass.belongsTo(Character, { foreignKey: 'character_id', as: 'character' });
-CharacterClass.belongsTo(DefinitionClass, { foreignKey: 'class_id', as: 'class_info' });
-
-Character.hasMany(CharacterAttribute, { foreignKey: 'character_id', as: 'attributes' });
-CharacterAttribute.belongsTo(Character, { foreignKey: 'character_id', as: 'character' });
-CharacterAttribute.belongsTo(DefinitionAttribute, { foreignKey: 'attribute_id', as: 'attribute_info' });
-
-Character.hasMany(CharacterSkill, { foreignKey: 'character_id', as: 'skills' });
-CharacterSkill.belongsTo(Character, { foreignKey: 'character_id', as: 'character' });
-CharacterSkill.belongsTo(DefinitionSkill, { foreignKey: 'skill_id', as: 'skill_info' });
-
-Character.hasMany(CharacterInventory, { foreignKey: 'character_id', as: 'inventory' });
-CharacterInventory.belongsTo(Character, { foreignKey: 'character_id', as: 'character' });
-CharacterInventory.belongsTo(DefinitionItem, { foreignKey: 'item_id', as: 'item_info' });
 
 // ==========================================
 // 4. Associações de Gameplay (Tarefas e Provas)
@@ -135,24 +100,14 @@ TaskSubmission.belongsTo(Task, { foreignKey: 'task_id', as: 'task' });
 FamilyUser.hasMany(TaskSubmission, { foreignKey: 'user_id', as: 'submitted_proofs' });
 TaskSubmission.belongsTo(FamilyUser, { foreignKey: 'user_id', as: 'submitter' });
 
-Character.hasMany(TaskSubmission, { foreignKey: 'character_id', as: 'hero_submissions' });
-TaskSubmission.belongsTo(Character, { foreignKey: 'character_id', as: 'character' });
+FamilyCharacter.hasMany(TaskSubmission, { foreignKey: 'character_id', as: 'hero_submissions' });
+TaskSubmission.belongsTo(FamilyCharacter, { foreignKey: 'character_id', as: 'character' });
 
 FamilyUser.hasMany(TaskSubmission, { foreignKey: 'reviewed_by', as: 'reviewed_proofs' });
 TaskSubmission.belongsTo(FamilyUser, { foreignKey: 'reviewed_by', as: 'reviewer' });
 
 // ==========================================
-// 5. Associações de Eventos e Batalhas
-// ==========================================
-Family.hasMany(Event, { foreignKey: 'family_id', as: 'events' });
-Event.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
-
-Family.hasMany(Battle, { foreignKey: 'family_id', as: 'battles' });
-Battle.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
-Battle.belongsTo(DefinitionMonster, { foreignKey: 'monster_id', as: 'monster' });
-
-// ==========================================
-// 6. Associações da Loja do Lar (Recompensas Reais)
+// 5. Associações da Loja do Lar (Recompensas Reais)
 // ==========================================
 Family.hasMany(FamilyReward, { foreignKey: 'family_id', as: 'rewards' });
 FamilyReward.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
@@ -170,31 +125,13 @@ FamilyUser.hasMany(FamilyRewardRedemption, { foreignKey: 'reviewed_by', as: 'rev
 FamilyRewardRedemption.belongsTo(FamilyUser, { foreignKey: 'reviewed_by', as: 'reviewer' });
 
 // ==========================================
-// 8. Associações do Quiz & Perguntas Educativas
+// 6. Associações do Quiz & Perguntas Educativas
 // ==========================================
 FamilyQuizQuestion.hasMany(FamilyQuizOption, { foreignKey: 'question_id', as: 'options', onDelete: 'CASCADE' });
 FamilyQuizOption.belongsTo(FamilyQuizQuestion, { foreignKey: 'question_id', as: 'question' });
 
 // ==========================================
-// 9. Associações do Livro-Jogo de Masmorras (Aventuras em Quest)
-// ==========================================
-FamilyDungeonAdventure.hasMany(FamilyDungeonScene, { foreignKey: 'adventure_id', as: 'scenes', onDelete: 'CASCADE' });
-FamilyDungeonScene.belongsTo(FamilyDungeonAdventure, { foreignKey: 'adventure_id', as: 'adventure' });
-
-FamilyDungeonScene.hasMany(FamilyDungeonAction, { foreignKey: 'scene_id', as: 'actions', onDelete: 'CASCADE' });
-FamilyDungeonAction.belongsTo(FamilyDungeonScene, { foreignKey: 'scene_id', as: 'scene' });
-
-FamilyUser.hasMany(FamilyDungeonRun, { foreignKey: 'user_id', as: 'dungeon_runs' });
-FamilyDungeonRun.belongsTo(FamilyUser, { foreignKey: 'user_id', as: 'user' });
-
-Character.hasMany(FamilyDungeonRun, { foreignKey: 'character_id', as: 'dungeon_runs' });
-FamilyDungeonRun.belongsTo(Character, { foreignKey: 'character_id', as: 'character' });
-
-FamilyDungeonAdventure.hasMany(FamilyDungeonRun, { foreignKey: 'adventure_id', as: 'runs' });
-FamilyDungeonRun.belongsTo(FamilyDungeonAdventure, { foreignKey: 'adventure_id', as: 'adventure' });
-
-// ==========================================
-// 10. Associações da Campanha Investigativa Marvel Zombies
+// 7. Associações da Campanha Investigativa Marvel Zombies
 // ==========================================
 FamilyZombiCampaign.hasMany(FamilyZombiMission, { foreignKey: 'campaign_id', as: 'missions', onDelete: 'CASCADE' });
 FamilyZombiMission.belongsTo(FamilyZombiCampaign, { foreignKey: 'campaign_id', as: 'campaign' });
@@ -203,7 +140,7 @@ FamilyZombiMission.hasMany(FamilyZombiToken, { foreignKey: 'mission_id', as: 'to
 FamilyZombiToken.belongsTo(FamilyZombiMission, { foreignKey: 'mission_id', as: 'mission' });
 
 // ==========================================
-// 11. Associações de Saúde, Nutrição & Compras (Fase 2)
+// 8. Associações de Saúde, Nutrição & Compras
 // ==========================================
 Family.hasMany(FamilyMealSchedule, { foreignKey: 'family_id', as: 'meal_schedules' });
 FamilyMealSchedule.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
@@ -226,14 +163,11 @@ FamilyMealCheckin.belongsTo(FamilyUser, { foreignKey: 'user_id', as: 'user' });
 FamilyUser.hasMany(FamilyMealCheckin, { foreignKey: 'validated_by', as: 'validated_checkins' });
 FamilyMealCheckin.belongsTo(FamilyUser, { foreignKey: 'validated_by', as: 'validator' });
 
-Character.hasMany(FamilyMealCheckin, { foreignKey: 'character_id', as: 'meal_checkins' });
-FamilyMealCheckin.belongsTo(Character, { foreignKey: 'character_id', as: 'character' });
-
 Family.hasMany(FamilyShoppingItem, { foreignKey: 'family_id', as: 'shopping_items' });
 FamilyShoppingItem.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
 
 // ==========================================
-// 12. Associações de Diversão & Eventos (Fase 4)
+// 9. Associações de Eventos do Clã
 // ==========================================
 Family.hasMany(FamilyEvent, { foreignKey: 'family_id', as: 'clan_events' });
 FamilyEvent.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
@@ -241,44 +175,14 @@ FamilyEvent.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
 FamilyUser.hasMany(FamilyEvent, { foreignKey: 'created_by', as: 'created_clan_events' });
 FamilyEvent.belongsTo(FamilyUser, { foreignKey: 'created_by', as: 'creator' });
 
-Family.hasMany(FamilyPoll, { foreignKey: 'family_id', as: 'polls' });
-FamilyPoll.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
-
-FamilyUser.hasMany(FamilyPoll, { foreignKey: 'created_by', as: 'created_polls' });
-FamilyPoll.belongsTo(FamilyUser, { foreignKey: 'created_by', as: 'creator' });
-
-FamilyPoll.hasMany(FamilyPollVote, { foreignKey: 'poll_id', as: 'votes', onDelete: 'CASCADE' });
-FamilyPollVote.belongsTo(FamilyPoll, { foreignKey: 'poll_id', as: 'poll' });
-
-FamilyUser.hasMany(FamilyPollVote, { foreignKey: 'user_id', as: 'poll_votes' });
-FamilyPollVote.belongsTo(FamilyUser, { foreignKey: 'user_id', as: 'voter' });
-
-// ==========================================
-// 13. Associações de Finanças & Cofres (Fase 4)
-// ==========================================
-Family.hasMany(FamilyBill, { foreignKey: 'family_id', as: 'bills' });
-FamilyBill.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
-
-FamilyUser.hasMany(FamilyBill, { foreignKey: 'created_by', as: 'created_bills' });
-FamilyBill.belongsTo(FamilyUser, { foreignKey: 'created_by', as: 'creator' });
-
-Family.hasMany(FamilyClanVault, { foreignKey: 'family_id', as: 'vaults' });
-FamilyClanVault.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
-
-FamilyUser.hasMany(FamilyClanVault, { foreignKey: 'created_by', as: 'created_vaults' });
-FamilyClanVault.belongsTo(FamilyUser, { foreignKey: 'created_by', as: 'creator' });
-
-Family.hasMany(FamilyChildVault, { foreignKey: 'family_id', as: 'child_vaults' });
-FamilyChildVault.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
-
-FamilyUser.hasOne(FamilyChildVault, { foreignKey: 'user_id', as: 'child_vault' });
-FamilyChildVault.belongsTo(FamilyUser, { foreignKey: 'user_id', as: 'user' });
-
 // ==========================================
 // 10. Associações de Comunicação & WhatsApp
 // ==========================================
 Family.hasOne(FamilyWhatsappConfig, { foreignKey: 'family_id', as: 'whatsapp_config' });
 FamilyWhatsappConfig.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
+
+// Alias de retrocompatibilidade
+const Character = FamilyCharacter;
 
 export {
   sequelize,
@@ -292,24 +196,15 @@ export {
   DefinitionItem,
   DefinitionMonster,
   DefinitionTask,
-  Character,
   FamilyCharacter,
-  CharacterClass,
+  Character,
   CharacterAttribute,
-  CharacterSkill,
-  CharacterInventory,
   Task,
   TaskSubmission,
-  Event,
-  Battle,
   FamilyReward,
   FamilyRewardRedemption,
   FamilyQuizQuestion,
   FamilyQuizOption,
-  FamilyDungeonAdventure,
-  FamilyDungeonScene,
-  FamilyDungeonAction,
-  FamilyDungeonRun,
   FamilyZombiCampaign,
   FamilyZombiMission,
   FamilyZombiToken,
@@ -320,11 +215,6 @@ export {
   FamilyMealCheckin,
   FamilyShoppingItem,
   FamilyEvent,
-  FamilyPoll,
-  FamilyPollVote,
-  FamilyBill,
-  FamilyClanVault,
-  FamilyChildVault,
   FamilyWhatsappConfig,
   FamilyPushSubscription,
 };

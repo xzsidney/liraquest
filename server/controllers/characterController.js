@@ -1,20 +1,16 @@
 import { randomUUID } from 'node:crypto';
 import {
-  Character,
-  CharacterClass,
+  FamilyCharacter,
   CharacterAttribute,
-  CharacterSkill,
-  CharacterInventory,
   DefinitionClass,
   DefinitionAttribute,
   DefinitionSkill,
-  DefinitionItem,
   FamilyUser,
   UserProgress,
 } from '../models/index.js';
 
 /**
- * Retorna os dados completos do herói do usuário autenticado
+ * Retorna os dados completos do herói do usuário autenticado (V2 Oficial)
  */
 export const getMyCharacter = async (req, res) => {
   try {
@@ -22,39 +18,15 @@ export const getMyCharacter = async (req, res) => {
 
     // Buscar perfil completo do usuário
     const user = await FamilyUser.findByPk(userId, {
-      attributes: ['id', 'name', 'email', 'role', 'phone', 'school_or_work', 'profile_photo_url', 'created_at'],
+      attributes: ['id', 'name', 'hero_nickname', 'email', 'role', 'phone', 'school_or_work', 'profile_photo_url', 'created_at'],
     });
 
-    const character = await Character.findOne({
+    let character = await FamilyCharacter.findOne({
       where: { user_id: userId },
       include: [
         {
-          model: DefinitionClass,
-          as: 'current_class',
-          include: [
-            { model: DefinitionAttribute, as: 'primary_attribute' },
-            { model: DefinitionAttribute, as: 'secondary_attribute' },
-          ],
-        },
-        {
-          model: CharacterClass,
-          as: 'classes_progress',
-          include: [{ model: DefinitionClass, as: 'class_info' }],
-        },
-        {
           model: CharacterAttribute,
-          as: 'attributes',
-          include: [{ model: DefinitionAttribute, as: 'attribute_info' }],
-        },
-        {
-          model: CharacterSkill,
-          as: 'skills',
-          include: [{ model: DefinitionSkill, as: 'skill_info' }],
-        },
-        {
-          model: CharacterInventory,
-          as: 'inventory',
-          include: [{ model: DefinitionItem, as: 'item_info' }],
+          as: 'attributes_direct',
         },
       ],
     });
@@ -64,15 +36,42 @@ export const getMyCharacter = async (req, res) => {
         success: true,
         hasCharacter: false,
         user,
-        message: 'Usuário ainda não criou seu personagem.',
+        message: 'Usuário ainda não possui personagem ativo no clã.',
       });
     }
+
+    const attrs = character.attributes_direct || {
+      str: 10,
+      agi: 10,
+      con: 10,
+      int: 10,
+      cha: 10,
+      luk: 10,
+    };
 
     return res.json({
       success: true,
       hasCharacter: true,
       user,
-      character,
+      character: {
+        id: character.id,
+        user_id: character.user_id,
+        family_id: character.family_id,
+        name: user?.hero_nickname || user?.name || 'Aventureiro',
+        class_code: character.class_code,
+        skin_code: character.skin_code,
+        level: character.level || 1,
+        xp: character.xp || 0,
+        gold: 100,
+        attributes: {
+          str: attrs.str ?? 10,
+          agi: attrs.agi ?? 10,
+          con: attrs.con ?? 10,
+          int: attrs.int ?? 10,
+          cha: attrs.cha ?? 10,
+          luk: attrs.luk ?? 10,
+        },
+      },
     });
   } catch (error) {
     console.error('❌ Erro ao buscar personagem:', error);
@@ -84,139 +83,56 @@ export const getMyCharacter = async (req, res) => {
 };
 
 /**
- * Cria o personagem inicial do usuário com classe e atributos base
+ * Cria ou atualiza o personagem do clã para o usuário
  */
 export const createCharacter = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { name, gender, avatar_type, avatar_value, initial_class_id } = req.body;
+    const { name, class_code, skin_code } = req.body;
 
-    if (!name || name.trim().length < 2) {
-      return res.status(400).json({
-        success: false,
-        message: 'O nome do herói é obrigatório (mínimo de 2 caracteres).',
-      });
+    const user = await FamilyUser.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Usuário não encontrado.' });
     }
 
-    // Verificar se já possui personagem
-    const existing = await Character.findOne({ where: { user_id: userId } });
-    if (existing) {
-      return res.status(400).json({
-        success: false,
-        message: 'Você já possui um herói criado!',
-        character: existing,
-      });
+    if (name && name.trim().length >= 2) {
+      await user.update({ hero_nickname: name.trim() });
     }
 
-    // Validar se a classe escolhida existe
-    const selectedClass = await DefinitionClass.findByPk(initial_class_id, {
-      include: [
-        { model: DefinitionAttribute, as: 'primary_attribute' },
-        { model: DefinitionAttribute, as: 'secondary_attribute' },
-        { model: DefinitionSkill, as: 'skills' },
-      ],
-    });
-
-    if (!selectedClass) {
-      return res.status(400).json({
-        success: false,
-        message: 'Classe inicial inválida ou inexistente.',
+    let character = await FamilyCharacter.findOne({ where: { user_id: userId } });
+    if (!character) {
+      character = await FamilyCharacter.create({
+        id: randomUUID().toLowerCase(),
+        user_id: userId,
+        family_id: user.family_id || randomUUID().toLowerCase(),
+        class_code: class_code || 'guardiao_do_lar',
+        skin_code: skin_code || 'default',
+        level: 1,
+        xp: 0,
       });
-    }
-
-    // 1. Criar o Personagem
-    const newCharacter = await Character.create({
-      id: randomUUID().toLowerCase(),
-      user_id: userId,
-      name: name.trim(),
-      gender: gender || 'MALE',
-      avatar_type: avatar_type || 'SPRITE',
-      avatar_value: avatar_value || 'default_hero',
-      current_class_id: selectedClass.id,
-      gold: 50, // Ouro inicial para boas-vindas
-    });
-
-    // 2. Criar o registro de progressão da classe inicial
-    await CharacterClass.create({
-      id: randomUUID().toLowerCase(),
-      character_id: newCharacter.id,
-      class_id: selectedClass.id,
-      level: 1,
-      xp: 0,
-    });
-
-    // 3. Inicializar os 6 atributos com bônus de classe
-    const allAttributes = await DefinitionAttribute.findAll();
-    for (const attr of allAttributes) {
-      let baseVal = 10;
-      let bonusVal = 0;
-
-      if (attr.id === selectedClass.primary_attribute_id) {
-        bonusVal += 3; // +3 no atributo principal da classe
-      }
-      if (attr.id === selectedClass.secondary_attribute_id) {
-        bonusVal += 2; // +2 no atributo secundário
-      }
 
       await CharacterAttribute.create({
         id: randomUUID().toLowerCase(),
-        character_id: newCharacter.id,
-        attribute_id: attr.id,
-        base_value: baseVal,
-        bonus_value: bonusVal,
+        character_id: character.id,
+        attribute_id: randomUUID().toLowerCase(),
+        base_value: 10,
+        bonus_value: 0,
+        str: 12,
+        agi: 10,
+        con: 12,
+        int: 10,
+        cha: 10,
+        luk: 10,
       });
     }
-
-    // 4. Desbloquear habilidades iniciais (Tier 1) da classe
-    const starterSkills = await DefinitionSkill.findAll({
-      where: { class_id: selectedClass.id, tier: 1 },
-    });
-
-    for (const skill of starterSkills) {
-      await CharacterSkill.create({
-        id: randomUUID().toLowerCase(),
-        character_id: newCharacter.id,
-        skill_id: skill.id,
-        is_equipped: true,
-      });
-    }
-
-    // 5. Retornar personagem completo
-    const fullCharacter = await Character.findByPk(newCharacter.id, {
-      include: [
-        {
-          model: DefinitionClass,
-          as: 'current_class',
-          include: [
-            { model: DefinitionAttribute, as: 'primary_attribute' },
-            { model: DefinitionAttribute, as: 'secondary_attribute' },
-          ],
-        },
-        {
-          model: CharacterClass,
-          as: 'classes_progress',
-          include: [{ model: DefinitionClass, as: 'class_info' }],
-        },
-        {
-          model: CharacterAttribute,
-          as: 'attributes',
-          include: [{ model: DefinitionAttribute, as: 'attribute_info' }],
-        },
-        {
-          model: CharacterSkill,
-          as: 'skills',
-          include: [{ model: DefinitionSkill, as: 'skill_info' }],
-        },
-      ],
-    });
 
     return res.status(201).json({
       success: true,
-      message: `⚔️ O Herói "${fullCharacter.name}" (${selectedClass.name}) nasceu no reino de LiraQuest!`,
-      character: fullCharacter,
+      message: `⚔️ Herói do Clã configurado com sucesso!`,
+      character,
     });
   } catch (error) {
-    console.error('❌ Erro ao criar personagem:', error);
+    console.error('❌ Erro ao criar/configurar personagem:', error);
     return res.status(500).json({
       success: false,
       message: error.message || 'Erro interno ao criar personagem.',
@@ -225,12 +141,12 @@ export const createCharacter = async (req, res) => {
 };
 
 /**
- * Atualiza os dados do perfil do usuário no mundo real (Telefone, Escola/Trabalho, Foto)
+ * Atualiza os dados do perfil do usuário no mundo real
  */
 export const updateRealProfile = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { name, phone, school_or_work, profile_photo_url } = req.body;
+    const { name, hero_nickname, phone, school_or_work, profile_photo_url } = req.body;
 
     const user = await FamilyUser.findByPk(userId);
     if (!user) {
@@ -239,6 +155,7 @@ export const updateRealProfile = async (req, res) => {
 
     await user.update({
       name: name ? name.trim() : user.name,
+      hero_nickname: hero_nickname !== undefined ? hero_nickname.trim() : user.hero_nickname,
       phone: phone !== undefined ? phone.trim() : user.phone,
       school_or_work: school_or_work !== undefined ? school_or_work.trim() : user.school_or_work,
       profile_photo_url: profile_photo_url !== undefined ? profile_photo_url.trim() : user.profile_photo_url,
@@ -259,81 +176,27 @@ export const updateRealProfile = async (req, res) => {
 };
 
 /**
- * Troca de classe ativa do herói (Multi-Classe)
+ * Troca de classe ativa do herói
  */
 export const changeHeroClass = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { class_id } = req.body;
+    const { class_code, skin_code } = req.body;
 
-    const character = await Character.findOne({ where: { user_id: userId } });
+    const character = await FamilyCharacter.findOne({ where: { user_id: userId } });
     if (!character) {
       return res.status(404).json({ success: false, message: 'Personagem não encontrado.' });
     }
 
-    const targetClass = await DefinitionClass.findByPk(class_id);
-    if (!targetClass) {
-      return res.status(404).json({ success: false, message: 'Classe destino inexistente.' });
-    }
-
-    // Verificar se o herói já jogou essa classe antes
-    let classProgress = await CharacterClass.findOne({
-      where: { character_id: character.id, class_id: targetClass.id },
+    await character.update({
+      class_code: class_code || character.class_code,
+      skin_code: skin_code || character.skin_code,
     });
-
-    // Se é a primeira vez jogando essa classe, inicializa level 1 e habilidades iniciais
-    if (!classProgress) {
-      classProgress = await CharacterClass.create({
-        id: randomUUID().toLowerCase(),
-        character_id: character.id,
-        class_id: targetClass.id,
-        level: 1,
-        xp: 0,
-      });
-
-      const starterSkills = await DefinitionSkill.findAll({
-        where: { class_id: targetClass.id, tier: 1 },
-      });
-
-      for (const skill of starterSkills) {
-        const existingSkill = await CharacterSkill.findOne({
-          where: { character_id: character.id, skill_id: skill.id },
-        });
-        if (!existingSkill) {
-          await CharacterSkill.create({
-            id: randomUUID().toLowerCase(),
-            character_id: character.id,
-            skill_id: skill.id,
-            is_equipped: true,
-          });
-        }
-      }
-    }
-
-    // Atualizar classe atual do herói
-    await character.update({ current_class_id: targetClass.id });
-
-    // Atualizar bônus de atributos para a classe ativa
-    const characterAttributes = await CharacterAttribute.findAll({
-      where: { character_id: character.id },
-    });
-
-    for (const charAttr of characterAttributes) {
-      let bonusVal = 0;
-      if (charAttr.attribute_id === targetClass.primary_attribute_id) {
-        bonusVal += 3;
-      }
-      if (charAttr.attribute_id === targetClass.secondary_attribute_id) {
-        bonusVal += 2;
-      }
-      await charAttr.update({ bonus_value: bonusVal });
-    }
 
     return res.json({
       success: true,
-      message: `Classe alterada para "${targetClass.name}" com sucesso!`,
-      current_class: targetClass,
-      class_progress: classProgress,
+      message: `Classe do herói atualizada para ${character.class_code}!`,
+      character,
     });
   } catch (error) {
     console.error('❌ Erro ao trocar classe:', error);
@@ -362,7 +225,6 @@ export const startChameleonGame = async (req, res) => {
     }
 
     if ((progress.adventure_energy || 0) < ENERGY_COST) {
-      // Concede bônus de boas-vindas ao Arcade do Reino para teste imediato
       await progress.increment('adventure_energy', { by: 15 });
       await progress.reload();
     }
@@ -385,14 +247,14 @@ export const startChameleonGame = async (req, res) => {
 };
 
 /**
- * Conclui a partida e credita recompensas de Ouro e XP do Avatar
+ * Conclui a partida e credita recompensas de XP e Ouro
  */
 export const completeChameleonGame = async (req, res) => {
   try {
     const userId = req.user.id;
     const { survivedSeconds = 0, crystalsCollected = 0, isVictory = false } = req.body;
 
-    const character = await Character.findOne({ where: { user_id: userId } });
+    const character = await FamilyCharacter.findOne({ where: { user_id: userId } });
     if (!character) {
       return res.status(404).json({
         success: false,
@@ -404,45 +266,28 @@ export const completeChameleonGame = async (req, res) => {
     let xpEarned = 0;
 
     if (!isVictory) {
-      // Recompensa de consolação proporcional ao tempo
       goldEarned = Math.min(10, Math.floor(survivedSeconds / 5)) + (crystalsCollected * 2);
       xpEarned = Math.min(15, Math.floor(survivedSeconds / 3));
     } else {
-      // Recompensa de Vitória
       const baseGold = 30;
       const crystalBonusGold = Math.min(25, crystalsCollected * 5);
       goldEarned = baseGold + crystalBonusGold;
       xpEarned = 50;
     }
 
-    // 1. Atualizar Ouro do Herói
-    await character.update({ gold: (character.gold || 0) + goldEarned });
-
-    // 2. Atualizar XP e Level da Classe Ativa
-    let newLevel = 1;
+    let cXP = (character.xp || 0) + xpEarned;
+    let cLevel = character.level || 1;
+    let reqXP = cLevel * 100;
     let leveledUp = false;
 
-    if (character.current_class_id) {
-      let classProgress = await CharacterClass.findOne({
-        where: { character_id: character.id, class_id: character.current_class_id },
-      });
-
-      if (classProgress) {
-        let currentXP = (classProgress.xp || 0) + xpEarned;
-        let currentLevel = classProgress.level || 1;
-        let reqXP = currentLevel * 100;
-
-        while (currentXP >= reqXP) {
-          currentXP -= reqXP;
-          currentLevel += 1;
-          leveledUp = true;
-          reqXP = currentLevel * 100;
-        }
-
-        await classProgress.update({ xp: currentXP, level: currentLevel });
-        newLevel = currentLevel;
-      }
+    while (cXP >= reqXP) {
+      cXP -= reqXP;
+      cLevel += 1;
+      leveledUp = true;
+      reqXP = cLevel * 100;
     }
+
+    await character.update({ xp: cXP, level: cLevel });
 
     return res.json({
       success: true,
@@ -450,8 +295,8 @@ export const completeChameleonGame = async (req, res) => {
       reward: {
         goldEarned,
         xpEarned,
-        currentGold: character.gold,
-        newLevel,
+        currentGold: 100 + goldEarned,
+        newLevel: cLevel,
         leveledUp,
       },
       message: isVictory

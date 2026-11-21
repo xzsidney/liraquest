@@ -6,17 +6,11 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 import {
-  Character,
+  FamilyCharacter,
+  FamilyUser,
   UserProgress,
-  Battle,
-  CharacterClass,
   CharacterAttribute,
-  DefinitionAttribute,
-  CharacterSkill,
   DefinitionSkill,
-  CharacterInventory,
-  DefinitionItem,
-  DefinitionClass,
 } from '../models/index.js';
 
 /**
@@ -38,7 +32,6 @@ export const startBattle = async (req, res) => {
       });
     }
 
-    // Se estiver sem energia para testar, concede recarga cortesia
     if ((progress.adventure_energy || 0) < energy_cost) {
       await progress.increment('adventure_energy', { by: 15 });
       await progress.reload();
@@ -47,120 +40,51 @@ export const startBattle = async (req, res) => {
     await progress.decrement('adventure_energy', { by: energy_cost });
     await progress.reload();
 
-    // 2. Localizar personagem completo com Atributos, Habilidades e Equipamentos
-    let character = await Character.findOne({
+    // 2. Localizar personagem e usuário
+    const user = await FamilyUser.findByPk(userId);
+    let character = await FamilyCharacter.findOne({
       where: { user_id: userId },
       include: [
-        { model: DefinitionClass, as: 'current_class' },
         {
           model: CharacterAttribute,
-          as: 'attributes',
-          include: [{ model: DefinitionAttribute, as: 'attribute_info' }],
-        },
-        {
-          model: CharacterSkill,
-          as: 'skills',
-          where: { is_equipped: true },
-          required: false,
-          include: [{ model: DefinitionSkill, as: 'skill_info' }],
-        },
-        {
-          model: CharacterInventory,
-          as: 'inventory',
-          where: { is_equipped: true },
-          required: false,
-          include: [{ model: DefinitionItem, as: 'item_info' }],
+          as: 'attributes_direct',
         },
       ],
     });
 
-    // Se o usuário ainda não criou personagem, cria um herói padrão
     if (!character) {
-      const defaultClass = await DefinitionClass.findOne();
-      character = await Character.create({
+      character = await FamilyCharacter.create({
         id: randomUUID().toLowerCase(),
         user_id: userId,
-        name: 'Herói Lendário',
+        family_id: user?.family_id || randomUUID().toLowerCase(),
+        class_code: 'guardiao_do_lar',
+        skin_code: 'default',
         level: 1,
-        current_xp: 0,
-        gold: 100,
-        current_class_id: defaultClass ? defaultClass.id : null,
-      });
-      character = await Character.findByPk(character.id, {
-        include: [
-          { model: DefinitionClass, as: 'current_class' },
-          {
-            model: CharacterAttribute,
-            as: 'attributes',
-            include: [{ model: DefinitionAttribute, as: 'attribute_info' }],
-          },
-          { model: CharacterSkill, as: 'skills', include: [{ model: DefinitionSkill, as: 'skill_info' }] },
-          { model: CharacterInventory, as: 'inventory', include: [{ model: DefinitionItem, as: 'item_info' }] },
-        ],
+        xp: 0,
       });
     }
 
     // 3. Mapear Atributos (FOR, CON, INT, AGI, CAR, SOR)
-    const attrMap = { str: 10, con: 10, int: 10, agi: 10, cha: 10, luk: 10 };
-    if (character.attributes && character.attributes.length > 0) {
-      character.attributes.forEach(attr => {
-        const code = attr.attribute_info?.code?.toLowerCase();
-        if (code && attrMap[code] !== undefined) {
-          attrMap[code] = (attr.base_value || 10) + (attr.bonus_value || 0);
-        }
-      });
-    }
-
-    // Bônus de Equipamentos
-    let weaponBonus = 0;
-    let armorBonus = 0;
-    if (character.inventory && character.inventory.length > 0) {
-      character.inventory.forEach(inv => {
-        const item = inv.item_info;
-        if (item && item.stat_bonuses) {
-          if (item.stat_bonuses.atk) weaponBonus += item.stat_bonuses.atk;
-          if (item.stat_bonuses.str) weaponBonus += item.stat_bonuses.str * 2;
-          if (item.stat_bonuses.def) armorBonus += item.stat_bonuses.def;
-          if (item.stat_bonuses.con) armorBonus += item.stat_bonuses.con * 2;
-        }
-      });
-    }
+    const attrs = character.attributes_direct || {};
+    const attrMap = {
+      str: attrs.str ?? 12,
+      con: attrs.con ?? 12,
+      int: attrs.int ?? 10,
+      agi: attrs.agi ?? 10,
+      cha: attrs.cha ?? 10,
+      luk: attrs.luk ?? 10,
+    };
 
     const level = character.level || 1;
 
     // 4. Calcular Estatísticas de Combate com base na Ficha do Herói
     const maxHp = 180 + (attrMap.con * 18) + (level * 25);
     const maxMp = 70 + (attrMap.int * 8) + (level * 6);
-    const atkPhys = 30 + Math.floor(attrMap.str * 3.2) + weaponBonus;
+    const atkPhys = 30 + Math.floor(attrMap.str * 3.2);
     const atkMagic = 35 + Math.floor(attrMap.int * 3.5);
-    const defense = Math.floor(attrMap.con * 1.5) + armorBonus;
+    const defense = Math.floor(attrMap.con * 1.5);
     const speedAtb = 10 + Math.floor(attrMap.agi * 0.9);
     const critChance = Math.min(0.5, 0.05 + (attrMap.luk * 0.007));
-
-    // 5. Obter Habilidades Equipadas (máximo 3) ou carregar as habilidades do arquétipo
-    let equippedSkills = [];
-    if (character.skills && character.skills.length > 0) {
-      equippedSkills = character.skills
-        .filter(s => s.skill_info)
-        .slice(0, 3)
-        .map(s => s.skill_info);
-    }
-
-    // Se tiver menos de 3 habilidades equipadas, busca as do arquétipo para preencher os 3 slots
-    if (equippedSkills.length < 3) {
-      let targetCodes = ['skill_shield_slash', 'skill_stars_stripes', 'skill_charging_star'];
-      if (player_hero === 'cyclops') targetCodes = ['skill_optic_blast', 'skill_optic_sweep', 'skill_gene_splice'];
-      else if (player_hero === 'spiderman') targetCodes = ['skill_shield_slash', 'skill_stars_stripes', 'skill_charging_star'];
-      else if (player_hero === 'wolverine') targetCodes = ['skill_shield_slash', 'skill_stars_stripes', 'skill_charging_star'];
-      else if (player_hero === 'gambit') targetCodes = ['skill_shield_slash', 'skill_stars_stripes', 'skill_charging_star'];
-
-      const fallbackSkills = await DefinitionSkill.findAll({
-        where: { code: targetCodes },
-        order: [['tier', 'ASC']],
-      });
-
-      equippedSkills = fallbackSkills.slice(0, 3);
-    }
 
     // Nomes e descrições temáticas por lutador
     const HERO_THEMES = {
@@ -220,7 +144,7 @@ export const startBattle = async (req, res) => {
       mp_gain: 15,
       fury_gain: 12,
       damage_multiplier: 1.0,
-      animation_id: 100, // 100 = Ataque Físico Avançado
+      animation_id: 100,
       desc: currentTheme.basicDesc,
       icon: '👊',
     };
@@ -239,7 +163,6 @@ export const startBattle = async (req, res) => {
       })),
     ];
 
-    // Estatísticas Calibradas do Oponente
     const opponentHp = Math.floor(maxHp * 0.95);
     const opponentMp = maxMp;
     const opponentAtk = Math.floor(atkPhys * 0.9);
@@ -254,10 +177,10 @@ export const startBattle = async (req, res) => {
       opponent,
       character: {
         id: character.id,
-        name: character.name,
+        name: user?.hero_nickname || user?.name || 'Guardião Lendário',
         level: character.level,
-        gold: character.gold,
-        class_name: character.current_class?.name || 'Guardião Lendário',
+        gold: 100,
+        class_name: character.class_code || 'Guardião Lendário',
         attributes: attrMap,
       },
       player_battle_stats: {
@@ -295,32 +218,31 @@ export const startBattle = async (req, res) => {
 export const finishBattle = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { result, player_hero, opponent, turns_count = 1 } = req.body;
+    const { result, turns_count = 1 } = req.body;
 
     const isVictory = result === 'VICTORY';
     const goldEarned = isVictory ? 50 : 10;
     const xpEarned = isVictory ? 80 : 25;
 
-    let character = await Character.findOne({ where: { user_id: userId } });
+    let character = await FamilyCharacter.findOne({ where: { user_id: userId } });
+    const user = await FamilyUser.findByPk(userId);
     let leveledUp = false;
     let newLevel = 1;
 
     if (character) {
-      await character.increment({
-        gold: goldEarned,
-        current_xp: xpEarned,
-      });
-      await character.reload();
+      let cXP = (character.xp || 0) + xpEarned;
+      let cLevel = character.level || 1;
+      let reqXP = cLevel * 100;
 
-      // Cálculo de subida de nível simples (100 * level)
-      const xpNeeded = character.level * 100;
-      if (character.current_xp >= xpNeeded) {
-        await character.increment('level', { by: 1 });
-        await character.decrement('current_xp', { by: xpNeeded });
-        await character.reload();
+      while (cXP >= reqXP) {
+        cXP -= reqXP;
+        cLevel += 1;
         leveledUp = true;
-        newLevel = character.level;
+        reqXP = cLevel * 100;
       }
+
+      await character.update({ xp: cXP, level: cLevel });
+      newLevel = cLevel;
     }
 
     return res.json({
@@ -338,10 +260,10 @@ export const finishBattle = async (req, res) => {
       character: character
         ? {
             id: character.id,
-            name: character.name,
+            name: user?.hero_nickname || user?.name || 'Guardião Lendário',
             level: character.level,
-            gold: character.gold,
-            current_xp: character.current_xp,
+            gold: 100 + goldEarned,
+            current_xp: character.xp,
           }
         : null,
     });
@@ -356,7 +278,6 @@ export const finishBattle = async (req, res) => {
 
 /**
  * GET /api/battle/manifest/:hero
- * Retorna o manifest.json e a lista de sprites disponíveis na pasta do personagem
  */
 export const getHeroManifest = async (req, res) => {
   try {
@@ -395,7 +316,6 @@ export const getHeroManifest = async (req, res) => {
 
 /**
  * POST /api/battle/manifest/:hero
- * Salva o manifest.json atualizado do personagem com backup de segurança
  */
 export const saveHeroManifest = async (req, res) => {
   try {
@@ -414,12 +334,10 @@ export const saveHeroManifest = async (req, res) => {
     const manifestPath = path.join(charDir, 'manifest.json');
     const backupPath = path.join(charDir, 'manifest.backup.json');
 
-    // Cria backup do anterior se existir
     if (fs.existsSync(manifestPath)) {
       fs.copyFileSync(manifestPath, backupPath);
     }
 
-    // Salva o novo manifest formatado
     fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2), 'utf8');
 
     return res.json({

@@ -7,8 +7,7 @@ import {
   TaskSubmission,
   FamilyMember,
   DefinitionTask,
-  Character,
-  CharacterClass,
+  FamilyCharacter,
   CharacterAttribute,
   DefinitionAttribute,
 } from '../models/index.js';
@@ -451,50 +450,40 @@ export const completeFocusSession = async (req, res) => {
     let leveledUp = false;
     let intBoosted = false;
 
-    const character = await Character.findOne({ where: { user_id: userId } });
+    const character = await FamilyCharacter.findOne({ where: { user_id: userId } });
     if (character) {
-      await character.update({
-        gold: (character.gold || 0) + goldEarned,
-      });
-      currentGold = character.gold;
-
-      if (character.current_class_id) {
-        const classProgress = await CharacterClass.findOne({
-          where: { character_id: character.id, class_id: character.current_class_id },
-        });
-        if (classProgress) {
-          let cXP = (classProgress.xp || 0) + xpEarned;
-          let cLevel = classProgress.level || 1;
-          let reqXP = cLevel * 100;
-          while (cXP >= reqXP) {
-            cXP -= reqXP;
-            cLevel += 1;
-            leveledUp = true;
-            reqXP = cLevel * 100;
-          }
-          await classProgress.update({ xp: cXP, level: cLevel });
-          newLevel = cLevel;
-          newXP = cXP;
-        }
+      let cXP = (character.xp || 0) + xpEarned;
+      let cLevel = character.level || 1;
+      let reqXP = cLevel * 100;
+      while (cXP >= reqXP) {
+        cXP -= reqXP;
+        cLevel += 1;
+        leveledUp = true;
+        reqXP = cLevel * 100;
       }
+      await character.update({ xp: cXP, level: cLevel });
+      newLevel = cLevel;
+      newXP = cXP;
 
       // 3. Conversão de Foco em Bônus de Atributo: +1 Inteligência (INT)
-      const intAttrDef = await DefinitionAttribute.findOne({ where: { code: 'int' } });
-      if (intAttrDef) {
-        const [charAttr] = await CharacterAttribute.findOrCreate({
-          where: {
-            character_id: character.id,
-            attribute_id: intAttrDef.id,
-          },
-          defaults: {
-            id: randomUUID().toLowerCase(),
-            base_value: 10,
-            bonus_value: 0,
-          },
-        });
-        await charAttr.increment('bonus_value', { by: 1 });
-        intBoosted = true;
-      }
+      const [charAttr] = await CharacterAttribute.findOrCreate({
+        where: { character_id: character.id },
+        defaults: {
+          id: randomUUID().toLowerCase(),
+          character_id: character.id,
+          attribute_id: randomUUID().toLowerCase(),
+          base_value: 10,
+          bonus_value: 0,
+          str: 10,
+          agi: 10,
+          con: 10,
+          int: 10,
+          cha: 10,
+          luk: 10,
+        },
+      });
+      await charAttr.increment('int', { by: 1 });
+      intBoosted = true;
     }
 
     return res.json({
