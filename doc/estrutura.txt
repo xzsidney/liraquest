@@ -19,6 +19,9 @@ LiraQuest/
 │   │   ├── core/             # API client, Auth, Navegação
 │   │   ├── components/       # HUD Nobre do Topo, Modais, Cards
 │   │   └── views/            # 📱 AS TELAS PRINCIPAIS (1 Clique)
+│   │       ├── HomeView.js   # Página Inicial & Portal do Reino
+│   │       ├── LoginView.js  # Acesso Híbrido: Pais (Senha) vs Filhos (PIN)
+│   │       ├── RegisterView.js # Cadastro de Guardião & Novo Clã
 │   │       ├── HubView.js    # A tela única do Herói/Guardião
 │   │       ├── TasksView.js  # Mural de Deveres
 │   │       ├── StudyView.js  # Foco Pomodoro & Lições

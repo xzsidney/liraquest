@@ -5,7 +5,9 @@
 import { auth } from './core/auth.js';
 import { router } from './core/router.js';
 import { renderNavbar, bindNavbarEvents } from './components/Navbar.js';
+import { renderHomeView, bindHomeEvents } from './views/HomeView.js';
 import { renderLoginView, bindLoginEvents } from './views/LoginView.js';
+import { renderRegisterView, bindRegisterEvents } from './views/RegisterView.js';
 import { renderHubView, bindHubEvents } from './views/HubView.js';
 import { renderTasksView, bindTasksEvents } from './views/TasksView.js';
 import { renderStudyView, bindStudyEvents } from './views/StudyView.js';
@@ -49,7 +51,9 @@ async function mountView(renderFn, bindFn) {
 }
 
 // Registro das Rotas Oficiais SPA
+router.register('home', () => mountView(renderHomeView, bindHomeEvents));
 router.register('login', () => mountView(renderLoginView, bindLoginEvents));
+router.register('register', () => mountView(renderRegisterView, bindRegisterEvents));
 router.register('hub', () => mountView(renderHubView, bindHubEvents));
 router.register('tasks', () => mountView(renderTasksView, bindTasksEvents));
 router.register('study', () => mountView(renderStudyView, bindStudyEvents));

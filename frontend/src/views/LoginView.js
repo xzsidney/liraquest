@@ -1,20 +1,17 @@
 /**
- * LiraQuest - Tela de Login Híbrido (Pais vs Filhos)
+ * LiraQuest - Tela de Login Oficial (Pais vs Filhos)
  * frontend/src/views/LoginView.js
  */
 
 import { auth } from '../core/auth.js';
 import { router } from '../core/router.js';
 
-let activeTab = 'children'; // 'children' ou 'parents'
+let activeTab = 'parents'; // 'parents' ou 'children'
 let selectedHero = null;
 let currentPin = '';
 
 export async function renderLoginView() {
   const children = await auth.getChildren();
-  if (!selectedHero && children.length > 0) {
-    selectedHero = children[0].hero_nickname;
-  }
 
   return `
     <div style="max-width: 480px; margin: 30px auto; animation: fadeIn 0.3s ease-out;">
@@ -24,23 +21,62 @@ export async function renderLoginView() {
         <div style="text-align: center; margin-bottom: 20px;">
           <div style="font-size: 3rem; margin-bottom: 8px;">🏰</div>
           <h2 class="cinzel gold-gradient-text" style="font-size: 2rem; margin-bottom: 4px;">Portões do Reino</h2>
-          <p style="font-size: 0.9rem; color: var(--text-muted);">Identifique-se para entrar no Grande Salão</p>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">Entre no Grande Salão com suas credenciais</p>
         </div>
 
         <!-- Abas de Alternância -->
         <div class="login-tabs-nav">
-          <button id="tab-btn-children" class="login-tab-btn ${activeTab === 'children' ? 'active' : ''}">
-            ⚔️ Filhos (Heróis)
-          </button>
           <button id="tab-btn-parents" class="login-tab-btn ${activeTab === 'parents' ? 'active' : ''}">
             👑 Pais (Guardiões)
           </button>
+          <button id="tab-btn-children" class="login-tab-btn ${activeTab === 'children' ? 'active' : ''}">
+            ⚔️ Filhos (Heróis)
+          </button>
         </div>
 
-        <!-- ABA 1: FILHOS / HERÓIS (CARDS + PIN) -->
+        <!-- ABA 1: PAIS / GUARDIÕES (E-MAIL E SENHA) -->
+        <div id="tab-content-parents" style="display: ${activeTab === 'parents' ? 'block' : 'none'};">
+          <form id="parents-login-form" style="display: flex; flex-direction: column; gap: 16px;">
+            <div>
+              <label style="display: block; font-size: 0.85rem; font-weight: 700; color: #cbd5e1; margin-bottom: 6px;">
+                E-mail Cadastrado
+              </label>
+              <input 
+                type="email" 
+                id="parent-input-email" 
+                required 
+                placeholder="seu@email.com" 
+                value=""
+                autocomplete="email"
+                style="width: 100%; background: #0f172a; color: #fff; border: 1px solid rgba(255, 255, 255, 0.15); padding: 12px 14px; border-radius: 12px; font-size: 0.95rem; outline: none;"
+              />
+            </div>
+
+            <div>
+              <label style="display: block; font-size: 0.85rem; font-weight: 700; color: #cbd5e1; margin-bottom: 6px;">
+                Senha Secreta
+              </label>
+              <input 
+                type="password" 
+                id="parent-input-password" 
+                required 
+                placeholder="Digite sua senha" 
+                value=""
+                autocomplete="current-password"
+                style="width: 100%; background: #0f172a; color: #fff; border: 1px solid rgba(255, 255, 255, 0.15); padding: 12px 14px; border-radius: 12px; font-size: 0.95rem; outline: none;"
+              />
+            </div>
+
+            <button type="submit" id="btn-submit-parent" class="btn-noble btn-noble-primary" style="width: 100%; padding: 14px; font-size: 1.05rem; margin-top: 6px;">
+              👑 Entrar como Guardião
+            </button>
+          </form>
+        </div>
+
+        <!-- ABA 2: FILHOS / HERÓIS (CARDS + PIN) -->
         <div id="tab-content-children" style="display: ${activeTab === 'children' ? 'block' : 'none'};">
           <p style="text-align: center; font-size: 0.85rem; color: #cbd5e1; margin-bottom: 14px;">
-            Escolha seu herói e digite o seu PIN de 4 números:
+            Toque no seu herói e digite o seu PIN de 4 números:
           </p>
 
           <!-- Cards dos Heróis -->
@@ -61,7 +97,7 @@ export async function renderLoginView() {
           <!-- Indicador Visual do PIN -->
           <div style="text-align: center; margin: 12px 0 6px;">
             <span style="font-size: 0.82rem; font-weight: 700; color: #fde047; text-transform: uppercase;">
-              PIN de Acesso:
+              PIN de 4 Números:
             </span>
           </div>
           <div class="pin-display-box">
@@ -89,55 +125,22 @@ export async function renderLoginView() {
 
           <!-- Botão de Entrar -->
           <button id="btn-submit-child" class="btn-noble btn-noble-gold" style="width: 100%; padding: 14px; font-size: 1.05rem;">
-            ⚔️ Iniciar Aventura (${selectedHero || 'Herói'})
+            ⚔️ Iniciar Aventura ${selectedHero ? `(${selectedHero})` : ''}
           </button>
-          <div style="text-align: center; margin-top: 10px;">
-            <small style="color: var(--text-dim); font-size: 0.75rem;">Dica dos Pais: PIN padrão é 1234</small>
-          </div>
-        </div>
-
-        <!-- ABA 2: PAIS / GUARDIÕES (E-MAIL E SENHA) -->
-        <div id="tab-content-parents" style="display: ${activeTab === 'parents' ? 'block' : 'none'};">
-          <form id="parents-login-form" style="display: flex; flex-direction: column; gap: 16px;">
-            <div>
-              <label style="display: block; font-size: 0.85rem; font-weight: 700; color: #cbd5e1; margin-bottom: 6px;">
-                E-mail do Guardião
-              </label>
-              <input 
-                type="email" 
-                id="parent-input-email" 
-                required 
-                placeholder="sidney@liraquest.com" 
-                value="sidney@liraquest.com"
-                style="width: 100%; background: #0f172a; color: #fff; border: 1px solid rgba(255, 255, 255, 0.15); padding: 12px 14px; border-radius: 12px; font-size: 0.95rem; outline: none;"
-              />
-            </div>
-
-            <div>
-              <label style="display: block; font-size: 0.85rem; font-weight: 700; color: #cbd5e1; margin-bottom: 6px;">
-                Senha Secreta
-              </label>
-              <input 
-                type="password" 
-                id="parent-input-password" 
-                required 
-                placeholder="••••••••" 
-                value="LiraQuest@2026"
-                style="width: 100%; background: #0f172a; color: #fff; border: 1px solid rgba(255, 255, 255, 0.15); padding: 12px 14px; border-radius: 12px; font-size: 0.95rem; outline: none;"
-              />
-            </div>
-
-            <button type="submit" id="btn-submit-parent" class="btn-noble btn-noble-primary" style="width: 100%; padding: 14px; font-size: 1.05rem; margin-top: 6px;">
-              👑 Entrar como Guardião Mestre
-            </button>
-          </form>
-          <div style="text-align: center; margin-top: 12px;">
-            <small style="color: var(--text-dim); font-size: 0.75rem;">Guardiões: Sidney Lira & Elaine Lira</small>
-          </div>
         </div>
 
         <!-- Mensagens de Erro / Status -->
         <div id="login-feedback-msg" style="margin-top: 14px; text-align: center; font-size: 0.85rem; display: none;"></div>
+
+        <!-- Links Auxiliares de Navegação -->
+        <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
+          <a href="#/register" id="link-go-reg" style="color: #fde047; text-decoration: none; font-weight: 700;">
+            ✨ Cadastrar Novo Clã
+          </a>
+          <a href="#/home" id="link-go-home" style="color: var(--text-muted); text-decoration: none;">
+            ⬅️ Voltar ao Início
+          </a>
+        </div>
 
       </div>
     </div>
@@ -150,6 +153,11 @@ export function bindLoginEvents() {
   const tabContentChildren = document.getElementById('tab-content-children');
   const tabContentParents = document.getElementById('tab-content-parents');
   const feedbackMsg = document.getElementById('login-feedback-msg');
+  const linkGoReg = document.getElementById('link-go-reg');
+  const linkGoHome = document.getElementById('link-go-home');
+
+  if (linkGoReg) linkGoReg.onclick = (e) => { e.preventDefault(); router.navigate('register'); };
+  if (linkGoHome) linkGoHome.onclick = (e) => { e.preventDefault(); router.navigate('home'); };
 
   function showMessage(text, isError = true) {
     if (feedbackMsg) {
@@ -272,12 +280,12 @@ export function bindLoginEvents() {
       const btn = document.getElementById('btn-submit-parent');
 
       if (!email || !password) {
-        showMessage('Preencha e-mail e senha.');
+        showMessage('Preencha seu e-mail e sua senha.');
         return;
       }
 
       try {
-        if (btn) btn.textContent = '⏳ Autenticando Guardião...';
+        if (btn) btn.textContent = '⏳ Autenticando...';
         showMessage('Validando credenciais...', false);
         await auth.loginWithEmail(email, password);
         showMessage('🎉 Bem-vindo, Guardião! Entrando...', false);
@@ -286,7 +294,7 @@ export function bindLoginEvents() {
         }, 300);
       } catch (err) {
         showMessage(err.message || 'E-mail ou senha incorretos.');
-        if (btn) btn.textContent = '👑 Entrar como Guardião Mestre';
+        if (btn) btn.textContent = '👑 Entrar como Guardião';
       }
     };
   }
