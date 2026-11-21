@@ -25,23 +25,32 @@ FamilyUser.init(
         len: { args: [2, 100], msg: 'O nome deve ter entre 2 e 100 caracteres.' },
       },
     },
+    hero_nickname: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
     email: {
       type: DataTypes.STRING(150),
-      allowNull: false,
+      allowNull: true,
       unique: {
         name: 'unique_user_email',
         msg: 'Este e-mail já está cadastrado no sistema.',
       },
       validate: {
-        isEmail: { msg: 'Forneça um e-mail válido.' },
+        isEmail(val) {
+          if (val && !/\S+@\S+\.\S+/.test(val)) {
+            throw new Error('Forneça um e-mail válido.');
+          }
+        },
       },
     },
     password: {
       type: DataTypes.STRING(255),
-      allowNull: false,
-      validate: {
-        notEmpty: { msg: 'A senha é obrigatória.' },
-      },
+      allowNull: true,
+    },
+    pin: {
+      type: DataTypes.STRING(10),
+      allowNull: true,
     },
     role: {
       type: DataTypes.ENUM('ADMIN', 'PARENT', 'CHILD'),
@@ -53,6 +62,10 @@ FamilyUser.init(
           msg: 'Perfil inválido. Escolha entre ADMIN, PARENT ou CHILD.',
         },
       },
+    },
+    family_id: {
+      type: DataTypes.UUID,
+      allowNull: true,
     },
     phone: {
       type: DataTypes.STRING(30),

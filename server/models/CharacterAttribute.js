@@ -28,6 +28,36 @@ CharacterAttribute.init(
       allowNull: false,
       defaultValue: 0,
     },
+    str: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: 10,
+    },
+    agi: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: 10,
+    },
+    con: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: 10,
+    },
+    int: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: 10,
+    },
+    cha: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: 10,
+    },
+    luk: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: 10,
+    },
   },
   {
     sequelize,
@@ -35,12 +65,7 @@ CharacterAttribute.init(
     tableName: 'character_attributes',
     timestamps: true,
     underscored: true,
-    indexes: [
-      {
-        unique: true,
-        fields: ['character_id', 'attribute_id'],
-        name: 'unique_character_attribute',
-      },
-    ],
   }
 );
+
+export default CharacterAttribute;

@@ -10,6 +10,7 @@ import { DefinitionItem } from './DefinitionItem.js';
 import { DefinitionMonster } from './DefinitionMonster.js';
 import { DefinitionTask } from './DefinitionTask.js';
 import { Character } from './Character.js';
+import { FamilyCharacter } from './FamilyCharacter.js';
 
 import { CharacterClass } from './CharacterClass.js';
 import { CharacterAttribute } from './CharacterAttribute.js';
@@ -71,6 +72,20 @@ FamilyMember.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
 
 FamilyUser.hasMany(FamilyMember, { foreignKey: 'user_id', as: 'family_memberships' });
 FamilyMember.belongsTo(FamilyUser, { foreignKey: 'user_id', as: 'user' });
+
+// Vínculo Multi-tenant Direto
+FamilyUser.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
+Family.hasMany(FamilyUser, { foreignKey: 'family_id', as: 'users' });
+
+// Associações do Herói do Clã (FamilyCharacter)
+FamilyUser.hasOne(FamilyCharacter, { foreignKey: 'user_id', as: 'family_character' });
+FamilyCharacter.belongsTo(FamilyUser, { foreignKey: 'user_id', as: 'user' });
+
+Family.hasMany(FamilyCharacter, { foreignKey: 'family_id', as: 'family_characters' });
+FamilyCharacter.belongsTo(Family, { foreignKey: 'family_id', as: 'family' });
+
+FamilyCharacter.hasOne(CharacterAttribute, { foreignKey: 'character_id', as: 'attributes_direct', constraints: false });
+CharacterAttribute.belongsTo(FamilyCharacter, { foreignKey: 'character_id', as: 'family_character', constraints: false });
 
 // ==========================================
 // 2. Associações de Definições / Catálogo
@@ -278,6 +293,7 @@ export {
   DefinitionMonster,
   DefinitionTask,
   Character,
+  FamilyCharacter,
   CharacterClass,
   CharacterAttribute,
   CharacterSkill,

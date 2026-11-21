@@ -26,9 +26,12 @@ Armazena a conta de acesso ao sistema (Mundo Real).
 |:---|:---|:---|:---|
 | `id` | `UUID` (PK) | Não | Identificador único do usuário |
 | `name` | `VARCHAR(100)` | Não | Nome real do usuário |
-| `email` | `VARCHAR(150)` | Não | E-mail de login (Único) |
-| `password` | `VARCHAR(255)` | Não | Hash seguro bcrypt |
+| `hero_nickname` | `VARCHAR(100)` | Sim | Apelido heroico de RPG (ex: 'Paladino Sidney', 'Sir Paulinho') |
+| `email` | `VARCHAR(150)` | Sim | E-mail de login (Único) |
+| `password` | `VARCHAR(255)` | Sim | Hash seguro bcrypt |
+| `pin` | `VARCHAR(10)` | Sim | PIN de 4 dígitos para login rápido de crianças no tablet |
 | `role` | `ENUM('ADMIN','PARENT','CHILD')` | Não | Papel no sistema (Padrão: `CHILD`) |
+| `family_id` | `UUID` (FK) | Sim | Chave de isolamento multi-tenant vinculada a `families.id` |
 | `phone` | `VARCHAR(30)` | Sim | Telefone de contato real |
 | `school_or_work` | `VARCHAR(150)` | Sim | Instituição de estudo ou trabalho |
 | `profile_photo_url` | `VARCHAR(255)` | Sim | URL da foto real do usuário |
@@ -189,10 +192,24 @@ Catálogo oficial das 42 tarefas padrão da vida real (Domestic, Study, Health, 
 
 ---
 
-## 4. Módulo de Personagem (`characters` e `character_*`)
+## 4. Módulo de Personagem (`family_characters`, `characters` e `character_*`)
+
+### 🛡️ `family_characters`
+Entidade primária do herói dentro da arquitetura Multi-Tenant do clã.
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único do herói |
+| `user_id` | `UUID` (FK) | Não | Referência a `family_users.id` (Único por membro) |
+| `family_id` | `UUID` (FK) | Não | Chave estrangeira para `families.id` |
+| `class_code` | `VARCHAR(50)` | Não | Código da classe ativa (`guardiao_do_lar`, etc.) |
+| `level` | `INT` | Não | Nível de aventureiro (Inicia em 1) |
+| `xp` | `INT` | Não | Pontos de experiência acumulados |
+| `skin_code` | `VARCHAR(100)` | Não | Código cosmético da Skin/Sprite ativa |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
 
 ### ⚔️ `characters`
-Identidade de RPG do jogador no Mundo do Jogo.
+Identidade de RPG estendida do jogador no Mundo do Jogo (compatibilidade legada).
 
 | Coluna | Tipo | Nulo | Descrição |
 |:---|:---|:---|:---|
@@ -222,17 +239,22 @@ Progresso individual de cada classe jogada (Sistema Multi-Classe).
 | *Constraint* | `UNIQUE(character_id, class_id)` | | Garante 1 registro por classe por herói |
 
 ### 📊 `character_attributes`
-Valores atuais dos 6 atributos do personagem.
+Valores atuais dos atributos do personagem (formato relacional e colunas diretas unificadas).
 
 | Coluna | Tipo | Nulo | Descrição |
 |:---|:---|:---|:---|
 | `id` | `UUID` (PK) | Não | Identificador do registro |
-| `character_id` | `UUID` (FK) | Não | Referência a `characters.id` |
-| `attribute_id` | `UUID` (FK) | Não | Referência a `definition_attributes.id` |
+| `character_id` | `UUID` (FK) | Não | Referência a `characters.id` / `family_characters.id` |
+| `attribute_id` | `UUID` (FK) | Sim | Referência a `definition_attributes.id` (modo relacional) |
 | `base_value` | `INT` | Não | Valor base (inicia em 10) |
 | `bonus_value` | `INT` | Não | Bônus de equipamentos ou buffs |
+| `str` | `INT` | Sim | Força (STR) do herói |
+| `agi` | `INT` | Sim | Agilidade (AGI) do herói |
+| `con` | `INT` | Sim | Constituição (CON) do herói |
+| `int` | `INT` | Sim | Inteligência (INT) do herói |
+| `cha` | `INT` | Sim | Carisma (CHA) do herói |
+| `luk` | `INT` | Sim | Sorte (LUK) do herói |
 | `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-| *Constraint* | `UNIQUE(character_id, attribute_id)` | | 1 valor por atributo por herói |
 
 ### 📜 `character_skills`
 Habilidades desbloqueadas na Árvore de Talentos pelo herói.
