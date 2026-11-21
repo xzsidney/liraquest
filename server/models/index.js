@@ -180,6 +180,10 @@ FamilyWhatsappConfig.belongsTo(Family, { foreignKey: 'family_id', as: 'family' }
 
 // Alias de retrocompatibilidade
 const Character = FamilyCharacter;
+const CharacterClass = DefinitionClass;
+const CharacterInventory = DefinitionItem;
+const CharacterSkill = DefinitionSkill;
+const Event = FamilyEvent;
 
 export {
   sequelize,
@@ -195,6 +199,10 @@ export {
   DefinitionTask,
   FamilyCharacter,
   Character,
+  CharacterClass,
+  CharacterInventory,
+  CharacterSkill,
+  Event,
   CharacterAttribute,
   Task,
   TaskSubmission,

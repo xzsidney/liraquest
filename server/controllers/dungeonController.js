@@ -22,6 +22,13 @@ export const startDungeonRun = async (req, res) => {
   });
 };
 
+export const finishDungeonRun = async (req, res) => {
+  return res.status(400).json({
+    success: false,
+    message: 'Módulo de masmorras antigas desativado.',
+  });
+};
+
 export const resolveDungeonAction = async (req, res) => {
   return res.status(400).json({
     success: false,
