@@ -58,12 +58,13 @@ export const auth = {
 
   async login(email, password) {
     const data = await api.post('/api/auth/login', { email, password });
-    if (data.token && data.user) {
+    const userData = data.user || data.member;
+    if (data.token && userData) {
       this.state.token = data.token;
-      this.state.user = data.user;
+      this.state.user = userData;
       localStorage.setItem('liraquest_token', data.token);
       localStorage.setItem('token', data.token);
-      localStorage.setItem('liraquest_user', JSON.stringify(data.user));
+      localStorage.setItem('liraquest_user', JSON.stringify(userData));
       
       // Carregar dados complementares do personagem e família
       await this.loadInitialUserData();
@@ -72,14 +73,15 @@ export const auth = {
     return data;
   },
 
-  async register(name, email, password, role = 'CHILD') {
-    const data = await api.post('/api/auth/register', { name, email, password, role });
-    if (data.token && data.user) {
+  async register(name, email, password, role = 'PARENT', family_name = null, invite_code = null) {
+    const data = await api.post('/api/auth/register', { name, email, password, role, family_name, invite_code });
+    const userData = data.user || data.member;
+    if (data.token && userData) {
       this.state.token = data.token;
-      this.state.user = data.user;
+      this.state.user = userData;
       localStorage.setItem('liraquest_token', data.token);
       localStorage.setItem('token', data.token);
-      localStorage.setItem('liraquest_user', JSON.stringify(data.user));
+      localStorage.setItem('liraquest_user', JSON.stringify(userData));
       
       await this.loadInitialUserData();
       this.notify();
@@ -102,9 +104,10 @@ export const auth = {
     if (!this.state.token) return false;
     try {
       const res = await api.get('/api/auth/me');
-      if (res && res.user) {
-        this.state.user = res.user;
-        localStorage.setItem('liraquest_user', JSON.stringify(res.user));
+      const resUser = res && (res.user || res.member);
+      if (res && resUser) {
+        this.state.user = resUser;
+        localStorage.setItem('liraquest_user', JSON.stringify(resUser));
         await this.loadInitialUserData();
         this.notify();
         return true;

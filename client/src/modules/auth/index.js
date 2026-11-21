@@ -130,6 +130,11 @@ export function renderRegisterView() {
           </div>
 
           <div>
+            <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #cbd5e1; margin-bottom: 6px;">Código do Clã ou Nome da Família (Opcional)</label>
+            <input type="text" id="reg-input-clan" placeholder="Ex: LIRA-2026 ou Clã Silva" style="width: 100%; background: #0f172a; color: #fff; border: 1px solid rgba(255, 255, 255, 0.15); padding: 12px 14px; border-radius: 12px; font-size: 0.95rem; outline: none;">
+          </div>
+
+          <div>
             <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #cbd5e1; margin-bottom: 6px;">Senha (mínimo 6 caracteres)</label>
             <input type="password" id="reg-input-password" required minlength="6" placeholder="••••••••" style="width: 100%; background: #0f172a; color: #fff; border: 1px solid rgba(255, 255, 255, 0.15); padding: 12px 14px; border-radius: 12px; font-size: 0.95rem; outline: none;">
           </div>
@@ -201,17 +206,28 @@ export function bindAuthEvents() {
       e.preventDefault();
       const name = document.getElementById('reg-input-name')?.value?.trim();
       const email = document.getElementById('reg-input-email')?.value?.trim();
+      const clanVal = document.getElementById('reg-input-clan')?.value?.trim();
       const password = document.getElementById('reg-input-password')?.value;
       const btn = document.getElementById('btn-submit-reg');
 
       if (!name || !email || !password) {
-        showToast('Preencha todos os campos.', 'warning');
+        showToast('Preencha Nome Completo, E-mail e Senha.', 'warning');
         return;
+      }
+
+      let inviteCode = null;
+      let familyName = null;
+      if (clanVal) {
+        if (clanVal.includes('-') || clanVal.length <= 10) {
+          inviteCode = clanVal.toUpperCase();
+        } else {
+          familyName = clanVal;
+        }
       }
 
       try {
         if (btn) btn.textContent = '⏳ Despertando...';
-        await auth.register(name, email, password);
+        await auth.register(name, email, password, 'PARENT', familyName, inviteCode);
         showToast('Conta criada com sucesso! Bem-vindo ao LiraQuest! 🎉', 'success');
         router.navigate('salao');
       } catch (err) {

@@ -59,12 +59,14 @@ export const login = async (req, res) => {
       }
 
       const token = generateToken(member);
+      const formatted = formatMemberResponse(member);
 
       return res.status(200).json({
         success: true,
         message: `Bem-vindo de volta, Guardião ${member.name}!`,
         token,
-        member: formatMemberResponse(member),
+        user: formatted,
+        member: formatted,
       });
     }
 
@@ -109,12 +111,14 @@ export const login = async (req, res) => {
       }
 
       const token = generateToken(member);
+      const formatted = formatMemberResponse(member);
 
       return res.status(200).json({
         success: true,
         message: `Avante para a aventura, ${member.hero_nickname}!`,
         token,
-        member: formatMemberResponse(member),
+        user: formatted,
+        member: formatted,
       });
     }
 
@@ -150,9 +154,12 @@ export const getMe = async (req, res) => {
       });
     }
 
+    const formatted = formatMemberResponse(member);
+
     return res.status(200).json({
       success: true,
-      member: formatMemberResponse(member),
+      user: formatted,
+      member: formatted,
     });
   } catch (error) {
     console.error('❌ Erro ao buscar perfil unificado /me:', error);
@@ -165,8 +172,8 @@ export const getMe = async (req, res) => {
 };
 
 /**
- * 3. POST /api/auth/register-family (Onboarding Multi-Família)
- * Permite cadastrar a nova família e o primeiro membro Guardião (ADMIN)
+ * 3. POST /api/auth/register-family & /api/auth/register
+ * Permite cadastrar a família e o Guardião, com suporte a cadastro simplificado (apenas Nome, E-mail, Senha)
  */
 export const registerFamily = async (req, res) => {
   try {
@@ -180,24 +187,25 @@ export const registerFamily = async (req, res) => {
       heroNickname,
       class_code,
       invite_code,
+      inviteCode,
+      role,
     } = req.body;
 
-    const clanName = (family_name || familyName || '').trim();
     const guardianName = (name || '').trim();
     const guardianEmail = (email || '').toLowerCase().trim();
     const heroNick = (hero_nickname || heroNickname || guardianName).trim();
 
-    if (!clanName || !guardianName || !guardianEmail || !password) {
+    if (!guardianName || !guardianEmail || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Preencha todos os campos obrigatórios: Nome da Família, Nome Real, E-mail e Senha.',
+        message: 'Preencha todos os campos obrigatórios: Nome Completo, E-mail e Senha.',
       });
     }
 
     if (password.length < 6) {
       return res.status(400).json({
         success: false,
-        message: 'A senha do Guardião deve ter no mínimo 6 caracteres.',
+        message: 'A senha deve ter no mínimo 6 caracteres.',
       });
     }
 
@@ -210,31 +218,52 @@ export const registerFamily = async (req, res) => {
       });
     }
 
-    // Gerar código de convite único se não fornecido
-    let cleanInviteCode = (invite_code || '').toUpperCase().trim();
-    if (!cleanInviteCode) {
-      const cleanPrefix = clanName.substring(0, 4).toUpperCase().replace(/[^A-Z]/g, 'LIRA');
-      const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-      cleanInviteCode = `${cleanPrefix}-${randomSuffix}`;
+    // Verificar se passou código de convite para ingressar em família existente
+    const cleanInvite = (invite_code || inviteCode || '').toUpperCase().trim();
+    let family = null;
+
+    if (cleanInvite) {
+      family = await Family.findOne({ where: { invite_code: cleanInvite } });
+      if (!family) {
+        return res.status(404).json({
+          success: false,
+          message: `Código de convite "${cleanInvite}" não encontrado.`,
+        });
+      }
     }
 
-    // Criar a Família
-    const family = await Family.create({
-      name: clanName,
-      invite_code: cleanInviteCode,
-    });
+    // Se não tem família existente, cria uma nova família
+    if (!family) {
+      let clanName = (family_name || familyName || '').trim();
+      if (!clanName) {
+        const firstName = guardianName.split(' ')[0];
+        clanName = `Clã ${firstName}`;
+      }
+
+      const cleanPrefix = clanName.substring(0, 4).toUpperCase().replace(/[^A-Z]/g, 'LIRA');
+      const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+      const generatedCode = `${cleanPrefix}-${randomSuffix}`;
+
+      family = await Family.create({
+        name: clanName,
+        invite_code: generatedCode,
+      });
+    }
 
     // Hash da senha com bcrypt
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Criar o Guardião Fundador (ADMIN / PARENT)
-    const guardian = await FamilyMember.create({
+    // Papel: se criou a família é ADMIN/PARENT, se entrou por código respeita role ou assume PARENT
+    const memberRole = role && ['ADMIN', 'PARENT', 'CHILD'].includes(role) ? role : 'PARENT';
+
+    // Criar o Membro
+    const newMember = await FamilyMember.create({
       family_id: family.id,
       name: guardianName,
       email: guardianEmail,
       password: hashedPassword,
-      role: 'ADMIN',
+      role: memberRole,
       hero_nickname: heroNick,
       class_code: class_code || 'guardiao_do_lar',
       skin_code: 'default',
@@ -253,17 +282,21 @@ export const registerFamily = async (req, res) => {
       is_active: true,
     });
 
-    // Vincular criador da família
-    await family.update({ created_by: guardian.id });
+    // Se a família ainda não tinha criador, define este membro como criador
+    if (!family.created_by) {
+      await family.update({ created_by: newMember.id });
+    }
 
     // Gerar JWT Token
-    const token = generateToken(guardian);
+    const token = generateToken(newMember);
+    const formatted = formatMemberResponse(newMember);
 
     return res.status(201).json({
       success: true,
-      message: `Família "${family.name}" e Guardião fundados com sucesso!`,
+      message: `Conta criada com sucesso! Bem-vindo ao ${family.name}! 🎉`,
       token,
-      member: formatMemberResponse(guardian),
+      user: formatted,
+      member: formatted,
       family: {
         id: family.id,
         name: family.name,
@@ -271,10 +304,10 @@ export const registerFamily = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('❌ Erro no onboarding register-family:', error);
+    console.error('❌ Erro no cadastro:', error);
     return res.status(500).json({
       success: false,
-      message: 'Erro interno ao registrar família.',
+      message: 'Erro interno ao realizar cadastro.',
       error: error.message,
     });
   }
