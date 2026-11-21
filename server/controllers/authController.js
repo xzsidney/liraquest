@@ -8,8 +8,26 @@ const JWT_SECRET = process.env.JWT_SECRET || 'liraquest_family_rpg_secret_key_20
 const JWT_EXPIRES_IN = '7d';
 
 /**
- * Geração de Token JWT Padronizado V2
+ * Gera um código de convite único com no máximo 10 caracteres (ex: TEST-4821)
  */
+async function generateUniqueInviteCode(clanName) {
+  const cleanLetters = (clanName || 'CLAN')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase()
+    .replace(/[^A-Z]/g, '');
+  const prefix = (cleanLetters.substring(0, 4) || 'CLAN').padEnd(4, 'X');
+
+  let attempts = 0;
+  while (attempts < 10) {
+    const num = Math.floor(1000 + Math.random() * 9000);
+    const code = `${prefix}-${num}`.substring(0, 10);
+    const exists = await Family.findOne({ where: { invite_code: code } });
+    if (!exists) return code;
+    attempts++;
+  }
+  return `LIRA-${Math.floor(1000 + Math.random() * 9000)}`;
+}
 export const generateToken = (member) => {
   return jwt.sign(
     {
@@ -240,9 +258,7 @@ export const registerFamily = async (req, res) => {
         clanName = `Clã ${firstName}`;
       }
 
-      const cleanPrefix = clanName.substring(0, 4).toUpperCase().replace(/[^A-Z]/g, 'LIRA');
-      const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-      const generatedCode = `${cleanPrefix}-${randomSuffix}`;
+      const generatedCode = await generateUniqueInviteCode(clanName);
 
       family = await Family.create({
         name: clanName,
