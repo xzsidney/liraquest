@@ -1,0 +1,33 @@
+LiraQuest/
+├── backend/                  # Servidor Node.js + Express + Sequelize + Socket.IO
+│   ├── src/
+│   │   ├── config/           # Conexão com MySQL Hostinger
+│   │   ├── core/             # Auth, Middlewares, Utils
+│   │   ├── modules/          # 📦 MÓDULOS DE NEGÓCIO
+│   │   │   ├── family/       # Usuários, Clã, Pais e Filhos
+│   │   │   ├── tasks/        # 🧹 Tarefas Domésticas & Provas
+│   │   │   ├── study/        # 📚 Estudos, Pomodoro & Conhecimento
+│   │   │   ├── health/       # 🥗 Saúde, Refeições & Água
+│   │   │   ├── economy/      # 🏪 Loja do Lar & Vales Reais
+│   │   │   └── rpg/          # ⚔️ Ficha D20, Atributos & Aventuras
+│   │   └── database/         # Migrações seguras e Seed inicial
+│   └── package.json
+│
+├── frontend/                 # Interface Web Moderna e Mobile-First
+│   ├── public/               # Ícones, sons e sprites dos heróis
+│   ├── src/
+│   │   ├── core/             # API client, Auth, Navegação
+│   │   ├── components/       # HUD Nobre do Topo, Modais, Cards
+│   │   └── views/            # 📱 AS TELAS PRINCIPAIS (1 Clique)
+│   │       ├── HubView.js    # A tela única do Herói/Guardião
+│   │       ├── TasksView.js  # Mural de Deveres
+│   │       ├── StudyView.js  # Foco Pomodoro & Lições
+│   │       ├── HealthView.js # Refeições e Hidratação
+│   │       ├── ShopView.js   # Loja do Lar & Vales
+│   │       └── RpgView.js    # Masmorras D20 & Combates
+│   └── package.json
+│
+└── doc/                      # Mapa da Arquitetura Viva
+    ├── LIRAQUEST_CONCEITO_CENTRAL.md
+    ├── BANCO_DE_DADOS.md
+    └── BACKEND_ROTAS.md

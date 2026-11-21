@@ -19,8 +19,8 @@ Este documento cataloga todos os endpoints REST e eventos de WebSocket (Socket.I
 |:---|:---|:---|:---|
 | `POST` | `/api/auth/login` | Pública | **Login Híbrido V2**: Autentica Pais (E-mail + Senha bcrypt) ou Heróis/Filhos (Apelido/Nome + PIN de 4 dígitos). Retorna Token JWT assinado contendo `{ id, familyId, role, heroNickname }` e o perfil formatado. |
 | `GET` | `/api/auth/me` | JWT | **Perfil Unificado**: Retorna a ficha viva completa do membro (nome real, apelido heroico, classe, nível, XP, ouro, energia, tokens, streak e os 6 atributos RPG `str/agi/con/int/cha/luk`) em um único JSON limpo. |
-| `POST` | `/api/auth/register-family` | Pública | **Onboarding Multi-Família**: Registra a nova família e o primeiro usuário Guardião (ADMIN) simultaneamente, gerando um código de convite nobre único (ex: `CLAN-1234`). |
-| `POST` | `/api/auth/register` | Pública | Alias de compatibilidade para onboarding de família. |
+| `GET` | `/api/auth/children` | Pública | **Heróis Filhos para Login**: Retorna a lista simplificada de heróis crianças (Nome, Apelido, Classe, Nível) para montagem dinâmica dos cards com PIN na tela de login. |
+| `POST` | `/api/auth/register` | Pública | **Cadastro de Guardião e Clã**: Registra o guardião e cria a família com código de convite nobre. |
 | `GET` | `/testeBD` (ou `/api/testeBD`) | Pública | Rota diagnóstica que testa a conexão com o banco MySQL e retorna status em JSON |
 
 ---

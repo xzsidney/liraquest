@@ -1,0 +1,10 @@
+{
+  "name": "liraquest-backend",
+  "version": "1.0.0",
+  "description": "LiraQuest - Backend Servidor e API",
+  "main": "src/modules/family/familyRoutes.js",
+  "type": "module",
+  "scripts": {
+    "seed": "node src/database/seed.js"
+  }
+}

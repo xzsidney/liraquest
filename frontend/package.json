@@ -1,0 +1,6 @@
+{
+  "name": "liraquest-frontend",
+  "version": "1.0.0",
+  "description": "LiraQuest - Frontend Mobile-First SPA",
+  "type": "module"
+}

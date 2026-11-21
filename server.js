@@ -1,36 +1,11 @@
 import express from 'express';
 import http from 'http';
-import { Server } from 'socket.io';
-import cors from 'cors';
-import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { testDbConnection, sequelize } from './server/config/database.js';
-import './server/models/index.js';
-import authRoutes from './server/routes/authRoutes.js';
-import catalogRoutes from './server/routes/catalogRoutes.js';
-import familyRoutes from './server/routes/familyRoutes.js';
-import characterRoutes from './server/routes/characterRoutes.js';
-import taskRoutes from './server/routes/taskRoutes.js';
-import shopRoutes from './server/routes/shopRoutes.js';
-import uploadRoutes from './server/routes/uploadRoutes.js';
-import progressRoutes from './server/routes/progressRoutes.js';
-import rewardRoutes from './server/routes/rewardRoutes.js';
-import quizRoutes from './server/routes/quizRoutes.js';
-import dungeonRoutes from './server/routes/dungeonRoutes.js';
-import battleRoutes from './server/routes/battleRoutes.js';
-import trucoRoutes from './server/routes/trucoRoutes.js';
-import zombiRoutes from './server/routes/zombiRoutes.js';
-import nutritionRoutes from './server/routes/nutritionRoutes.js';
-import funRoutes from './server/routes/funRoutes.js';
-import financeRoutes from './server/routes/financeRoutes.js';
-import whatsappRoutes from './server/routes/whatsappRoutes.js';
-import pushRoutes from './server/routes/pushRoutes.js';
-import { initChameleonSocket } from './server/sockets/chameleonSocket.js';
-import { initDuelSocket } from './server/sockets/duelSocket.js';
-import { initNutritionCron } from './server/services/nutritionCron.js';
-import { initAlarmService } from './server/services/alarmService.js';
-import { setWhatsAppSocketIO } from './server/services/whatsappService.js';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import { testDbConnection } from './backend/src/config/database.js';
+import familyRoutes from './backend/src/modules/family/familyRoutes.js';
 
 dotenv.config();
 
@@ -38,158 +13,40 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const httpServer = http.createServer(app);
-const io = new Server(httpServer, {
-  cors: {
-    origin: '*',
-    methods: ['GET', 'POST'],
-  },
-});
+const server = http.createServer(app);
 
-// Inicializar WebSockets do Esconde-Esconde e Duelo de Arqueiros
-initChameleonSocket(io);
-initDuelSocket(io);
-
-// Inicializar Central de WhatsApp e Serviço de Alarmes Automáticos com node-cron (Fase 5)
-setWhatsAppSocketIO(io);
-initAlarmService(io);
-
-const PORT = process.env.PORT || 3000;
-
-// Middlewares Globais
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Servir arquivos estáticos do frontend (Monorepo Modular em client/ e legado/assets em public/)
-app.use(express.static(path.join(__dirname, 'client')));
-app.use(express.static(path.join(__dirname, 'public')));
+// 1. Rotas da API Backend
+app.use('/api', familyRoutes);
 
-// Rotas da API
-app.use('/api/auth', authRoutes);
-app.use('/api/catalog', catalogRoutes);
-app.use('/api/family', familyRoutes);
-app.use('/api/character', characterRoutes);
-app.use('/api/tasks', taskRoutes);
-app.use('/api/shop', shopRoutes);
-app.use('/api/upload', uploadRoutes);
-app.use('/api/progress', progressRoutes);
-app.use('/api/rewards', rewardRoutes);
-app.use('/api/quiz', quizRoutes);
-app.use('/api/dungeon', dungeonRoutes);
-app.use('/api/battle', battleRoutes);
-app.use('/api/truco', trucoRoutes);
-app.use('/api/zombi', zombiRoutes);
-app.use('/api/nutrition', nutritionRoutes);
-app.use('/api/fun', funRoutes);
-app.use('/api/finance', financeRoutes);
-app.use('/api/whatsapp', whatsappRoutes);
-app.use('/api/push', pushRoutes);
-
-
-// Health check & status
-app.get('/api/status', (req, res) => {
-  res.json({
-    status: 'online',
-    app: 'LiraQuest',
-    version: '1.0.0',
-    timestamp: new Date().toISOString(),
-  });
+// Rota diagnóstica de teste do banco de dados: /testeBD
+app.get('/testeBD', (req, res) => {
+  res.redirect('/api/testeBD');
 });
 
-// Rota Diagnóstica de Teste do Banco de Dados: http://liraquest.com.br/testeBD
-app.get(['/testeBD', '/api/testeBD'], async (req, res) => {
-  const startTime = Date.now();
-  try {
-    await sequelize.authenticate();
-    const responseTimeMs = Date.now() - startTime;
+// 2. Servir Frontend Estático no mesmo servidor
+app.use(express.static(path.join(__dirname, 'frontend')));
+app.use('/public', express.static(path.join(__dirname, 'frontend/public')));
 
-    const rawUrl = process.env.DATABASE_URL || '';
-    const maskedUrl = rawUrl ? rawUrl.replace(/:([^:@]+)@/, ':****@') : 'Não definida no .env';
-
-    return res.json({
-      success: true,
-      status: 'Conectado com sucesso! 🎉',
-      message: '✅ A conexão entre o Node.js e o banco MySQL da Hostinger está 100% operacional!',
-      database: {
-        dialect: sequelize.getDialect(),
-        database_name: sequelize.config.database || 'N/A',
-        host: sequelize.config.host || 'localhost',
-        port: sequelize.config.port || 3306,
-        response_time_ms: `${responseTimeMs}ms`,
-      },
-      env_check: {
-        has_database_url: Boolean(process.env.DATABASE_URL),
-        masked_database_url: maskedUrl,
-        node_env: process.env.NODE_ENV || 'production',
-      },
-      timestamp: new Date().toISOString(),
-    });
-  } catch (error) {
-    const responseTimeMs = Date.now() - startTime;
-    return res.status(500).json({
-      success: false,
-      status: 'Falha na conexão com o banco de dados',
-      message: '❌ Não foi possível conectar ao MySQL. Verifique as credenciais no arquivo .env.',
-      error_details: {
-        message: error.message,
-        code: error.code || error.original?.code || 'UNKNOWN_ERROR',
-        name: error.name,
-      },
-      env_check: {
-        has_database_url: Boolean(process.env.DATABASE_URL),
-        node_env: process.env.NODE_ENV || 'production',
-      },
-      timestamp: new Date().toISOString(),
-    });
-  }
-});
-
-
-// Módulo Independente: Jogo de Truco Paulista (https://liraquest.com.br/truco)
-app.use('/truco', express.static(path.join(__dirname, 'public', 'truco')));
-app.get(['/truco', '/truco/*'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'truco', 'index.html'));
-});
-
-// Módulo Independente: Companheiro RPG Marvel Zombies (https://liraquest.com.br/zombi)
-app.use('/zombi', express.static(path.join(__dirname, 'public', 'zombi')));
-app.get(['/zombi', '/zombi/*'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'zombi', 'index.html'));
-});
-
-// Fallback para SPA (Single Page Application - Monorepo Modular client/)
+// Redirecionar qualquer rota web para o index.html da SPA
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'client', 'index.html'));
+  if (req.path.startsWith('/api')) {
+    return res.status(404).json({ error: 'Endpoint não encontrado' });
+  }
+  res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
 });
 
-// Inicialização Robusta do Servidor (Proteção contra Erro 503 na Hostinger)
-async function startServer() {
-  try {
-    // 1. Iniciar servidor HTTP imediatamente para a Hostinger responder 200 OK
-    const server = httpServer.listen(PORT, () => {
-      console.log('====================================================');
-      console.log(`🏰 [LiraQuest] Servidor Fullstack com WebSockets Online na porta ${PORT}!`);
-      console.log(`🌐 Porta ativa: ${PORT}`);
-      console.log('====================================================');
-    });
+const PORT = process.env.PORT || 3000;
 
-    server.on('error', (err) => {
-      if (err.code === 'EADDRINUSE') {
-        console.error(`⚠️ Porta ${PORT} já está em uso. O servidor pode já estar rodando.`);
-      } else {
-        console.error('❌ Erro no servidor HTTP:', err);
-      }
-    });
+server.listen(PORT, async () => {
+  await testDbConnection();
+  console.log('====================================================');
+  console.log(`🏰 LiraQuest Monorepo rodando na porta ${PORT}`);
+  console.log(`🌐 Servidor Fullstack Unificado Online!`);
+  console.log('====================================================');
+});
 
-    // 2. Testar conexão com banco MySQL em segundo plano (não bloqueia inicialização)
-    testDbConnection().catch((err) => {
-      console.error('⚠️ Aviso de banco de dados na Hostinger:', err.message);
-    });
-  } catch (err) {
-    console.error('❌ Erro ao iniciar a aplicação:', err);
-  }
-}
-
-startServer();
-
+export default app;
