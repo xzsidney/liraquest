@@ -11,64 +11,6 @@
 }
 
 /* ========================================================
-   BARRA DE CONTROLE DO PREVIEW (ACIMA DA FICHA)
-   ======================================================== */
-.sheet-preview-bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  background: rgba(15, 23, 42, 0.92);
-  border: 1px solid rgba(212, 175, 55, 0.38);
-  border-radius: 16px;
-  padding: 10px 14px;
-  margin-bottom: 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
-}
-
-.sheet-preview-group {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-}
-
-.sheet-preview-label {
-  font-size: 0.72rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  color: #94a3b8;
-  margin-right: 4px;
-}
-
-.sheet-ctrl-btn {
-  padding: 6px 12px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.05);
-  color: #e2e8f0;
-  font-family: var(--font-sans);
-  font-size: 0.78rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.sheet-ctrl-btn:hover {
-  border-color: rgba(212, 175, 55, 0.6);
-  color: #fde047;
-}
-
-.sheet-ctrl-btn.active {
-  background: linear-gradient(135deg, #800020, #1e3a8a);
-  border-color: #d4af37;
-  color: #fde047;
-  box-shadow: 0 0 12px rgba(212, 175, 55, 0.35);
-}
-
-/* ========================================================
    TEMAS DA FICHA (PERGAMINHO CLÁSSICO vs GRIMÓRIO ESCURO)
    ======================================================== */
 .lq-sheet-page[data-sheet-theme="parchment"] {

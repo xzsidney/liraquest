@@ -7,102 +7,37 @@ import { auth } from '../core/auth.js';
 import { router } from '../core/router.js';
 import { api } from '../core/api.js';
 
-let currentTheme = 'parchment'; // 'parchment' | 'obsidian'
-let selectedPreset = null;      // null -> 'real' se logado, senão 'paladin'
 let selectedStat = 'str';
 let lastRollText = 'Clique em um atributo e role o D20!';
 
-const HERO_PRESETS = {
-  paladin: {
-    key: 'paladin',
-    name: 'Sidney Lira',
-    hero_nickname: 'Paladino Sidney',
-    role: 'ADMIN',
-    class_code: 'guardiao_do_lar',
-    class_label: 'Guardião do Lar',
-    origin_label: 'Mestre Guardião',
-    alignment_label: 'Honra & Disciplina',
-    family_name: 'Clã Lira (LIRA-2026)',
-    level: 5,
-    xp: 240,
-    adventure_energy: 10,
-    family_tokens: 50,
-    gold: 150,
-    streak_days: 5,
-    str: 15,
-    agi: 10,
-    con: 16,
-    int: 12,
-    cha: 12,
-    luk: 10,
-    xp_str: 65,
-    xp_agi: 20,
-    xp_con: 45,
-    xp_int: 30,
-    xp_cha: 50,
-    xp_luk: 10,
-    portrait: '/src/assets/heroes/paladin_lira.jpg',
-  },
-  valkyrie: {
-    key: 'valkyrie',
-    name: 'Jennifer Lira',
-    hero_nickname: 'Valquíria Jennifer',
-    role: 'CHILD',
-    class_code: 'artifice_criativo',
-    class_label: 'Artífice Criativa',
-    origin_label: 'Herói Aventureiro',
-    alignment_label: 'Criatividade & Saber',
-    family_name: 'Clã Lira (LIRA-2026)',
-    level: 3,
-    xp: 150,
-    adventure_energy: 10,
-    family_tokens: 25,
-    gold: 75,
-    streak_days: 4,
-    str: 14,
-    agi: 11,
-    con: 12,
-    int: 16,
-    cha: 11,
-    luk: 10,
-    xp_str: 40,
-    xp_agi: 35,
-    xp_con: 25,
-    xp_int: 75,
-    xp_cha: 30,
-    xp_luk: 20,
-    portrait: '/src/assets/heroes/valkyrie_artificer.jpg',
-  },
-  newbie: {
-    key: 'newbie',
-    name: 'Novo Herói',
-    hero_nickname: 'Aprendiz do Clã',
-    role: 'CHILD',
-    class_code: 'guerreiro_disciplina',
-    class_label: 'Guerreiro da Disciplina',
-    origin_label: 'Herói Recém-Desperto',
-    alignment_label: 'Base Equilibrada (Todos 10)',
-    family_name: 'Aguardando Clã',
-    level: 1,
-    xp: 0,
-    adventure_energy: 10,
-    family_tokens: 0,
-    gold: 50,
-    streak_days: 1,
-    str: 10,
-    agi: 10,
-    con: 10,
-    int: 10,
-    cha: 10,
-    luk: 10,
-    xp_str: 0,
-    xp_agi: 0,
-    xp_con: 0,
-    xp_int: 0,
-    xp_cha: 0,
-    xp_luk: 0,
-    portrait: '/src/assets/heroes/paladin_lira.jpg',
-  },
+const FALLBACK_HERO = {
+  name: 'Sidney Lira',
+  hero_nickname: 'Paladino Sidney',
+  role: 'ADMIN',
+  class_code: 'guardiao_do_lar',
+  class_label: 'Guardião do Lar',
+  origin_label: 'Mestre Guardião',
+  alignment_label: 'Honra & Disciplina',
+  family_name: 'Clã Lira (LIRA-2026)',
+  level: 5,
+  xp: 240,
+  adventure_energy: 10,
+  family_tokens: 50,
+  gold: 150,
+  streak_days: 5,
+  str: 15,
+  agi: 10,
+  con: 16,
+  int: 12,
+  cha: 12,
+  luk: 10,
+  xp_str: 65,
+  xp_agi: 20,
+  xp_con: 45,
+  xp_int: 30,
+  xp_cha: 50,
+  xp_luk: 10,
+  portrait: '/src/assets/heroes/paladin_lira.jpg',
 };
 
 const SAMPLE_MISSIONS = [
@@ -169,13 +104,9 @@ function resolvePortrait(classCode) {
 }
 
 function resolveActiveHero() {
-  const isLogged = auth.isAuthenticated();
-  const mode = selectedPreset || (isLogged ? 'real' : 'paladin');
-
-  if (mode === 'real' && isLogged) {
+  if (auth.isAuthenticated()) {
     const m = auth.getMember() || {};
     return {
-      key: 'real',
       name: m.name || 'Herói',
       hero_nickname: m.hero_nickname || m.name || 'Aventureiro',
       role: m.role || 'CHILD',
@@ -206,16 +137,15 @@ function resolveActiveHero() {
     };
   }
 
-  return HERO_PRESETS[mode] || HERO_PRESETS.paladin;
+  return FALLBACK_HERO;
 }
 
 export async function renderSheetTestView() {
   const isLogged = auth.isAuthenticated();
   const hero = resolveActiveHero();
-  const activeMode = hero.key;
 
   let missions = SAMPLE_MISSIONS;
-  if (isLogged && activeMode === 'real') {
+  if (isLogged) {
     try {
       const res = await api.get('/api/tasks');
       if (Array.isArray(res?.tasks) && res.tasks.length > 0) {
@@ -237,42 +167,7 @@ export async function renderSheetTestView() {
   const activeStatXp = hero[`xp_${activeStatMeta.key}`] ?? 0;
 
   return `
-    <div class="lq-sheet-page" id="lq-sheet-root" data-sheet-theme="${currentTheme}">
-      
-      <!-- Barra de Controle do Preview /home/teste -->
-      <div class="sheet-preview-bar">
-        <div class="sheet-preview-group">
-          <span class="sheet-preview-label">Estilo:</span>
-          <button type="button" class="sheet-ctrl-btn ${currentTheme === 'parchment' ? 'active' : ''}" data-sheet-theme-btn="parchment">
-            📜 Pergaminho Clássico
-          </button>
-          <button type="button" class="sheet-ctrl-btn ${currentTheme === 'obsidian' ? 'active' : ''}" data-sheet-theme-btn="obsidian">
-            🌌 Grimório LiraQuest
-          </button>
-        </div>
-
-        <div class="sheet-preview-group">
-          <span class="sheet-preview-label">Herói:</span>
-          ${isLogged ? `
-            <button type="button" class="sheet-ctrl-btn ${activeMode === 'real' ? 'active' : ''}" data-sheet-preset="real">
-              👤 Meu Herói Real
-            </button>
-          ` : ''}
-          <button type="button" class="sheet-ctrl-btn ${activeMode === 'paladin' ? 'active' : ''}" data-sheet-preset="paladin">
-            🛡️ Paladino Sidney
-          </button>
-          <button type="button" class="sheet-ctrl-btn ${activeMode === 'valkyrie' ? 'active' : ''}" data-sheet-preset="valkyrie">
-            🎨 Valquíria Jennifer
-          </button>
-          <button type="button" class="sheet-ctrl-btn ${activeMode === 'newbie' ? 'active' : ''}" data-sheet-preset="newbie">
-            ✨ Novo Herói (Todos 10)
-          </button>
-        </div>
-
-        <button type="button" id="btn-sheet-back" class="sheet-ctrl-btn">
-          ⬅️ ${isLogged ? 'Voltar ao Salão' : 'Página Inicial'}
-        </button>
-      </div>
+    <div class="lq-sheet-page" id="lq-sheet-root" data-sheet-theme="parchment">
 
       <!-- FICHA ILUSTRADA D&D 5e -->
       <section class="sheet-canvas" aria-label="Ficha Ilustrada do Herói">
@@ -621,31 +516,7 @@ export async function renderSheetTestView() {
 }
 
 export function bindSheetTestEvents() {
-  const root = document.getElementById('lq-sheet-root');
-
-  // 1. Alternador de Tema (Pergaminho Clássico vs Grimório Escuro)
-  document.querySelectorAll('[data-sheet-theme-btn]').forEach(btn => {
-    btn.onclick = () => {
-      const nextTheme = btn.getAttribute('data-sheet-theme-btn');
-      if (!nextTheme) return;
-      currentTheme = nextTheme;
-      if (root) root.setAttribute('data-sheet-theme', nextTheme);
-      document.querySelectorAll('[data-sheet-theme-btn]').forEach(b => {
-        b.classList.toggle('active', b.getAttribute('data-sheet-theme-btn') === nextTheme);
-      });
-    };
-  });
-
-  // 2. Alternador de Herói de Exemplo / Herói Real
-  document.querySelectorAll('[data-sheet-preset]').forEach(btn => {
-    btn.onclick = () => {
-      selectedPreset = btn.getAttribute('data-sheet-preset');
-      lastRollText = 'Clique em um atributo e role o D20!';
-      router.navigate('home/teste');
-    };
-  });
-
-  // 3. Seleção de Atributo nos 6 Medalhões do Arco
+  // 1. Seleção de Atributo nos 6 Medalhões do Arco
   const hero = resolveActiveHero();
   document.querySelectorAll('[data-stat-key]').forEach(btn => {
     btn.onclick = () => {
@@ -670,7 +541,7 @@ export function bindSheetTestEvents() {
     };
   });
 
-  // 4. Rolador D20 Integrado com o Atributo Selecionado
+  // 2. Rolador D20 Integrado com o Atributo Selecionado
   const rollBtn = document.getElementById('btn-sheet-roll-d20');
   const readout = document.getElementById('sheet-d20-readout');
   if (rollBtn) {
@@ -685,7 +556,7 @@ export function bindSheetTestEvents() {
     };
   }
 
-  // 5. Navegação dos Portais do Grimório e Botões
+  // 3. Navegação dos Portais do Grimório e Botões
   document.querySelectorAll('[data-portal-route]').forEach(btn => {
     btn.onclick = () => {
       const target = btn.getAttribute('data-portal-route');
@@ -696,11 +567,6 @@ export function bindSheetTestEvents() {
   const btnOpenTasks = document.getElementById('btn-sheet-open-tasks');
   if (btnOpenTasks) {
     btnOpenTasks.onclick = () => router.navigate(auth.isAuthenticated() ? 'tasks' : 'login');
-  }
-
-  const btnBack = document.getElementById('btn-sheet-back');
-  if (btnBack) {
-    btnBack.onclick = () => router.navigate(auth.isAuthenticated() ? 'hub' : 'home');
   }
 }
 
