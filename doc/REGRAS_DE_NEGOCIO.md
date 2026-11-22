@@ -183,7 +183,7 @@ LiraQuest/
 ├── frontend/
 │   ├── index.html                 # Shell principal da SPA
 │   ├── package.json
-│   ├── public/                    # Assets estáticos legados/auxiliares
+│   ├── public/                    # Legado V1 (SPA anterior e minigames estáticos servidos em /public)
 │   └── src/
 │       ├── main.js                # Registro de rotas e bootstrap da SPA
 │       ├── styles/
@@ -208,10 +208,8 @@ LiraQuest/
 ├── doc/
 │   ├── REGRAS_DE_NEGOCIO.md       # Este documento (Regras, Arquitetura e Rotas V2)
 │   ├── BANCO_DE_DADOS.md          # Modelagem MySQL, Diagrama ER e Seed V2
-│   ├── banco/                     # Referências históricas preservadas
-│   ├── modelo/                    # Protótipos visuais preservados
-│   ├── saude/                     # Materiais nutricionais preservados
-│   └── zombi/                     # Materiais do módulo Zombi preservados
+│   └── diagramas/                 # Diagramas Draw.io de fluxos e casos de uso
+├── scripts/                       # Scripts auxiliares do repositório
 ├── package.json                   # Scripts start, dev, seed, build, deploy
 └── server.js                      # Servidor Express unificado (API + SPA)
 ```
@@ -233,7 +231,7 @@ Relação fiel e exclusiva das rotas montadas atualmente em `server.js`, `backen
 | :--- | :--- | :--- | :--- |
 | `GET` | `/testeBD` | Pública | Redireciona (`302`) para `/api/testeBD`. |
 | `GET` | `/api/testeBD` *(alias: `/api/status`)* | Pública | Executa `sequelize.authenticate()` e retorna status JSON do MySQL com `responseTimeMs` e `timestamp`. |
-| `GET` | `/api/*` *(não mapeada)* | Pública | Retorna HTTP `404` `{ error: 'Endpoint não encontrado' }`. |
+| `ALL` | `/api` e `/api/*` *(não mapeada)* | Pública | Retorna HTTP `404` `{ success: false, error: 'Endpoint não encontrado' }` em qualquer método HTTP. |
 | `GET` | `*` *(demais rotas web)* | Pública | Entrega `frontend/index.html` para roteamento SPA no cliente. |
 
 ### 6.2 Autenticação & Clã Familiar (`familyRoutes.js`, prefixo `/api`)

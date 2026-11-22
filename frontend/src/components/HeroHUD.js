@@ -20,7 +20,7 @@ export function renderHeroHUD() {
   const streak = member.streak_days !== undefined ? member.streak_days : 1;
 
   // Ícone temático conforme classe
-  let avatarIcon = '⚔️';
+  let avatarIcon = '🛡️';
   let classTitle = 'Guardião do Lar';
 
   if (member.class_code === 'guardiao_da_harmonia') {
@@ -32,6 +32,9 @@ export function renderHeroHUD() {
   } else if (member.class_code === 'artifice_criativo') {
     avatarIcon = '🎨';
     classTitle = 'Artífice Criativa';
+  } else if (member.class_code === 'guerreiro_disciplina') {
+    avatarIcon = '⚔️';
+    classTitle = 'Guerreiro da Disciplina';
   } else if (member.role === 'ADMIN') {
     avatarIcon = '🛡️';
     classTitle = 'Mestre Guardião';

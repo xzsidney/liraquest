@@ -23,7 +23,7 @@ export function renderHomeView() {
         </div>
 
         <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(212, 175, 55, 0.15); border: 1px solid rgba(212, 175, 55, 0.4); padding: 6px 18px; border-radius: 30px; font-size: 0.82rem; font-weight: 800; color: #fde047; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 18px;">
-          ⚔️ RPG FAMILIAR COOPERATIVO EM TEMPO REAL
+          ⚔️ RPG FAMILIAR GAMIFICADO
         </div>
 
         <h1 class="cinzel gold-gradient-text" style="font-size: clamp(2.2rem, 5vw, 3.4rem); line-height: 1.15; margin-bottom: 16px; font-weight: 900;">
@@ -83,7 +83,7 @@ export function renderHomeView() {
               Arrumar a cama, organizar o quarto, lavar louça e deveres cotidianos com comprovação por foto e visto dos pais.
             </p>
             <div class="pilar-footer">
-              <span class="pilar-bonus">💪 +FORÇA (STR) & ⚡ ENERGIA</span>
+              <span class="pilar-bonus">💪 +FORÇA (STR) & 🎟️ FICHAS</span>
               <span class="pilar-action">Ver Mais ➜</span>
             </div>
           </div>
@@ -157,7 +157,7 @@ export function renderHomeView() {
             <div style="font-size: 3.5rem; margin-bottom: 12px;">🛡️👑⚔️</div>
             <h4 class="cinzel" style="color: #fff; font-size: 1.2rem; margin-bottom: 8px;">Pronto para Começar?</h4>
             <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">
-              Acesse sua conta existente ou crie o seu clã em menos de 1 minuto.
+              Acesse sua conta existente ou desperte seu herói para ingressar no clã da sua família.
             </p>
             <div style="display: flex; flex-direction: column; gap: 10px;">
               <button id="home-card-btn-login" class="btn-noble btn-noble-primary" style="width: 100%;">

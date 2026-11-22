@@ -81,7 +81,7 @@ export async function renderHubView() {
             Organização do quarto, louça, arrumar a cama e missões diárias com comprovação fotográfica.
           </p>
           <div class="pilar-footer">
-            <span class="pilar-bonus">💪 +FORÇA (STR) & ⚡ ENERGIA</span>
+            <span class="pilar-bonus">💪 +FORÇA (STR) & 🎟️ FICHAS</span>
             <span class="pilar-action">Acessar ➜</span>
           </div>
         </div>

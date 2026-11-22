@@ -23,6 +23,8 @@ export function renderNavbar() {
   else if (user?.role === 'PARENT') avatarIcon = '👑';
   else if (user?.class_code === 'rastreador_veloz') avatarIcon = '🏹';
   else if (user?.class_code === 'artifice_criativo') avatarIcon = '🎨';
+  else if (user?.class_code === 'guardiao_do_lar') avatarIcon = '🛡️';
+  else if (user?.class_code === 'guerreiro_disciplina') avatarIcon = '⚔️';
 
   return `
     <nav class="noble-navbar">

@@ -33,11 +33,13 @@ app.get('/testeBD', (req, res) => {
 app.use(express.static(path.join(__dirname, 'frontend')));
 app.use('/public', express.static(path.join(__dirname, 'frontend/public')));
 
+// Qualquer endpoint /api ou /api/* não mapeado retorna 404 JSON em qualquer método HTTP
+app.all(['/api', '/api/*'], (req, res) => {
+  return res.status(404).json({ success: false, error: 'Endpoint não encontrado' });
+});
+
 // Redirecionar qualquer rota web para o index.html da SPA
 app.get('*', (req, res) => {
-  if (req.path.startsWith('/api')) {
-    return res.status(404).json({ error: 'Endpoint não encontrado' });
-  }
   res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
 });
 
