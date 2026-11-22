@@ -17,10 +17,10 @@ Este documento cataloga todos os endpoints REST e eventos de WebSocket (Socket.I
 
 | Método | Rota | Autenticação | Descrição |
 |:---|:---|:---|:---|
-| `POST` | `/api/auth/login` | Pública | **Login Híbrido V2**: Autentica Pais (E-mail + Senha bcrypt) ou Heróis/Filhos (Apelido/Nome + PIN de 4 dígitos). Retorna Token JWT assinado contendo `{ id, familyId, role, heroNickname }` e o perfil formatado. |
+| `POST` | `/api/auth/login` | Pública | **Login Universal V2**: Autentica Pais e Filhos via credencial universal `{ identifier, password }` (onde `identifier` é o e-mail ou apelido heroico e a senha é validada via hash bcrypt). Retorna Token JWT assinado contendo `{ id, familyId, role, heroNickname }` e o perfil unificado. |
 | `GET` | `/api/auth/me` | JWT | **Perfil Unificado**: Retorna a ficha viva completa do membro (nome real, apelido heroico, classe, nível, XP, ouro, energia, tokens, streak e os 6 atributos RPG `str/agi/con/int/cha/luk`) em um único JSON limpo. |
-| `GET` | `/api/auth/children` | Pública | **Heróis Filhos para Login**: Retorna a lista simplificada de heróis crianças (Nome, Apelido, Classe, Nível) para montagem dinâmica dos cards com PIN na tela de login. |
-| `POST` | `/api/auth/register` | Pública | **Cadastro de Herói (Sempre do tipo FILHO)**: Cadastra um novo herói (`role: 'CHILD'`) vinculado a um clã existente através do `invite_code`. Contém Nome Real, Apelido Heroico, PIN de 4 números e Classe inicial. *(Regra: Apenas usuários do tipo Pai podem criar clãs).* |
+| `GET` | `/api/auth/children` | Pública | **Heróis Filhos para Consulta**: Retorna a lista simplificada de heróis crianças (Nome, Apelido, Classe, Nível). |
+| `POST` | `/api/auth/register` | Pública | **Cadastro de Herói (Sempre do tipo FILHO)**: Cadastra um novo herói (`role: 'CHILD'`) vinculado a um clã existente através do `invite_code`. Recebe Nome Real, Apelido Heroico, Senha de Acesso (com hash bcrypt) e Classe inicial. *(Regra: Apenas usuários do tipo Pai podem criar clãs).* |
 | `GET` | `/testeBD` (ou `/api/testeBD`) | Pública | Rota diagnóstica que testa a conexão com o banco MySQL e retorna status em JSON |
 
 ---

@@ -51,10 +51,13 @@ export const auth = {
   },
 
   /**
-   * Login dos Pais via E-mail e Senha
+   * Login Universal (Usuário/E-mail + Senha)
    */
-  async loginWithEmail(email, password) {
-    const data = await api.post('/api/auth/login', { email, password });
+  async login(identifier, password) {
+    const data = await api.post('/api/auth/login', {
+      identifier: (identifier || '').trim(),
+      password,
+    });
     const memberData = data.user || data.member;
 
     if (data.token && memberData) {
@@ -69,24 +72,14 @@ export const auth = {
   },
 
   /**
-   * Login dos Filhos via Apelido/Herói e PIN de 4 dígitos
+   * Métodos retrocompatíveis
    */
-  async loginWithPin(heroNickname, pin) {
-    const data = await api.post('/api/auth/login', {
-      hero_nickname: heroNickname,
-      pin: String(pin).trim(),
-    });
-    const memberData = data.user || data.member;
+  async loginWithEmail(email, password) {
+    return this.login(email, password);
+  },
 
-    if (data.token && memberData) {
-      this.state.token = data.token;
-      this.state.user = memberData;
-      localStorage.setItem('liraquest_token', data.token);
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('liraquest_user', JSON.stringify(memberData));
-      this.notify();
-    }
-    return data;
+  async loginWithPin(heroNickname, pin) {
+    return this.login(heroNickname, pin);
   },
 
   /**

@@ -48,10 +48,6 @@ FamilyMember.init(
       type: DataTypes.STRING(255),
       allowNull: true,
     },
-    pin: {
-      type: DataTypes.STRING(10),
-      allowNull: true,
-    },
     role: {
       type: DataTypes.ENUM('ADMIN', 'PARENT', 'CHILD'),
       allowNull: false,

@@ -44,9 +44,8 @@ Armazena a identidade completa de cada membro do clã. Une a pessoa da vida real
 | `id` | `UUID` (PK) | Não | Identificador único do membro (UUIDv4) |
 | `family_id` | `UUID` (FK) | Não | Vinculação direta com `families.id` (Multi-tenant) |
 | `name` | `VARCHAR(100)` | Não | Nome real da pessoa (usado em relatórios e aprovações) |
-| `email` | `VARCHAR(150)` | Sim | E-mail de login para pais/guardiões (Único) |
-| `password` | `VARCHAR(255)` | Sim | Hash seguro bcrypt para pais |
-| `pin` | `VARCHAR(10)` | Sim | PIN simples de 4 dígitos para login das crianças no tablet |
+| `email` | `VARCHAR(150)` | Sim | E-mail de login / contato (Único) |
+| `password` | `VARCHAR(255)` | Sim | Hash seguro bcrypt para autenticação universal (Pais e Filhos) |
 | `role` | `ENUM('ADMIN','PARENT','CHILD')` | Não | Papel de autorização no sistema (Padrão: `CHILD`) |
 | `hero_nickname` | `VARCHAR(100)` | Não | Nome de Guerra / Apelido heroico de RPG (ex: 'Paladino Sidney', 'Sir Paulinho') |
 | `class_code` | `VARCHAR(50)` | Não | Código da classe heroica (Padrão: `guardiao_do_lar`) |

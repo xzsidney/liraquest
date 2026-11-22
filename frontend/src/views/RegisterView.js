@@ -71,19 +71,17 @@ export function renderRegisterView() {
             />
           </div>
 
-          <!-- 4. PIN Secreto de 4 dígitos -->
+          <!-- 4. Senha de Acesso -->
           <div>
             <label style="display: block; font-size: 0.82rem; font-weight: 700; color: #cbd5e1; margin-bottom: 6px;">
-              PIN de Acesso (4 números para login rápido)
+              🔒 Senha de Acesso
             </label>
             <input 
               type="password" 
-              id="reg-input-pin" 
+              id="reg-input-password" 
               required 
-              maxlength="4" 
-              pattern="[0-9]{4}" 
-              placeholder="•••• (Ex: 1234)" 
-              style="width: 100%; background: #0f172a; color: #fde047; font-weight: 800; letter-spacing: 4px; border: 1px solid rgba(255, 255, 255, 0.15); padding: 12px 14px; border-radius: 12px; font-size: 1.1rem; outline: none;"
+              placeholder="Crie sua senha secreta (ex: 1234 ou sua senha)" 
+              style="width: 100%; background: #0f172a; color: #fff; border: 1px solid rgba(255, 255, 255, 0.15); padding: 12px 14px; border-radius: 12px; font-size: 0.95rem; outline: none;"
             />
           </div>
 
@@ -189,16 +187,11 @@ export function bindRegisterEvents() {
       const clanCode = document.getElementById('reg-input-clan-code')?.value?.trim();
       const name = document.getElementById('reg-input-name')?.value?.trim();
       const heroNick = document.getElementById('reg-input-hero-nick')?.value?.trim();
-      const pin = document.getElementById('reg-input-pin')?.value?.trim();
+      const password = document.getElementById('reg-input-password')?.value?.trim();
       const btn = document.getElementById('btn-submit-hero-reg');
 
-      if (!name || !heroNick || !pin) {
-        showMessage('Por favor, preencha Nome Real, Apelido Heroico e PIN!');
-        return;
-      }
-
-      if (pin.length !== 4) {
-        showMessage('O PIN deve conter exatamente 4 números!');
+      if (!name || !heroNick || !password) {
+        showMessage('Por favor, preencha Nome Real, Apelido Heroico e Senha!');
         return;
       }
 
@@ -210,7 +203,7 @@ export function bindRegisterEvents() {
           invite_code: clanCode ? clanCode.toUpperCase() : undefined,
           name,
           hero_nickname: heroNick,
-          pin,
+          password,
           class_code: selectedClass,
         });
 

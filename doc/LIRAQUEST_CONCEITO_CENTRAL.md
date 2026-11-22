@@ -19,7 +19,7 @@ Ao invés de uma abordagem punitiva ou de cobranças repetitivas, o LiraQuest in
 ## 🌐 2. O Conceito Central: A Teoria dos Dois Terminais & A Entidade Unificada (V2)
 
 No LiraQuest V2, implementou-se o princípio arquitetural onde **O Usuário É o Herói**:
-- Cada membro familiar possui uma ficha unificada (`family_members`) integrando tanto o mundo real (nome, responsabilidades, e-mail/PIN) quanto o reino da fantasia (apelido heroico, classe, atributos D20, moedas de ouro e energia de aventura).
+- Cada membro familiar possui uma ficha unificada (`family_members`) integrando tanto o mundo real (nome, responsabilidades, credenciais de login universal com e-mail/apelido e senha) quanto o reino da fantasia (apelido heroico, classe, atributos D20, moedas de ouro e energia de aventura).
 - A separação entre o plano da Vida Real e o plano do Reino Virtual é dinâmica: as tarefas cumpridas na casa geram Fichas do Lar e Energia de Aventura que habilitam batalhas, masmorras e resgates reais.
 
 ```

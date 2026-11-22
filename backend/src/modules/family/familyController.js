@@ -24,111 +24,86 @@ export const generateToken = (member) => {
 };
 
 /**
- * 1. POST /api/auth/login (Login Híbrido)
- * - Pais: email + password (bcrypt)
- * - Filhos: hero_nickname (ou name) + pin (4 dígitos)
+ * 1. POST /api/auth/login (Login Universal: Usuário/E-mail + Senha)
+ * - Pais e Filhos utilizam a mesma autenticação universal:
+ * - identifier (e-mail ou apelido do herói) + password (com hash bcrypt)
  */
 export const login = async (req, res) => {
   try {
-    const { email, password, hero_nickname, nickname, name, pin, family_code } = req.body;
+    const {
+      identifier,
+      email,
+      hero_nickname,
+      nickname,
+      name,
+      password,
+      family_code,
+    } = req.body;
 
-    // Cenário A: Login de Pais / Guardiões (Email + Senha)
-    if (email && password) {
-      const cleanEmail = String(email).toLowerCase().trim();
-      const member = await FamilyMember.findOne({
-        where: {
-          email: cleanEmail,
-          is_active: true,
-        },
-        include: [{ model: Family, as: 'family' }],
-      });
+    const target = (identifier || email || hero_nickname || nickname || name || '').trim();
+    const rawPassword = password !== undefined && password !== null ? String(password) : '';
 
-      if (!member || !member.password) {
-        return res.status(401).json({
-          success: false,
-          message: 'E-mail ou senha incorretos.',
-        });
-      }
-
-      const isMatch = await bcrypt.compare(password, member.password);
-      if (!isMatch) {
-        return res.status(401).json({
-          success: false,
-          message: 'E-mail ou senha incorretos.',
-        });
-      }
-
-      const token = generateToken(member);
-      const formatted = formatMemberResponse(member);
-
-      return res.status(200).json({
-        success: true,
-        message: `Bem-vindo de volta, Guardião ${member.name}!`,
-        token,
-        user: formatted,
-        member: formatted,
+    if (!target || !rawPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Informe seu e-mail ou apelido de herói e sua senha.',
       });
     }
 
-    // Cenário B: Login de Heróis / Filhos (Apelido/Nome + PIN)
-    const targetNickname = (hero_nickname || nickname || name || '').trim();
-    if (targetNickname && pin) {
-      const cleanPin = String(pin).trim();
+    const cleanEmail = target.toLowerCase();
 
-      const whereClause = {
-        [Op.or]: [
-          { hero_nickname: targetNickname },
-          { name: targetNickname },
-        ],
-        is_active: true,
-      };
+    const whereClause = {
+      [Op.or]: [
+        { email: cleanEmail },
+        { hero_nickname: target },
+        { name: target },
+      ],
+      is_active: true,
+    };
 
-      if (family_code) {
-        const family = await Family.findOne({
-          where: { invite_code: String(family_code).toUpperCase().trim() },
-        });
-        if (family) {
-          whereClause.family_id = family.id;
-        }
-      }
-
-      const member = await FamilyMember.findOne({
-        where: whereClause,
-        include: [{ model: Family, as: 'family' }],
+    if (family_code) {
+      const family = await Family.findOne({
+        where: { invite_code: String(family_code).toUpperCase().trim() },
       });
-
-      if (!member) {
-        return res.status(401).json({
-          success: false,
-          message: `Herói "${targetNickname}" não encontrado ou inativo.`,
-        });
+      if (family) {
+        whereClause.family_id = family.id;
       }
+    }
 
-      if (member.pin !== cleanPin) {
-        return res.status(401).json({
-          success: false,
-          message: 'PIN de acesso incorreto.',
-        });
-      }
+    const member = await FamilyMember.findOne({
+      where: whereClause,
+      include: [{ model: Family, as: 'family' }],
+    });
 
-      const token = generateToken(member);
-      const formatted = formatMemberResponse(member);
-
-      return res.status(200).json({
-        success: true,
-        message: `Avante para a aventura, ${member.hero_nickname}!`,
-        token,
-        user: formatted,
-        member: formatted,
+    if (!member || !member.password) {
+      return res.status(401).json({
+        success: false,
+        message: 'Credenciais inválidas. Verifique seu usuário/e-mail e senha.',
       });
     }
 
-    return res.status(400).json({
-      success: false,
-      message: 'Credenciais inválidas. Forneça [email + password] para Pais ou [hero_nickname + pin] para Heróis.',
+    const isMatch = await bcrypt.compare(rawPassword, member.password);
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: 'Credenciais inválidas. Verifique seu usuário/e-mail e senha.',
+      });
+    }
+
+    const token = generateToken(member);
+    const formatted = formatMemberResponse(member);
+
+    return res.status(200).json({
+      success: true,
+      message: member.role === 'CHILD'
+        ? `Avante para a aventura, ${member.hero_nickname}! ⚔️`
+        : `Bem-vindo de volta, Guardião ${member.name}! 👑`,
+      token,
+      user: formatted,
+      member: formatted,
     });
   } catch (error) {
-    console.error('❌ Erro no login híbrido:', error);
+    console.error('❌ Erro no login unificado:', error);
     return res.status(500).json({
       success: false,
       message: 'Erro interno ao realizar autenticação.',
@@ -255,18 +230,18 @@ export const register = async (req, res) => {
       name,
       hero_nickname,
       heroNickname,
+      password,
       pin,
       invite_code,
       inviteCode,
       class_code,
       classCode,
       email,
-      password,
     } = req.body;
 
     const childName = (name || '').trim();
     const heroNick = (hero_nickname || heroNickname || childName).trim();
-    const childPin = pin ? String(pin).trim() : '1234';
+    const rawPassword = (password || pin || '').trim();
     const chosenClass = class_code || classCode || 'rastreador_veloz';
     const cleanInvite = (invite_code || inviteCode || 'LIRA-2026').toUpperCase().trim();
 
@@ -277,10 +252,10 @@ export const register = async (req, res) => {
       });
     }
 
-    if (!childPin || childPin.length !== 4) {
+    if (!rawPassword) {
       return res.status(400).json({
         success: false,
-        message: 'O PIN de acesso deve ter exatamente 4 números.',
+        message: 'A senha de acesso é obrigatória.',
       });
     }
 
@@ -317,9 +292,8 @@ export const register = async (req, res) => {
       });
     }
 
-    // 3. E-mail e senha opcionais (se o jovem tiver e-mail próprio)
+    // 3. E-mail opcional (se o jovem tiver e-mail próprio)
     let cleanEmail = null;
-    let hashedPassword = null;
     if (email && email.trim()) {
       cleanEmail = email.toLowerCase().trim();
       const existingEmail = await FamilyMember.findOne({ where: { email: cleanEmail } });
@@ -329,11 +303,11 @@ export const register = async (req, res) => {
           message: 'Já existe um membro cadastrado com este e-mail.',
         });
       }
-      if (password) {
-        const salt = await bcrypt.genSalt(10);
-        hashedPassword = await bcrypt.hash(password, salt);
-      }
     }
+
+    // Hash da Senha Universal com Bcrypt
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(rawPassword, salt);
 
     // 4. Atributos base conforme arquétipo
     let stats = { str: 10, agi: 10, con: 10, int: 10, cha: 10, luk: 10 };
@@ -352,7 +326,6 @@ export const register = async (req, res) => {
       hero_nickname: heroNick,
       email: cleanEmail,
       password: hashedPassword,
-      pin: childPin,
       role: 'CHILD', // REGRA: Sempre tipo FILHO!
       class_code: chosenClass,
       skin_code: chosenClass,

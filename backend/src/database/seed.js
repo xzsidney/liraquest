@@ -33,8 +33,9 @@ export async function runSeed() {
     console.log(`🏰 Família confirmada: "${clan.name}" [${clan.invite_code}]`);
   }
 
-  // Senha padrão para os pais
-  const defaultPasswordHash = await bcrypt.hash('LiraQuest@2026', 10);
+  // Senhas padrão hasheadas
+  const defaultParentPasswordHash = await bcrypt.hash('LiraQuest@2026', 10);
+  const defaultChildPasswordHash = await bcrypt.hash('1234', 10);
 
   // 3. Os 4 Membros Fundadores
   const membersData = [
@@ -42,8 +43,7 @@ export async function runSeed() {
       name: 'Sidney Lira',
       hero_nickname: 'Paladino Sidney',
       email: 'sidney@liraquest.com',
-      password: defaultPasswordHash,
-      pin: null,
+      password: defaultParentPasswordHash,
       role: 'ADMIN',
       class_code: 'guardiao_do_lar',
       skin_code: 'paladino_lira',
@@ -64,8 +64,7 @@ export async function runSeed() {
       name: 'Elaine Lira',
       hero_nickname: 'Mestra Elaine',
       email: 'elaine@liraquest.com',
-      password: defaultPasswordHash,
-      pin: null,
+      password: defaultParentPasswordHash,
       role: 'PARENT',
       class_code: 'guardiao_da_harmonia',
       skin_code: 'guardia_harmonia',
@@ -86,8 +85,7 @@ export async function runSeed() {
       name: 'Paulo Lira',
       hero_nickname: 'Sir Paulinho',
       email: 'paulo@liraquest.com',
-      password: null,
-      pin: '1234',
+      password: defaultChildPasswordHash,
       role: 'CHILD',
       class_code: 'rastreador_veloz',
       skin_code: 'rastreador_veloz',
@@ -108,8 +106,7 @@ export async function runSeed() {
       name: 'Jennifer Lira',
       hero_nickname: 'Valquíria Jennifer',
       email: 'jennifer@liraquest.com',
-      password: null,
-      pin: '1234',
+      password: defaultChildPasswordHash,
       role: 'CHILD',
       class_code: 'artifice_criativo',
       skin_code: 'artifice_criativa',
