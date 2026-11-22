@@ -4,7 +4,7 @@
 
 import { auth } from './auth.js';
 
-const PUBLIC_ROUTES = ['home', 'login', 'register', 'home/teste'];
+const PUBLIC_ROUTES = ['home', 'login', 'register'];
 
 export const router = {
   routes: {},
@@ -17,10 +17,7 @@ export const router = {
   navigate(path) {
     const cleanPath = path.replace(/^#?\/?/, '').replace(/\/+$/, '');
     const targetHash = `#/${cleanPath}`;
-    if (window.location.pathname && window.location.pathname !== '/' && cleanPath !== 'home/teste') {
-      window.history?.replaceState?.(null, '', '/');
-    }
-    if (window.location.hash === targetHash || (!window.location.hash && this.getPath() === cleanPath)) {
+    if (window.location.hash === targetHash) {
       this.handleRouting();
     } else {
       window.location.hash = targetHash;
@@ -31,10 +28,6 @@ export const router = {
     const hash = window.location.hash || '';
     const clean = hash.replace(/^#\/?/, '').replace(/\/+$/, '').trim();
     if (!clean) {
-      const pathname = (window.location.pathname || '').replace(/^\/+|\/+$/g, '').trim();
-      if (pathname && this.routes[pathname]) {
-        return pathname;
-      }
       return auth.isAuthenticated() ? 'hub' : 'home';
     }
     return clean;

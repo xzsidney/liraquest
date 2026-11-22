@@ -14,7 +14,6 @@ import { renderStudyView, bindStudyEvents } from './views/StudyView.js';
 import { renderHealthView, bindHealthEvents } from './views/HealthView.js';
 import { renderShopView, bindShopEvents } from './views/ShopView.js';
 import { renderRpgView, bindRpgEvents } from './views/RpgView.js';
-import { renderSheetTestView, bindSheetTestEvents } from './views/SheetTestView.js';
 
 function updateNavbar() {
   const mount = document.getElementById('navbar-mount');
@@ -61,7 +60,6 @@ router.register('study', () => mountView(renderStudyView, bindStudyEvents));
 router.register('health', () => mountView(renderHealthView, bindHealthEvents));
 router.register('shop', () => mountView(renderShopView, bindShopEvents));
 router.register('rpg', () => mountView(renderRpgView, bindRpgEvents));
-router.register('home/teste', () => mountView(renderSheetTestView, bindSheetTestEvents));
 
 // Inicialização da Aplicação
 async function initApp() {

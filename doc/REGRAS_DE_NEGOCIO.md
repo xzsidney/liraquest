@@ -11,7 +11,9 @@ O **LiraQuest** é um ecossistema gamificado de rotina, hábitos familiares e RP
 ### 1.1 A Entidade Unificada (`family_members`)
 A arquitetura V2 elimina a divisão legada de dois terminais/entidades separadas (*Terminal do Usuário* vs. *Terminal do Avatar*).
 - **O Usuário É o Herói:** Pais e filhos não controlam um personagem distante — cada membro familiar possui uma ficha atômica única na tabela `family_members`, unificando identidade real (`name`, `email`), credenciais de acesso (`password`, `role`), economia (`gold`, `family_tokens`, `adventure_energy`), consistência (`streak_days`), progressão (`level`, `xp`) e atributos D20 (`str`, `agi`, `con`, `int`, `cha`, `luk` + barras de mestria `xp_*`).
-- **Hub Único (`Grande Salão` / `#/hub`):** Experiência mobile-first centralizada com o componente `HeroHUD` no topo (avatar/classe, Nível/XP, ⚡ Energia de Aventura, 🎟️ Fichas do Lar, 💰 Ouro e 🔥 Sequência), os **4 Portais da Vida Familiar** e a **Ficha Viva D20** em tempo real.
+- **Hub Único (`Grande Salão` / `#/hub`):** Experiência responsiva (mobile-first e desktop) no layout de **Ficha Ilustrada D&D 5e** ([HubView.js](file:///e:/11_Games/LiraQuest/frontend/src/views/HubView.js)), integrando o retrato do herói, os 6 medalhões de atributos da Ficha Viva D20, os **4 Portais da Vida Familiar** e modais compartilhados ([TaskModals.js](file:///e:/11_Games/LiraQuest/frontend/src/components/TaskModals.js)):
+  - **Para Filhos (`CHILD`):** Grimório lateral priorizado no topo do celular com lista de missões reais e botão direto **`📸 Concluir` / `📸 Reenviar`** (envio de foto em 1 clique), além de metas de recompensas, vitalidade e rolador D20.
+  - **Para Pais / Guardiões (`PARENT`/`ADMIN`):** Grimório do Guardião com botão **`➕ Nova Missão`**, alerta rápido de pendências, **Fila de Aprovação 1-Clique** com foto ampliável e painel **Heróis do Clã** exibindo o progresso dos membros da família.
 
 ### 1.2 Isolamento Multi-Tenant
 Embora nasça configurado para o **Clã Lira**, o backend isola os dados por família:
@@ -149,7 +151,7 @@ Atualmente possuem interfaces SPA estruturadas em `frontend/src/views/` e diret�
 
 ### 5.1 Stack Tecnológica Real
 - **Backend:** Node.js (ES Modules), Express `^4.21.2`, Sequelize `^6.37.8`, MySQL2 `^3.24.2`, `bcryptjs`, `jsonwebtoken`, `cors`, `dotenv`.
-- **Frontend:** SPA modular em HTML5, CSS3 e JavaScript nativo (ES Modules sem bundler) com roteamento hash (`#/home`, `#/home/teste` / `/home/teste`, `#/login`, `#/register`, `#/hub`, `#/tasks`, `#/study`, `#/health`, `#/shop`, `#/rpg`), servido estaticamente pelo mesmo servidor Express (`server.js`).
+- **Frontend:** SPA modular em HTML5, CSS3 e JavaScript nativo (ES Modules sem bundler) com roteamento hash (`#/home`, `#/login`, `#/register`, `#/hub`, `#/tasks`, `#/study`, `#/health`, `#/shop`, `#/rpg`), servido estaticamente pelo mesmo servidor Express (`server.js`).
 - **Tipografia Oficial:** Google Fonts **Cinzel** (cabeçalhos nobres) e **Plus Jakarta Sans** (leitura e controles).
 
 ### 5.2 Árvore Real de Pastas do Monorepo
@@ -180,24 +182,24 @@ LiraQuest/
 │   └── src/
 │       ├── main.js                # Registro de rotas e bootstrap da SPA
 │       ├── assets/
-│       │   └── heroes/            # Retratos ilustrados dos arquétipos de herói (.jpg)
+│       │   └── heroes/            # Retratos ilustrados do herói (.jpg)
 │       ├── styles/
 │       │   ├── main.css           # Design system oficial (Bordô, Azul Real, Dourado)
-│       │   └── sheet-test.css     # Estilos da Ficha Ilustrada D&D 5e (/home/teste)
+│       │   └── hero-sheet.css     # Estilos da Ficha Ilustrada D&D 5e (#/hub)
 │       ├── core/
 │       │   ├── api.js             # Cliente HTTP fetch com injeção de Bearer JWT
 │       │   ├── auth.js            # Estado de sessão e helpers de perfil
 │       │   └── router.js          # Roteador SPA hash-based com guarda de auth
 │       ├── components/
-│       │   ├── HeroHUD.js         # HUD do topo (Nível, XP, Energia, Fichas, Ouro, Streak)
-│       │   └── Navbar.js          # Barra de navegação superior
+│       │   ├── HeroHUD.js         # HUD do topo das telas secundárias
+│       │   ├── Navbar.js          # Barra de navegação superior
+│       │   └── TaskModals.js      # Modais compartilhados de foto, nova missão e fanfarra STR
 │       └── views/
 │           ├── HomeView.js        # Landing Page & apresentação dos 4 Pilares
-│           ├── SheetTestView.js   # Protótipo Ficha Ilustrada D&D 5e (/home/teste)
 │           ├── LoginView.js       # Login universal (e-mail/apelido + senha)
 │           ├── RegisterView.js    # Cadastro de herói (role CHILD)
-│           ├── HubView.js         # Grande Salão (4 Portais + Ficha Viva D20)
-│           ├── TasksView.js       # Mural de Tarefas, upload foto e fila 1-clique
+│           ├── HubView.js         # Grande Salão Oficial (Ficha Ilustrada D&D 5e)
+│           ├── TasksView.js       # Mural completo de Tarefas, upload foto e fila 1-clique
 │           ├── StudyView.js       # Protótipo UI Pomodoro do Sábio
 │           ├── HealthView.js      # Protótipo UI Hidratação e Refeições
 │           ├── ShopView.js        # Protótipo UI Loja do Lar
