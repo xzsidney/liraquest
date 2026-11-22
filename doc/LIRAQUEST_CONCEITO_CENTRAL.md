@@ -43,7 +43,10 @@ No LiraQuest V2, implementou-se o princípio arquitetural onde **O Usuário É o
 
 ### 2.1 Terminal do Usuário (Painel da Vida Real do Filho)
 Representa a vida prática e a rotina do membro da família:
-* **Mural de Missões do Dia:** Lista de deveres organizados por períodos e categorias com recompensas claras de Fichas, Ouro, XP e Energia.
+* **Mural de Missões do Lar & Pilar de Força (STR):** Lista de deveres domésticos (arrumar a cama, lavar a louça, recolher o lixo, organizar a mesa) com envio direto de fotos para comprovação.
+* **Mestria de Atributos & Evolução Contínua:** Cada tarefa do lar aprovada pelos pais concede +XP de Força (STR) (`xp_str`), além de Ouro e Fichas do Lar.
+  - **Regra de Ascensão em Atributo (+1 STR a cada 100 XP):** Ao atingir ou superar 100 pontos de `xp_str`, o atributo Força (STR) do herói sobe permanentemente (+1), o excedente é mantido e a fanfarra comemorativa é disparada na tela.
+  - **Ficha Viva D20:** Mini barras de progresso nobre para os 6 atributos (`STR, AGI, CON, INT, CHA, LUK`) exibidas em tempo real no Salão e no Mural de Tarefas.
 * **Painel do Herói (Evolução Real do Filho):** Central de acompanhamento da evolução pessoal do usuário no mundo real, contendo:
   - **Nível Real do Usuário (Hábitos):** Nível de disciplina e consistência calculado a partir do XP real de tarefas cumpridas.
   - **Barra de XP & Patentes do Lar:** Títulos de honra (*🌱 Recruta do Lar*, *⚔️ Herói Dedicado*, *🛡️ Guardião Exemplar*, *👑 Cavaleiro de Elite*, *🌟 Campeão Lendário*).

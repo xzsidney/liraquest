@@ -133,41 +133,71 @@ export async function renderHubView() {
           <span>⚔️</span> Atributos Fundamentais do Herói (Ficha Viva D20)
         </h3>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; text-align: center;">
-          <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 14px; padding: 12px 8px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; text-align: center;">
+          <!-- FORÇA (STR) -->
+          <div class="attr-card-d20" title="${member?.xp_str || 0}% para FORÇA ${(member?.str || 10) + 1}">
             <div style="font-size: 0.75rem; font-weight: 800; color: #f87171;">FORÇA (STR)</div>
             <div style="font-size: 1.6rem; font-weight: 900; color: #fff;">${member?.str || 10}</div>
-            <div style="font-size: 0.7rem; color: var(--text-muted);">Tarefas do Lar</div>
+            <div class="attr-progress-bar">
+              <div class="attr-progress-fill fill-str" style="width: ${Math.min(100, member?.xp_str || 0)}%;"></div>
+            </div>
+            <div class="attr-progress-label">${member?.xp_str || 0}% para FORÇA ${(member?.str || 10) + 1}</div>
+            <div style="font-size: 0.65rem; color: var(--text-dim); margin-top: 2px;">Tarefas do Lar</div>
           </div>
 
-          <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 14px; padding: 12px 8px;">
+          <!-- AGILIDADE (AGI) -->
+          <div class="attr-card-d20" title="${member?.xp_agi || 0}% para AGILIDADE ${(member?.agi || 10) + 1}">
             <div style="font-size: 0.75rem; font-weight: 800; color: #60a5fa;">AGILIDADE (AGI)</div>
             <div style="font-size: 1.6rem; font-weight: 900; color: #fff;">${member?.agi || 10}</div>
-            <div style="font-size: 0.7rem; color: var(--text-muted);">Velocidade & Reflexos</div>
+            <div class="attr-progress-bar">
+              <div class="attr-progress-fill fill-agi" style="width: ${Math.min(100, member?.xp_agi || 0)}%;"></div>
+            </div>
+            <div class="attr-progress-label">${member?.xp_agi || 0}% para AGI ${(member?.agi || 10) + 1}</div>
+            <div style="font-size: 0.65rem; color: var(--text-dim); margin-top: 2px;">Velocidade & Reflexos</div>
           </div>
 
-          <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 14px; padding: 12px 8px;">
+          <!-- CONSTITUIÇÃO (CON) -->
+          <div class="attr-card-d20" title="${member?.xp_con || 0}% para CON ${(member?.con || 10) + 1}">
             <div style="font-size: 0.75rem; font-weight: 800; color: #4ade80;">CONSTITUIÇÃO (CON)</div>
             <div style="font-size: 1.6rem; font-weight: 900; color: #fff;">${member?.con || 10}</div>
-            <div style="font-size: 0.7rem; color: var(--text-muted);">Saúde & Água</div>
+            <div class="attr-progress-bar">
+              <div class="attr-progress-fill fill-con" style="width: ${Math.min(100, member?.xp_con || 0)}%;"></div>
+            </div>
+            <div class="attr-progress-label">${member?.xp_con || 0}% para CON ${(member?.con || 10) + 1}</div>
+            <div style="font-size: 0.65rem; color: var(--text-dim); margin-top: 2px;">Saúde & Água</div>
           </div>
 
-          <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 14px; padding: 12px 8px;">
+          <!-- INTELIGÊNCIA (INT) -->
+          <div class="attr-card-d20" title="${member?.xp_int || 0}% para INT ${(member?.int || 10) + 1}">
             <div style="font-size: 0.75rem; font-weight: 800; color: #c084fc;">INTELIGÊNCIA (INT)</div>
             <div style="font-size: 1.6rem; font-weight: 900; color: #fff;">${member?.int || 10}</div>
-            <div style="font-size: 0.7rem; color: var(--text-muted);">Estudos & Lições</div>
+            <div class="attr-progress-bar">
+              <div class="attr-progress-fill fill-int" style="width: ${Math.min(100, member?.xp_int || 0)}%;"></div>
+            </div>
+            <div class="attr-progress-label">${member?.xp_int || 0}% para INT ${(member?.int || 10) + 1}</div>
+            <div style="font-size: 0.65rem; color: var(--text-dim); margin-top: 2px;">Estudos & Lições</div>
           </div>
 
-          <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 14px; padding: 12px 8px;">
+          <!-- CARISMA (CHA) -->
+          <div class="attr-card-d20" title="${member?.xp_cha || 0}% para CHA ${(member?.cha || 10) + 1}">
             <div style="font-size: 0.75rem; font-weight: 800; color: #f472b6;">CARISMA (CHA)</div>
             <div style="font-size: 1.6rem; font-weight: 900; color: #fff;">${member?.cha || 10}</div>
-            <div style="font-size: 0.7rem; color: var(--text-muted);">Harmonia Familiar</div>
+            <div class="attr-progress-bar">
+              <div class="attr-progress-fill fill-cha" style="width: ${Math.min(100, member?.xp_cha || 0)}%;"></div>
+            </div>
+            <div class="attr-progress-label">${member?.xp_cha || 0}% para CHA ${(member?.cha || 10) + 1}</div>
+            <div style="font-size: 0.65rem; color: var(--text-dim); margin-top: 2px;">Harmonia Familiar</div>
           </div>
 
-          <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 14px; padding: 12px 8px;">
+          <!-- SORTE (LUK) -->
+          <div class="attr-card-d20" title="${member?.xp_luk || 0}% para LUK ${(member?.luk || 10) + 1}">
             <div style="font-size: 0.75rem; font-weight: 800; color: #fde047;">SORTE (LUK)</div>
             <div style="font-size: 1.6rem; font-weight: 900; color: #fff;">${member?.luk || 10}</div>
-            <div style="font-size: 0.7rem; color: var(--text-muted);">Dados & Recompensas</div>
+            <div class="attr-progress-bar">
+              <div class="attr-progress-fill fill-luk" style="width: ${Math.min(100, member?.xp_luk || 0)}%;"></div>
+            </div>
+            <div class="attr-progress-label">${member?.xp_luk || 0}% para LUK ${(member?.luk || 10) + 1}</div>
+            <div style="font-size: 0.65rem; color: var(--text-dim); margin-top: 2px;">Dados & Recompensas</div>
           </div>
         </div>
       </div>

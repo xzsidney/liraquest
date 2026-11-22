@@ -473,6 +473,12 @@ export function formatMemberResponse(member) {
     int: member.int,
     cha: member.cha,
     luk: member.luk,
+    xp_str: member.xp_str || 0,
+    xp_agi: member.xp_agi || 0,
+    xp_con: member.xp_con || 0,
+    xp_int: member.xp_int || 0,
+    xp_cha: member.xp_cha || 0,
+    xp_luk: member.xp_luk || 0,
     is_active: member.is_active,
     family: member.family
       ? {

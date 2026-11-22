@@ -54,20 +54,16 @@ Este documento cataloga todos os endpoints REST e eventos de WebSocket (Socket.I
 
 ---
 
-## 5. Módulo de Missões & Gamificação (`/api/tasks`)
+## 5. Módulo de Missões do Lar & Mestria em Força (`/api/tasks`)
 
 | Método | Rota | Autenticação | Descrição |
 |:---|:---|:---|:---|
-| `POST` | `/api/tasks` | JWT (`PARENT` / `ADMIN`) | Cria uma nova missão da vida real (`title`, `description`, `xp_reward`, `gold_reward`, `energy_reward`, `token_reward`, `category`, `difficulty`, `allowed_profile`, `requires_proof`, `estimated_time`, `assigned_to`) |
-| `PUT` | `/api/tasks/:taskId` | JWT (`PARENT` / `ADMIN`) | Atualiza os dados de uma missão existente da família |
-| `PATCH` | `/api/tasks/:taskId/toggle` | JWT (`PARENT` / `ADMIN`) | Alterna o status da missão entre Ativa e Pausada (`is_active: true/false`) |
-| `DELETE` | `/api/tasks/:taskId` | JWT (`PARENT` / `ADMIN`) | Exclui a missão (ou desativa de forma suave se houver histórico de envios) |
-| `GET` | `/api/tasks` | JWT | Lista as missões da família (suporta `?include_inactive=true` para o painel dos pais) |
-| `POST` | `/api/tasks/:taskId/submit` | JWT | Filho submete comprovação remota (foto + texto) |
-| `GET` | `/api/tasks/submissions/pending` | JWT (`PARENT` / `ADMIN`) | Pais listam evidências pendentes de avaliação no clã |
-| `GET` | `/api/tasks/submissions/reviewed` | JWT (`PARENT` / `ADMIN`) | Pais consultam o histórico das últimas avaliações concluídas no clã |
-| `POST` | `/api/tasks/submissions/:submissionId/review` | JWT (`PARENT` / `ADMIN`) | Pais aprovam (creditando XP, Ouro, Level Up no herói + Energia de Aventura, Fichas do Lar, Streak e Contadores no `UserProgress`) ou rejeitam com feedback |
-| `GET` | `/api/tasks/submissions/my` | JWT | Histórico de comprovações e feedbacks recebidos pelo filho |
+| `GET` | `/api/tasks` | JWT | Lista as missões ativas da família do usuário. Para filhos, traz tarefas atribuídas ou abertas, com flags `today_pending` e `today_approved` baseadas nos envios do dia. |
+| `POST` | `/api/tasks` | JWT (`PARENT` / `ADMIN`) | Cria uma nova missão do lar (`title`, `description`, `category`, `frequency`, `reward_str_xp`, `reward_xp`, `reward_gold`, `reward_tokens`). Vincula automaticamente ao clã (`family_id`). |
+| `POST` | `/api/tasks/:id/submit` | JWT | Filho submete comprovação com foto (Base64) e anotações opcionais (`proof_image`, `member_notes`). Gera registro em `family_task_submissions` com status `PENDING`. |
+| `GET` | `/api/tasks/submissions/pending` | JWT (`PARENT` / `ADMIN`) | Pais listam todas as comprovações pendentes do clã com dados da tarefa e do herói executor. |
+| `POST` | `/api/tasks/submissions/:id/approve` | JWT (`PARENT` / `ADMIN`) | **Aprovação em 1 Clique**: Marca `status = 'APPROVED'`, registra o avaliador e credita no herói: `+reward_str_xp`, `+reward_gold`, `+reward_tokens` e `+reward_xp`. Se `xp_str >= 100`, evolui `str += 1`, decrementa 100 de `xp_str` e retorna flag `str_leveled_up: true`. |
+| `POST` | `/api/tasks/submissions/:id/reject` | JWT (`PARENT` / `ADMIN`) | Marca `status = 'REJECTED'`, registra o avaliador e anexa o `parent_feedback` pedagógico para que o herói capriche mais. |
 
 
 

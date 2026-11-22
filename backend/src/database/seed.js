@@ -2,6 +2,8 @@ import bcrypt from 'bcryptjs';
 import { sequelize, testDbConnection } from '../config/database.js';
 import { Family } from '../modules/family/Family.js';
 import { FamilyMember } from '../modules/family/FamilyMember.js';
+import { FamilyTask } from '../modules/tasks/FamilyTask.js';
+import { FamilyTaskSubmission } from '../modules/tasks/FamilyTaskSubmission.js';
 
 export async function runSeed() {
   console.log('🏰 [LiraQuest] Iniciando Seed do Clã Lira...');
@@ -13,9 +15,22 @@ export async function runSeed() {
   }
 
   // 1. Sincronizar tabelas de forma segura e aditiva (sem drop/destruição)
-  console.log('🔄 Sincronizando tabelas do módulo Family...');
+  console.log('🔄 Sincronizando tabelas do módulo Family e Tasks...');
   await Family.sync();
-  await FamilyMember.sync();
+
+  // Migração aditiva segura para family_members
+  const [columns] = await sequelize.query('SHOW COLUMNS FROM `family_members`');
+  const existingColNames = columns.map((c) => c.Field);
+  const newCols = ['xp_str', 'xp_agi', 'xp_con', 'xp_int', 'xp_cha', 'xp_luk'];
+  for (const col of newCols) {
+    if (!existingColNames.includes(col)) {
+      console.log(`➕ Adicionando coluna ${col} à tabela family_members...`);
+      await sequelize.query(`ALTER TABLE \`family_members\` ADD COLUMN \`${col}\` INT NOT NULL DEFAULT 0`);
+    }
+  }
+
+  await FamilyTask.sync();
+  await FamilyTaskSubmission.sync();
 
   // 2. Criar ou Obter o Clã Lira
   const clanInviteCode = 'LIRA-2026';
@@ -153,6 +168,72 @@ export async function runSeed() {
 
     if (item.role === 'ADMIN' && !clan.created_by) {
       await clan.update({ created_by: member.id });
+    }
+  }
+
+  // 4. Missões Padrão do Clã Lira (Módulo de Tarefas do Lar - Pilar STR)
+  console.log('🧹 Semeando missões padrão de Força (STR) do Lar...');
+  const defaultTasks = [
+    {
+      title: 'Arrumar a Cama e Quarto',
+      description: 'Lençóis esticados, travesseiros alinhados e brinquedos guardados no baú.',
+      category: 'LAR',
+      frequency: 'DAILY',
+      reward_str_xp: 25,
+      reward_xp: 15,
+      reward_gold: 10,
+      reward_tokens: 1,
+    },
+    {
+      title: 'Lavar e Guardar a Louça do Almoço',
+      description: 'Lavar pratos, copos e talheres, secar e guardar na despensa.',
+      category: 'LAR',
+      frequency: 'DAILY',
+      reward_str_xp: 30,
+      reward_xp: 20,
+      reward_gold: 15,
+      reward_tokens: 1,
+    },
+    {
+      title: 'Recolher o Lixo da Casa',
+      description: 'Trocar sacolas dos cestos dos quartos, banheiros e cozinha e levar à lixeira externa.',
+      category: 'LAR',
+      frequency: 'DAILY',
+      reward_str_xp: 20,
+      reward_xp: 15,
+      reward_gold: 10,
+      reward_tokens: 1,
+    },
+    {
+      title: 'Organizar a Mesa de Estudos',
+      description: 'Cadernos empilhados, estojo guardado e área de trabalho limpa para novas tarefas.',
+      category: 'LAR',
+      frequency: 'DAILY',
+      reward_str_xp: 15,
+      reward_xp: 10,
+      reward_gold: 10,
+      reward_tokens: 1,
+    },
+  ];
+
+  for (const t of defaultTasks) {
+    const existing = await FamilyTask.findOne({
+      where: {
+        family_id: clan.id,
+        title: t.title,
+      },
+    });
+
+    if (!existing) {
+      const created = await FamilyTask.create({
+        ...t,
+        family_id: clan.id,
+        is_active: true,
+      });
+      console.log(`🧹 Missão criada: "${created.title}" (+${created.reward_str_xp} XP STR)`);
+    } else {
+      await existing.update(t);
+      console.log(`🔄 Missão atualizada: "${existing.title}" (+${existing.reward_str_xp} XP STR)`);
     }
   }
 

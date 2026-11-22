@@ -6,6 +6,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { testDbConnection } from './backend/src/config/database.js';
 import familyRoutes from './backend/src/modules/family/familyRoutes.js';
+import tasksRoutes from './backend/src/modules/tasks/tasksRoutes.js';
 
 dotenv.config();
 
@@ -16,11 +17,12 @@ const app = express();
 const server = http.createServer(app);
 
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '15mb' }));
+app.use(express.urlencoded({ limit: '15mb', extended: true }));
 
 // 1. Rotas da API Backend
 app.use('/api', familyRoutes);
+app.use('/api/tasks', tasksRoutes);
 
 // Rota diagnóstica de teste do banco de dados: /testeBD
 app.get('/testeBD', (req, res) => {

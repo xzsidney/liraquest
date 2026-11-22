@@ -62,6 +62,12 @@ Armazena a identidade completa de cada membro do clã. Une a pessoa da vida real
 | `int` | `INT` | Não | Inteligência (Estudos e Leitura / Magia e Tática) (Padrão: `10`) |
 | `cha` | `INT` | Não | Carisma (Harmonia Familiar / Suporte e Buffs) (Padrão: `10`) |
 | `luk` | `INT` | Não | Sorte (Recompensas Raras e Críticos) (Padrão: `10`) |
+| `xp_str` | `INT` | Não | Progresso de Maestria em Força (0 a 100). Atingindo 100, sobe STR (+1) e zera. (Padrão: `0`) |
+| `xp_agi` | `INT` | Não | Progresso de Maestria em Agilidade (0 a 100) (Padrão: `0`) |
+| `xp_con` | `INT` | Não | Progresso de Maestria em Constituição (0 a 100) (Padrão: `0`) |
+| `xp_int` | `INT` | Não | Progresso de Maestria em Inteligência (0 a 100) (Padrão: `0`) |
+| `xp_cha` | `INT` | Não | Progresso de Maestria em Carisma (0 a 100) (Padrão: `0`) |
+| `xp_luk` | `INT` | Não | Progresso de Maestria em Sorte (0 a 100) (Padrão: `0`) |
 | `is_active` | `BOOLEAN` | Não | Controle de desativação lógica (Padrão: `true`) |
 | `created_at` / `updated_at` | `DATETIME` | Não | Timestamps de auditoria |
 
@@ -314,9 +320,47 @@ Inventário e equipamentos ativos do herói.
 
 ---
 
-## 5. Módulo de Gameplay (Tarefas, Provas e Raids)
+## 5. Módulo de Gameplay (Tarefas do Lar, Provas e Mestria em Atributos V2)
 
-### 📋 `tasks`
+### 🧹 `family_tasks` (Mural de Missões do Lar V2)
+Armazena as missões e deveres domésticos criados pelos Guardiões para alimentar o Pilar de Força (STR).
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único UUIDv4 |
+| `family_id` | `UUID` (FK) | Não | Chave estrangeira para `families.id` |
+| `title` | `VARCHAR(150)` | Não | Título da missão (ex: "Arrumar a Cama e Quarto") |
+| `description` | `TEXT` | Sim | Instruções e detalhes práticos para o herói |
+| `category` | `VARCHAR(50)` | Não | Categoria da missão (Padrão: `'LAR'`) |
+| `assigned_to` | `UUID` (FK) | Sim | Membro específico ou nulo para aberta a todos os filhos (`family_members.id`) |
+| `frequency` | `ENUM('DAILY','WEEKLY','ONCE')` | Não | Frequência de repetição (Padrão: `'DAILY'`) |
+| `reward_str_xp` | `INT` | Não | XP de Força (STR) concedido ao herói (Padrão: `25`) |
+| `reward_xp` | `INT` | Não | XP Geral de Aventureiro concedido (Padrão: `15`) |
+| `reward_gold` | `INT` | Não | Moedas de ouro concedidas (Padrão: `10`) |
+| `reward_tokens` | `INT` | Não | Fichas do Lar para a vida real concedidas (Padrão: `1`) |
+| `is_active` | `BOOLEAN` | Não | Status de ativação da missão (Padrão: `true`) |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps de auditoria |
+
+### 📸 `family_task_submissions` (Fila de Comprovação e Avaliação V2)
+Armazena as submissões fotográficas enviadas pelas crianças e o fluxo de aprovação em 1 clique dos pais.
+
+| Coluna | Tipo | Nulo | Descrição |
+|:---|:---|:---|:---|
+| `id` | `UUID` (PK) | Não | Identificador único UUIDv4 |
+| `task_id` | `UUID` (FK) | Não | Referência direta a `family_tasks.id` |
+| `family_id` | `UUID` (FK) | Não | Referência direta a `families.id` |
+| `member_id` | `UUID` (FK) | Não | Herói autor do cumprimento (`family_members.id`) |
+| `status` | `ENUM('PENDING','APPROVED','REJECTED')` | Não | Estado da avaliação (Padrão: `'PENDING'`) |
+| `proof_image` | `LONGTEXT` | Sim | Foto da comprovação em Base64 ou URL |
+| `member_notes` | `TEXT` | Sim | Comentário/relato do herói sobre a missão |
+| `reviewed_by` | `UUID` (FK) | Sim | Guardião (Pai/Mãe) avaliador (`family_members.id`) |
+| `reviewed_at` | `DATETIME` | Sim | Data e hora da avaliação |
+| `parent_feedback` | `TEXT` | Sim | Mensagem de feedback/orientação dos pais |
+| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps de auditoria |
+
+---
+
+### 📋 `tasks` (Compatibilidade Legada V1)
 Missões da vida real criadas pelos Pais (Guardiões).
 
 | Coluna | Tipo | Nulo | Descrição |
