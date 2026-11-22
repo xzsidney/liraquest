@@ -10,8 +10,24 @@ import { renderHeroHUD } from '../components/HeroHUD.js';
 
 let cachedTasks = [];
 let cachedPendingSubmissions = [];
+let cachedChildren = [];
 let selectedTaskForSubmission = null;
 let currentPreviewBase64 = null;
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function formatFrequencyLabel(freq) {
+  if (freq === 'WEEKLY') return 'Semanal';
+  if (freq === 'ONCE') return 'Única';
+  return 'Diária';
+}
 
 function showToast(message, type = 'gold') {
   const container = document.getElementById('toast-container');
@@ -75,7 +91,7 @@ export async function renderTasksView() {
     cachedTasks = [];
   }
 
-  // 2. Se for pai, carregar fila de provas pendentes
+  // 2. Se for pai, carregar fila de provas pendentes e lista de heróis filhos do clã
   if (isParent) {
     try {
       const pendingRes = await api.get('/api/tasks/submissions/pending');
@@ -84,6 +100,16 @@ export async function renderTasksView() {
       console.warn('Erro ao buscar pendências:', err.message);
       cachedPendingSubmissions = [];
     }
+
+    try {
+      const childrenRes = await api.get('/api/family/children');
+      cachedChildren = childrenRes.children || [];
+    } catch (err) {
+      console.warn('Erro ao buscar heróis do clã:', err.message);
+      cachedChildren = [];
+    }
+  } else {
+    cachedChildren = [];
   }
 
   const strVal = member?.str || 10;
@@ -225,22 +251,22 @@ export async function renderTasksView() {
                     <div>
                       <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
                         <span style="font-size: 0.75rem; font-weight: 800; color: #fde047; text-transform: uppercase;">
-                          ${sub.member?.hero_nickname || 'Herói'} (${sub.member?.name || ''})
+                          ${escapeHtml(sub.member?.hero_nickname || 'Herói')} (${escapeHtml(sub.member?.name || '')})
                         </span>
                         <span class="noble-badge noble-badge-str">STR ${sub.member?.str || 10}</span>
                       </div>
                       <strong style="color: #fff; font-size: 1.05rem;">
-                        ${sub.task?.title || 'Tarefa do Lar'}
+                        ${escapeHtml(sub.task?.title || 'Tarefa do Lar')}
                       </strong>
                       ${sub.member_notes ? `
                         <p style="color: #cbd5e1; font-size: 0.82rem; font-style: italic; margin-top: 4px;">
-                          "${sub.member_notes}"
+                          "${escapeHtml(sub.member_notes)}"
                         </p>
                       ` : ''}
                       <div style="display: flex; gap: 10px; margin-top: 6px; font-size: 0.78rem; font-weight: 800;">
-                        <span style="color: #f87171;">💪 +${sub.task?.reward_str_xp || 25} XP STR</span>
-                        <span style="color: #fde047;">💰 +${sub.task?.reward_gold || 10} Ouro</span>
-                        <span style="color: #60a5fa;">🎟️ +${sub.task?.reward_tokens || 1} Ficha</span>
+                        <span style="color: #f87171;">💪 +${sub.task?.reward_str_xp ?? 25} XP STR</span>
+                        <span style="color: #fde047;">💰 +${sub.task?.reward_gold ?? 10} Ouro</span>
+                        <span style="color: #60a5fa;">🎟️ +${sub.task?.reward_tokens ?? 1} Ficha</span>
                       </div>
                     </div>
                   </div>
@@ -293,20 +319,34 @@ export async function renderTasksView() {
             else if (task.title.toLowerCase().includes('lixo')) icon = '🗑️';
             else if (task.title.toLowerCase().includes('estudos') || task.title.toLowerCase().includes('quarto')) icon = '📚';
 
+            const rejectedSub = !task.today_pending && !task.today_approved && task.latest_submission?.status === 'REJECTED'
+              ? task.latest_submission
+              : null;
+
             return `
-              <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 14px; padding: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; transition: border-color 0.2s;">
+              <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid ${rejectedSub ? 'rgba(239, 68, 68, 0.45)' : 'rgba(212, 175, 55, 0.2)'}; border-radius: 14px; padding: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; transition: border-color 0.2s;">
                 
                 <div style="flex: 1; min-width: 250px;">
-                  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                  <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 4px;">
                     <span style="font-size: 1.3rem;">${icon}</span>
-                    <strong style="color: #fff; font-size: 1.05rem;">${task.title}</strong>
+                    <strong style="color: #fff; font-size: 1.05rem;">${escapeHtml(task.title)}</strong>
                     <span class="noble-badge" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3);">
-                      ${task.frequency === 'DAILY' ? 'Diária' : task.frequency}
+                      ${formatFrequencyLabel(task.frequency)}
                     </span>
+                    ${task.assignee ? `
+                      <span class="noble-badge noble-badge-gold">
+                        👤 ${escapeHtml(task.assignee.hero_nickname || task.assignee.name)}
+                      </span>
+                    ` : ''}
                   </div>
                   <p style="color: var(--text-muted); font-size: 0.85rem; line-height: 1.4;">
-                    ${task.description || 'Cumprir com capricho e dedicação.'}
+                    ${escapeHtml(task.description || 'Cumprir com capricho e dedicação.')}
                   </p>
+                  ${rejectedSub ? `
+                    <div class="task-rejection-feedback" style="margin-top: 8px; padding: 8px 12px; border-radius: 10px; background: rgba(239, 68, 68, 0.14); border: 1px solid rgba(239, 68, 68, 0.38); color: #fecaca; font-size: 0.82rem; line-height: 1.4;">
+                      💬 <strong>Orientação dos Pais:</strong> "${escapeHtml(rejectedSub.parent_feedback || 'Capriche um pouco mais e envie novamente!')}"
+                    </div>
+                  ` : ''}
                   <div style="display: flex; gap: 12px; margin-top: 8px; font-size: 0.8rem; font-weight: 800;">
                     <span style="color: #f87171;">💪 +${task.reward_str_xp} XP STR</span>
                     <span style="color: #fde047;">💰 +${task.reward_gold} Ouro</span>
@@ -328,9 +368,9 @@ export async function renderTasksView() {
                     <button 
                       class="btn-noble btn-noble-primary btn-noble-sm btn-submit-task-photo"
                       data-task-id="${task.id}"
-                      data-task-title="${task.title}"
+                      data-task-title="${escapeHtml(task.title)}"
                     >
-                      📸 Enviar Prova
+                      ${rejectedSub ? '📸 Reenviar Prova' : '📸 Enviar Prova'}
                     </button>
                   `)}
                 </div>
@@ -617,31 +657,56 @@ function openNewTaskModal() {
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <div>
+              <label style="display: block; font-size: 0.8rem; font-weight: 700; color: #60a5fa; margin-bottom: 4px;">
+                🔁 Frequência:
+              </label>
+              <select id="new-task-frequency" class="noble-select">
+                <option value="DAILY" selected>Diária</option>
+                <option value="WEEKLY">Semanal</option>
+                <option value="ONCE">Única</option>
+              </select>
+            </div>
+
+            <div>
+              <label style="display: block; font-size: 0.8rem; font-weight: 700; color: #fde047; margin-bottom: 4px;">
+                👤 Destinatário:
+              </label>
+              <select id="new-task-assignee" class="noble-select">
+                <option value="">👥 Todos os Heróis do Clã</option>
+                ${cachedChildren.map(child => `
+                  <option value="${escapeHtml(child.id)}">${escapeHtml(child.hero_nickname || child.name)} (${escapeHtml(child.name)})</option>
+                `).join('')}
+              </select>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div>
               <label style="display: block; font-size: 0.8rem; font-weight: 700; color: #f87171; margin-bottom: 4px;">
                 💪 Bônus Força (STR XP):
               </label>
-              <input type="number" id="new-task-str-xp" class="noble-input" value="25" />
+              <input type="number" min="0" id="new-task-str-xp" class="noble-input" value="25" />
             </div>
 
             <div>
               <label style="display: block; font-size: 0.8rem; font-weight: 700; color: #fde047; margin-bottom: 4px;">
                 💰 Ouro do Herói:
               </label>
-              <input type="number" id="new-task-gold" class="noble-input" value="10" />
+              <input type="number" min="0" id="new-task-gold" class="noble-input" value="10" />
             </div>
 
             <div>
               <label style="display: block; font-size: 0.8rem; font-weight: 700; color: #60a5fa; margin-bottom: 4px;">
                 🎟️ Fichas do Lar:
               </label>
-              <input type="number" id="new-task-tokens" class="noble-input" value="1" />
+              <input type="number" min="0" id="new-task-tokens" class="noble-input" value="1" />
             </div>
 
             <div>
               <label style="display: block; font-size: 0.8rem; font-weight: 700; color: #a78bfa; margin-bottom: 4px;">
                 ⚡ XP de Aventureiro:
               </label>
-              <input type="number" id="new-task-xp" class="noble-input" value="15" />
+              <input type="number" min="0" id="new-task-xp" class="noble-input" value="15" />
             </div>
           </div>
 
@@ -665,10 +730,12 @@ function openNewTaskModal() {
   document.getElementById('btn-save-new-task').onclick = async () => {
     const title = document.getElementById('new-task-title')?.value;
     const desc = document.getElementById('new-task-desc')?.value;
-    const strXp = document.getElementById('new-task-str-xp')?.value;
-    const gold = document.getElementById('new-task-gold')?.value;
-    const tokens = document.getElementById('new-task-tokens')?.value;
-    const xp = document.getElementById('new-task-xp')?.value;
+    const frequency = document.getElementById('new-task-frequency')?.value || 'DAILY';
+    const assignedTo = document.getElementById('new-task-assignee')?.value || '';
+    const strXpRaw = document.getElementById('new-task-str-xp')?.value;
+    const goldRaw = document.getElementById('new-task-gold')?.value;
+    const tokensRaw = document.getElementById('new-task-tokens')?.value;
+    const xpRaw = document.getElementById('new-task-xp')?.value;
 
     if (!title || !title.trim()) {
       alert('Por favor, informe o título da missão!');
@@ -680,11 +747,12 @@ function openNewTaskModal() {
         title: title.trim(),
         description: desc?.trim() || '',
         category: 'LAR',
-        frequency: 'DAILY',
-        reward_str_xp: Number(strXp) || 25,
-        reward_gold: Number(gold) || 10,
-        reward_tokens: Number(tokens) || 1,
-        reward_xp: Number(xp) || 15,
+        frequency,
+        assigned_to: assignedTo || null,
+        reward_str_xp: strXpRaw === '' || strXpRaw === undefined ? 25 : Number(strXpRaw),
+        reward_gold: goldRaw === '' || goldRaw === undefined ? 10 : Number(goldRaw),
+        reward_tokens: tokensRaw === '' || tokensRaw === undefined ? 1 : Number(tokensRaw),
+        reward_xp: xpRaw === '' || xpRaw === undefined ? 15 : Number(xpRaw),
       });
 
       showToast('🎉 Nova missão do lar criada com sucesso!', 'success');
