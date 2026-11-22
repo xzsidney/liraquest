@@ -5,12 +5,14 @@
 
 import { auth } from '../core/auth.js';
 import { router } from '../core/router.js';
+import { api } from '../core/api.js';
 import { renderHeroHUD } from '../components/HeroHUD.js';
 
 export async function renderHubView() {
   const member = auth.getMember();
   const heroName = member?.hero_nickname || member?.name || 'Aventureiro';
-  const clanName = member?.family?.name || 'Clã Lira';
+  const hasClan = Boolean(member?.family_id || member?.family);
+  const clanName = member?.family?.name || (hasClan ? 'Clã Familiar' : 'Sem Clã Vinculado');
 
   return `
     <div style="animation: fadeIn 0.35s ease-out;">
@@ -18,11 +20,43 @@ export async function renderHubView() {
       <!-- 1. HeroHUD Nobre no Topo -->
       ${renderHeroHUD()}
 
+      <!-- 1.1 Banner de Ingressar no Clã (Aparece se o herói ainda não escolheu um Clã) -->
+      ${!hasClan ? `
+        <div class="noble-card" id="join-clan-card" style="border-color: rgba(212, 175, 55, 0.7); background: linear-gradient(135deg, rgba(128, 0, 32, 0.4), rgba(15, 23, 42, 0.95)); margin-bottom: 24px; padding: 20px 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <div>
+              <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; font-weight: 800; color: #fde047; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">
+                🏰 ESCOLHA SEU CLÃ FAMILIAR
+              </div>
+              <h3 class="cinzel gold-gradient-text" style="font-size: 1.35rem; margin-bottom: 4px;">
+                Vincule-se ao Clã dos seus Pais
+              </h3>
+              <p style="color: #cbd5e1; font-size: 0.88rem; max-width: 620px; line-height: 1.5;">
+                Digite o <strong>Código do Clã</strong> (ex: <code>LIRA-2026</code>) fornecido pelos seus pais para sincronizar suas missões do lar, recompensas e rankings familiares!
+              </p>
+            </div>
+
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+              <input 
+                type="text" 
+                id="input-hub-clan-code" 
+                placeholder="EX: LIRA-2026" 
+                style="background: #0f172a; color: #fde047; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; border: 1px solid rgba(212, 175, 55, 0.4); padding: 12px 14px; border-radius: 12px; font-size: 0.95rem; outline: none; width: 170px;" 
+              />
+              <button id="btn-hub-join-clan" class="btn-noble btn-noble-gold btn-noble-sm" style="padding: 12px 20px; font-size: 0.95rem;">
+                🛡️ Ingressar no Clã
+              </button>
+            </div>
+          </div>
+          <div id="hub-clan-feedback-msg" style="display: none; margin-top: 12px; font-size: 0.85rem; font-weight: 700;"></div>
+        </div>
+      ` : ''}
+
       <!-- 2. Boas-vindas e Status do Clã -->
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 24px;">
         <div>
           <h2 class="cinzel gold-gradient-text" style="font-size: 1.8rem; margin-bottom: 2px;">
-            Grande Salão do ${clanName}
+            ${hasClan ? `Grande Salão do ${clanName}` : `Salão do Aventureiro Solitário`}
           </h2>
           <p style="color: var(--text-muted); font-size: 0.92rem;">
             Seja bem-vindo, <strong>${heroName}</strong>! Complete suas missões na vida real para fortalecer seu herói.
@@ -31,7 +65,7 @@ export async function renderHubView() {
 
         <div style="text-align: right;">
           <span style="display: inline-block; background: rgba(212, 175, 55, 0.15); border: 1px solid rgba(212, 175, 55, 0.35); padding: 4px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; color: #fde047;">
-            🏰 Clã Oficial: ${clanName}
+            ${hasClan ? `🏰 Clã Oficial: ${clanName}` : `🛡️ Sem Clã Vinculado`}
           </span>
         </div>
       </div>
@@ -154,6 +188,55 @@ export function bindHubEvents() {
 
   const portalShop = document.getElementById('portal-card-shop');
   if (portalShop) portalShop.onclick = () => router.navigate('shop');
+
+  // Evento de Ingressar no Clã após o Login
+  const btnJoinClan = document.getElementById('btn-hub-join-clan');
+  const inputClanCode = document.getElementById('input-hub-clan-code');
+  const msgEl = document.getElementById('hub-clan-feedback-msg');
+
+  if (btnJoinClan && inputClanCode) {
+    btnJoinClan.onclick = async () => {
+      const code = inputClanCode.value?.trim();
+      if (!code) {
+        if (msgEl) {
+          msgEl.textContent = 'Digite o código do clã dos seus pais!';
+          msgEl.style.display = 'block';
+          msgEl.style.color = '#f87171';
+        }
+        return;
+      }
+
+      try {
+        btnJoinClan.textContent = '⏳ Ingressando...';
+        const res = await api.post('/api/family/join', { invite_code: code });
+        
+        const member = res.member || res.user;
+        if (member) {
+          auth.state.user = member;
+          localStorage.setItem('liraquest_user', JSON.stringify(member));
+          auth.notify();
+        }
+
+        if (msgEl) {
+          msgEl.textContent = res.message || '🎉 Vinculado com sucesso!';
+          msgEl.style.display = 'block';
+          msgEl.style.color = '#4ade80';
+        }
+
+        setTimeout(() => {
+          router.navigate('hub');
+          window.location.reload();
+        }, 800);
+      } catch (err) {
+        btnJoinClan.textContent = '🛡️ Ingressar no Clã';
+        if (msgEl) {
+          msgEl.textContent = err.message || 'Código do clã inválido.';
+          msgEl.style.display = 'block';
+          msgEl.style.color = '#f87171';
+        }
+      }
+    };
+  }
 }
 
 export default { renderHubView, bindHubEvents };

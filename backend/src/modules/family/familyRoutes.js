@@ -5,6 +5,7 @@ import {
   getMembers,
   getChildren,
   register,
+  joinClan,
 } from './familyController.js';
 import { authMiddleware } from '../../core/authMiddleware.js';
 import { sequelize } from '../../config/database.js';
@@ -32,6 +33,8 @@ router.get('/children', getChildren);
 router.get('/family/me', authMiddleware, getMe);
 router.get('/family/members', authMiddleware, getMembers);
 router.get('/family/children', getChildren);
+router.post('/family/join', authMiddleware, joinClan);
+router.post('/family/join-clan', authMiddleware, joinClan);
 
 // ==========================================
 // Diagnóstico do Banco (/api/testeBD)

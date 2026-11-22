@@ -15,7 +15,7 @@ export function renderNavbar() {
     ? '👑 Guardiã Mestra'
     : '⚔️ Herói Aventureiro';
 
-  const clanName = user?.family?.name || 'Clã Lira';
+  const clanName = user?.family?.name || (user?.family_id ? 'Clã Familiar' : 'Sem Clã');
   const heroName = user?.hero_nickname || user?.name || 'Aventureiro';
 
   let avatarIcon = '⚔️';

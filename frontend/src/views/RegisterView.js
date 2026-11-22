@@ -26,21 +26,20 @@ export function renderRegisterView() {
 
         <form id="hero-register-form" style="display: flex; flex-direction: column; gap: 14px;">
           
-          <!-- 1. Código do Clã dos Pais -->
+          <!-- 1. Código do Clã dos Pais (OPCIONAL) -->
           <div>
             <label style="display: flex; justify-content: space-between; font-size: 0.82rem; font-weight: 700; color: #cbd5e1; margin-bottom: 6px;">
               <span>Código do Clã Familiar (dos Pais)</span>
-              <span style="color: #fde047; font-weight: 800;">Obrigatório</span>
+              <span style="color: #94a3b8; font-weight: 600;">Opcional</span>
             </label>
             <input 
               type="text" 
               id="reg-input-clan-code" 
-              required 
-              placeholder="Ex: LIRA-2026" 
-              style="width: 100%; background: #0f172a; color: #fde047; font-weight: 800; letter-spacing: 1.5px; border: 1px solid rgba(212, 175, 55, 0.35); padding: 12px 14px; border-radius: 12px; font-size: 0.95rem; outline: none; text-transform: uppercase;"
+              placeholder="Ex: LIRA-2026 (ou deixe em branco)" 
+              style="width: 100%; background: #0f172a; color: #fde047; font-weight: 800; letter-spacing: 1.5px; border: 1px solid rgba(212, 175, 55, 0.25); padding: 12px 14px; border-radius: 12px; font-size: 0.95rem; outline: none; text-transform: uppercase;"
             />
             <small style="color: var(--text-dim); font-size: 0.75rem; margin-top: 4px; display: block;">
-              Peça o código de convite do clã aos seus pais (ex: LIRA-2026).
+              Se você ainda não tem o código dos seus pais, pode deixar em branco e escolher o seu clã depois do login!
             </small>
           </div>
 
@@ -193,8 +192,8 @@ export function bindRegisterEvents() {
       const pin = document.getElementById('reg-input-pin')?.value?.trim();
       const btn = document.getElementById('btn-submit-hero-reg');
 
-      if (!clanCode || !name || !heroNick || !pin) {
-        showMessage('Por favor, preencha todos os campos obrigatórios.');
+      if (!name || !heroNick || !pin) {
+        showMessage('Por favor, preencha Nome Real, Apelido Heroico e PIN!');
         return;
       }
 
@@ -208,7 +207,7 @@ export function bindRegisterEvents() {
         showMessage('Ingressando no Clã...', false);
 
         const data = await api.post('/api/auth/register', {
-          invite_code: clanCode.toUpperCase(),
+          invite_code: clanCode ? clanCode.toUpperCase() : undefined,
           name,
           hero_nickname: heroNick,
           pin,

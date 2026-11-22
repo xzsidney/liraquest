@@ -284,35 +284,36 @@ export const register = async (req, res) => {
       });
     }
 
-    // 1. Localizar o Clã pelo código de convite dos pais
-    let family = await Family.findOne({ where: { invite_code: cleanInvite } });
-    if (!family) {
-      // Fallback para o Clã Lira padrão se o código for LIRA-2026 ou se não encontrar
-      family = await Family.findOne({ where: { invite_code: 'LIRA-2026' } });
-      if (!family) {
-        family = await Family.findOne();
-      }
+    // 1. Localizar o Clã pelo código de convite (OPCIONAL no cadastro)
+    let familyId = null;
+    let family = null;
+
+    if (cleanInvite) {
+      family = await Family.findOne({ where: { invite_code: cleanInvite } });
       if (!family) {
         return res.status(404).json({
           success: false,
-          message: `Código de Clã "${cleanInvite}" não encontrado. Solicite o código correto aos seus pais!`,
+          message: `Código de Clã "${cleanInvite}" não encontrado. Deixe em branco para ingressar depois do login ou solicite aos seus pais!`,
         });
       }
+      familyId = family.id;
     }
 
-    // 2. Verificar se já existe herói com esse apelido no mesmo clã
-    const existingNick = await FamilyMember.findOne({
-      where: {
-        family_id: family.id,
-        hero_nickname: heroNick,
-        is_active: true,
-      },
-    });
+    // 2. Verificar se já existe herói com esse apelido
+    const whereClause = {
+      hero_nickname: heroNick,
+      is_active: true,
+    };
+    if (familyId) {
+      whereClause.family_id = familyId;
+    }
+
+    const existingNick = await FamilyMember.findOne({ where: whereClause });
 
     if (existingNick) {
       return res.status(409).json({
         success: false,
-        message: `Já existe um herói chamado "${heroNick}" no ${family.name}. Escolha outro apelido!`,
+        message: `Já existe um herói chamado "${heroNick}". Escolha outro apelido heroico!`,
       });
     }
 
@@ -346,7 +347,7 @@ export const register = async (req, res) => {
 
     // 5. REGRA OFICIAL: Cadastro público é SEMPRE do tipo FILHO (CHILD)
     const newMember = await FamilyMember.create({
-      family_id: family.id,
+      family_id: familyId,
       name: childName,
       hero_nickname: heroNick,
       email: cleanEmail,
@@ -372,13 +373,82 @@ export const register = async (req, res) => {
 
     const token = generateToken(newMember);
     const formatted = formatMemberResponse(newMember);
+    if (family) {
+      formatted.family = {
+        id: family.id,
+        name: family.name,
+        invite_code: family.invite_code,
+      };
+    }
 
     return res.status(201).json({
       success: true,
-      message: `Avante para a aventura, ${newMember.hero_nickname}! Bem-vindo ao ${family.name}! 🎉`,
+      message: family 
+        ? `Avante para a aventura, ${newMember.hero_nickname}! Bem-vindo ao ${family.name}! 🎉`
+        : `Avante para a aventura, ${newMember.hero_nickname}! Herói desperto com sucesso! 🎉`,
       token,
       user: formatted,
       member: formatted,
+      family: family ? {
+        id: family.id,
+        name: family.name,
+        invite_code: family.invite_code,
+      } : null,
+    });
+  } catch (error) {
+    console.error('❌ Erro no cadastro do herói:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Erro interno ao cadastrar herói.',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * 6. POST /api/family/join (Ingressar em um Clã pelo código após o login)
+ */
+export const joinClan = async (req, res) => {
+  try {
+    const { invite_code, inviteCode } = req.body;
+    const cleanInvite = (invite_code || inviteCode || '').toUpperCase().trim();
+
+    if (!cleanInvite) {
+      return res.status(400).json({
+        success: false,
+        message: 'Por favor, informe o Código do Clã.',
+      });
+    }
+
+    const family = await Family.findOne({ where: { invite_code: cleanInvite } });
+    if (!family) {
+      return res.status(404).json({
+        success: false,
+        message: `Código de Clã "${cleanInvite}" não encontrado. Verifique com seus pais!`,
+      });
+    }
+
+    const member = await FamilyMember.findByPk(req.user.id);
+    if (!member) {
+      return res.status(404).json({
+        success: false,
+        message: 'Membro não encontrado.',
+      });
+    }
+
+    await member.update({ family_id: family.id });
+    const formatted = formatMemberResponse(member);
+    formatted.family = {
+      id: family.id,
+      name: family.name,
+      invite_code: family.invite_code,
+    };
+
+    return res.status(200).json({
+      success: true,
+      message: `🎉 Parabéns! Você agora faz parte do ${family.name}!`,
+      member: formatted,
+      user: formatted,
       family: {
         id: family.id,
         name: family.name,
@@ -386,10 +456,10 @@ export const register = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('❌ Erro no cadastro do herói:', error);
+    console.error('❌ Erro ao ingressar no clã:', error);
     return res.status(500).json({
       success: false,
-      message: 'Erro interno ao cadastrar herói.',
+      message: 'Erro interno ao ingressar no clã.',
       error: error.message,
     });
   }
