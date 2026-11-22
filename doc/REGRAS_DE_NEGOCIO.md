@@ -78,14 +78,7 @@ O campo `role` em `family_members` define três níveis de autorização, aplica
 - **Regra de Cadastro (`POST /api/auth/register`):** O cadastro público cria **exclusivamente** membros com `role: 'CHILD'`. A fundação e gestão de clãs pertencem aos Guardiões (`PARENT`/`ADMIN`).
 - **Dados do Cadastro:** Exige `name`, `hero_nickname` (fallback para `name`) e `password`; `email` e `invite_code` são opcionais. Caso `invite_code` seja omitido ou vazio, o herói é criado com `family_id: null` para vincular-se posteriormente no Hub.
 - **Recursos Iniciais do Novo Herói:** `level: 1`, `xp: 0`, `adventure_energy: 10`, `family_tokens: 0`, `gold: 50`, `streak_days: 1`.
-- **Arquétipos de Classe no Cadastro (`familyController.js`):**
-
-| `class_code` | STR | AGI | CON | INT | CHA | LUK |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| `rastreador_veloz` *(padrão)* | 12 | 16 | 11 | 10 | 10 | 14 |
-| `artifice_criativo` | 14 | 11 | 12 | 16 | 11 | 10 |
-| `guardiao_do_lar` | 16 | 10 | 15 | 10 | 12 | 10 |
-| Outros códigos *(ex: `guerreiro_disciplina`)* | 10 | 10 | 10 | 10 | 10 | 10 |
+- **Atributos Iniciais Padrão (`familyController.js`):** Todo usuário novo cadastrado inicia obrigatoriamente com **todos os 6 atributos fundamentais iguais a `10`** (`STR 10 / AGI 10 / CON 10 / INT 10 / CHA 10 / LUK 10`), evoluindo organicamente por mestria conforme realiza suas tarefas e hábitos. O campo `class_code` (`rastreador_veloz` *(padrão)*, `artifice_criativo`, `guardiao_do_lar`, `guerreiro_disciplina`) define apenas a identidade visual e temática do herói (`skin_code`).
 
 - **Vínculo Pós-Login (`POST /api/family/join`):** Caso um herói ainda não possua `family_id`, o `HubView.js` exibe um banner dedicado para inserir o código do clã (ex: `LIRA-2026`), vincular-se imediatamente e receber um novo token JWT atualizado com o `familyId` do clã.
 
@@ -156,7 +149,7 @@ Atualmente possuem interfaces SPA estruturadas em `frontend/src/views/` e diret�
 
 ### 5.1 Stack Tecnológica Real
 - **Backend:** Node.js (ES Modules), Express `^4.21.2`, Sequelize `^6.37.8`, MySQL2 `^3.24.2`, `bcryptjs`, `jsonwebtoken`, `cors`, `dotenv`.
-- **Frontend:** SPA modular em HTML5, CSS3 e JavaScript nativo (ES Modules sem bundler) com roteamento hash (`#/home`, `#/login`, `#/register`, `#/hub`, `#/tasks`, `#/study`, `#/health`, `#/shop`, `#/rpg`), servido estaticamente pelo mesmo servidor Express (`server.js`).
+- **Frontend:** SPA modular em HTML5, CSS3 e JavaScript nativo (ES Modules sem bundler) com roteamento hash (`#/home`, `#/home/teste` / `/home/teste`, `#/login`, `#/register`, `#/hub`, `#/tasks`, `#/study`, `#/health`, `#/shop`, `#/rpg`), servido estaticamente pelo mesmo servidor Express (`server.js`).
 - **Tipografia Oficial:** Google Fonts **Cinzel** (cabeçalhos nobres) e **Plus Jakarta Sans** (leitura e controles).
 
 ### 5.2 Árvore Real de Pastas do Monorepo
@@ -186,8 +179,11 @@ LiraQuest/
 │   ├── public/                    # Legado V1 (SPA anterior e minigames estáticos servidos em /public)
 │   └── src/
 │       ├── main.js                # Registro de rotas e bootstrap da SPA
+│       ├── assets/
+│       │   └── heroes/            # Retratos ilustrados dos arquétipos de herói (.jpg)
 │       ├── styles/
-│       │   └── main.css           # Design system oficial (Bordô, Azul Real, Dourado)
+│       │   ├── main.css           # Design system oficial (Bordô, Azul Real, Dourado)
+│       │   └── sheet-test.css     # Estilos da Ficha Ilustrada D&D 5e (/home/teste)
 │       ├── core/
 │       │   ├── api.js             # Cliente HTTP fetch com injeção de Bearer JWT
 │       │   ├── auth.js            # Estado de sessão e helpers de perfil
@@ -197,6 +193,7 @@ LiraQuest/
 │       │   └── Navbar.js          # Barra de navegação superior
 │       └── views/
 │           ├── HomeView.js        # Landing Page & apresentação dos 4 Pilares
+│           ├── SheetTestView.js   # Protótipo Ficha Ilustrada D&D 5e (/home/teste)
 │           ├── LoginView.js       # Login universal (e-mail/apelido + senha)
 │           ├── RegisterView.js    # Cadastro de herói (role CHILD)
 │           ├── HubView.js         # Grande Salão (4 Portais + Ficha Viva D20)
@@ -240,7 +237,7 @@ Relação fiel e exclusiva das rotas montadas atualmente em `server.js`, `backen
 | :--- | :--- | :--- | :--- |
 | `POST` | `/api/auth/login` *(alias: `/api/login`)* | Pública | Body: `{ identifier \| email \| hero_nickname \| nickname \| name, password, family_code? }`. Valida senha com `bcryptjs` (retorna `401` se `family_code` não existir), gera JWT (`7d`) e retorna `{ token, user, member }`. |
 | `GET` | `/api/auth/me` *(aliases: `/api/me`, `/api/family/me`)* | JWT | Retorna a ficha unificada do membro autenticado (`is_active: true`) com objeto `family`, sem `password`. |
-| `POST` | `/api/auth/register` *(alias: `/api/register`)* | Pública | Body: `{ name, hero_nickname?, password \| pin, invite_code?, class_code?, email? }`. Cria membro sempre com `role: 'CHILD'`, atributos iniciais do arquétipo e vínculo opcional ao clã (`family_id: null` se `invite_code` omitido). Retorna `201` com JWT e perfil. |
+| `POST` | `/api/auth/register` *(alias: `/api/register`)* | Pública | Body: `{ name, hero_nickname?, password \| pin, invite_code?, class_code?, email? }`. Cria membro sempre com `role: 'CHILD'`, todos os 6 atributos iniciais em `10` e vínculo opcional ao clã (`family_id: null` se `invite_code` omitido). Retorna `201` com JWT e perfil. |
 | `GET` | `/api/auth/children` *(aliases: `/api/children`, `/api/family/children`)* | JWT | Lista simplificada de membros ativos com `role = 'CHILD'` restrita estritamente ao `family_id` do usuário autenticado (`id`, `name`, `hero_nickname`, `skin_code`, `class_code`, `level`). |
 | `GET` | `/api/family/members` | JWT | Lista todos os membros ativos (`is_active: true`) do mesmo `family_id` do usuário autenticado, ordenados por `role ASC, name ASC`, sem `password`. |
 | `POST` | `/api/family/join` *(alias: `/api/family/join-clan`)* | JWT | Body: `{ invite_code \| inviteCode }`. Localiza a família pelo código (case-insensitive), atualiza `family_id` do membro autenticado e retorna um novo JWT `token` atualizado. |

@@ -129,7 +129,7 @@ Armazena os clãs/famílias multi-tenant do sistema.
 ---
 
 ### 3.2 `family_members`
-Entidade atômica unificada (**O Usuário É o Herói**). Armazena dados pessoais, credenciais de acesso, papel RBAC, economia do lar e ficha viva D20 (atributos e barras de mestria).
+Entidade atômica unificada (**O Usuário É o Herói**). Armazena dados pessoais, credenciais de acesso, papel RBAC, economia do lar e ficha viva D20 (atributos e barras de mestria). Todo usuário novo cadastrado inicia com todos os 6 atributos base (`str`, `agi`, `con`, `int`, `cha`, `luk`) iguais a `10`.
 - **Modelo Sequelize:** `FamilyMember` ([FamilyMember.js](file:///e:/11_Games/LiraQuest/backend/src/modules/family/FamilyMember.js))
 - **Associações:** `belongsTo(Family, as: 'family')`, `hasMany(FamilyTask, foreignKey: 'assigned_to', as: 'assignedTasks')`, `hasMany(FamilyTaskSubmission, foreignKey: 'member_id', as: 'submissions')`, `hasMany(FamilyTaskSubmission, foreignKey: 'reviewed_by', as: 'reviewedSubmissions')`.
 

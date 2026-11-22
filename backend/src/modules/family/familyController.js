@@ -324,15 +324,8 @@ export const register = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(rawPassword, salt);
 
-    // 4. Atributos base conforme arquétipo
-    let stats = { str: 10, agi: 10, con: 10, int: 10, cha: 10, luk: 10 };
-    if (chosenClass === 'rastreador_veloz') {
-      stats = { str: 12, con: 11, agi: 16, int: 10, cha: 10, luk: 14 };
-    } else if (chosenClass === 'artifice_criativo') {
-      stats = { str: 14, con: 12, agi: 11, int: 16, cha: 11, luk: 10 };
-    } else if (chosenClass === 'guardiao_do_lar') {
-      stats = { str: 16, con: 15, agi: 10, int: 10, cha: 12, luk: 10 };
-    }
+    // 4. REGRA OFICIAL: Todo usuário novo inicia com todos os 6 atributos fundamentais iguais a 10
+    const stats = { str: 10, agi: 10, con: 10, int: 10, cha: 10, luk: 10 };
 
     // 5. REGRA OFICIAL: Cadastro público é SEMPRE do tipo FILHO (CHILD)
     const newMember = await FamilyMember.create({

@@ -1,0 +1,1184 @@
+/* ========================================================
+   LIRAQUEST - FICHA ILUSTRADA D&D 5e (/home/teste)
+   Escopo isolado sob .lq-sheet-page (Pergaminho Clássico vs. Grimório Real)
+   ======================================================== */
+
+.lq-sheet-page {
+  max-width: 1180px;
+  margin: 0 auto 36px;
+  padding: 6px 4px 28px;
+  animation: fadeIn 0.35s ease-out;
+}
+
+/* ========================================================
+   BARRA DE CONTROLE DO PREVIEW (ACIMA DA FICHA)
+   ======================================================== */
+.sheet-preview-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid rgba(212, 175, 55, 0.38);
+  border-radius: 16px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.sheet-preview-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.sheet-preview-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #94a3b8;
+  margin-right: 4px;
+}
+
+.sheet-ctrl-btn {
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.05);
+  color: #e2e8f0;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sheet-ctrl-btn:hover {
+  border-color: rgba(212, 175, 55, 0.6);
+  color: #fde047;
+}
+
+.sheet-ctrl-btn.active {
+  background: linear-gradient(135deg, #800020, #1e3a8a);
+  border-color: #d4af37;
+  color: #fde047;
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.35);
+}
+
+/* ========================================================
+   TEMAS DA FICHA (PERGAMINHO CLÁSSICO vs GRIMÓRIO ESCURO)
+   ======================================================== */
+.lq-sheet-page[data-sheet-theme="parchment"] {
+  --sh-bg: #f3e8ce;
+  --sh-bg-2: #e5d1a4;
+  --sh-panel: #f9f2e1;
+  --sh-panel-alt: #efe1be;
+  --sh-ink: #24170c;
+  --sh-ink-muted: #5d4731;
+  --sh-gold: #b48228;
+  --sh-gold-bright: #e6bc58;
+  --sh-border: #8a6220;
+  --sh-ruby: #800020;
+  --sh-royal: #1e3a8a;
+  --sh-emerald: #166534;
+  --sh-line: rgba(138, 98, 32, 0.24);
+  --sh-shadow: rgba(45, 28, 10, 0.24);
+  --sh-astrolabe: rgba(122, 87, 30, 0.32);
+}
+
+.lq-sheet-page[data-sheet-theme="obsidian"] {
+  --sh-bg: #0b1020;
+  --sh-bg-2: #111b33;
+  --sh-panel: rgba(15, 23, 42, 0.94);
+  --sh-panel-alt: rgba(30, 41, 59, 0.88);
+  --sh-ink: #f8fafc;
+  --sh-ink-muted: #cbd5e1;
+  --sh-gold: #d4af37;
+  --sh-gold-bright: #fde047;
+  --sh-border: rgba(212, 175, 55, 0.65);
+  --sh-ruby: #9b111e;
+  --sh-royal: #2563eb;
+  --sh-emerald: #10b981;
+  --sh-line: rgba(212, 175, 55, 0.16);
+  --sh-shadow: rgba(0, 0, 0, 0.6);
+  --sh-astrolabe: rgba(212, 175, 55, 0.28);
+}
+
+/* ========================================================
+   MOLDURA PRINCIPAL DA FICHA
+   ======================================================== */
+.sheet-canvas {
+  position: relative;
+  border-radius: 18px;
+  padding: 24px 22px 26px;
+  color: var(--sh-ink);
+  border: 3px solid var(--sh-border);
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.55),
+    inset 0 0 60px var(--sh-shadow);
+  overflow: hidden;
+}
+
+.lq-sheet-page[data-sheet-theme="parchment"] .sheet-canvas {
+  background-color: var(--sh-bg);
+  background-image:
+    radial-gradient(circle at 18% 12%, rgba(255, 250, 235, 0.7) 0%, transparent 45%),
+    radial-gradient(circle at 82% 85%, rgba(180, 130, 40, 0.16) 0%, transparent 50%),
+    repeating-linear-gradient(0deg, rgba(138, 98, 32, 0.03) 0px, rgba(138, 98, 32, 0.03) 1px, transparent 1px, transparent 3px),
+    linear-gradient(165deg, #f6edd7 0%, #ede0be 55%, #e4d1a5 100%);
+}
+
+.lq-sheet-page[data-sheet-theme="obsidian"] .sheet-canvas {
+  background-color: var(--sh-bg);
+  background-image:
+    radial-gradient(circle at 52% 28%, rgba(128, 0, 32, 0.26) 0%, transparent 50%),
+    radial-gradient(circle at 22% 72%, rgba(30, 58, 138, 0.32) 0%, transparent 50%),
+    radial-gradient(circle at 84% 20%, rgba(212, 175, 55, 0.12) 0%, transparent 40%),
+    linear-gradient(170deg, #0b1020 0%, #0f172a 55%, #090d19 100%);
+}
+
+/* Borda interna dupla estilo D&D */
+.sheet-canvas::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 1px solid var(--sh-gold);
+  border-radius: 12px;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* ========================================================
+   1. CABEÇALHO SUPERIOR (PLACA DO NOME + PERGAMINHO)
+   ======================================================== */
+.sheet-header-grid {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(250px, 340px) 1fr;
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.sheet-name-plaque {
+  position: relative;
+  background: var(--sh-panel);
+  border: 2.5px solid var(--sh-border);
+  border-radius: 10px;
+  padding: 12px 18px 14px;
+  box-shadow:
+    0 6px 16px var(--sh-shadow),
+    inset 0 0 0 3px rgba(212, 175, 55, 0.22);
+  text-align: center;
+}
+
+.sheet-name-plaque::before,
+.sheet-name-plaque::after {
+  content: '✦';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--sh-gold);
+  font-size: 0.9rem;
+}
+
+.sheet-name-plaque::before { left: 8px; }
+.sheet-name-plaque::after { right: 8px; }
+
+.sheet-plaque-kicker {
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.6px;
+  color: var(--sh-ruby);
+  margin-bottom: 3px;
+}
+
+.lq-sheet-page[data-sheet-theme="obsidian"] .sheet-plaque-kicker {
+  color: #fde047;
+}
+
+.sheet-hero-name {
+  font-family: var(--font-serif);
+  font-size: clamp(1.35rem, 2.2vw, 1.75rem);
+  font-weight: 900;
+  color: var(--sh-ink);
+  line-height: 1.15;
+}
+
+/* Pergaminho Enrolado Direito */
+.sheet-scroll-banner {
+  position: relative;
+  background: linear-gradient(180deg, var(--sh-panel) 0%, var(--sh-panel-alt) 100%);
+  border-top: 2.5px solid var(--sh-border);
+  border-bottom: 2.5px solid var(--sh-border);
+  padding: 10px 26px;
+  margin: 0 12px;
+  box-shadow: 0 6px 16px var(--sh-shadow);
+}
+
+.sheet-scroll-banner::before,
+.sheet-scroll-banner::after {
+  content: '';
+  position: absolute;
+  top: -7px;
+  bottom: -7px;
+  width: 18px;
+  border-radius: 9px;
+  border: 2px solid var(--sh-border);
+  background: linear-gradient(90deg, #6e4816 0%, #c8963e 45%, #5c3a10 100%);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+}
+
+.sheet-scroll-banner::before { left: -12px; }
+.sheet-scroll-banner::after { right: -12px; }
+
+.sheet-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px 16px;
+}
+
+.sheet-meta-cell {
+  border-bottom: 1px solid var(--sh-line);
+  padding-bottom: 3px;
+}
+
+.sheet-meta-value {
+  font-family: var(--font-serif);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--sh-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sheet-meta-label {
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--sh-ink-muted);
+}
+
+/* ========================================================
+   2. FAIXA DE MEDALHÕES & COROA DOS 6 PILARES
+   ======================================================== */
+.sheet-medallions-row {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.sheet-medallions-left,
+.sheet-medallions-right {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.sheet-ribbon-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--sh-panel);
+  border: 2px solid var(--sh-border);
+  border-radius: 999px;
+  padding: 5px 14px 5px 10px;
+  box-shadow: 0 4px 10px var(--sh-shadow);
+}
+
+.sheet-ribbon-circle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--sh-gold-bright), var(--sh-gold));
+  border: 2px solid var(--sh-border);
+  color: #1f1408;
+  font-family: var(--font-serif);
+  font-weight: 900;
+  font-size: 0.92rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sheet-ribbon-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.sheet-ribbon-title {
+  font-size: 0.64rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: var(--sh-ink-muted);
+}
+
+.sheet-ribbon-sub {
+  font-family: var(--font-serif);
+  font-size: 0.86rem;
+  font-weight: 800;
+  color: var(--sh-ink);
+}
+
+/* Coroa com 6 Bandeirinhas (equivalente aos Saving Throws) */
+.sheet-pillars-crown {
+  background: var(--sh-panel);
+  border: 2px solid var(--sh-border);
+  border-radius: 26px 26px 12px 12px;
+  padding: 6px 14px 10px;
+  box-shadow: 0 5px 14px var(--sh-shadow);
+  text-align: center;
+}
+
+.sheet-crown-title {
+  font-family: var(--font-serif);
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.1px;
+  color: var(--sh-gold);
+  margin-bottom: 6px;
+}
+
+.sheet-crown-flags {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 8px;
+}
+
+.sheet-flag {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 40px;
+}
+
+.sheet-flag-val {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--sh-panel-alt);
+  border: 2px solid var(--sh-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-serif);
+  font-weight: 900;
+  font-size: 0.84rem;
+  color: var(--sh-ink);
+  z-index: 2;
+}
+
+.sheet-flag-ribbon {
+  margin-top: -4px;
+  width: 30px;
+  padding: 5px 2px 6px;
+  font-size: 0.58rem;
+  font-weight: 900;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%);
+}
+
+.flag-str { background: #800020; }
+.flag-agi { background: #1e3a8a; }
+.flag-con { background: #166534; }
+.flag-int { background: #5b21b6; }
+.flag-cha { background: #9d174d; }
+.flag-luk { background: #b45309; }
+
+/* Escudo de Defesa / Poder */
+.sheet-ac-crest {
+  position: relative;
+  width: 78px;
+  height: 84px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 50% 35%, var(--sh-panel) 0%, var(--sh-panel-alt) 100%);
+  border: 3px solid var(--sh-border);
+  border-radius: 16px 16px 42px 42px;
+  box-shadow:
+    0 6px 16px var(--sh-shadow),
+    inset 0 0 0 2px rgba(212, 175, 55, 0.4);
+}
+
+.sheet-ac-val {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--sh-ink);
+  line-height: 1;
+}
+
+.sheet-ac-label {
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--sh-ruby);
+  margin-top: 2px;
+}
+
+.lq-sheet-page[data-sheet-theme="obsidian"] .sheet-ac-label {
+  color: #fde047;
+}
+
+/* ========================================================
+   3. ÁREA CENTRAL (GRIMÓRIO À ESQUERDA + PALCO DO HERÓI)
+   ======================================================== */
+.sheet-main-grid {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 305px 1fr;
+  gap: 20px;
+  align-items: stretch;
+  margin-bottom: 22px;
+}
+
+/* Grimório de Perícias e Portais */
+.sheet-grimoire {
+  position: relative;
+  background: linear-gradient(90deg, #4b2d18 0%, #694122 10px, var(--sh-panel) 18px, var(--sh-panel) 100%);
+  border: 2.5px solid var(--sh-border);
+  border-radius: 8px 16px 16px 8px;
+  padding: 14px 16px 14px 24px;
+  box-shadow:
+    -4px 8px 20px var(--sh-shadow),
+    inset 4px 0 12px rgba(0, 0, 0, 0.22);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.lq-sheet-page[data-sheet-theme="obsidian"] .sheet-grimoire {
+  background: linear-gradient(90deg, #1b0a12 0%, #4a0e17 10px, rgba(15, 23, 42, 0.96) 18px, rgba(15, 23, 42, 0.96) 100%);
+}
+
+.sheet-grimoire-clasp {
+  position: absolute;
+  right: -8px;
+  width: 14px;
+  height: 28px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, var(--sh-gold-bright), var(--sh-gold));
+  border: 1.5px solid var(--sh-border);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+.sheet-grimoire-clasp.clasp-top { top: 44px; }
+.sheet-grimoire-clasp.clasp-bottom { bottom: 44px; }
+
+.sheet-grimoire-title {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 900;
+  text-align: center;
+  color: var(--sh-ink);
+  border-bottom: 2px solid var(--sh-gold);
+  padding-bottom: 6px;
+  margin-bottom: 10px;
+}
+
+.sheet-portals-mini {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.sheet-portal-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--sh-border);
+  background: var(--sh-panel-alt);
+  color: var(--sh-ink);
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sheet-portal-btn:hover {
+  border-color: var(--sh-gold-bright);
+  background: linear-gradient(135deg, rgba(128, 0, 32, 0.14), rgba(30, 58, 138, 0.14));
+  transform: translateY(-1px);
+}
+
+.sheet-skills-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sheet-skill-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.77rem;
+  padding: 3px 2px;
+  border-bottom: 1px dashed var(--sh-line);
+}
+
+.sheet-skill-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--sh-ink);
+  font-weight: 600;
+}
+
+.sheet-skill-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1.5px solid var(--sh-border);
+  flex-shrink: 0;
+}
+
+.sheet-skill-dot.proficient {
+  background: var(--sh-ruby);
+  border-color: var(--sh-gold);
+}
+
+.sheet-skill-attr {
+  color: var(--sh-ink-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.sheet-skill-mod {
+  font-family: var(--font-serif);
+  font-weight: 800;
+  color: var(--sh-ink);
+  min-width: 28px;
+  text-align: right;
+  border-bottom: 1px solid var(--sh-border);
+}
+
+.sheet-grimoire-footer {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1.5px solid var(--sh-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--sh-ink-muted);
+}
+
+/* ========================================================
+   PALCO CENTRAL DO HERÓI + ARCO DOS 6 ATRIBUTOS
+   ======================================================== */
+.sheet-hero-stage {
+  position: relative;
+  min-height: 555px;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.sheet-astrolabe-svg {
+  position: absolute;
+  left: 39%;
+  top: 53%;
+  width: 450px;
+  height: 450px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.sheet-arc-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.sheet-hero-portrait-wrap {
+  position: absolute;
+  left: 39%;
+  top: 53%;
+  width: 345px;
+  height: 450px;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.sheet-hero-portrait {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  border-radius: 24px;
+}
+
+/* No tema Pergaminho, o fundo creme da pintura se funde ao pergaminho e círculo arcano */
+.lq-sheet-page[data-sheet-theme="parchment"] .sheet-hero-portrait {
+  mix-blend-mode: multiply;
+  -webkit-mask-image: radial-gradient(ellipse 68% 72% at 50% 45%, #000 56%, rgba(0, 0, 0, 0.45) 75%, transparent 98%);
+  mask-image: radial-gradient(ellipse 68% 72% at 50% 45%, #000 56%, rgba(0, 0, 0, 0.45) 75%, transparent 98%);
+}
+
+/* No tema Grimório Escuro, mantém brilho nítido com vinheta suave e halo dourado */
+.lq-sheet-page[data-sheet-theme="obsidian"] .sheet-hero-portrait {
+  -webkit-mask-image: radial-gradient(ellipse 68% 72% at 50% 45%, #000 58%, rgba(0, 0, 0, 0.5) 78%, transparent 98%);
+  mask-image: radial-gradient(ellipse 68% 72% at 50% 45%, #000 58%, rgba(0, 0, 0, 0.5) 78%, transparent 98%);
+  filter: drop-shadow(0 10px 26px rgba(212, 175, 55, 0.35));
+}
+
+/* Medalhões dos 6 Atributos em Arco */
+.sheet-stats-arc {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 555px;
+  z-index: 4;
+}
+
+.sheet-stat-orb {
+  position: absolute;
+  width: 92px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: inherit;
+  transition: transform 0.2s ease;
+}
+
+.sheet-stat-orb:hover {
+  transform: translateX(-50%) translateY(-3px) scale(1.04);
+}
+
+.sheet-stat-ring {
+  position: relative;
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--sh-panel) 0%, var(--sh-panel-alt) 100%);
+  border: 3px solid var(--sh-border);
+  box-shadow:
+    0 6px 16px var(--sh-shadow),
+    inset 0 0 0 2px rgba(212, 175, 55, 0.42);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sheet-stat-orb.selected .sheet-stat-ring {
+  border-color: var(--sh-gold-bright);
+  box-shadow:
+    0 0 20px rgba(212, 175, 55, 0.65),
+    inset 0 0 0 2px var(--sh-ruby);
+}
+
+.sheet-stat-mod {
+  position: absolute;
+  top: -7px;
+  left: -8px;
+  min-width: 30px;
+  height: 26px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--sh-panel);
+  border: 2px solid var(--sh-border);
+  font-family: var(--font-serif);
+  font-size: 0.78rem;
+  font-weight: 900;
+  color: var(--sh-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px var(--sh-shadow);
+}
+
+.sheet-stat-val {
+  font-family: var(--font-serif);
+  font-size: 1.55rem;
+  font-weight: 900;
+  color: var(--sh-ink);
+  line-height: 1;
+}
+
+.sheet-stat-xp {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: var(--sh-ink-muted);
+  margin-top: 2px;
+}
+
+.sheet-stat-banner {
+  margin-top: -8px;
+  background: linear-gradient(135deg, var(--sh-ruby), var(--sh-royal));
+  color: #fde047;
+  border: 1.5px solid var(--sh-gold);
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+  z-index: 2;
+}
+
+.sheet-stat-bar {
+  width: 68px;
+  height: 4px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.25);
+  margin-top: 4px;
+  overflow: hidden;
+}
+
+.sheet-stat-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--sh-gold), var(--sh-gold-bright));
+}
+
+/* Posições no Arco (Desktop >= 960px) */
+.pos-str { top: 14px; left: 26%; }
+.pos-agi { top: 6px; left: 50%; }
+.pos-con { top: 44px; left: 73%; }
+.pos-int { top: 156px; left: 84%; }
+.pos-cha { top: 286px; left: 84%; }
+.pos-luk { top: 406px; left: 74%; }
+
+/* Visão Passiva (inferior esquerdo) & Ritmo (inferior direito) */
+.sheet-passive-eye {
+  position: absolute;
+  left: 16px;
+  bottom: 18px;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--sh-panel);
+  border: 2px solid var(--sh-border);
+  border-radius: 999px;
+  padding: 5px 14px 5px 8px;
+  box-shadow: 0 4px 12px var(--sh-shadow);
+}
+
+.sheet-eye-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--sh-panel-alt);
+  border: 1.5px solid var(--sh-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-serif);
+  font-weight: 900;
+  font-size: 0.9rem;
+  color: var(--sh-ink);
+}
+
+.sheet-speed-tag {
+  position: absolute;
+  right: 16px;
+  bottom: 18px;
+  z-index: 4;
+  background: linear-gradient(135deg, var(--sh-panel) 0%, var(--sh-panel-alt) 100%);
+  border: 2px solid var(--sh-border);
+  border-radius: 10px;
+  padding: 6px 14px;
+  box-shadow: 0 4px 12px var(--sh-shadow);
+  text-align: center;
+}
+
+/* ========================================================
+   4. PAINÉIS INFERIORES EM 3 COLUNAS + ESPADA DECORATIVA
+   ======================================================== */
+.sheet-bottom-wrap {
+  position: relative;
+  z-index: 2;
+  padding-left: 24px;
+}
+
+.sheet-sword-deco {
+  position: absolute;
+  left: -4px;
+  top: -12px;
+  bottom: 6px;
+  width: 26px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.sheet-bottom-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  align-items: stretch;
+}
+
+.sheet-panel {
+  position: relative;
+  background: var(--sh-panel);
+  border: 2.5px solid var(--sh-border);
+  border-radius: 10px;
+  padding: 0 0 14px;
+  box-shadow:
+    0 8px 20px var(--sh-shadow),
+    inset 0 0 0 2px rgba(212, 175, 55, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.sheet-panel-header {
+  background: linear-gradient(90deg, var(--sh-ruby) 0%, var(--sh-royal) 100%);
+  color: #fde047;
+  font-family: var(--font-serif);
+  font-size: 0.92rem;
+  font-weight: 900;
+  letter-spacing: 0.6px;
+  text-align: center;
+  padding: 9px 12px;
+  border-bottom: 2px solid var(--sh-gold);
+  border-radius: 7px 7px 0 0;
+}
+
+.sheet-panel-body {
+  padding: 12px 14px 4px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sheet-table-row {
+  display: grid;
+  grid-template-columns: 1.4fr 0.9fr 0.7fr;
+  gap: 6px;
+  align-items: center;
+  padding: 6px 4px;
+  border-bottom: 1px solid var(--sh-line);
+  font-size: 0.76rem;
+}
+
+.sheet-table-head {
+  font-size: 0.64rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: var(--sh-ink-muted);
+  border-bottom: 1.5px solid var(--sh-border);
+}
+
+.sheet-status-tag {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.tag-ready {
+  background: rgba(30, 58, 138, 0.16);
+  color: var(--sh-royal);
+  border: 1px solid rgba(30, 58, 138, 0.4);
+}
+
+.lq-sheet-page[data-sheet-theme="obsidian"] .tag-ready {
+  color: #93c5fd;
+  border-color: rgba(96, 165, 250, 0.45);
+}
+
+.tag-done {
+  background: rgba(22, 101, 52, 0.16);
+  color: var(--sh-emerald);
+  border: 1px solid rgba(22, 101, 52, 0.45);
+}
+
+.lq-sheet-page[data-sheet-theme="obsidian"] .tag-done {
+  color: #4ade80;
+}
+
+.tag-pending {
+  background: rgba(180, 130, 40, 0.2);
+  color: var(--sh-gold);
+  border: 1px solid var(--sh-gold);
+}
+
+/* Coluna 2: Vitalidade & Recursos */
+.sheet-hp-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--sh-panel-alt);
+  border: 1.5px solid var(--sh-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.sheet-hp-num {
+  font-family: var(--font-serif);
+  font-size: 1.65rem;
+  font-weight: 900;
+  color: var(--sh-ink);
+  line-height: 1;
+}
+
+.sheet-xp-track {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid var(--sh-border);
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.sheet-xp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--sh-ruby), var(--sh-gold));
+}
+
+.sheet-treasury-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.sheet-treasure-box {
+  background: var(--sh-panel-alt);
+  border: 1px solid var(--sh-border);
+  border-radius: 8px;
+  padding: 8px 6px;
+  text-align: center;
+}
+
+.sheet-treasure-val {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: var(--sh-ink);
+}
+
+.sheet-treasure-lbl {
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--sh-ink-muted);
+}
+
+.sheet-seals-row {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.sheet-seal-pip {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--sh-border);
+  background: var(--sh-panel-alt);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 900;
+  color: var(--sh-ink-muted);
+}
+
+.sheet-seal-pip.lit {
+  background: linear-gradient(135deg, var(--sh-gold-bright), var(--sh-gold));
+  color: #1f1408;
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.55);
+}
+
+/* Coluna 3: Traços & Rolador D20 */
+.sheet-traits-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.sheet-trait-item {
+  font-size: 0.77rem;
+  line-height: 1.42;
+  color: var(--sh-ink);
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--sh-line);
+}
+
+.sheet-trait-item strong {
+  color: var(--sh-ruby);
+}
+
+.lq-sheet-page[data-sheet-theme="obsidian"] .sheet-trait-item strong {
+  color: #fde047;
+}
+
+.sheet-d20-box {
+  background: var(--sh-panel-alt);
+  border: 1.5px solid var(--sh-border);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sheet-d20-result {
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--sh-ink);
+}
+
+.sheet-cta-btn {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1.5px solid var(--sh-gold);
+  background: linear-gradient(135deg, var(--sh-ruby), var(--sh-royal));
+  color: #fde047;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.sheet-cta-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
+}
+
+/* ========================================================
+   RESPONSIVIDADE (MOBILE & TABLET < 960px)
+   ======================================================== */
+@media (max-width: 960px) {
+  .sheet-header-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sheet-meta-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sheet-main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sheet-hero-stage {
+    min-height: auto;
+    padding: 18px 10px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .sheet-astrolabe-svg {
+    left: 50%;
+    top: 155px;
+    width: 300px;
+    height: 300px;
+  }
+
+  .sheet-arc-svg {
+    display: none;
+  }
+
+  .sheet-hero-portrait-wrap {
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
+    width: 240px;
+    height: 310px;
+  }
+
+  .sheet-stats-arc {
+    min-height: auto;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px 8px;
+    justify-items: center;
+  }
+
+  .sheet-stat-orb {
+    position: static;
+    transform: none;
+    width: auto;
+  }
+
+  .sheet-stat-orb:hover {
+    transform: translateY(-2px);
+  }
+
+  .sheet-passive-eye,
+  .sheet-speed-tag {
+    position: static;
+  }
+
+  .sheet-bottom-wrap {
+    padding-left: 0;
+  }
+
+  .sheet-sword-deco {
+    display: none;
+  }
+
+  .sheet-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .sheet-canvas {
+    padding: 16px 12px 18px;
+  }
+
+  .sheet-stats-arc {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sheet-crown-flags {
+    flex-wrap: wrap;
+  }
+}

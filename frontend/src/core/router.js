@@ -4,20 +4,23 @@
 
 import { auth } from './auth.js';
 
-const PUBLIC_ROUTES = ['home', 'login', 'register'];
+const PUBLIC_ROUTES = ['home', 'login', 'register', 'home/teste'];
 
 export const router = {
   routes: {},
   currentRoute: null,
 
   register(path, handler) {
-    this.routes[path.replace(/^#?\/?/, '')] = handler;
+    this.routes[path.replace(/^#?\/?/, '').replace(/\/+$/, '')] = handler;
   },
 
   navigate(path) {
-    const cleanPath = path.replace(/^#?\/?/, '');
+    const cleanPath = path.replace(/^#?\/?/, '').replace(/\/+$/, '');
     const targetHash = `#/${cleanPath}`;
-    if (window.location.hash === targetHash) {
+    if (window.location.pathname && window.location.pathname !== '/' && cleanPath !== 'home/teste') {
+      window.history?.replaceState?.(null, '', '/');
+    }
+    if (window.location.hash === targetHash || (!window.location.hash && this.getPath() === cleanPath)) {
       this.handleRouting();
     } else {
       window.location.hash = targetHash;
@@ -25,9 +28,13 @@ export const router = {
   },
 
   getPath() {
-    const hash = window.location.hash;
-    const clean = hash.replace(/^#\/?/, '').trim();
+    const hash = window.location.hash || '';
+    const clean = hash.replace(/^#\/?/, '').replace(/\/+$/, '').trim();
     if (!clean) {
+      const pathname = (window.location.pathname || '').replace(/^\/+|\/+$/g, '').trim();
+      if (pathname && this.routes[pathname]) {
+        return pathname;
+      }
       return auth.isAuthenticated() ? 'hub' : 'home';
     }
     return clean;
