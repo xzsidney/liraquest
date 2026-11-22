@@ -1,923 +1,254 @@
-# 🗄️ LiraQuest — Arquitetura e Mapa do Banco de Dados (MySQL)
+# 🗄️ LiraQuest — Arquitetura e Mapa do Banco de Dados (V2)
 
-Este documento descreve todas as tabelas criadas no banco de dados MySQL de produção na Hostinger (`u328169675_liraquest`), seus propósitos, colunas e relacionamentos.
-
----
-
-## 📌 Padrão de Nomenclatura e Identificadores (UUID / GUID Obrigatório)
-- **Chaves Primárias (`id`) & Estrangeiras (`*_id`, `family_id`):** Todas as tabelas utilizam obrigatoriamente identificadores únicos do tipo **UUID** (UUIDv4 gerados por `DataTypes.UUIDV4`) para compatibilidade distribuída entre Windows e Linux.
-- **Identificadores Amigáveis (`code`):** Tabelas de catálogo imutável (`definition_*`) utilizam chave primária UUID e possuem uma coluna adicional `code` (string única, ex: `'str'`, `'guardiao_do_lar'`) para buscas legíveis no código.
-- **Tabelas SQL:** `snake_case` minúsculo com prefixo oficial `family_`, `definition_` ou módulo nativo.
-- **Modelos Sequelize:** `PascalCase` nos arquivos JavaScript/Node.js com `tableName` e `underscored: true` configurados.
-- **Arquitetura V2 Oficial (O Usuário É o Herói):** 
-  Elimina-se a antiga divisão de usuário versus personagem distante. A entidade viva `family_members` unifica credenciais, dados do mundo real e a ficha viva de RPG (atributos, classes, moedas, energia).
-
-> **🚀 RESET TOTAL & TRANSIÇÃO V2 CONCLUÍDOS (Novembro/2026):**
-> O banco de dados foi completamente resetado e inicializado com a arquitetura limpa V2 Core:
-> 1. `families`
-> 2. `family_members` (A Entidade Unificada)
-> 3. `definition_attributes`
-> 4. `definition_classes`
+Este documento descreve a modelagem oficial do banco de dados **MySQL** do **LiraQuest (Arquitetura V2 Unificada)** conectado via Sequelize (`backend/src/config/database.js`), seu diagrama entidade-relacionamento, o detalhamento exato das tabelas ativas, o seed inicial e a previsão estrutural do roadmap.
 
 ---
 
-## 1. Módulo Core Familiar & Aventureiros (V2 Unificada)
+## 1. Padrões Obrigatórios da Arquitetura V2
 
-### 🏰 `families`
-Armazena os clãs/famílias multi-tenant criados pelos Guardiões (Pais).
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único da família (UUIDv4) |
-| `name` | `VARCHAR(100)` | Não | Nome do Clã (ex: "Clã Lira") |
-| `invite_code` | `VARCHAR(10)` | Não | Código de convite único e nobre (ex: "LIRA-2026") |
-| `created_by` | `UUID` (FK) | Sim | ID do Guardião fundador (`family_members.id`) |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps de auditoria |
-
----
-
-### 🛡️ `family_members` (A Entidade Unificada — O Usuário É o Herói)
-Armazena a identidade completa de cada membro do clã. Une a pessoa da vida real, suas credenciais de segurança e sua ficha viva de herói de RPG em uma única tabela atômica.
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único do membro (UUIDv4) |
-| `family_id` | `UUID` (FK) | Não | Vinculação direta com `families.id` (Multi-tenant) |
-| `name` | `VARCHAR(100)` | Não | Nome real da pessoa (usado em relatórios e aprovações) |
-| `email` | `VARCHAR(150)` | Sim | E-mail de login / contato (Único) |
-| `password` | `VARCHAR(255)` | Sim | Hash seguro bcrypt para autenticação universal (Pais e Filhos) |
-| `role` | `ENUM('ADMIN','PARENT','CHILD')` | Não | Papel de autorização no sistema (Padrão: `CHILD`) |
-| `hero_nickname` | `VARCHAR(100)` | Não | Nome de Guerra / Apelido heroico de RPG (ex: 'Paladino Sidney', 'Sir Paulinho') |
-| `class_code` | `VARCHAR(50)` | Não | Código da classe heroica (Padrão: `guardiao_do_lar`) |
-| `skin_code` | `VARCHAR(50)` | Não | Código cosmético da skin ativa (Padrão: `default`) |
-| `level` | `INT` | Não | Nível de aventureiro (Padrão: `1`) |
-| `xp` | `INT` | Não | Pontos de experiência acumulados (Padrão: `0`) |
-| `adventure_energy` | `INT` | Não | ⚡ Energia de aventura para masmorras e combates (Padrão: `10`) |
-| `family_tokens` | `INT` | Não | 🎟️ Fichas do Lar para resgate de vales na vida real (Padrão: `0`) |
-| `gold` | `INT` | Não | 💰 Moedas de ouro virtuais do reino (Padrão: `50`) |
-| `streak_days` | `INT` | Não | 🔥 Dias consecutivos de disciplina e hábitos (Padrão: `1`) |
-| `str` | `INT` | Não | Força (Tarefas pesadas / Dano de Impacto) (Padrão: `10`) |
-| `agi` | `INT` | Não | Agilidade (Pontualidade / Esquiva e Velocidade) (Padrão: `10`) |
-| `con` | `INT` | Não | Constituição (Saúde e Nutrição / HP e Vigor) (Padrão: `10`) |
-| `int` | `INT` | Não | Inteligência (Estudos e Leitura / Magia e Tática) (Padrão: `10`) |
-| `cha` | `INT` | Não | Carisma (Harmonia Familiar / Suporte e Buffs) (Padrão: `10`) |
-| `luk` | `INT` | Não | Sorte (Recompensas Raras e Críticos) (Padrão: `10`) |
-| `xp_str` | `INT` | Não | Progresso de Maestria em Força (0 a 100). Atingindo 100, sobe STR (+1) e zera. (Padrão: `0`) |
-| `xp_agi` | `INT` | Não | Progresso de Maestria em Agilidade (0 a 100) (Padrão: `0`) |
-| `xp_con` | `INT` | Não | Progresso de Maestria em Constituição (0 a 100) (Padrão: `0`) |
-| `xp_int` | `INT` | Não | Progresso de Maestria em Inteligência (0 a 100) (Padrão: `0`) |
-| `xp_cha` | `INT` | Não | Progresso de Maestria em Carisma (0 a 100) (Padrão: `0`) |
-| `xp_luk` | `INT` | Não | Progresso de Maestria em Sorte (0 a 100) (Padrão: `0`) |
-| `is_active` | `BOOLEAN` | Não | Controle de desativação lógica (Padrão: `true`) |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps de auditoria |
+1. **Identificadores UUIDv4 Obrigatórios:**
+   - Todas as chaves primárias (`id`) e chaves estrangeiras (`*_id`, `family_id`) utilizam `DataTypes.UUID` gerados automaticamente por `DataTypes.UUIDV4`.
+2. **Nomenclatura SQL e Sequelize:**
+   - **Tabelas SQL:** `snake_case` minúsculo com prefixo `family_` para entidades do domínio (e `families` para a entidade raiz de clã).
+   - **Modelos Sequelize:** Classes e arquivos em `PascalCase` (ex.: `FamilyMember.js`, `FamilyTask.js`), configurados explicitamente com `tableName`, `timestamps: true` e `underscored: true` (mapeando `created_at` e `updated_at`).
+3. **Entidade Unificada (`family_members`):**
+   - O usuário e o herói são a **mesma entidade** em produção. Credenciais de acesso, dados familiares, recursos de economia (`gold`, `family_tokens`, `adventure_energy`), nível/XP e atributos RPG (`str`..`luk` e `xp_str`..`xp_luk`) residem em uma única tabela atômica.
+4. **Isolamento Multi-Tenant:**
+   - Toda tabela operacional vincula-se ao clã via `family_id` (`families.id`), garantindo isolamento estrito de membros, missões e fotos de comprovação entre famílias.
+5. **Desativação Lógica & Evolução Aditiva:**
+   - Registros desativados utilizam `is_active: false` em vez de exclusão física destrutiva.
+   - Alterações de esquema devem ser exclusivamente **aditivas** (criação de tabelas/colunas novas), sendo proibido executar `DROP TABLE`, `TRUNCATE` ou `sync({ force: true })` sem autorização expressa.
 
 ---
 
-## 2. Módulo de Catálogo Global Imutável
+## 2. Diagrama Entidade-Relacionamento (ER) — Tabelas Ativas
 
-### 📊 `definition_attributes`
-Catálogo dos 6 atributos fundamentais de RPG baseados nos pilares da vida real.
+```mermaid
+erDiagram
+    families {
+        uuid id PK
+        varchar name
+        varchar invite_code UK
+        uuid created_by
+        datetime created_at
+        datetime updated_at
+    }
 
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único do atributo |
-| `code` | `VARCHAR(20)` | Não | Slug identificador (`str`, `agi`, `con`, `int`, `cha`, `luk`) |
-| `name` | `VARCHAR(50)` | Não | Nome de exibição (ex: Força, Inteligência) |
-| `description` | `TEXT` | Sim | Explicação imersiva |
-| `combat_role` | `VARCHAR(255)` | Sim | Papel no combate e masmorras RPG |
-| `real_life_role` | `VARCHAR(255)` | Sim | Correspondência com a rotina e hábitos da casa |
+    family_members {
+        uuid id PK
+        uuid family_id FK
+        varchar name
+        varchar hero_nickname
+        varchar email UK
+        varchar password
+        enum role
+        varchar class_code
+        varchar skin_code
+        int level
+        int xp
+        int adventure_energy
+        int family_tokens
+        int gold
+        int streak_days
+        int str
+        int agi
+        int con
+        int int
+        int cha
+        int luk
+        int xp_str
+        int xp_agi
+        int xp_con
+        int xp_int
+        int xp_cha
+        int xp_luk
+        boolean is_active
+        datetime created_at
+        datetime updated_at
+    }
 
----
+    family_tasks {
+        uuid id PK
+        uuid family_id FK
+        varchar title
+        text description
+        varchar category
+        uuid assigned_to FK
+        enum frequency
+        int reward_str_xp
+        int reward_xp
+        int reward_gold
+        int reward_tokens
+        boolean is_active
+        datetime created_at
+        datetime updated_at
+    }
 
-### 🛡️ `definition_classes`
-Catálogo oficial das classes heroicas disponíveis no ecossistema.
+    family_task_submissions {
+        uuid id PK
+        uuid task_id FK
+        uuid family_id FK
+        uuid member_id FK
+        enum status
+        longtext proof_image
+        text member_notes
+        uuid reviewed_by FK
+        datetime reviewed_at
+        text parent_feedback
+        datetime created_at
+        datetime updated_at
+    }
 
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único da classe |
-| `code` | `VARCHAR(50)` | Não | Slug da classe (`guardiao_do_lar`, `guardiao_da_harmonia`, `rastreador_veloz`, `artifice_criativo`, etc.) |
-| `name` | `VARCHAR(100)` | Não | Nome heroico da classe |
-| `description` | `TEXT` | Sim | Lore e perfil da vocação |
-| `combat_role` | `VARCHAR(100)` | Sim | Função no combate (Tanque, Dano, Suporte) |
-| `real_life_focus` | `VARCHAR(255)` | Sim | Foco na vida real |
-| `icon` | `VARCHAR(100)` | Sim | Ícone representativo |
-| `name` | `VARCHAR(100)` | Não | Nome da família (ex: "Clã Lira") |
-| `invite_code` | `VARCHAR(10)` | Não | Código único para entrada de membros |
-| `created_by` | `UUID` (FK) | Não | Referência a `family_users.id` (Guardião criador) |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
-### 👥 `family_members`
-Associa os usuários às suas famílias e define seu papel familiar.
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único da adesão |
-| `family_id` | `UUID` (FK) | Não | Referência a `families.id` |
-| `user_id` | `UUID` (FK) | Não | Referência a `family_users.id` |
-| `role_in_family` | `ENUM('GUARDIAN','MEMBER')` | Não | Papel dentro do clã |
-| `joined_at` | `DATETIME` | Não | Data de entrada na família |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
----
-
-## 3. Módulo de Catálogo Global (`definition_*`)
-
-### ⚡ `definition_attributes`
-Catálogo dos 6 atributos fundamentais do RPG LiraQuest.
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único UUID |
-| `code` | `VARCHAR(20)` (Unique) | Não | Código legível (`str`, `agi`, `con`, `int`, `cha`, `luk`) |
-| `name` | `VARCHAR(50)` | Não | Nome do atributo (ex: Força, Agilidade) |
-| `description` | `TEXT` | Sim | Explicação temática do atributo |
-| `combat_role` | `VARCHAR(255)` | Não | Impacto no combate tático / raids |
-| `real_life_role` | `VARCHAR(255)` | Não | Conexão com tarefas e hábitos reais |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
-### 🛡️ `definition_classes`
-Catálogo das 6 classes de heróis disponíveis.
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único UUID |
-| `code` | `VARCHAR(50)` (Unique) | Não | Código da classe (ex: `guardiao_do_lar`) |
-| `name` | `VARCHAR(100)` | Não | Nome da classe |
-| `description` | `TEXT` | Sim | Resumo do arquétipo |
-| `primary_attribute_id` | `UUID` (FK) | Não | Atributo principal (`definition_attributes.id`) |
-| `secondary_attribute_id` | `UUID` (FK) | Não | Atributo secundário (`definition_attributes.id`) |
-| `combat_role` | `VARCHAR(100)` | Não | Papel em combate (Tanque, Mago, Curandeiro, etc.) |
-| `real_life_focus` | `VARCHAR(255)` | Não | Foco de hábitos na vida real |
-| `icon` | `VARCHAR(100)` | Sim | Ícone identificador |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
-### 🔮 `definition_skills`
-Habilidades e magias da Árvore de Talentos de cada classe (Tiers I, II e III).
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único da habilidade |
-| `code` | `VARCHAR(50)` (Unique) | Não | Código único da habilidade |
-| `class_id` | `UUID` (FK) | Não | Referência a `definition_classes.id` |
-| `tier` | `INT` | Não | Tier da habilidade (1 = Básico, 2 = Veterano, 3 = Mestre) |
-| `name` | `VARCHAR(100)` | Não | Nome da habilidade |
-| `description` | `TEXT` | Sim | Efeito detalhado da habilidade |
-| `mana_cost` | `INT` | Não | Custo de Mana (MP) |
-| `cooldown_turns` | `INT` | Não | Tempo de recarga em turnos |
-| `required_skill_id` | `UUID` (FK) | Sim | Pré-requisito na Árvore de Talentos |
-| `xp_cost_to_unlock` | `INT` | Não | Custo em XP para aprender |
-| `damage_multiplier` | `FLOAT` | Não | Multiplicador de dano base |
-| `heal_amount` | `INT` | Não | Valor base de cura |
-| `effect_type` | `VARCHAR(50)` | Sim | Tipo de efeito (`SHIELD`, `MAGIC_DAMAGE`, `HEAL`, etc.) |
-| `icon` | `VARCHAR(100)` | Sim | Ícone de combate |
-| `animation_id` | `INT` | Não | ID da animação/efeito visual disparado na Arena 2D (ex: 1 = Arremesso, 2 = Feixe Laser, 3 = Gancho, 4 = Investida, 5 = Rasteira, 100 = Básico) |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
-### 🗡️ `definition_items`
-Catálogo de itens da Loja do Reino (equipamentos, consumíveis e recompensas reais).
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único UUID |
-| `code` | `VARCHAR(50)` (Unique) | Não | Código único do item |
-| `name` | `VARCHAR(100)` | Não | Nome do item |
-| `description` | `TEXT` | Sim | Descrição do item |
-| `type` | `ENUM(...)` | Não | `WEAPON`, `ARMOR`, `ACCESSORY`, `POTION`, `REAL_WORLD` |
-| `price_gold` | `INT` | Não | Custo em moedas de ouro |
-| `stat_bonuses` | `JSON` | Sim | Bônus aplicados aos atributos (ex: `{"str": 2}`) |
-| `icon` | `VARCHAR(100)` | Sim | Ícone do item |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
-### 🐉 `definition_monsters`
-Catálogo de monstros e chefes para o motor de combate Phaser e Raids.
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único UUID |
-| `code` | `VARCHAR(50)` (Unique) | Não | Código único do monstro |
-| `name` | `VARCHAR(100)` | Não | Nome do monstro |
-| `description` | `TEXT` | Sim | Descrição e história do monstro |
-| `is_boss` | `BOOLEAN` | Não | `true` se for Chefe de Raid |
-| `max_hp` | `INT` | Não | Pontos de vida máximos |
-| `attack_power` | `INT` | Não | Poder de ataque |
-| `defense` | `INT` | Não | Defesa física |
-| `speed` | `INT` | Não | Velocidade para ordem de iniciativa |
-| `xp_reward` | `INT` | Não | XP concedido ao derrotar |
-| `gold_reward` | `INT` | Não | Ouro concedido ao derrotar |
-| `sprite_key` | `VARCHAR(100)` | Sim | Chave do sprite visual |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
-### 📋 `definition_tasks`
-Catálogo oficial das 42 tarefas padrão da vida real (Domestic, Study, Health, Creative, Social).
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único UUID |
-| `slug` | `VARCHAR(100)` (Unique) | Não | Identificador legível (ex: `'arrumar-cama'`) |
-| `name` | `VARCHAR(150)` | Não | Nome da missão exibido no app |
-| `description` | `TEXT` | Sim | Instruções práticas |
-| `category` | `ENUM(...)` | Não | `DOMESTIC`, `STUDY`, `HEALTH`, `CREATIVE`, `SOCIAL` |
-| `difficulty` | `ENUM(...)` | Não | `EASY`, `MEDIUM`, `HARD` |
-| `allowed_profile` | `ENUM(...)` | Não | `ALL`, `CHILD_ONLY`, `ADULT_ONLY` |
-| `reward_xp` | `INT` | Não | XP concedido ao completar |
-| `reward_gold` | `INT` | Não | Ouro concedido ao completar |
-| `reward_energy` | `INT` | Não | ⚡ Energia de Aventura concedida |
-| `estimated_time` | `VARCHAR(50)` | Sim | Tempo estimado (ex: `'5-10 min'`) |
-| `requires_proof` | `BOOLEAN` | Não | Se exige foto/texto como prova |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
+    families ||--o{ family_members : "possui membros"
+    families ||--o{ family_tasks : "possui missoes"
+    families ||--o{ family_task_submissions : "isola comprovacoes"
+    family_members ||--o{ family_tasks : "assigned_to (opcional)"
+    family_tasks ||--o{ family_task_submissions : "recebe comprovacoes"
+    family_members ||--o{ family_task_submissions : "envia (member_id)"
+    family_members ||--o{ family_task_submissions : "avalia (reviewed_by)"
+```
 
 ---
 
-## 4. Módulo de Personagem (`family_characters`, `characters` e `character_*`)
+## 3. Tabelas Ativas em Produção (V2)
 
-### 🛡️ `family_characters`
-Entidade primária do herói dentro da arquitetura Multi-Tenant do clã.
+### 3.1 `families`
+Armazena os clãs/famílias multi-tenant do sistema.
+- **Modelo Sequelize:** `Family` ([Family.js](file:///e:/11_Games/LiraQuest/backend/src/modules/family/Family.js))
+- **Associações:** `hasMany(FamilyMember, as: 'members')`, `hasMany(FamilyTask, as: 'tasks')`, `hasMany(FamilyTaskSubmission, as: 'taskSubmissions')`.
 
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único do herói |
-| `user_id` | `UUID` (FK) | Não | Referência a `family_users.id` (Único por membro) |
-| `family_id` | `UUID` (FK) | Não | Chave estrangeira para `families.id` |
-| `class_code` | `VARCHAR(50)` | Não | Código da classe ativa (`guardiao_do_lar`, etc.) |
-| `level` | `INT` | Não | Nível de aventureiro (Inicia em 1) |
-| `xp` | `INT` | Não | Pontos de experiência acumulados |
-| `skin_code` | `VARCHAR(100)` | Não | Código cosmético da Skin/Sprite ativa |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
-### ⚔️ `characters`
-Identidade de RPG estendida do jogador no Mundo do Jogo (compatibilidade legada).
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único do personagem |
-| `user_id` | `UUID` (FK) | Não | Referência a `family_users.id` (1 personagem por usuário) |
-| `name` | `VARCHAR(100)` | Não | Nome do herói no jogo |
-| `gender` | `ENUM('MALE','FEMALE','OTHER')` | Não | Sexo do personagem |
-| `avatar_type` | `ENUM('PHOTO','SPRITE')` | Não | Tipo de avatar escolhido |
-| `avatar_value` | `VARCHAR(255)` | Não | URL da foto ou ID do sprite MUGEN |
-| `current_class_id` | `UUID` (FK) | Sim | Classe ativa atualmente (`definition_classes.id`) |
-| `gold` | `INT` | Não | Ouro acumulado pelo herói |
-| `is_in_infirmary` | `BOOLEAN` | Não | Flag se está internado na Enfermaria Real |
-| `infirmary_until` | `DATETIME` | Sim | Data e hora de liberação da enfermaria |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
-### 📈 `character_classes`
-Progresso individual de cada classe jogada (Sistema Multi-Classe).
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador do registro |
-| `character_id` | `UUID` (FK) | Não | Referência a `characters.id` |
-| `class_id` | `UUID` (FK) | Não | Referência a `definition_classes.id` |
-| `level` | `INT` | Não | Nível alcançado nesta classe específica |
-| `xp` | `INT` | Não | Experiência acumulada nesta classe |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-| *Constraint* | `UNIQUE(character_id, class_id)` | | Garante 1 registro por classe por herói |
-
-### 📊 `character_attributes`
-Valores atuais dos atributos do personagem (formato relacional e colunas diretas unificadas).
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador do registro |
-| `character_id` | `UUID` (FK) | Não | Referência a `characters.id` / `family_characters.id` |
-| `attribute_id` | `UUID` (FK) | Sim | Referência a `definition_attributes.id` (modo relacional) |
-| `base_value` | `INT` | Não | Valor base (inicia em 10) |
-| `bonus_value` | `INT` | Não | Bônus de equipamentos ou buffs |
-| `str` | `INT` | Sim | Força (STR) do herói |
-| `agi` | `INT` | Sim | Agilidade (AGI) do herói |
-| `con` | `INT` | Sim | Constituição (CON) do herói |
-| `int` | `INT` | Sim | Inteligência (INT) do herói |
-| `cha` | `INT` | Sim | Carisma (CHA) do herói |
-| `luk` | `INT` | Sim | Sorte (LUK) do herói |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
-### 📜 `character_skills`
-Habilidades desbloqueadas na Árvore de Talentos pelo herói.
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador |
-| `character_id` | `UUID` (FK) | Não | Referência a `characters.id` |
-| `skill_id` | `UUID` (FK) | Não | Referência a `definition_skills.id` |
-| `is_equipped` | `BOOLEAN` | Não | `true` se está equipada no deck de combate |
-| `unlocked_at` | `DATETIME` | Não | Data em que foi aprendida com XP |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-| *Constraint* | `UNIQUE(character_id, skill_id)` | | Habilidade única por herói |
-
-### 🎒 `character_inventory`
-Inventário e equipamentos ativos do herói.
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador |
-| `character_id` | `UUID` (FK) | Não | Referência a `characters.id` |
-| `item_id` | `UUID` (FK) | Não | Referência a `definition_items.id` |
-| `quantity` | `INT` | Não | Quantidade do item |
-| `is_equipped` | `BOOLEAN` | Não | Se o item está equipado |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+| Coluna | Tipo | Nulo | Default | Chave / Restrição | Descrição |
+| :--- | :--- | :---: | :--- | :--- | :--- |
+| `id` | `UUID` | Não | `UUIDV4` | **PK** | Identificador único do clã |
+| `name` | `VARCHAR(100)` | Não | — | `notEmpty`, `len[2,100]` | Nome do clã/família (ex.: `"Clã Lira"`) |
+| `invite_code` | `VARCHAR(10)` | Não | — | **UNIQUE** (`unique_family_invite_code`) | Código de convite para ingresso de membros (ex.: `"LIRA-2026"`) |
+| `created_by` | `UUID` | Sim | `NULL` | Ref. lógica `family_members.id` | ID do Guardião fundador do clã |
+| `created_at` | `DATETIME` | Não | Automático | `underscored: true` | Data/hora de criação |
+| `updated_at` | `DATETIME` | Não | Automático | `underscored: true` | Data/hora da última atualização |
 
 ---
 
-## 5. Módulo de Gameplay (Tarefas do Lar, Provas e Mestria em Atributos V2)
+### 3.2 `family_members`
+Entidade atômica unificada (**O Usuário É o Herói**). Armazena dados pessoais, credenciais de acesso, papel RBAC, economia do lar e ficha viva D20 (atributos e barras de mestria).
+- **Modelo Sequelize:** `FamilyMember` ([FamilyMember.js](file:///e:/11_Games/LiraQuest/backend/src/modules/family/FamilyMember.js))
+- **Associações:** `belongsTo(Family, as: 'family')`, `hasMany(FamilyTask, foreignKey: 'assigned_to', as: 'assignedTasks')`, `hasMany(FamilyTaskSubmission, foreignKey: 'member_id', as: 'submissions')`, `hasMany(FamilyTaskSubmission, foreignKey: 'reviewed_by', as: 'reviewedSubmissions')`.
 
-### 🧹 `family_tasks` (Mural de Missões do Lar V2)
-Armazena as missões e deveres domésticos criados pelos Guardiões para alimentar o Pilar de Força (STR).
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único UUIDv4 |
-| `family_id` | `UUID` (FK) | Não | Chave estrangeira para `families.id` |
-| `title` | `VARCHAR(150)` | Não | Título da missão (ex: "Arrumar a Cama e Quarto") |
-| `description` | `TEXT` | Sim | Instruções e detalhes práticos para o herói |
-| `category` | `VARCHAR(50)` | Não | Categoria da missão (Padrão: `'LAR'`) |
-| `assigned_to` | `UUID` (FK) | Sim | Membro específico ou nulo para aberta a todos os filhos (`family_members.id`) |
-| `frequency` | `ENUM('DAILY','WEEKLY','ONCE')` | Não | Frequência de repetição (Padrão: `'DAILY'`) |
-| `reward_str_xp` | `INT` | Não | XP de Força (STR) concedido ao herói (Padrão: `25`) |
-| `reward_xp` | `INT` | Não | XP Geral de Aventureiro concedido (Padrão: `15`) |
-| `reward_gold` | `INT` | Não | Moedas de ouro concedidas (Padrão: `10`) |
-| `reward_tokens` | `INT` | Não | Fichas do Lar para a vida real concedidas (Padrão: `1`) |
-| `is_active` | `BOOLEAN` | Não | Status de ativação da missão (Padrão: `true`) |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps de auditoria |
-
-### 📸 `family_task_submissions` (Fila de Comprovação e Avaliação V2)
-Armazena as submissões fotográficas enviadas pelas crianças e o fluxo de aprovação em 1 clique dos pais.
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único UUIDv4 |
-| `task_id` | `UUID` (FK) | Não | Referência direta a `family_tasks.id` |
-| `family_id` | `UUID` (FK) | Não | Referência direta a `families.id` |
-| `member_id` | `UUID` (FK) | Não | Herói autor do cumprimento (`family_members.id`) |
-| `status` | `ENUM('PENDING','APPROVED','REJECTED')` | Não | Estado da avaliação (Padrão: `'PENDING'`) |
-| `proof_image` | `LONGTEXT` | Sim | Foto da comprovação em Base64 ou URL |
-| `member_notes` | `TEXT` | Sim | Comentário/relato do herói sobre a missão |
-| `reviewed_by` | `UUID` (FK) | Sim | Guardião (Pai/Mãe) avaliador (`family_members.id`) |
-| `reviewed_at` | `DATETIME` | Sim | Data e hora da avaliação |
-| `parent_feedback` | `TEXT` | Sim | Mensagem de feedback/orientação dos pais |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps de auditoria |
-
----
-
-### 📋 `tasks` (Compatibilidade Legada V1)
-Missões da vida real criadas pelos Pais (Guardiões).
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador da tarefa |
-| `family_id` | `UUID` (FK) | Não | Família dona da missão |
-| `created_by` | `UUID` (FK) | Não | Usuário pai que criou |
-| `assigned_to` | `UUID` (FK) | Sim | Usuário filho designado (ou aberto) |
-| `title` | `VARCHAR(150)` | Não | Título da missão |
-| `description` | `TEXT` | Sim | Detalhes e instruções |
-| `xp_reward` | `INT` | Não | XP concedido ao herói |
-| `gold_reward` | `INT` | Não | Ouro concedido ao herói |
-| `energy_reward` | `INT` | Não | ⚡ Energia de Aventura concedida ao herói |
-| `token_reward` | `INT` | Não | 🏠 Fichas do Lar concedidas ao usuário real |
-| `category` | `ENUM('DOMESTIC','STUDY','HEALTH','CREATIVE','SOCIAL','GERAL')` | Não | Categoria da missão |
-| `difficulty` | `ENUM('EASY','MEDIUM','HARD')` | Não | Dificuldade da tarefa |
-| `allowed_profile` | `ENUM('ALL','CHILD_ONLY','ADULT_ONLY')` | Não | Perfil com permissão de visualizar |
-| `requires_proof` | `BOOLEAN` | Não | Se exige foto/texto como prova |
-| `estimated_time` | `VARCHAR(50)` | Sim | Tempo estimado de execução (ex: '15-20 min') |
-| `is_active` | `BOOLEAN` | Não | Status da tarefa |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
-### 📸 `task_submissions`
-Envios de comprovação remota (foto + texto) pelos filhos para aprovação dos pais.
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador da submissão |
-| `task_id` | `UUID` (FK) | Não | Referência a `tasks.id` |
-| `user_id` | `UUID` (FK) | Não | Usuário que enviou a prova |
-| `character_id` | `UUID` (FK) | Sim | Personagem que receberá as recompensas |
-| `proof_text` | `TEXT` | Sim | Relato da conclusão da tarefa |
-| `proof_photo_url` | `VARCHAR(255)` | Sim | URL da foto anexada como evidência |
-| `status` | `ENUM('PENDING','APPROVED','REJECTED')` | Não | Estado da avaliação |
-| `feedback` | `TEXT` | Sim | Mensagem de feedback do avaliador |
-| `reviewed_by` | `UUID` (FK) | Sim | Usuário pai que avaliou |
-| `reviewed_at` | `DATETIME` | Sim | Data e hora da avaliação |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
-### 🎉 `events`
-Eventos sazonais e gincanas da família (Natal, Férias, etc.).
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador do evento |
-| `family_id` | `UUID` (FK) | Sim | Família do evento (ou global) |
-| `title` | `VARCHAR(150)` | Não | Nome do evento |
-| `description` | `TEXT` | Sim | Regras e temática |
-| `start_date` / `end_date` | `DATETIME` | Não | Período de vigência |
-| `is_active` | `BOOLEAN` | Não | Flag ativo |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
-### ⚔️ `battles`
-Histórico de batalhas e Raids cooperativas familiares.
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador da batalha |
-| `family_id` | `UUID` (FK) | Não | Família participante |
-| `monster_id` | `UUID` (FK) | Não | Monstro enfrentado (`definition_monsters.id`) |
-| `status` | `ENUM('IN_PROGRESS','VICTORY','DEFEAT')` | Não | Resultado da batalha |
-| `battle_log` | `JSON` | Sim | Log completo de ações dos turnos |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+| Coluna | Tipo | Nulo | Default | Chave / Restrição | Descrição |
+| :--- | :--- | :---: | :--- | :--- | :--- |
+| `id` | `UUID` | Não | `UUIDV4` | **PK** | Identificador único do membro/herói |
+| `family_id` | `UUID` | Sim | `NULL` | **FK** ➔ `families.id` | Clã vinculado (anulável para permitir ingresso posterior via `/api/family/join`) |
+| `name` | `VARCHAR(100)` | Não | — | `notEmpty` | Nome real do membro da família |
+| `hero_nickname` | `VARCHAR(100)` | Não | — | `notEmpty` | Apelido heroico exibido na interface e placares |
+| `email` | `VARCHAR(150)` | Sim | `NULL` | **UNIQUE** (`unique_family_member_email`), `isEmail` | E-mail de autenticação (opcional para crianças) |
+| `password` | `VARCHAR(255)` | Sim | `NULL` | Hash `bcryptjs` | Senha criptografada para login universal |
+| `role` | `ENUM('ADMIN','PARENT','CHILD')` | Não | `'CHILD'` | — | Papel de autorização no sistema |
+| `class_code` | `VARCHAR(50)` | Não | `'guardiao_do_lar'` | — | Código do arquétipo/classe heroica |
+| `skin_code` | `VARCHAR(50)` | Não | `'default'` | — | Código da skin/aparência ativa |
+| `level` | `INT` | Não | `1` | — | Nível geral do herói (`nextLevel = level * 100 XP`) |
+| `xp` | `INT` | Não | `0` | — | Experiência atual acumulada no nível |
+| `adventure_energy` | `INT` | Não | `10` | — | ⚡ Energia de Aventura para desafios RPG |
+| `family_tokens` | `INT` | Não | `0` | — | 🎟️ Fichas do Lar para troca por vales reais |
+| `gold` | `INT` | Não | `50` | — | 💰 Moedas de ouro acumuladas |
+| `streak_days` | `INT` | Não | `1` | — | 🔥 Dias consecutivos de hábitos cumpridos |
+| `str` | `INT` | Não | `10` | — | Atributo Força (Tarefas do Lar) |
+| `agi` | `INT` | Não | `10` | — | Atributo Agilidade |
+| `con` | `INT` | Não | `10` | — | Atributo Constituição (Saúde e Vitalidade) |
+| `int` | `INT` | Não | `10` | — | Atributo Inteligência (Estudos e Saber) |
+| `cha` | `INT` | Não | `10` | — | Atributo Carisma (Harmonia Familiar) |
+| `luk` | `INT` | Não | `10` | — | Atributo Sorte |
+| `xp_str` | `INT` | Não | `0` | — | XP de Mestria em Força (a cada `100`, sobe `+1` em `str` mantendo excedente) |
+| `xp_agi` | `INT` | Não | `0` | — | XP de Mestria em Agilidade (`0–99`) |
+| `xp_con` | `INT` | Não | `0` | — | XP de Mestria em Constituição (`0–99`) |
+| `xp_int` | `INT` | Não | `0` | — | XP de Mestria em Inteligência (`0–99`) |
+| `xp_cha` | `INT` | Não | `0` | — | XP de Mestria em Carisma (`0–99`) |
+| `xp_luk` | `INT` | Não | `0` | — | XP de Mestria em Sorte (`0–99`) |
+| `is_active` | `BOOLEAN` | Não | `true` | — | Controle de desativação lógica |
+| `created_at` | `DATETIME` | Não | Automático | `underscored: true` | Data/hora de criação |
+| `updated_at` | `DATETIME` | Não | Automático | `underscored: true` | Data/hora da última atualização |
 
 ---
 
-## 5. Módulo da Loja do Lar & Recompensas Familiares
+### 3.3 `family_tasks`
+Catálogo de missões domésticas configuradas pelos Guardiões de cada clã (Pilar de Força `STR`).
+- **Modelo Sequelize:** `FamilyTask` ([FamilyTask.js](file:///e:/11_Games/LiraQuest/backend/src/modules/tasks/FamilyTask.js))
+- **Associações:** `belongsTo(Family, as: 'family')`, `belongsTo(FamilyMember, foreignKey: 'assigned_to', as: 'assignee')`, `hasMany(FamilyTaskSubmission, foreignKey: 'task_id', as: 'submissions')`.
 
-### 🎁 `family_rewards`
-Armazena o catálogo de recompensas da vida real criadas para a família.
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único da recompensa |
-| `family_id` | `UUID` (FK) | Não | Família dona da recompensa (`families.id`) |
-| `created_by` | `UUID` (FK) | Não | Usuário pai que criou a recompensa (`family_users.id`) |
-| `title` | `VARCHAR(100)` | Não | Título da recompensa (ex: "Noite da Pizza", "Vale Futebol") |
-| `description` | `TEXT` | Sim | Detalhes de como usufruir da recompensa |
-| `token_cost` | `INT` | Não | Custo em 🎟️ Fichas do Lar (padrão: 20) |
-| `category` | `ENUM('GASTRONOMY','ENTERTAINMENT','OUTING','GIFT','PRIVILEGE')` | Não | Categoria temática |
-| `icon` | `VARCHAR(20)` | Não | Emoji/ícone de exibição (ex: 🍕, 🎮, ⚽, 🎁, 🛌) |
-| `allowed_profile` | `ENUM('ALL','CHILD','PARENT')` | Não | Quem pode resgatar |
-| `is_active` | `BOOLEAN` | Não | Flag se a recompensa está ativa na vitrine (default: `true`) |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
-### 🎟️ `family_reward_redemptions`
-Histórico de vales resgatados pelos membros com suas Fichas do Lar.
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único do resgate |
-| `reward_id` | `UUID` (FK) | Não | Recompensa resgatada (`family_rewards.id`) |
-| `family_id` | `UUID` (FK) | Não | Família onde ocorreu o resgate (`families.id`) |
-| `user_id` | `UUID` (FK) | Não | Membro que comprou o vale (`family_users.id`) |
-| `token_cost` | `INT` | Não | Quantidade de Fichas do Lar gastas |
-| `status` | `ENUM('PENDING','APPROVED','DELIVERED','CANCELLED')` | Não | Estado do vale |
-| `reviewed_by` | `UUID` (FK) | Sim | Guardião (Pai) que avaliou/entregou (`family_users.id`) |
-| `reviewed_at` | `DATETIME` | Sim | Data e hora da avaliação |
-| `notes` | `TEXT` | Sim | Observações adicionais |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+| Coluna | Tipo | Nulo | Default | Chave / Restrição | Descrição |
+| :--- | :--- | :---: | :--- | :--- | :--- |
+| `id` | `UUID` | Não | `UUIDV4` | **PK** | Identificador único da missão |
+| `family_id` | `UUID` | Não | — | **FK** ➔ `families.id` | Clã proprietário da missão |
+| `title` | `VARCHAR(150)` | Não | — | `notEmpty` | Título exibido no Mural de Missões |
+| `description` | `TEXT` | Sim | `NULL` | — | Instruções práticas para o cumprimento |
+| `category` | `VARCHAR(50)` | Não | `'LAR'` | — | Categoria da tarefa |
+| `assigned_to` | `UUID` | Sim | `NULL` | **FK** ➔ `family_members.id` | Herói específico designado (`NULL` = aberta a todos os filhos) |
+| `frequency` | `ENUM('DAILY','WEEKLY','ONCE')` | Não | `'DAILY'` | — | Periodicidade da missão |
+| `reward_str_xp` | `INT` | Não | `25` | — | Bônus de `xp_str` concedido na aprovação |
+| `reward_xp` | `INT` | Não | `15` | — | Bônus de XP geral concedido na aprovação |
+| `reward_gold` | `INT` | Não | `10` | — | Bônus de moedas de ouro concedido na aprovação |
+| `reward_tokens` | `INT` | Não | `1` | — | Bônus de Fichas do Lar concedido na aprovação |
+| `is_active` | `BOOLEAN` | Não | `true` | — | Flag de missão ativa no mural |
+| `created_at` | `DATETIME` | Não | Automático | `underscored: true` | Data/hora de criação |
+| `updated_at` | `DATETIME` | Não | Automático | `underscored: true` | Data/hora da última atualização |
 
 ---
 
-## 6. Agregações e Inteligência do Painel do Clã (Analytics dos Pais)
+### 3.4 `family_task_submissions`
+Registro das comprovações enviadas pelos membros (com foto Base64 e anotações) e do histórico de aprovação ou devolução pedagógica pelos Guardiões.
+- **Modelo Sequelize:** `FamilyTaskSubmission` ([FamilyTaskSubmission.js](file:///e:/11_Games/LiraQuest/backend/src/modules/tasks/FamilyTaskSubmission.js))
+- **Associações:** `belongsTo(FamilyTask, as: 'task')`, `belongsTo(Family, as: 'family')`, `belongsTo(FamilyMember, foreignKey: 'member_id', as: 'member')`, `belongsTo(FamilyMember, foreignKey: 'reviewed_by', as: 'reviewer')`.
 
-O **Painel do Clã** (`/api/family/analytics`) realiza agregações analíticas em tempo real a partir das tabelas relacionais do sistema:
-- **Hábitos Semanais (`weeklyHabits`):** Cruzamento de `task_submissions` (`status = 'APPROVED'`) nos últimos 7 dias por data e usuário.
-- **Distribuição de Categorias (`categoryDistribution`):** Agrupamento de `task_submissions` aprovadas com a coluna `category` de `tasks` (`DOMESTIC`, `STUDY`, `HEALTH`, `CREATIVE`, `SOCIAL`, `GERAL`).
-- **Comparativo Entre Heróis (`childrenComparison`):** Comparação individual de produtividade, percentual de contribuição no clã, categoria de foco e lista de últimas missões concluídas por cada filho.
-- **Matriz de Hábitos Lado a Lado (`categoryMatrix`):** Tabela comparativa cruzando cada categoria com a contagem de tarefas de cada filho e identificação do líder do hábito.
-- **Extrato do Tesouro Familiar (`treasuryStatement`):** Soma de recompensas obtidas em `tasks` vs resgates consumidos em `family_reward_redemptions` (`token_cost`).
-- **Insígnias Coletivas (`clanAchievements`):** Metas dinâmicas do clã combinando total de tarefas, sequências e acúmulo de ouro.
-- **Relatório Pedagógico (`pedagogicalInsights`):** Heurística baseada no equilíbrio de hábitos, sequências ativas e incentivo individual.
-
----
-
-## 7. Módulo Arcade & Quiz Educativo (`family_quiz_*`)
-
-Tabelas de suporte para os mini-jogos **O Arqueiro do Saber (Solo)** e **⚔️ Duelo de Arqueiros (1v1 Família em Tempo Real)**, fornecendo perguntas pedagógicas calibradas do primário à faculdade. O modo 1v1 reutiliza este catálogo em tempo real para permitir que dois irmãos joguem simultaneamente com etapas de ensino independentes.
-
-### ❓ `family_quiz_questions`
-Catálogo de enigmas e perguntas com classificação pedagógica, nível de dificuldade e explicações.
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único do enigma |
-| `question_text` | `TEXT` | Não | Enunciado completo da pergunta |
-| `discipline` | `VARCHAR(50)` | Não | Disciplina (`matematica`, `portugues`, `ciencias`, `historia`, `geografia`, `logica_geral`, etc.) |
-| `education_stage` | `ENUM` | Não | Etapa: `fundamental_1`, `fundamental_2`, `ensino_medio`, `superior` |
-| `school_year` | `VARCHAR(50)` | Sim | Detalhamento da série (ex: `1_ao_3_ano`, `6_ao_8_ano`, `faculdade`) |
-| `difficulty_level` | `INT` | Não | Nível de 1 a 10 (calibra velocidade e pontos) |
-| `explanation` | `TEXT` | Sim | Explicação didática exibida em caso de erro |
-| `is_active` | `BOOLEAN` | Não | Ativação da pergunta (default: `true`) |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
-### 🎯 `family_quiz_options`
-Alternativas / alvos móveis vinculados a cada pergunta do quiz (1 correta e 3 distratores contextuais).
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador da alternativa |
-| `question_id` | `UUID` (FK) | Não | Chave estrangeira para `family_quiz_questions.id` (CASCADE) |
-| `option_text` | `VARCHAR(255)` | Não | Texto exibido no alvo flutuante |
-| `is_correct` | `BOOLEAN` | Não | `true` se for a alternativa correta, `false` para distratores |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+| Coluna | Tipo | Nulo | Default | Chave / Restrição | Descrição |
+| :--- | :--- | :---: | :--- | :--- | :--- |
+| `id` | `UUID` | Não | `UUIDV4` | **PK** | Identificador único da comprovação |
+| `task_id` | `UUID` | Não | — | **FK** ➔ `family_tasks.id` | Missão cumprida |
+| `family_id` | `UUID` | Não | — | **FK** ➔ `families.id` | Clã onde a submissão ocorreu |
+| `member_id` | `UUID` | Não | — | **FK** ➔ `family_members.id` | Herói que enviou a comprovação |
+| `status` | `ENUM('PENDING','APPROVED','REJECTED')` | Não | `'PENDING'` | — | Estado atual da avaliação |
+| `proof_image` | `LONGTEXT` | Sim | `NULL` | `DataTypes.TEXT('long')` | Foto da prova em Data URL Base64 ou URL |
+| `member_notes` | `TEXT` | Sim | `NULL` | — | Comentário opcional do herói sobre a execução |
+| `reviewed_by` | `UUID` | Sim | `NULL` | **FK** ➔ `family_members.id` | Guardião (`PARENT`/`ADMIN`) avaliador |
+| `reviewed_at` | `DATETIME` | Sim | `NULL` | — | Carimbo de data/hora da decisão |
+| `parent_feedback` | `TEXT` | Sim | `NULL` | — | Orientação pedagógica registrada em rejeições |
+| `created_at` | `DATETIME` | Não | Automático | `underscored: true` | Data/hora do envio |
+| `updated_at` | `DATETIME` | Não | Automático | `underscored: true` | Data/hora da última atualização |
 
 ---
 
-## 8. Módulo do Livro-Jogo de Masmorras (`family_dungeon_*`)
+## 4. Seed Inicial Oficial (`backend/src/database/seed.js`)
 
-Estrutura 100% relacional e modular para o **Jogo 3 do Arcade: Aventuras em Quest** (1 História ➔ N Cenas ➔ 3 Ações por cena + Histórico de Runs).
+O script de seed é executado via `npm run seed` (`node backend/src/database/seed.js`) e opera de forma **segura, idempotente e aditiva**:
 
-### 📜 `family_dungeon_adventures`
-Catálogo de masmorras e livros-jogos disponíveis no reino.
+1. **Sincronização Aditiva:**
+   - Executa `Family.sync()`, `FamilyTask.sync()` e `FamilyTaskSubmission.sync()`.
+   - Inspeciona `SHOW COLUMNS FROM family_members` e executa `ALTER TABLE` aditivo apenas se alguma das colunas de mestria (`xp_str`, `xp_agi`, `xp_con`, `xp_int`, `xp_cha`, `xp_luk`) ainda não existir.
+2. **Clã Fundador:**
+   - Cria ou confirma a família **`Clã Lira`** com `invite_code: 'LIRA-2026'` e preenche `created_by` com o UUID do administrador.
+3. **4 Membros Fundadores:**
+   - Popula/atualiza `Sidney Lira` (`ADMIN`, `guardiao_do_lar`, Nível 5), `Elaine Lira` (`PARENT`, `guardiao_da_harmonia`, Nível 5), `Paulo Lira` (`CHILD`, `rastreador_veloz`, Nível 3) e `Jennifer Lira` (`CHILD`, `artifice_criativo`, Nível 3) com senhas criptografadas via `bcryptjs`.
+4. **4 Missões Iniciais do Lar (`category: 'LAR'`, `frequency: 'DAILY'`):**
 
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único UUID |
-| `code` | `VARCHAR(50)` (Unique) | Não | Código legível da aventura (ex: `'covil_goblin_poeira'`) |
-| `title` | `VARCHAR(150)` | Não | Título épico da masmorra |
-| `description` | `TEXT` | Sim | Sinopse e contexto narrativo |
-| `cover_icon` | `VARCHAR(50)` | Não | Emoji/ícone de capa |
-| `difficulty_level` | `ENUM('EASY','MEDIUM','HARD')` | Não | Nível de dificuldade calibrado |
-| `energy_cost` | `INT` | Não | Custo em Energia de Aventura (padrão: 5 ⚡) |
-| `base_gold_reward` | `INT` | Não | Ouro base ao triunfar no Baú Épico |
-| `base_xp_reward` | `INT` | Não | XP base creditado na classe ativa |
-| `is_active` | `BOOLEAN` | Não | Flag de ativação (default: `true`) |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
-### 🏛️ `family_dungeon_scenes`
-Capítulos, salas e nós sequenciais que compõem cada livro de masmorra.
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único UUID |
-| `adventure_id` | `UUID` (FK) | Não | Referência a `family_dungeon_adventures.id` (CASCADE) |
-| `step_order` | `INT` | Não | Ordem cronológica da cena (1 a 5) |
-| `scene_code` | `VARCHAR(50)` | Não | Identificador do nó (ex: `'sotao_entrada'`, `'nevoa_poeira'`) |
-| `title` | `VARCHAR(150)` | Não | Título da sala/capítulo |
-| `narrative_text` | `TEXT` | Não | Prosa narrativa imersiva com descrição do ambiente |
-| `scene_icon` | `VARCHAR(50)` | Sim | Ícone temático da cena |
-| `scene_image_url` | `VARCHAR(255)` | Sim | Caminho/URL da ilustração artística específica da cena |
-| `is_final_scene` | `BOOLEAN` | Não | Se é a câmara do Baú Épico final |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
-### ⚔️ `family_dungeon_actions`
-As 3 opções de ação disponíveis em cada cena para o herói escolher e testar seus atributos.
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único UUID |
-| `scene_id` | `UUID` (FK) | Não | Referência a `family_dungeon_scenes.id` (CASCADE) |
-| `action_number` | `INT` | Não | Posição da ação (1, 2 ou 3) |
-| `title` | `VARCHAR(255)` | Não | Texto descritivo da ação escolhida pelo jogador |
-| `attribute_code` | `VARCHAR(20)` | Não | Código do atributo testado (`str`, `agi`, `con`, `int`, `cha`, `luk`) |
-| `difficulty_dc` | `INT` | Não | Classe de Dificuldade (CD) para teste no D20 |
-| `success_text` | `TEXT` | Não | Desfecho glorioso em caso de sucesso |
-| `failure_text` | `TEXT` | Não | Desfecho em caso de falha |
-| `failure_damage` | `INT` | Não | Dano infligido ao HP em caso de falha |
-| `bonus_gold` | `INT` | Não | Ouro extra encontrado caso supere com louvor |
-| `success_scene_code` | `VARCHAR(50)` | Sim | Código da cena de destino em caso de Sucesso (Árvore de Causa e Consequência) |
-| `failure_scene_code` | `VARCHAR(50)` | Sim | Código da cena de destino em caso de Falha (Árvore de Causa e Consequência) |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
-### 🛡️ `family_dungeon_runs`
-Histórico de expedições realizadas pelos heróis do clã.
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único da partida |
-| `user_id` | `UUID` (FK) | Não | Membro do clã (`family_users.id`) |
-| `character_id` | `UUID` (FK) | Sim | Herói participante (`characters.id`) |
-| `adventure_id` | `UUID` (FK) | Não | Masmorra explorada (`family_dungeon_adventures.id`) |
-| `status` | `ENUM('IN_PROGRESS','VICTORY','DEFEAT')` | Não | Desfecho da expedição |
-| `final_hp` | `INT` | Não | HP restante do herói ao concluir |
-| `choices_log` | `JSON` | Sim | Histórico das rolagens e decisões tomadas |
-| `rewards_collected` | `JSON` | Sim | Resumo de Ouro, XP e Atributo aprimorado |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+| Título | `reward_str_xp` | `reward_xp` | `reward_gold` | `reward_tokens` |
+| :--- | :---: | :---: | :---: | :---: |
+| **Arrumar a Cama e Quarto** | 25 | 15 | 10 | 1 |
+| **Lavar e Guardar a Louça do Almoço** | 30 | 20 | 15 | 1 |
+| **Recolher o Lixo da Casa** | 20 | 15 | 10 | 1 |
+| **Organizar a Mesa de Estudos** | 15 | 10 | 10 | 1 |
 
 ---
 
-### ⚔️ `battles`
-Histórico e estado das sessões de combate da Arena 2D e Raids Familiares.
+## 5. Próximas Tabelas Planejadas (Roadmap — Ainda Não Criadas)
 
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único da batalha |
-| `family_id` | `UUID` (FK) | Não | Família à qual a batalha pertence |
-| `monster_id` | `UUID` (FK) | Não | Monstro/Oponente enfrentado |
-| `status` | `ENUM('IN_PROGRESS','VICTORY','DEFEAT')` | Não | Status da batalha |
-| `battle_log` | `JSON` | Sim | Histórico de turnos, danos, bloqueios e golpes especiais executados |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
+> [!NOTE]
+> As estruturas listadas nesta seção representam apenas a **previsão arquitetural** para os próximos módulos V2 e **ainda NÃO existem no banco de dados MySQL nem possuem modelos Sequelize implementados**. Todas seguirão o padrão obrigatório V2 (`id` UUIDv4, `family_id` FK ➔ `families.id`, prefixo `family_`, `snake_case`).
 
----
-
-## 🃏 Módulo de Mini-Game de Truco Paulista (`/truco`)
-- **Integração de Economia & Gamificação (Etapa 1 Concluída):**
-  - **Tabela `characters`:** A rota `POST /api/truco/finish` credita Ouro (`characters.gold`) e Experiência (`characters.current_xp`), processando automaticamente subida de nível (`characters.level`).
-  - **Tabela `user_progress`:** Sincroniza o saldo e presença ativa do membro familiar.
-  - **Sessão:** Leitura do usuário autenticado a partir de `family_users.id` via JWT (`GET /api/truco/profile`).
-  - **Tabelas Futuras:** Quando o multiplayer via WebSocket for implementado (Etapa 5), tabelas relacionais com prefixo `family_truco_*` serão criadas e documentadas nesta seção.
-
----
-
-## 🧟‍♂️ Módulo Companheiro de Campanha RPG Marvel Zombies (`/zombi`)
-
-Tabelas relacionais que sustentam o motor investigativo **"Carmen Sandiego + Fort Hendrix"** para partidas físicas de *Marvel Zombies*.
-
-### 🌌 `family_zombi_campaigns`
-Armazena a definição da campanha e o estado persistente da investigação familiar (capítulo atual, modo ativo e flags conquistadas).
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único UUID |
-| `code` | `VARCHAR(60)` (UNIQUE) | Não | Slug único da campanha (ex: `o_sinal_do_fim_do_mundo`) |
-| `title` | `VARCHAR(150)` | Não | Título da campanha |
-| `subtitle` | `VARCHAR(200)` | Sim | Subtítulo descritivo |
-| `premise_hero` | `TEXT` | Não | Premissa narrativa na perspectiva dos Heróis Vivos |
-| `premise_zombie` | `TEXT` | Não | Premissa narrativa na perspectiva dos Heróis Zumbis |
-| `current_mission_number` | `INT` | Não | Capítulo atual em andamento (1 a 5) |
-| `active_mode` | `ENUM('HERO','ZOMBIE')` | Não | Modo de jogo selecionado na campanha |
-| `campaign_state` | `JSON` | Sim | Estado salvo dos tokens concluídos e flags adquiridas por capítulo |
-| `is_active` | `BOOLEAN` | Não | Se a campanha está ativa |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
-### 🗺️ `family_zombi_missions`
-Armazena cada um dos 5 capítulos interligados da campanha e seu mapeamento com o manual físico (*MZ1* a *MZ5*).
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único UUID |
-| `campaign_id` | `UUID` (FK) | Não | Referência a `family_zombi_campaigns.id` (CASCADE) |
-| `mission_number` | `INT` | Não | Ordem do capítulo (1 a 5) |
-| `code` | `VARCHAR(60)` (UNIQUE) | Não | Código único da missão (ex: `M01_O_PRIMEIRO_ECO`) |
-| `title` | `VARCHAR(150)` | Não | Título do capítulo |
-| `location_name` | `VARCHAR(180)` | Não | Nome do cenário da missão |
-| `rulebook_map_code` | `VARCHAR(30)` | Não | Referência ao mapa do livro de regras (`MZ1` a `MZ5`) |
-| `tiles_needed` | `VARCHAR(120)` | Não | Lista de tiles necessários na mesa física |
-| `map_image_url` | `VARCHAR(255)` | Sim | Caminho da imagem do mapa completo |
-| `setup_notes` | `TEXT` | Sim | Instruções de preparação do tabuleiro físico |
-| `lore_hero` | `TEXT` | Não | Texto introdutório para o Modo Heróis Vivos |
-| `lore_zombie` | `TEXT` | Não | Texto introdutório para o Modo Heróis Zumbis |
-| `inventory_badges` | `JSON` | Não | Lista de insígnias de progresso e pistas do capítulo |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
-### 🎯 `family_zombi_tokens`
-Armazena os 6 tokens investigativos (1 a 6) de cada missão, com dependências, enigmas de senha e rolagens de D6.
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único UUID |
-| `mission_id` | `UUID` (FK) | Não | Referência a `family_zombi_missions.id` (CASCADE) |
-| `token_number` | `INT` | Não | Número do token no tabuleiro (1 a 6) |
-| `token_role` | `VARCHAR(60)` | Não | Função estrutural (Triagem, Investigação, Clímax, Ganância, Interruptor, Extração) |
-| `title` | `VARCHAR(150)` | Não | Nome da sala ou ponto de interesse |
-| `tile_location` | `VARCHAR(120)` | Sim | Identificação do tile e posição |
-| `crop_image_url` | `VARCHAR(255)` | Sim | Imagem recortada da zona no tabuleiro |
-| `initial_status` | `ENUM('AVAILABLE','LOCKED')` | Não | Estado inicial do token |
-| `requires_flags` | `JSON` | Não | Array de flags necessárias para desbloquear (`["has_key", "has_power"]`) |
-| `lock_banner_text` | `VARCHAR(255)` | Sim | Alerta exibido enquanto os pré-requisitos não forem cumpridos |
-| `unlock_action_label` | `VARCHAR(120)` | Sim | Rótulo do botão de ação quando liberado |
-| `room_desc_hero` | `TEXT` | Não | Descrição curta do card no Modo Heróis Vivos |
-| `room_desc_zombie` | `TEXT` | Não | Descrição curta do card no Modo Heróis Zumbis |
-| `modal_lore_hero` | `TEXT` | Não | Narrativa detalhada do modal no Modo Heróis Vivos |
-| `modal_lore_zombie` | `TEXT` | Não | Narrativa detalhada do modal no Modo Heróis Zumbis |
-| `actions_json` | `JSON` | Não | Opções de escolha, códigos de Keypad, resultados de 1d6 e flags concedidas |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
-### 🦸 `definition_mz_characters`
-Catálogo global imutável com os **82 personagens oficiais** de Marvel Zombies (Caixa Base, X-Men Resistance, Heroes' Resistance, Hydra Resurrection, Promos do Kickstarter e expansões), modelado no padrão *Document-Relational* com índices SQL rápidos e payload de perfis em JSON.
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único UUID |
-| `code` | `VARCHAR(60)` (UNIQUE) | Não | Slug único do personagem (ex: `thor`, `wolverine`, `deadpool`) |
-| `name` | `VARCHAR(100)` | Não | Nome de exibição oficial do herói (ex: "Thor", "Deadpool") |
-| `box_name` | `VARCHAR(120)` | Não | Nome da caixa ou expansão padronizada (Indexado) |
-| `has_super_hero` | `BOOLEAN` | Não | `true` se possui modo de jogo Super-Herói Vivo |
-| `has_zombie_hero` | `BOOLEAN` | Não | `true` se possui modo de jogo Herói Zumbi |
-| `has_boss_enemy` | `BOOLEAN` | Não | `true` se possui modo de jogo Boss Inimigo |
-| `boss_health` | `INT` | Sim | Vitalidade máxima quando enfrentado como Boss (ex: 4, 5, 6 HP) |
-| `boss_ability` | `TEXT` | Sim | Resumo da habilidade ativa ou passiva de spawn do Boss |
-| `profiles` | `JSON` | Não | Objeto estruturado com todas as facetas (`attack`: nome, alcance, dados, precisão; `skills`: azul, amarelo, laranja, vermelho; `boss_enemy`) |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
----
-
-## 11. Módulo Saúde, Nutrição & Hábitos Alimentares (Fase 2)
-
-### ⏰ `family_meal_schedules`
-Armazena a grade de horários, modo de rotina e minutos de antecedência para alarmes de cada refeição da família.
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único UUIDv4 |
-| `family_id` | `UUID` (FK) | Não | Referência a `families.id` |
-| `meal_type` | `ENUM('cafe','almoco','lanche','jantar','ceia')` | Não | Tipo da refeição nobre |
-| `scheduled_time` | `VARCHAR(10)` | Não | Horário planejado em HH:MM (ex: "11:45", "12:00") |
-| `routine_mode` | `ENUM('certinho','flexivel')` | Não | Modo de rotina ativa (Padrão: `certinho`) |
-| `alert_minutes_before` | `INT` | Não | Minutos de aviso sonoro/notificação prévia (Padrão: 15) |
-| `is_active` | `BOOLEAN` | Não | Status de monitoramento pelo node-cron (Padrão: `true`) |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
-### 🍽️ `family_meals`
-Armazena o cardápio dos pratos cadastrados por dia e refeição da família com orientações para a cozinha.
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único UUIDv4 |
-| `family_id` | `UUID` (FK) | Não | Referência a `families.id` |
-| `meal_date` | `DATEONLY` | Não | Data da refeição ('YYYY-MM-DD') |
-| `meal_type` | `ENUM('cafe','almoco','lanche','jantar','ceia')` | Não | Tipo da refeição nobre |
-| `title` | `VARCHAR(255)` | Não | Título do prato (ex: "Patinho Moído com Cenoura Invisível") |
-| `cooking_notes` | `TEXT` | Sim | Dicas de preparo para a cozinha (ex: "zero óleo, cebola batida no mixer") |
-| `routine_mode` | `ENUM('certinho','flexivel')` | Não | Modo de rotina associado |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
-### ⚖️ `family_meal_items`
-Armazena os alimentos, proporções em gramas e tags de saúde de cada prato.
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único UUIDv4 |
-| `meal_id` | `UUID` (FK) | Não | Referência a `family_meals.id` (CASCADE) |
-| `name` | `VARCHAR(255)` | Não | Nome do alimento/ingrediente (ex: "Arroz Integral Cozido") |
-| `quantity_grams` | `VARCHAR(100)` | Sim | Porção / Peso (ex: "80g", "150g", "À vontade") |
-| `category` | `VARCHAR(50)` | Não | Categoria (proteina, carboidrato, salada, legume, fruta, bebida) |
-| `health_tags` | `VARCHAR(255)` | Sim | Tags funcionais (ex: "vesicula_segura", "baixo_indice_glicemico", "zero_oleo") |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
-### 👑 `family_meal_checkins`
-Registra a presença dos filhos na mesa, pontuação e penalidades de pontualidade (Mecânica do Paulinho).
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único UUIDv4 |
-| `meal_id` | `UUID` (FK) | Sim | Referência opcional a `family_meals.id` |
-| `family_id` | `UUID` (FK) | Não | Referência a `families.id` |
-| `user_id` | `UUID` (FK) | Não | Referência a `family_users.id` (Filho) |
-| `character_id` | `UUID` (FK) | Sim | Referência a `characters.id` (Herói do filho) |
-| `meal_date` | `DATEONLY` | Não | Data da refeição ('YYYY-MM-DD') |
-| `meal_type` | `VARCHAR(50)` | Não | Tipo da refeição avaliada |
-| `status` | `ENUM('no_horario','atrasado','faltou')` | Não | Resultado da validação |
-| `xp_awarded` | `INT` | Não | XP creditado (+30 se no horário, +10 se atrasou, 0 se faltou) |
-| `gold_awarded` | `INT` | Não | Ouro creditado (+10 se no horário, 0 caso contrário) |
-| `penalty_note` | `TEXT` | Sim | Advertência/motivo registrado se faltou ou atrasou |
-| `validated_by` | `UUID` (FK) | Sim | Referência a `family_users.id` (Guardião que validou) |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
-### 🛒 `family_shopping_items`
-Armazena a lista de compras inteligente do clã dividida entre abastecimento mensal e feira semanal.
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único UUIDv4 |
-| `family_id` | `UUID` (FK) | Não | Referência a `families.id` |
-| `name` | `VARCHAR(255)` | Não | Nome do item (ex: "Patinho bovino moído") |
-| `quantity` | `VARCHAR(100)` | Sim | Quantidade / volume (ex: "2 kg", "2 maços") |
-| `category` | `ENUM('mensal_abastecimento','semanal_feira')` | Não | Coluna de compra |
-| `is_purchased` | `BOOLEAN` | Não | Status de compra marcado na lista (Padrão: `false`) |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
----
-
-## 12. Módulo de Expansão: Diversão & Conexão Familiar (Fase 4)
-
-### 📅 `family_events`
-Armazena a agenda de eventos, aniversários e encontros da casa com data, horário, ícone e contagem regressiva.
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único UUIDv4 |
-| `family_id` | `UUID` (FK) | Não | Referência a `families.id` |
-| `created_by` | `UUID` (FK) | Não | Referência a `family_users.id` (Criador) |
-| `title` | `VARCHAR(150)` | Não | Título do evento (ex: "Noite da Pizza & Jogos") |
-| `description` | `TEXT` | Sim | Detalhes e instruções do evento |
-| `event_date` | `DATEONLY` | Não | Data do evento ('YYYY-MM-DD') |
-| `event_time` | `VARCHAR(10)` | Sim | Horário previsto ('HH:MM', padrão: "12:00") |
-| `category` | `ENUM('BIRTHDAY','FAMILY_OUTING','MEETING','PARTY','SPECIAL_LUNCH','OTHER')` | Não | Categoria do evento |
-| `icon` | `VARCHAR(30)` | Não | Ícone temático (ex: '🍕', '🎂', '🌳') |
-| `color` | `VARCHAR(20)` | Não | Cor de destaque em hexadecimal |
-| `is_recurring_yearly` | `BOOLEAN` | Não | Se o evento se repete anualmente (aniversário) |
-| `is_active` | `BOOLEAN` | Não | Status ativo na agenda (Padrão: `true`) |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
-### 🗳️ `family_polls`
-Armazena as votações familiares para escolha democrática dos passeios de fim de semana com múltiplas opções cadastradas pelos pais.
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único UUIDv4 |
-| `family_id` | `UUID` (FK) | Não | Referência a `families.id` |
-| `created_by` | `UUID` (FK) | Não | Referência a `family_users.id` (Guardião criador) |
-| `title` | `VARCHAR(150)` | Não | Pergunta da votação (ex: "Qual o passeio do fim de semana?") |
-| `description` | `TEXT` | Sim | Contexto e orientações para a família |
-| `options` | `JSON` | Não | Array JSON contendo as opções (`id`, `title`, `description`, `icon`) |
-| `status` | `ENUM('OPEN','CLOSED')` | Não | Status da votação (Padrão: `OPEN`) |
-| `closes_at` | `DATETIME` | Sim | Data e horário limite de votação |
-| `winner_option_id` | `VARCHAR(50)` | Sim | Identificador da opção vencedora proclamada |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
-### 🗳️ `family_poll_votes`
-Registra os votos individuais de cada membro da família nas enquetes de passeios.
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único UUIDv4 |
-| `poll_id` | `UUID` (FK) | Não | Referência a `family_polls.id` (CASCADE) |
-| `user_id` | `UUID` (FK) | Não | Referência a `family_users.id` (Membro votante) |
-| `option_id` | `VARCHAR(50)` | Não | ID da opção escolhida |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps (Índice único: `poll_id` + `user_id`) |
-
----
-
-## 13. Módulo de Expansão: Financeiro & Tesouro do Clã (Fase 4)
-
-### 📑 `family_bills`
-Armazena as contas domésticas e despesas mensais dos pais com valores, vencimentos, forma de pagamento e status de liquidação.
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único UUIDv4 |
-| `family_id` | `UUID` (FK) | Não | Referência a `families.id` |
-| `created_by` | `UUID` (FK) | Não | Referência a `family_users.id` (Guardião) |
-| `title` | `VARCHAR(150)` | Não | Nome da despesa (ex: "Conta de Energia Elétrica") |
-| `category` | `ENUM('ENERGY','WATER','INTERNET','HOUSING','SUPERMARKET','STREAMING','EDUCATION','HEALTH','OTHER')` | Não | Categoria da conta |
-| `amount` | `DECIMAL(10,2)` | Não | Valor da conta em Reais (R$) |
-| `due_date` | `DATEONLY` | Não | Data de vencimento ('YYYY-MM-DD') |
-| `status` | `ENUM('PENDING','PAID','OVERDUE')` | Não | Status de pagamento |
-| `paid_at` | `DATETIME` | Sim | Data e hora em que a conta foi liquidada |
-| `payment_method` | `VARCHAR(50)` | Sim | Meio de pagamento ('PIX', 'Boleto', etc.) |
-| `barcode_or_pix` | `TEXT` | Sim | Código de barras ou chave/código Copia e Cola |
-| `notes` | `TEXT` | Sim | Observações adicionais do guardião |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
-### 🏰 `family_clan_vaults`
-Armazena as metas coletivas dos grandes sonhos do clã (ex: Viagem de Férias, Reforma do Lar, Console de Jogos) com progresso financeiro e de missões.
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único UUIDv4 |
-| `family_id` | `UUID` (FK) | Não | Referência a `families.id` |
-| `created_by` | `UUID` (FK) | Não | Referência a `family_users.id` |
-| `title` | `VARCHAR(150)` | Não | Nome do grande sonho (ex: "Viagem de Férias na Praia") |
-| `description` | `TEXT` | Sim | Motivação e detalhes do objetivo familiar |
-| `category` | `ENUM('TRIP','RENOVATION','PURCHASE','EXPERIENCE','SAVINGS','OTHER')` | Não | Categoria da meta |
-| `icon` | `VARCHAR(30)` | Não | Ícone temático (ex: '🏖️', '🛠️', '🎮') |
-| `target_amount` | `DECIMAL(10,2)` | Não | Valor financeiro alvo em Reais (R$) |
-| `current_amount` | `DECIMAL(10,2)` | Não | Valor total acumulado e economizado |
-| `target_tasks` | `INT` | Não | Meta opcional de tarefas coletivas do clã |
-| `current_tasks` | `INT` | Não | Tarefas totais concluídas pela família |
-| `target_date` | `DATEONLY` | Sim | Data planejada para realização do sonho |
-| `status` | `ENUM('ACTIVE','ACHIEVED','PAUSED')` | Não | Status da meta (Padrão: `ACTIVE`) |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
-### 🪙 `family_child_vaults`
-Armazena o cofrinho e mesada gamificada dos filhos, vinculando ouro poupado à conversão em dinheiro real com registro de objetivos de compra.
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único UUIDv4 |
-| `family_id` | `UUID` (FK) | Não | Referência a `families.id` |
-| `user_id` | `UUID` (FK) | Não | Referência a `family_users.id` (Filho / Herói) |
-| `character_id` | `UUID` (FK) | Sim | Referência a `characters.id` (Personagem RPG) |
-| `saved_gold` | `INT` | Não | Ouro guardado no cofrinho de poupança |
-| `allowance_balance_brl` | `DECIMAL(10,2)` | Não | Saldo de mesada real acumulada (R$) |
-| `gold_to_brl_rate` | `DECIMAL(6,2)` | Não | Taxa de conversão (Padrão: 10 Ouro = R$ 1,00) |
-| `goal_title` | `VARCHAR(150)` | Sim | Brinquedo ou jogo que o herói quer comprar |
-| `goal_amount_brl` | `DECIMAL(10,2)` | Não | Valor do objetivo do herói em Reais (R$) |
-| `total_withdrawn_brl` | `DECIMAL(10,2)` | Não | Total de mesada já paga na vida real pelos pais |
-| `notes` | `TEXT` | Sim | Anotações ou combinados de educação financeira |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps (Índice único: `family_id` + `user_id`) |
-
----
-
-## 14. Módulo de Comunicação: Central de WhatsApp do Clã (Fase 5 - Em Estudo / Oculto na UI)
-> **Nota de Arquitetura:** A estrutura de dados e modelo da tabela estão preservados no banco de dados. A interface visual no módulo de Saúde foi ocultada temporariamente para estudos posteriores sobre as políticas cadastrais da Meta.
-
-### 📱 `family_whatsapp_configs`
-Armazena as configurações de conexão, destinos e preferências de envio de alarmes do WhatsApp para cada família do reino.
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único UUIDv4 |
-| `family_id` | `UUID` (FK) | Não | Referência a `families.id` (Único / 1:1) |
-| `group_id_or_phone` | `VARCHAR(255)` | Sim | Número individual ou ID do Grupo no WhatsApp |
-| `is_connected` | `BOOLEAN` | Não | Indica se a sessão do WhatsApp está pareada e ativa |
-| `notify_meals` | `BOOLEAN` | Não | Habilita os alarmes das refeições (11h15, 11h45, 19h45) |
-| `notify_hydration` | `BOOLEAN` | Não | Habilita os lembretes de hidratação e mana (16h00) |
-| `session_data` | `TEXT` | Sim | Metadados da sessão pareada (dispositivo, data, auth) |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
----
-
-## 15. Módulo de Comunicação: Notificações Web Push do Clã (PWA)
-
-### 🔔 `family_push_subscriptions`
-Armazena as credenciais de entrega dos aparelhos móveis (celulares Android/iOS e computadores) inscritos nas notificações Web Push do LiraQuest via Service Worker.
-
-| Coluna | Tipo | Nulo | Descrição |
-|:---|:---|:---|:---|
-| `id` | `UUID` (PK) | Não | Identificador único UUIDv4 |
-| `family_id` | `UUID` (FK) | Não | Referência a `families.id` |
-| `user_id` | `UUID` (FK) | Não | Referência a `family_users.id` |
-| `endpoint` | `TEXT` | Não | URL do endpoint criptografado do dispositivo (Google/Apple/Mozilla) |
-| `p256dh` | `TEXT` | Não | Chave pública ECDH do cliente para cifragem da mensagem |
-| `auth` | `VARCHAR(255)` | Não | Chave secreta de autenticação do PushManager |
-| `user_agent` | `VARCHAR(255)` | Sim | Identificação do navegador/aparelho |
-| `is_active` | `BOOLEAN` | Não | Indica se a subscrição está ativa (desativa em caso de 410 Gone) |
-| `created_at` / `updated_at` | `DATETIME` | Não | Timestamps |
-
-
-
-
-
-
-
-
-
-
+- **Módulo Estudos (`INT`):**
+  - `family_study_sessions`: Registro de sessões Pomodoro e missões escolares (`id`, `family_id`, `member_id`, `subject`, `duration_minutes`, `reward_int_xp`, `reward_xp`, `reward_gold`, `completed_at`).
+- **Módulo Saúde & Vitalidade (`CON`):**
+  - `family_meals`: Cardápio planejado por refeição e modo de rotina com ingredientes/gramas (`id`, `family_id`, `meal_type`, `routine_mode`, `title`, `items_json`, `is_active`).
+  - `family_meal_logs`: Check-in e validação de presença dos membros nas refeições (`id`, `family_id`, `meal_id`, `member_id`, `reviewed_by`, `status`, `reward_con_xp`, `logged_at`).
+  - `family_water_logs`: Acompanhamento diário de copos de água de 250ml rumo à meta de 2L (`id`, `family_id`, `member_id`, `log_date`, `glasses_count`, `goal_reached`).
+- **Módulo Empório & Vales Reais:**
+  - `family_rewards`: Catálogo de recompensas reais do clã (`id`, `family_id`, `title`, `description`, `icon`, `token_cost`, `allowed_profile`, `is_active`).
+  - `family_reward_redemptions`: Solicitações e entregas de vales resgatados com Fichas do Lar (`id`, `family_id`, `reward_id`, `member_id`, `token_cost`, `status`, `reviewed_by`, `reviewed_at`).
+- **Módulo Aventuras RPG D20:**
+  - `family_rpg_runs`: Histórico de expedições em masmorras D20 (`id`, `family_id`, `member_id`, `dungeon_code`, `energy_spent`, `rolls_json`, `outcome`, `gold_earned`, `xp_earned`).

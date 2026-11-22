@@ -28,10 +28,9 @@ Toda vez que for necessário atualizar a estrutura do banco de dados (como criar
 - Se o script ou a operação for **deletar tabelas, apagar colunas, ou resetar dados existentes (ex: delete em massa, destroy)**, a IA esbarra na regra de "Proteção Contra Perda de Dados" e **precisa de permissão expressa** do usuário antes de rodar o comando.
 
 ## Documentação Contínua da Arquitetura e do Conceito Central
-Sempre que a IA construir ou modificar funcionalidades do projeto (exemplo: criar um novo CRUD, adicionar novas tabelas no banco de dados, criar novas rotas REST, introduzir novos eventos de WebSocket, mecânicas de combate MUGEN 2D ou fluxo de Raids), é **OBRIGATÓRIO** atualizar imediatamente os três arquivos de mapa localizados na pasta `doc/`:
-1. `doc/LIRAQUEST_CONCEITO_CENTRAL.md`: Manter atualizada a visão do produto, descrevendo novas mecânicas, regras de gamificação familiar, Foco AFK, Árvore de Talentos, classes de heróis e fluxo da Raid Cooperativa.
-2. `doc/BANCO_DE_DADOS.md`: Registrar o nome da tabela criada/modificada, descrever suas colunas (tipo e função) e listar os relacionamentos com outras tabelas.
-3. `doc/BACKEND_ROTAS.md`: Mapear a localização da rota REST ou evento de WebSocket recém-criado, detalhar os parâmetros e listar as ações executadas.
+Sempre que a IA construir ou modificar funcionalidades do projeto (exemplo: criar um novo CRUD, adicionar novas tabelas no banco de dados, criar novas rotas REST, alterar regras de gamificação, introduzir novos módulos ou fluxos), é **OBRIGATÓRIO** atualizar imediatamente os dois documentos oficiais localizados na pasta `doc/`:
+1. `doc/REGRAS_DE_NEGOCIO.md`: Manter atualizada a visão do produto ("Eu sou o Herói"), os 4 Pilares, o Sistema de Mestria Orgânica por Atributo, as regras dos módulos ativos/planejados, a arquitetura do monorepo e o Mapa Oficial de Rotas REST ativas.
+2. `doc/BANCO_DE_DADOS.md`: Registrar toda tabela criada/modificada, descrever suas colunas exatas (tipo, nulabilidade, default, PK/FK), manter o Diagrama ER (Mermaid) atualizado e documentar alterações no seed inicial.
 
 Esta regra garante que a visão estratégica do jogo e a arquitetura técnica do ecossistema estejam sempre documentadas de forma impecável.
 
