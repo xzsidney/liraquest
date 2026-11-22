@@ -486,7 +486,6 @@ export async function renderHubView() {
         <!-- 1. Cabeçalho Superior -->
         <header class="sheet-header-grid">
           <div class="sheet-name-plaque">
-            <div class="sheet-plaque-kicker">LiraQuest • Ficha Viva D20</div>
             <h1 class="sheet-hero-name">${escapeHtml(hero.hero_nickname)}</h1>
           </div>
 
