@@ -45,7 +45,7 @@ export function renderHomeView() {
               🔑 Acessar Conta (Fazer Login)
             </button>
             <button id="home-btn-register" class="btn-noble btn-noble-secondary" style="padding: 16px 34px; font-size: 1.05rem;">
-              ✨ Cadastrar Novo Clã Familiar
+              ✨ Cadastrar Novo Herói (Filho)
             </button>
           `}
         </div>
@@ -164,7 +164,7 @@ export function renderHomeView() {
                 🔑 Entrar no Grande Salão
               </button>
               <button id="home-card-btn-register" class="btn-noble btn-noble-secondary" style="width: 100%;">
-                ✨ Criar Conta de Guardião
+                ✨ Cadastrar Novo Herói (Filho)
               </button>
             </div>
           </div>

@@ -64,7 +64,7 @@ export function renderNavbar() {
             </button>
           ` : `
             <button id="nav-btn-register" class="btn-noble btn-noble-secondary btn-noble-sm">
-              ✨ Cadastrar Clã
+              ✨ Cadastrar Herói
             </button>
             <button id="nav-btn-login" class="btn-noble btn-noble-gold btn-noble-sm">
               🔑 Entrar

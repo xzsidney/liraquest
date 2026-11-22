@@ -245,72 +245,137 @@ export const getChildren = async (req, res) => {
 };
 
 /**
- * 5. POST /api/auth/register (Cadastro de Guardião e Clã)
+ * 5. POST /api/auth/register (Cadastro de Herói - Sempre do Tipo FILHO)
+ * Regra do Sistema: Apenas usuários do tipo Pai/Mãe podem criar clãs.
+ * O cadastro público é EXCLUSIVAMENTE para Heróis/Filhos ingressando no Clã.
  */
 export const register = async (req, res) => {
   try {
-    const { name, email, password, family_name, role } = req.body;
+    const {
+      name,
+      hero_nickname,
+      heroNickname,
+      pin,
+      invite_code,
+      inviteCode,
+      class_code,
+      classCode,
+      email,
+      password,
+    } = req.body;
 
-    if (!name || !email || !password) {
+    const childName = (name || '').trim();
+    const heroNick = (hero_nickname || heroNickname || childName).trim();
+    const childPin = pin ? String(pin).trim() : '1234';
+    const chosenClass = class_code || classCode || 'rastreador_veloz';
+    const cleanInvite = (invite_code || inviteCode || 'LIRA-2026').toUpperCase().trim();
+
+    if (!childName) {
       return res.status(400).json({
         success: false,
-        message: 'Preencha Nome Completo, E-mail e Senha.',
+        message: 'O nome da criança/herói é obrigatório.',
       });
     }
 
-    const cleanEmail = email.toLowerCase().trim();
-    const existing = await FamilyMember.findOne({ where: { email: cleanEmail } });
-    if (existing) {
-      return res.status(409).json({
+    if (!childPin || childPin.length !== 4) {
+      return res.status(400).json({
         success: false,
-        message: 'Já existe um membro cadastrado com este e-mail.',
+        message: 'O PIN de acesso deve ter exatamente 4 números.',
       });
     }
 
-    // Criar Clã
-    const clanName = family_name?.trim() || `Clã ${name.split(' ')[0]}`;
-    const inviteCode = `LIRA-${Math.floor(1000 + Math.random() * 9000)}`;
+    // 1. Localizar o Clã pelo código de convite dos pais
+    let family = await Family.findOne({ where: { invite_code: cleanInvite } });
+    if (!family) {
+      // Fallback para o Clã Lira padrão se o código for LIRA-2026 ou se não encontrar
+      family = await Family.findOne({ where: { invite_code: 'LIRA-2026' } });
+      if (!family) {
+        family = await Family.findOne();
+      }
+      if (!family) {
+        return res.status(404).json({
+          success: false,
+          message: `Código de Clã "${cleanInvite}" não encontrado. Solicite o código correto aos seus pais!`,
+        });
+      }
+    }
 
-    const family = await Family.create({
-      name: clanName,
-      invite_code: inviteCode,
+    // 2. Verificar se já existe herói com esse apelido no mesmo clã
+    const existingNick = await FamilyMember.findOne({
+      where: {
+        family_id: family.id,
+        hero_nickname: heroNick,
+        is_active: true,
+      },
     });
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    if (existingNick) {
+      return res.status(409).json({
+        success: false,
+        message: `Já existe um herói chamado "${heroNick}" no ${family.name}. Escolha outro apelido!`,
+      });
+    }
 
+    // 3. E-mail e senha opcionais (se o jovem tiver e-mail próprio)
+    let cleanEmail = null;
+    let hashedPassword = null;
+    if (email && email.trim()) {
+      cleanEmail = email.toLowerCase().trim();
+      const existingEmail = await FamilyMember.findOne({ where: { email: cleanEmail } });
+      if (existingEmail) {
+        return res.status(409).json({
+          success: false,
+          message: 'Já existe um membro cadastrado com este e-mail.',
+        });
+      }
+      if (password) {
+        const salt = await bcrypt.genSalt(10);
+        hashedPassword = await bcrypt.hash(password, salt);
+      }
+    }
+
+    // 4. Atributos base conforme arquétipo
+    let stats = { str: 10, agi: 10, con: 10, int: 10, cha: 10, luk: 10 };
+    if (chosenClass === 'rastreador_veloz') {
+      stats = { str: 12, con: 11, agi: 16, int: 10, cha: 10, luk: 14 };
+    } else if (chosenClass === 'artifice_criativo') {
+      stats = { str: 14, con: 12, agi: 11, int: 16, cha: 11, luk: 10 };
+    } else if (chosenClass === 'guardiao_do_lar') {
+      stats = { str: 16, con: 15, agi: 10, int: 10, cha: 12, luk: 10 };
+    }
+
+    // 5. REGRA OFICIAL: Cadastro público é SEMPRE do tipo FILHO (CHILD)
     const newMember = await FamilyMember.create({
       family_id: family.id,
-      name: name.trim(),
+      name: childName,
+      hero_nickname: heroNick,
       email: cleanEmail,
       password: hashedPassword,
-      role: role && ['ADMIN', 'PARENT'].includes(role) ? role : 'PARENT',
-      hero_nickname: name.trim(),
-      class_code: 'guardiao_do_lar',
-      skin_code: 'default',
+      pin: childPin,
+      role: 'CHILD', // REGRA: Sempre tipo FILHO!
+      class_code: chosenClass,
+      skin_code: chosenClass,
       level: 1,
       xp: 0,
       adventure_energy: 10,
       family_tokens: 0,
       gold: 50,
       streak_days: 1,
-      str: 10,
-      agi: 10,
-      con: 10,
-      int: 10,
-      cha: 10,
-      luk: 10,
+      str: stats.str,
+      agi: stats.agi,
+      con: stats.con,
+      int: stats.int,
+      cha: stats.cha,
+      luk: stats.luk,
       is_active: true,
     });
-
-    await family.update({ created_by: newMember.id });
 
     const token = generateToken(newMember);
     const formatted = formatMemberResponse(newMember);
 
     return res.status(201).json({
       success: true,
-      message: `Bem-vindo ao ${family.name}!`,
+      message: `Avante para a aventura, ${newMember.hero_nickname}! Bem-vindo ao ${family.name}! 🎉`,
       token,
       user: formatted,
       member: formatted,
@@ -321,10 +386,10 @@ export const register = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('❌ Erro no cadastro:', error);
+    console.error('❌ Erro no cadastro do herói:', error);
     return res.status(500).json({
       success: false,
-      message: 'Erro interno ao realizar cadastro.',
+      message: 'Erro interno ao cadastrar herói.',
       error: error.message,
     });
   }

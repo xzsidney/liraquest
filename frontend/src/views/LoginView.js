@@ -135,7 +135,7 @@ export async function renderLoginView() {
         <!-- Links Auxiliares de Navegação -->
         <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
           <a href="#/register" id="link-go-reg" style="color: #fde047; text-decoration: none; font-weight: 700;">
-            ✨ Cadastrar Novo Clã
+            ✨ Cadastrar Novo Herói (Filho)
           </a>
           <a href="#/home" id="link-go-home" style="color: var(--text-muted); text-decoration: none;">
             ⬅️ Voltar ao Início
