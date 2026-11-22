@@ -1,0 +1,613 @@
+<mxfile host="app.diagrams.net" modified="2026-11-22T14:20:00.000Z" agent="Antigravity" version="24.7.17" etag="gerenciador-familia-v1" type="device">
+  <diagram id="tab-casos-de-uso" name="1. Casos de Uso">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1560" pageHeight="1100" background="#FAFAFA" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Cabeçalho -->
+        <mxCell id="t1_title" value="&lt;b&gt;&lt;font style=&quot;font-size: 20px;&quot;&gt;App Gerenciador de Família — Diagrama de Casos de Uso&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#475569&quot; style=&quot;font-size: 12px;&quot;&gt;Atores: Administrador  •  Pai / Responsável  •  Filho&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=0;strokeColor=none;fillColor=none;fontColor=#0F172A;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="1480" height="48" as="geometry" />
+        </mxCell>
+
+        <!-- Fronteira do Sistema -->
+        <mxCell id="t1_system" value="App Gerenciador de Família" style="rounded=1;whiteSpace=wrap;html=1;arcSize=2;fillColor=#FFFFFF;strokeColor=#94A3B8;strokeWidth=1.5;verticalAlign=top;align=left;spacingLeft=16;spacingTop=10;fontSize=15;fontStyle=1;fontColor=#1E293B;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="440" y="90" width="660" height="980" as="geometry" />
+        </mxCell>
+
+        <!-- Pacotes -->
+        <mxCell id="t1_pkg_acesso" value="Acesso" style="rounded=1;whiteSpace=wrap;html=1;arcSize=4;fillColor=#F0F9FF;strokeColor=#93C5FD;strokeWidth=1.5;dashed=1;dashPattern=6 4;verticalAlign=top;align=left;spacingLeft=14;spacingTop=8;fontSize=13;fontStyle=1;fontColor=#1E40AF;" vertex="1" parent="1">
+          <mxGeometry x="465" y="135" width="610" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t1_pkg_crud" value="Gestão do Sistema (CRUD)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=4;fillColor=#FAF5FF;strokeColor=#D8B4FE;strokeWidth=1.5;dashed=1;dashPattern=6 4;verticalAlign=top;align=left;spacingLeft=14;spacingTop=8;fontSize=13;fontStyle=1;fontColor=#6B21A8;" vertex="1" parent="1">
+          <mxGeometry x="465" y="335" width="610" height="300" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t1_pkg_rotina" value="Rotina Familiar" style="rounded=1;whiteSpace=wrap;html=1;arcSize=4;fillColor=#F0FDF4;strokeColor=#86EFAC;strokeWidth=1.5;dashed=1;dashPattern=6 4;verticalAlign=top;align=left;spacingLeft=14;spacingTop=8;fontSize=13;fontStyle=1;fontColor=#166534;" vertex="1" parent="1">
+          <mxGeometry x="465" y="655" width="610" height="400" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t1_rotina_sep" value="" style="endArrow=none;html=1;strokeColor=#86EFAC;strokeWidth=1.2;dashed=1;dashPattern=4 4;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="490" y="866" as="sourcePoint" />
+            <mxPoint x="1050" y="866" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Casos de Uso: Acesso -->
+        <mxCell id="t1_uc_home" value="Acessar Tela Home" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FEF9E7;strokeColor=#1E293B;strokeWidth=1.8;shadow=1;fontSize=13;fontStyle=0;fontColor=#0F172A;" vertex="1" parent="1">
+          <mxGeometry x="645" y="172" width="250" height="48" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t1_uc_login" value="Realizar Login" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FEF9E7;strokeColor=#1E293B;strokeWidth=1.8;shadow=1;fontSize=13;fontStyle=0;fontColor=#0F172A;" vertex="1" parent="1">
+          <mxGeometry x="645" y="252" width="250" height="48" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t1_edge_include" value="«include»" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;dashPattern=6 4;endArrow=open;endFill=0;strokeColor=#475569;strokeWidth=1.8;fontSize=11;fontColor=#334155;labelBackgroundColor=#F0F9FF;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="t1_uc_home" target="t1_uc_login">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Casos de Uso: Gestão do Sistema (CRUD) -->
+        <mxCell id="t1_uc_create" value="Cadastrar Usuário" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FEF9E7;strokeColor=#1E293B;strokeWidth=1.8;shadow=1;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1">
+          <mxGeometry x="645" y="375" width="250" height="46" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t1_uc_update" value="Atualizar Usuário / Perfil" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FEF9E7;strokeColor=#1E293B;strokeWidth=1.8;shadow=1;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1">
+          <mxGeometry x="645" y="435" width="250" height="46" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t1_uc_delete" value="Remover Usuário" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FEF9E7;strokeColor=#1E293B;strokeWidth=1.8;shadow=1;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1">
+          <mxGeometry x="645" y="495" width="250" height="46" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t1_uc_read" value="Consultar Usuários" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FEF9E7;strokeColor=#1E293B;strokeWidth=1.8;shadow=1;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1">
+          <mxGeometry x="645" y="565" width="250" height="46" as="geometry" />
+        </mxCell>
+
+        <!-- Casos de Uso: Rotina Familiar -->
+        <mxCell id="t1_uc_criar_tarefa" value="Criar Tarefas para Filhos" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FEF9E7;strokeColor=#1E293B;strokeWidth=1.8;shadow=1;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1">
+          <mxGeometry x="645" y="685" width="250" height="46" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t1_uc_aprovar" value="Aprovar Tarefa Concluída" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FEF9E7;strokeColor=#1E293B;strokeWidth=1.8;shadow=1;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1">
+          <mxGeometry x="645" y="745" width="250" height="46" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t1_uc_mesada" value="Gerenciar Mesada e Pontos" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FEF9E7;strokeColor=#1E293B;strokeWidth=1.8;shadow=1;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1">
+          <mxGeometry x="645" y="805" width="250" height="46" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t1_uc_ver_tarefa" value="Visualizar Tarefas Pendentes" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FEF9E7;strokeColor=#1E293B;strokeWidth=1.8;shadow=1;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1">
+          <mxGeometry x="645" y="880" width="250" height="46" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t1_uc_concluir" value="Marcar Tarefa como Concluída" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FEF9E7;strokeColor=#1E293B;strokeWidth=1.8;shadow=1;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1">
+          <mxGeometry x="645" y="940" width="250" height="46" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t1_uc_resgatar" value="Resgatar Recompensas" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FEF9E7;strokeColor=#1E293B;strokeWidth=1.8;shadow=1;fontSize=13;fontColor=#0F172A;" vertex="1" parent="1">
+          <mxGeometry x="645" y="1000" width="250" height="46" as="geometry" />
+        </mxCell>
+
+        <!-- Atores (Pílulas Amarelas com Avatar) -->
+        <mxCell id="t1_grp_admin" value="" style="group" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="90" y="380" width="210" height="96" as="geometry" />
+        </mxCell>
+        <mxCell id="t1_actor_admin" value="Administrador" style="rounded=1;whiteSpace=wrap;html=1;arcSize=50;fillColor=#FDE047;strokeColor=#1E293B;strokeWidth=2;fontStyle=1;fontSize=14;fontColor=#0F172A;verticalAlign=bottom;spacingBottom=11;shadow=1;" vertex="1" parent="t1_grp_admin">
+          <mxGeometry y="34" width="210" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="t1_avatar_admin_bg" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#1E293B;strokeColor=#FFFFFF;strokeWidth=2.5;" vertex="1" parent="t1_grp_admin">
+          <mxGeometry x="77" width="56" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="t1_avatar_admin_head" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="t1_grp_admin">
+          <mxGeometry x="96" y="10" width="18" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="t1_avatar_admin_body" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=50;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="t1_grp_admin">
+          <mxGeometry x="89" y="31" width="32" height="16" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t1_grp_pai" value="" style="group" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="90" y="680" width="210" height="96" as="geometry" />
+        </mxCell>
+        <mxCell id="t1_actor_pai" value="Pai / Responsável" style="rounded=1;whiteSpace=wrap;html=1;arcSize=50;fillColor=#FDE047;strokeColor=#1E293B;strokeWidth=2;fontStyle=1;fontSize=14;fontColor=#0F172A;verticalAlign=bottom;spacingBottom=11;shadow=1;" vertex="1" parent="t1_grp_pai">
+          <mxGeometry y="34" width="210" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="t1_avatar_pai_bg" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#1E293B;strokeColor=#FFFFFF;strokeWidth=2.5;" vertex="1" parent="t1_grp_pai">
+          <mxGeometry x="77" width="56" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="t1_avatar_pai_head" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="t1_grp_pai">
+          <mxGeometry x="96" y="10" width="18" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="t1_avatar_pai_body" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=50;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="t1_grp_pai">
+          <mxGeometry x="89" y="31" width="32" height="16" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t1_grp_filho" value="" style="group" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="1240" y="880" width="210" height="96" as="geometry" />
+        </mxCell>
+        <mxCell id="t1_actor_filho" value="Filho" style="rounded=1;whiteSpace=wrap;html=1;arcSize=50;fillColor=#FDE047;strokeColor=#1E293B;strokeWidth=2;fontStyle=1;fontSize=14;fontColor=#0F172A;verticalAlign=bottom;spacingBottom=11;shadow=1;" vertex="1" parent="t1_grp_filho">
+          <mxGeometry y="34" width="210" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="t1_avatar_filho_bg" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#1E293B;strokeColor=#FFFFFF;strokeWidth=2.5;" vertex="1" parent="t1_grp_filho">
+          <mxGeometry x="77" width="56" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="t1_avatar_filho_head" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="t1_grp_filho">
+          <mxGeometry x="96" y="10" width="18" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="t1_avatar_filho_body" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=50;fillColor=#FFFFFF;strokeColor=none;" vertex="1" parent="t1_grp_filho">
+          <mxGeometry x="89" y="31" width="32" height="16" as="geometry" />
+        </mxCell>
+
+        <!-- Conexões Administrador (sem cruzamentos) -->
+        <mxCell id="t1_e_admin_home" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1E293B;strokeWidth=2;endArrow=none;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.7;entryDx=0;entryDy=0;" edge="1" parent="1" source="t1_actor_admin" target="t1_uc_home">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="365" y="445" />
+              <mxPoint x="365" y="206" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="t1_e_admin_create" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1E293B;strokeWidth=2;endArrow=none;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="t1_actor_admin" target="t1_uc_create">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="365" y="445" />
+              <mxPoint x="365" y="398" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="t1_e_admin_update" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1E293B;strokeWidth=2;endArrow=none;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="t1_actor_admin" target="t1_uc_update">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="365" y="445" />
+              <mxPoint x="365" y="458" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="t1_e_admin_delete" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1E293B;strokeWidth=2;endArrow=none;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="t1_actor_admin" target="t1_uc_delete">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="365" y="445" />
+              <mxPoint x="365" y="518" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="t1_e_admin_read" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1E293B;strokeWidth=2;endArrow=none;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.35;entryDx=0;entryDy=0;" edge="1" parent="1" source="t1_actor_admin" target="t1_uc_read">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="365" y="445" />
+              <mxPoint x="365" y="581" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Conexões Pai / Responsável (sem cruzamentos) -->
+        <mxCell id="t1_e_pai_home" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1E293B;strokeWidth=2;endArrow=none;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="t1_actor_pai" target="t1_uc_home">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="45" y="745" />
+              <mxPoint x="45" y="184" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="t1_e_pai_read" value="(Apenas sua família)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1E293B;strokeWidth=2;endArrow=none;fontSize=11;fontColor=#334155;labelBackgroundColor=#FAF5FF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.72;entryDx=0;entryDy=0;" edge="1" parent="1" source="t1_actor_pai" target="t1_uc_read">
+          <mxGeometry x="0.63" y="-12" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="365" y="745" />
+              <mxPoint x="365" y="598" />
+            </Array>
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="t1_e_pai_criar" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1E293B;strokeWidth=2;endArrow=none;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="t1_actor_pai" target="t1_uc_criar_tarefa">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="365" y="745" />
+              <mxPoint x="365" y="708" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="t1_e_pai_aprovar" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1E293B;strokeWidth=2;endArrow=none;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="t1_actor_pai" target="t1_uc_aprovar">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="365" y="745" />
+              <mxPoint x="365" y="768" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="t1_e_pai_mesada" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1E293B;strokeWidth=2;endArrow=none;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="t1_actor_pai" target="t1_uc_mesada">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="365" y="745" />
+              <mxPoint x="365" y="828" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Conexões Filho (sem cruzamentos) -->
+        <mxCell id="t1_e_filho_home" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1E293B;strokeWidth=2;endArrow=none;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="t1_actor_filho" target="t1_uc_home">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1165" y="945" />
+              <mxPoint x="1165" y="196" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="t1_e_filho_ver" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1E293B;strokeWidth=2;endArrow=none;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="t1_actor_filho" target="t1_uc_ver_tarefa">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1165" y="945" />
+              <mxPoint x="1165" y="903" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="t1_e_filho_concluir" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1E293B;strokeWidth=2;endArrow=none;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="t1_actor_filho" target="t1_uc_concluir">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1165" y="945" />
+              <mxPoint x="1165" y="963" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="t1_e_filho_resgatar" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1E293B;strokeWidth=2;endArrow=none;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="t1_actor_filho" target="t1_uc_resgatar">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1165" y="945" />
+              <mxPoint x="1165" y="1023" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram id="tab-fluxograma-telas" name="2. Fluxograma de Telas">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1040" background="#FAFAFA" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Cabeçalho -->
+        <mxCell id="t2_title" value="&lt;b&gt;&lt;font style=&quot;font-size: 20px;&quot;&gt;Fluxograma de Navegação — Telas e Perfis&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#475569&quot; style=&quot;font-size: 12px;&quot;&gt;Autenticação  •  Roteamento por Perfil  •  Telas e Ações por Usuário&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=0;strokeColor=none;fillColor=none;fontColor=#0F172A;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="1520" height="48" as="geometry" />
+        </mxCell>
+
+        <!-- Zonas de Fluxo por Perfil (atrás dos nós) -->
+        <mxCell id="t2_zone_adm" value="Fluxo Administrador" style="rounded=1;whiteSpace=wrap;html=1;arcSize=4;fillColor=#FAF5FF;strokeColor=#D8B4FE;strokeWidth=1.5;dashed=1;dashPattern=6 4;verticalAlign=top;align=left;spacingLeft=14;spacingTop=10;fontSize=13;fontStyle=1;fontColor=#6B21A8;" vertex="1" parent="1">
+          <mxGeometry x="40" y="565" width="510" height="420" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t2_zone_pai" value="Fluxo Pai / Responsável" style="rounded=1;whiteSpace=wrap;html=1;arcSize=4;fillColor=#F0F9FF;strokeColor=#93C5FD;strokeWidth=1.5;dashed=1;dashPattern=6 4;verticalAlign=top;align=left;spacingLeft=14;spacingTop=10;fontSize=13;fontStyle=1;fontColor=#1E40AF;" vertex="1" parent="1">
+          <mxGeometry x="580" y="565" width="440" height="420" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t2_zone_filho" value="Fluxo Filho" style="rounded=1;whiteSpace=wrap;html=1;arcSize=4;fillColor=#F0FDF4;strokeColor=#86EFAC;strokeWidth=1.5;dashed=1;dashPattern=6 4;verticalAlign=top;align=left;spacingLeft=14;spacingTop=10;fontSize=13;fontStyle=1;fontColor=#166534;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="565" width="490" height="420" as="geometry" />
+        </mxCell>
+
+        <!-- Fluxo Principal de Autenticação -->
+        <mxCell id="t2_home" value="Tela Home / Apresentação" style="rounded=1;whiteSpace=wrap;html=1;arcSize=50;fillColor=#FDE047;strokeColor=#1E293B;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#0F172A;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="660" y="95" width="280" height="52" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t2_login" value="Tela de Login" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#FEF9E7;strokeColor=#1E293B;strokeWidth=1.8;fontStyle=1;fontSize=13;fontColor=#0F172A;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="680" y="185" width="240" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t2_auth" value="Credenciais&lt;br&gt;Válidas?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#1E40AF;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#0F172A;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="695" y="275" width="210" height="96" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t2_erro" value="Exibir Erro de Login" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#FEE2E2;strokeColor=#DC2626;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#991B1B;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="298" width="210" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t2_perfil" value="Qual o&lt;br&gt;Perfil?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#1E40AF;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#0F172A;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="695" y="420" width="210" height="96" as="geometry" />
+        </mxCell>
+
+        <!-- Nós Fluxo Administrador -->
+        <mxCell id="t2_painel_adm" value="Painel do Administrador" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#FDE047;strokeColor=#1E293B;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#0F172A;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="165" y="605" width="260" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t2_crud" value="CRUD de Usuários / Famílias" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#FEF3C7;strokeColor=#1E293B;strokeWidth=1.8;fontStyle=1;fontSize=13;fontColor=#0F172A;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="165" y="695" width="260" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t2_criar" value="Criar Usuário" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FEF9E7;strokeColor=#1E293B;strokeWidth=1.8;fontSize=13;fontColor=#0F172A;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="65" y="790" width="205" height="52" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t2_listar" value="Listar / Buscar Usuários" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FEF9E7;strokeColor=#1E293B;strokeWidth=1.8;fontSize=13;fontColor=#0F172A;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="320" y="790" width="205" height="52" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t2_editar" value="Editar Dados / Perfil" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FEF9E7;strokeColor=#1E293B;strokeWidth=1.8;fontSize=13;fontColor=#0F172A;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="65" y="880" width="205" height="52" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t2_excluir" value="Excluir / Bloquear Conta" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FEF9E7;strokeColor=#1E293B;strokeWidth=1.8;fontSize=13;fontColor=#0F172A;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="320" y="880" width="205" height="52" as="geometry" />
+        </mxCell>
+
+        <!-- Nós Fluxo Pai / Responsável -->
+        <mxCell id="t2_painel_pai" value="Painel dos Pais" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#FDE047;strokeColor=#1E293B;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#0F172A;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="670" y="605" width="260" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t2_tarefas_pai" value="Criar e Validar Tarefas" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FEF9E7;strokeColor=#1E293B;strokeWidth=1.8;fontSize=13;fontColor=#0F172A;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="670" y="700" width="290" height="54" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t2_recompensas" value="Gerenciar Recompensas" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FEF9E7;strokeColor=#1E293B;strokeWidth=1.8;fontSize=13;fontColor=#0F172A;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="670" y="785" width="290" height="54" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t2_financas" value="Controle de Mesada" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FEF9E7;strokeColor=#1E293B;strokeWidth=1.8;fontSize=13;fontColor=#0F172A;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="670" y="870" width="290" height="54" as="geometry" />
+        </mxCell>
+
+        <!-- Nós Fluxo Filho -->
+        <mxCell id="t2_painel_filho" value="Painel do Filho" style="rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=#FDE047;strokeColor=#1E293B;strokeWidth=2;fontStyle=1;fontSize=13;fontColor=#0F172A;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1165" y="605" width="260" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t2_ver_tarefas" value="Visualizar Minhas Tarefas" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FEF9E7;strokeColor=#1E293B;strokeWidth=1.8;fontSize=13;fontColor=#0F172A;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1150" y="700" width="320" height="54" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t2_concluir" value="Marcar Tarefa como Feita" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FEF9E7;strokeColor=#1E293B;strokeWidth=1.8;fontSize=13;fontColor=#0F172A;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1150" y="785" width="320" height="54" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t2_resgatar" value="Solicitar Recompensa" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FEF9E7;strokeColor=#1E293B;strokeWidth=1.8;fontSize=13;fontColor=#0F172A;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="1150" y="870" width="320" height="54" as="geometry" />
+        </mxCell>
+
+        <!-- Arestas do Fluxo Principal -->
+        <mxCell id="t2_e_home_login" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1E293B;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="t2_home" target="t2_login">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t2_e_login_auth" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1E293B;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="t2_login" target="t2_auth">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t2_e_auth_nao" value="Não" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#DC2626;strokeWidth=2;endArrow=block;endFill=1;fontColor=#DC2626;fontStyle=1;fontSize=12;labelBackgroundColor=#FAFAFA;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="t2_auth" target="t2_erro">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t2_e_erro_login" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#DC2626;strokeWidth=2;dashed=1;dashPattern=5 3;endArrow=block;endFill=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="t2_erro" target="t2_login">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1115" y="210" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="t2_e_auth_sim" value="Sim" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#16A34A;strokeWidth=2;endArrow=block;endFill=1;fontColor=#15803D;fontStyle=1;fontSize=12;labelBackgroundColor=#FAFAFA;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="t2_auth" target="t2_perfil">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Roteamento por Perfil -->
+        <mxCell id="t2_e_perfil_adm" value="Administrador" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#7E22CE;strokeWidth=2;endArrow=block;endFill=1;fontColor=#6B21A8;fontStyle=1;fontSize=12;labelBackgroundColor=#FAFAFA;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="t2_perfil" target="t2_painel_adm">
+          <mxGeometry x="-0.25" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="295" y="468" />
+            </Array>
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="t2_e_perfil_pai" value="Pai / Responsável" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1D4ED8;strokeWidth=2;endArrow=block;endFill=1;fontColor=#1E40AF;fontStyle=1;fontSize=12;labelBackgroundColor=#FAFAFA;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="t2_perfil" target="t2_painel_pai">
+          <mxGeometry x="-0.15" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="t2_e_perfil_filho" value="Filho" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#15803D;strokeWidth=2;endArrow=block;endFill=1;fontColor=#166534;fontStyle=1;fontSize=12;labelBackgroundColor=#FAFAFA;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="t2_perfil" target="t2_painel_filho">
+          <mxGeometry x="-0.25" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1295" y="468" />
+            </Array>
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Arestas Internas: Administrador -->
+        <mxCell id="t2_e_adm_crud" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1E293B;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="t2_painel_adm" target="t2_crud">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t2_e_crud_criar" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1E293B;strokeWidth=1.8;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="t2_crud" target="t2_criar">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="295" y="816" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="t2_e_crud_listar" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1E293B;strokeWidth=1.8;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="t2_crud" target="t2_listar">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="295" y="816" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="t2_e_crud_editar" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1E293B;strokeWidth=1.8;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="t2_crud" target="t2_editar">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="295" y="906" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="t2_e_crud_excluir" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1E293B;strokeWidth=1.8;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="t2_crud" target="t2_excluir">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="295" y="906" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Arestas Internas: Pai / Responsável -->
+        <mxCell id="t2_e_pai_tarefas" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1E293B;strokeWidth=1.8;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="t2_painel_pai" target="t2_tarefas_pai">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="625" y="630" />
+              <mxPoint x="625" y="727" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="t2_e_pai_recompensas" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1E293B;strokeWidth=1.8;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="t2_painel_pai" target="t2_recompensas">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="625" y="630" />
+              <mxPoint x="625" y="812" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="t2_e_pai_financas" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1E293B;strokeWidth=1.8;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="t2_painel_pai" target="t2_financas">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="625" y="630" />
+              <mxPoint x="625" y="897" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Arestas Internas: Filho -->
+        <mxCell id="t2_e_filho_ver" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1E293B;strokeWidth=1.8;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="t2_painel_filho" target="t2_ver_tarefas">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1105" y="630" />
+              <mxPoint x="1105" y="727" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="t2_e_filho_concluir" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1E293B;strokeWidth=1.8;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="t2_painel_filho" target="t2_concluir">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1105" y="630" />
+              <mxPoint x="1105" y="812" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="t2_e_filho_resgatar" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#1E293B;strokeWidth=1.8;endArrow=block;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="t2_painel_filho" target="t2_resgatar">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1105" y="630" />
+              <mxPoint x="1105" y="897" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <diagram id="tab-especificacao-uc" name="3. Especificação UC01-UC04">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1560" pageHeight="920" background="#FAFAFA" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Cabeçalho -->
+        <mxCell id="t3_title" value="&lt;b&gt;&lt;font style=&quot;font-size: 20px;&quot;&gt;Estrutura Detalhada por Tela e Caso de Uso (UC01 – UC04)&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;font color=&quot;#475569&quot; style=&quot;font-size: 12px;&quot;&gt;Documentação Funcional por Perfil  •  App Gerenciador de Família&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=0;strokeColor=none;fillColor=none;fontColor=#0F172A;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="1480" height="48" as="geometry" />
+        </mxCell>
+
+        <!-- Card UC01 -->
+        <mxCell id="t3_uc01_box" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=4;fillColor=#FEF9E7;strokeColor=#1E293B;strokeWidth=2;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="95" width="700" height="355" as="geometry" />
+        </mxCell>
+        <mxCell id="t3_uc01_hdr" value="UC01 — Tela Home e Autenticação (Login)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#FDE047;strokeColor=#1E293B;strokeWidth=2;fontStyle=1;fontSize=15;fontColor=#0F172A;align=left;spacingLeft=16;" vertex="1" parent="1">
+          <mxGeometry x="40" y="95" width="700" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="t3_uc01_sub" value="&lt;b&gt;Atores:&lt;/b&gt; Todos (Admin, Pai, Filho)  •  &lt;b&gt;Telas:&lt;/b&gt; Tela Home / Apresentação → Tela de Login" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#1E293B;strokeWidth=1;fontSize=12;fontColor=#334155;align=left;spacingLeft=16;" vertex="1" parent="1">
+          <mxGeometry x="40" y="139" width="700" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t3_uc01_body" value="&lt;b&gt;Fluxo Principal:&lt;/b&gt;&lt;br&gt;&lt;br&gt;1. O usuário acessa a &lt;b&gt;Tela Home&lt;/b&gt; (boas-vindas e botão &lt;b&gt;&quot;Entrar&quot;&lt;/b&gt;).&lt;br&gt;&lt;br&gt;2. Na &lt;b&gt;Tela de Login&lt;/b&gt;, informa e-mail/usuário e senha.&lt;br&gt;&lt;br&gt;3. O sistema valida as credenciais, identifica o &lt;code&gt;tipo_perfil&lt;/code&gt; e redireciona automaticamente para a tela correspondente (Admin, Pai ou Filho).&lt;br&gt;&lt;br&gt;&lt;b&gt;Fluxo Alternativo (Erro):&lt;/b&gt; Caso as credenciais sejam inválidas, exibe mensagem de erro e retorna para a Tela de Login." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=top;fontSize=13;fontColor=#0F172A;strokeColor=none;fillColor=none;spacingTop=4;" vertex="1" parent="1">
+          <mxGeometry x="58" y="186" width="664" height="248" as="geometry" />
+        </mxCell>
+
+        <!-- Card UC02 -->
+        <mxCell id="t3_uc02_box" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=4;fillColor=#FEF9E7;strokeColor=#1E293B;strokeWidth=2;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="820" y="95" width="700" height="355" as="geometry" />
+        </mxCell>
+        <mxCell id="t3_uc02_hdr" value="UC02 — CRUD de Usuários (Foco no Perfil Administrador)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#FDE047;strokeColor=#1E293B;strokeWidth=2;fontStyle=1;fontSize=15;fontColor=#0F172A;align=left;spacingLeft=16;" vertex="1" parent="1">
+          <mxGeometry x="820" y="95" width="700" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="t3_uc02_sub" value="&lt;b&gt;Ator Principal:&lt;/b&gt; Administrador (e parcialmente o Pai, dentro do próprio núcleo familiar)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#1E293B;strokeWidth=1;fontSize=12;fontColor=#334155;align=left;spacingLeft=16;" vertex="1" parent="1">
+          <mxGeometry x="820" y="139" width="700" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t3_uc02_body" value="&lt;b&gt;Funcionalidades na Tela do Admin:&lt;/b&gt;&lt;br&gt;&lt;br&gt;• &lt;b&gt;Create (Criar):&lt;/b&gt; Cadastrar novos usuários definindo Nome, E-mail, Senha e Perfil (Admin, Pai ou Filho) e vincular a uma família.&lt;br&gt;&lt;br&gt;• &lt;b&gt;Read (Ler/Listar):&lt;/b&gt; Visualizar lista de todos os usuários cadastrados com filtro por família ou perfil.&lt;br&gt;&lt;br&gt;• &lt;b&gt;Update (Atualizar):&lt;/b&gt; Alterar dados cadastrais, redefinir senhas ou mudar o tipo de perfil.&lt;br&gt;&lt;br&gt;• &lt;b&gt;Delete (Excluir):&lt;/b&gt; Desativar ou remover um usuário do sistema." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=top;fontSize=13;fontColor=#0F172A;strokeColor=none;fillColor=none;spacingTop=4;" vertex="1" parent="1">
+          <mxGeometry x="838" y="186" width="664" height="248" as="geometry" />
+        </mxCell>
+
+        <!-- Card UC03 -->
+        <mxCell id="t3_uc03_box" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=4;fillColor=#FEF9E7;strokeColor=#1E293B;strokeWidth=2;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="510" width="700" height="355" as="geometry" />
+        </mxCell>
+        <mxCell id="t3_uc03_hdr" value="UC03 — Área de Trabalho: Perfil Pai / Responsável" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#FDE047;strokeColor=#1E293B;strokeWidth=2;fontStyle=1;fontSize=15;fontColor=#0F172A;align=left;spacingLeft=16;" vertex="1" parent="1">
+          <mxGeometry x="40" y="510" width="700" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="t3_uc03_sub" value="&lt;b&gt;Tela:&lt;/b&gt; Dashboard de Gestão Familiar  •  &lt;b&gt;Ator:&lt;/b&gt; Pai / Responsável" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#1E293B;strokeWidth=1;fontSize=12;fontColor=#334155;align=left;spacingLeft=16;" vertex="1" parent="1">
+          <mxGeometry x="40" y="554" width="700" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t3_uc03_body" value="&lt;b&gt;O que faz:&lt;/b&gt;&lt;br&gt;&lt;br&gt;• &lt;b&gt;Criar Tarefas:&lt;/b&gt; Cria tarefas domésticas ou escolares atribuídas a um filho específico.&lt;br&gt;&lt;br&gt;• &lt;b&gt;Validar e Aprovar:&lt;/b&gt; Recebe notificações quando o filho marca uma tarefa como feita e clica em &lt;b&gt;&quot;Aprovar&quot;&lt;/b&gt;.&lt;br&gt;&lt;br&gt;• &lt;b&gt;Recompensas e Mesada:&lt;/b&gt; Define regras de pontos ou valor da mesada, além de gerenciar o catálogo de recompensas da família.&lt;br&gt;&lt;br&gt;• &lt;b&gt;Consulta Restrita:&lt;/b&gt; Consulta os usuários pertencentes apenas ao próprio núcleo familiar." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=top;fontSize=13;fontColor=#0F172A;strokeColor=none;fillColor=none;spacingTop=4;" vertex="1" parent="1">
+          <mxGeometry x="58" y="601" width="664" height="248" as="geometry" />
+        </mxCell>
+
+        <!-- Card UC04 -->
+        <mxCell id="t3_uc04_box" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=4;fillColor=#FEF9E7;strokeColor=#1E293B;strokeWidth=2;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="820" y="510" width="700" height="355" as="geometry" />
+        </mxCell>
+        <mxCell id="t3_uc04_hdr" value="UC04 — Área de Trabalho: Perfil Filho" style="rounded=1;whiteSpace=wrap;html=1;arcSize=6;fillColor=#FDE047;strokeColor=#1E293B;strokeWidth=2;fontStyle=1;fontSize=15;fontColor=#0F172A;align=left;spacingLeft=16;" vertex="1" parent="1">
+          <mxGeometry x="820" y="510" width="700" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="t3_uc04_sub" value="&lt;b&gt;Tela:&lt;/b&gt; Dashboard Gamificado / Minhas Missões  •  &lt;b&gt;Ator:&lt;/b&gt; Filho" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#1E293B;strokeWidth=1;fontSize=12;fontColor=#334155;align=left;spacingLeft=16;" vertex="1" parent="1">
+          <mxGeometry x="820" y="554" width="700" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="t3_uc04_body" value="&lt;b&gt;O que faz:&lt;/b&gt;&lt;br&gt;&lt;br&gt;• &lt;b&gt;Visualizar Tarefas:&lt;/b&gt; Visualiza a lista de tarefas do dia/semana com prazos e pontuação.&lt;br&gt;&lt;br&gt;• &lt;b&gt;Concluir Missões:&lt;/b&gt; Envia comprovação (ou marca como concluída) para avaliação dos pais.&lt;br&gt;&lt;br&gt;• &lt;b&gt;Saldo e Resgates:&lt;/b&gt; Acompanha seu saldo de pontos/mesada e troca por recompensas cadastradas pelos pais." style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=top;fontSize=13;fontColor=#0F172A;strokeColor=none;fillColor=none;spacingTop=4;" vertex="1" parent="1">
+          <mxGeometry x="838" y="601" width="664" height="248" as="geometry" />
+        </mxCell>
+
+        <!-- Setas de Roteamento entre UC01 e UC02–UC04 -->
+        <mxCell id="t3_e_uc01_uc02" value="Perfil: Admin" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;dashed=1;dashPattern=6 4;endArrow=block;endFill=1;strokeColor=#7E22CE;strokeWidth=2;fontColor=#6B21A8;fontStyle=1;fontSize=11;labelBackgroundColor=#FAFAFA;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="t3_uc01_box" target="t3_uc02_box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t3_e_uc01_uc03" value="Perfil: Pai" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;dashed=1;dashPattern=6 4;endArrow=block;endFill=1;strokeColor=#1D4ED8;strokeWidth=2;fontColor=#1E40AF;fontStyle=1;fontSize=11;labelBackgroundColor=#FAFAFA;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="t3_uc01_box" target="t3_uc03_box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t3_e_uc01_uc04" value="Perfil: Filho" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;dashed=1;dashPattern=6 4;endArrow=block;endFill=1;strokeColor=#15803D;strokeWidth=2;fontColor=#166534;fontStyle=1;fontSize=11;labelBackgroundColor=#FAFAFA;exitX=0.85;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="t3_uc01_box" target="t3_uc04_box">
+          <mxGeometry x="0.1" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="635" y="480" />
+              <mxPoint x="1170" y="480" />
+            </Array>
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

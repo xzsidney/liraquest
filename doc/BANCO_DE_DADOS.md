@@ -219,13 +219,14 @@ Registro das comprovações enviadas pelos membros (com foto Base64 e anotaçõe
 O script de seed é executado via `npm run seed` (`node backend/src/database/seed.js`) e opera de forma **segura, idempotente e aditiva**:
 
 1. **Sincronização Aditiva:**
-   - Executa `Family.sync()`, `FamilyTask.sync()` e `FamilyTaskSubmission.sync()`.
+   - Executa `Family.sync()`, `FamilyMember.sync()`, `FamilyTask.sync()` e `FamilyTaskSubmission.sync()`.
    - Inspeciona `SHOW COLUMNS FROM family_members` e executa `ALTER TABLE` aditivo apenas se alguma das colunas de mestria (`xp_str`, `xp_agi`, `xp_con`, `xp_int`, `xp_cha`, `xp_luk`) ainda não existir.
 2. **Clã Fundador:**
    - Cria ou confirma a família **`Clã Lira`** com `invite_code: 'LIRA-2026'` e preenche `created_by` com o UUID do administrador.
-3. **4 Membros Fundadores:**
-   - Popula/atualiza `Sidney Lira` (`ADMIN`, `guardiao_do_lar`, Nível 5), `Elaine Lira` (`PARENT`, `guardiao_da_harmonia`, Nível 5), `Paulo Lira` (`CHILD`, `rastreador_veloz`, Nível 3) e `Jennifer Lira` (`CHILD`, `artifice_criativo`, Nível 3) com senhas criptografadas via `bcryptjs`.
-4. **4 Missões Iniciais do Lar (`category: 'LAR'`, `frequency: 'DAILY'`):**
+3. **4 Membros Fundadores (Insert-Only / Sem Sobrescrita):**
+   - Cria `Sidney Lira` (`ADMIN`, `guardiao_do_lar`, Nível 5), `Elaine Lira` (`PARENT`, `guardiao_da_harmonia`, Nível 5), `Paulo Lira` (`CHILD`, `rastreador_veloz`, Nível 3) e `Jennifer Lira` (`CHILD`, `artifice_criativo`, Nível 3) com senhas criptografadas via `bcryptjs` apenas se ainda não existirem — preservando integralmente níveis, XP, ouro, fichas, atributos, sequência e senhas alteradas em produção (vinculando `family_id` apenas se estiver `NULL`).
+4. **4 Missões Iniciais do Lar (`category: 'LAR'`, `frequency: 'DAILY'`, Insert-Only):**
+   - Cria cada missão inicial apenas se ainda não existir no clã, preservando eventuais edições feitas pelos guardiões.
 
 | Título | `reward_str_xp` | `reward_xp` | `reward_gold` | `reward_tokens` |
 | :--- | :---: | :---: | :---: | :---: |

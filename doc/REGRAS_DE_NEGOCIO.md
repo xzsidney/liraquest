@@ -70,13 +70,13 @@ O campo `role` em `family_members` define três níveis de autorização, aplica
 - **`CHILD`:** Herói Aventureiro (Filho/Jovem). Visualiza missões abertas do clã ou atribuídas diretamente a si e envia comprovações fotográficas. Rotas protegidas por `requireGuardian` retornam HTTP `403` para este perfil.
 
 ### 3.2 Login Universal & Sessão JWT
-- **Autenticação Unificada (`POST /api/auth/login`):** Pais e filhos utilizam a mesma tela (`LoginView.js`) e o mesmo endpoint. O campo `identifier` aceita **e-mail** (normalizado em minúsculas), **apelido heroico** (`hero_nickname`) ou **nome real** (`name`), com filtro opcional por `family_code`.
+- **Autenticação Unificada (`POST /api/auth/login`):** Pais e filhos utilizam a mesma tela (`LoginView.js`) e o mesmo endpoint. O campo `identifier` aceita **e-mail** (normalizado em minúsculas), **apelido heroico** (`hero_nickname`) ou **nome real** (`name`), com filtro opcional por `family_code` (se um `family_code` inexistente for informado, retorna HTTP `401`).
 - **Segurança:** A senha é verificada via `bcryptjs.compare()` contra o hash armazenado no banco (`is_active = true`).
 - **Token JWT:** Assinado com validade de `7d`, carregando `{ id, familyId, role, heroNickname }`, enviado pelo cliente no cabeçalho `Authorization: Bearer <token>`.
 
 ### 3.3 Cadastro Público & Ingresso em Clã
 - **Regra de Cadastro (`POST /api/auth/register`):** O cadastro público cria **exclusivamente** membros com `role: 'CHILD'`. A fundação e gestão de clãs pertencem aos Guardiões (`PARENT`/`ADMIN`).
-- **Dados do Cadastro:** Exige `name`, `hero_nickname` (fallback para `name`) e `password`; `email` é opcional. O `invite_code` tem fallback padrão `'LIRA-2026'` no backend caso omitido.
+- **Dados do Cadastro:** Exige `name`, `hero_nickname` (fallback para `name`) e `password`; `email` e `invite_code` são opcionais. Caso `invite_code` seja omitido ou vazio, o herói é criado com `family_id: null` para vincular-se posteriormente no Hub.
 - **Recursos Iniciais do Novo Herói:** `level: 1`, `xp: 0`, `adventure_energy: 10`, `family_tokens: 0`, `gold: 50`, `streak_days: 1`.
 - **Arquétipos de Classe no Cadastro (`familyController.js`):**
 
@@ -87,7 +87,7 @@ O campo `role` em `family_members` define três níveis de autorização, aplica
 | `guardiao_do_lar` | 16 | 10 | 15 | 10 | 12 | 10 |
 | Outros códigos *(ex: `guerreiro_disciplina`)* | 10 | 10 | 10 | 10 | 10 | 10 |
 
-- **Vínculo Pós-Login (`POST /api/family/join`):** Caso um herói ainda não possua `family_id`, o `HubView.js` exibe um banner dedicado para inserir o código do clã (ex: `LIRA-2026`) e vincular-se imediatamente.
+- **Vínculo Pós-Login (`POST /api/family/join`):** Caso um herói ainda não possua `family_id`, o `HubView.js` exibe um banner dedicado para inserir o código do clã (ex: `LIRA-2026`), vincular-se imediatamente e receber um novo token JWT atualizado com o `familyId` do clã.
 
 ### 3.4 Clã Fundador (Clã Lira — Código `LIRA-2026`)
 O script `backend/src/database/seed.js` garante a existência do **Clã Lira** (`invite_code: 'LIRA-2026'`) e dos 4 membros fundadores abaixo (com senhas armazenadas exclusivamente como hash `bcryptjs`):
@@ -240,12 +240,12 @@ Relação fiel e exclusiva das rotas montadas atualmente em `server.js`, `backen
 
 | Método | Rota | Autenticação / RBAC | Parâmetros & Comportamento |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/api/auth/login` *(alias: `/api/login`)* | Pública | Body: `{ identifier \| email \| hero_nickname \| nickname \| name, password, family_code? }`. Valida senha com `bcryptjs`, gera JWT (`7d`) e retorna `{ token, user, member }`. |
+| `POST` | `/api/auth/login` *(alias: `/api/login`)* | Pública | Body: `{ identifier \| email \| hero_nickname \| nickname \| name, password, family_code? }`. Valida senha com `bcryptjs` (retorna `401` se `family_code` não existir), gera JWT (`7d`) e retorna `{ token, user, member }`. |
 | `GET` | `/api/auth/me` *(aliases: `/api/me`, `/api/family/me`)* | JWT | Retorna a ficha unificada do membro autenticado (`is_active: true`) com objeto `family`, sem `password`. |
-| `POST` | `/api/auth/register` *(alias: `/api/register`)* | Pública | Body: `{ name, hero_nickname?, password \| pin, invite_code?, class_code?, email? }`. Cria membro sempre com `role: 'CHILD'`, atributos iniciais do arquétipo e vínculo ao clã (fallback `'LIRA-2026'`). Retorna `201` com JWT e perfil. |
-| `GET` | `/api/auth/children` *(aliases: `/api/children`, `/api/family/children`)* | Pública | Lista simplificada de membros ativos com `role = 'CHILD'` (`id`, `name`, `hero_nickname`, `skin_code`, `class_code`, `level`). |
+| `POST` | `/api/auth/register` *(alias: `/api/register`)* | Pública | Body: `{ name, hero_nickname?, password \| pin, invite_code?, class_code?, email? }`. Cria membro sempre com `role: 'CHILD'`, atributos iniciais do arquétipo e vínculo opcional ao clã (`family_id: null` se `invite_code` omitido). Retorna `201` com JWT e perfil. |
+| `GET` | `/api/auth/children` *(aliases: `/api/children`, `/api/family/children`)* | JWT | Lista simplificada de membros ativos com `role = 'CHILD'` restrita estritamente ao `family_id` do usuário autenticado (`id`, `name`, `hero_nickname`, `skin_code`, `class_code`, `level`). |
 | `GET` | `/api/family/members` | JWT | Lista todos os membros ativos (`is_active: true`) do mesmo `family_id` do usuário autenticado, ordenados por `role ASC, name ASC`, sem `password`. |
-| `POST` | `/api/family/join` *(alias: `/api/family/join-clan`)* | JWT | Body: `{ invite_code \| inviteCode }`. Localiza a família pelo código (case-insensitive) e atualiza `family_id` do membro autenticado. |
+| `POST` | `/api/family/join` *(alias: `/api/family/join-clan`)* | JWT | Body: `{ invite_code \| inviteCode }`. Localiza a família pelo código (case-insensitive), atualiza `family_id` do membro autenticado e retorna um novo JWT `token` atualizado. |
 
 ### 6.3 Tarefas do Lar & Comprovações (`tasksRoutes.js`, prefixo `/api/tasks`)
 

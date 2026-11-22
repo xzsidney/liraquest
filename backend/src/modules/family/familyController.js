@@ -61,13 +61,17 @@ export const login = async (req, res) => {
       is_active: true,
     };
 
-    if (family_code) {
+    if (family_code && String(family_code).trim() !== '') {
       const family = await Family.findOne({
         where: { invite_code: String(family_code).toUpperCase().trim() },
       });
-      if (family) {
-        whereClause.family_id = family.id;
+      if (!family) {
+        return res.status(401).json({
+          success: false,
+          message: 'Credenciais inválidas. Verifique seu usuário/e-mail, código do clã e senha.',
+        });
       }
+      whereClause.family_id = family.id;
     }
 
     const member = await FamilyMember.findOne({
@@ -193,12 +197,22 @@ export const getMembers = async (req, res) => {
 
 /**
  * 4. GET /api/auth/children & /api/family/children
- * Retorna os heróis crianças públicos para exibição dos cards de login
+ * Retorna os heróis crianças do clã autenticado
  */
 export const getChildren = async (req, res) => {
   try {
+    const familyId = req.user?.familyId || req.user?.family_id;
+
+    if (!familyId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Usuário não possui clã vinculado.',
+      });
+    }
+
     const children = await FamilyMember.findAll({
       where: {
+        family_id: familyId,
         role: 'CHILD',
         is_active: true,
       },
@@ -243,7 +257,8 @@ export const register = async (req, res) => {
     const heroNick = (hero_nickname || heroNickname || childName).trim();
     const rawPassword = (password || pin || '').trim();
     const chosenClass = class_code || classCode || 'rastreador_veloz';
-    const cleanInvite = (invite_code || inviteCode || 'LIRA-2026').toUpperCase().trim();
+    const rawInvite = invite_code !== undefined ? invite_code : inviteCode;
+    const cleanInvite = rawInvite ? String(rawInvite).toUpperCase().trim() : '';
 
     if (!childName) {
       return res.status(400).json({
@@ -410,6 +425,7 @@ export const joinClan = async (req, res) => {
     }
 
     await member.update({ family_id: family.id });
+    const token = generateToken(member);
     const formatted = formatMemberResponse(member);
     formatted.family = {
       id: family.id,
@@ -420,6 +436,7 @@ export const joinClan = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: `🎉 Parabéns! Você agora faz parte do ${family.name}!`,
+      token,
       member: formatted,
       user: formatted,
       family: {

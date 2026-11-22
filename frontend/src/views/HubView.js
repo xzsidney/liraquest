@@ -240,6 +240,12 @@ export function bindHubEvents() {
         btnJoinClan.textContent = '⏳ Ingressando...';
         const res = await api.post('/api/family/join', { invite_code: code });
         
+        if (res.token) {
+          auth.state.token = res.token;
+          localStorage.setItem('liraquest_token', res.token);
+          localStorage.setItem('token', res.token);
+        }
+
         const member = res.member || res.user;
         if (member) {
           auth.state.user = member;
@@ -255,8 +261,7 @@ export function bindHubEvents() {
 
         setTimeout(() => {
           router.navigate('hub');
-          window.location.reload();
-        }, 800);
+        }, 600);
       } catch (err) {
         btnJoinClan.textContent = '🛡️ Ingressar no Clã';
         if (msgEl) {

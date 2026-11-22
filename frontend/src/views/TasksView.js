@@ -28,7 +28,7 @@ function showToast(message, type = 'gold') {
   }, 4500);
 }
 
-function showFanfareModal(heroName, newStr, oldStr) {
+function showFanfareModal(heroName, newStr, oldStr, onClose) {
   const modalMount = document.getElementById('tasks-modal-mount');
   if (!modalMount) return;
 
@@ -58,6 +58,7 @@ function showFanfareModal(heroName, newStr, oldStr) {
 
   document.getElementById('btn-close-fanfare')?.addEventListener('click', () => {
     modalMount.innerHTML = '';
+    if (typeof onClose === 'function') onClose();
   });
 }
 
@@ -391,18 +392,18 @@ export function bindTasksEvents() {
 
       try {
         const res = await api.post(`/api/tasks/submissions/${submissionId}/approve`);
-        if (res.str_leveled_up) {
-          showFanfareModal(heroName, res.new_str, res.old_str);
-        } else {
-          showToast(res.message || 'Missão aprovada com sucesso!', 'success');
-        }
 
         // Atualizar sessão do usuário caso ele seja o membro modificado
         await auth.checkSession();
 
-        setTimeout(() => {
-          router.navigate('tasks');
-        }, 1200);
+        if (res.str_leveled_up) {
+          showFanfareModal(heroName, res.new_str, res.old_str, () => router.navigate('tasks'));
+        } else {
+          showToast(res.message || 'Missão aprovada com sucesso!', 'success');
+          setTimeout(() => {
+            router.navigate('tasks');
+          }, 800);
+        }
       } catch (err) {
         showToast(err.message || 'Erro ao aprovar submissão', 'danger');
         btn.disabled = false;

@@ -83,32 +83,15 @@ export const auth = {
   },
 
   /**
-   * Busca a lista de crianças/heróis para exibição nos cards da tela de login
+   * Busca a lista de crianças/heróis do clã autenticado
    */
   async getChildren() {
+    if (!this.isAuthenticated()) return [];
     try {
       const res = await api.get('/api/auth/children');
       return res.children || [];
     } catch {
-      // Fallback padrão Clã Lira
-      return [
-        {
-          id: 'child-paulinho',
-          name: 'Paulo Lira',
-          hero_nickname: 'Sir Paulinho',
-          class_code: 'rastreador_veloz',
-          skin_code: 'rastreador_veloz',
-          level: 3,
-        },
-        {
-          id: 'child-jennifer',
-          name: 'Jennifer Lira',
-          hero_nickname: 'Valquíria Jennifer',
-          class_code: 'artifice_criativo',
-          skin_code: 'artifice_criativa',
-          level: 3,
-        },
-      ];
+      return [];
     }
   },
 

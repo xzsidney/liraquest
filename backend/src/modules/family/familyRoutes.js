@@ -24,15 +24,15 @@ router.get('/me', authMiddleware, getMe);
 router.post('/auth/register', register);
 router.post('/register', register);
 
-router.get('/auth/children', getChildren);
-router.get('/children', getChildren);
+router.get('/auth/children', authMiddleware, getChildren);
+router.get('/children', authMiddleware, getChildren);
 
 // ==========================================
 // Rotas da Família (/api/family)
 // ==========================================
 router.get('/family/me', authMiddleware, getMe);
 router.get('/family/members', authMiddleware, getMembers);
-router.get('/family/children', getChildren);
+router.get('/family/children', authMiddleware, getChildren);
 router.post('/family/join', authMiddleware, joinClan);
 router.post('/family/join-clan', authMiddleware, joinClan);
 

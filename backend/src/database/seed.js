@@ -17,6 +17,7 @@ export async function runSeed() {
   // 1. Sincronizar tabelas de forma segura e aditiva (sem drop/destruição)
   console.log('🔄 Sincronizando tabelas do módulo Family e Tasks...');
   await Family.sync();
+  await FamilyMember.sync();
 
   // Migração aditiva segura para family_members
   const [columns] = await sequelize.query('SHOW COLUMNS FROM `family_members`');
@@ -143,10 +144,9 @@ export async function runSeed() {
   for (const item of membersData) {
     let member = await FamilyMember.findOne({
       where: {
-        family_id: clan.id,
         [sequelize.Sequelize.Op.or]: [
           { email: item.email },
-          { hero_nickname: item.hero_nickname },
+          { family_id: clan.id, hero_nickname: item.hero_nickname },
         ],
       },
     });
@@ -159,11 +159,10 @@ export async function runSeed() {
       });
       console.log(`👤 Herói criado: ${member.hero_nickname} (${member.name}) - [${member.role}]`);
     } else {
-      await member.update({
-        ...item,
-        is_active: true,
-      });
-      console.log(`🔄 Herói atualizado: ${member.hero_nickname} (${member.name}) - [${member.role}]`);
+      if (!member.family_id) {
+        await member.update({ family_id: clan.id });
+      }
+      console.log(`⏭️ Herói já existe (progresso preservado): ${member.hero_nickname} (${member.name}) - [${member.role}]`);
     }
 
     if (item.role === 'ADMIN' && !clan.created_by) {
@@ -232,8 +231,7 @@ export async function runSeed() {
       });
       console.log(`🧹 Missão criada: "${created.title}" (+${created.reward_str_xp} XP STR)`);
     } else {
-      await existing.update(t);
-      console.log(`🔄 Missão atualizada: "${existing.title}" (+${existing.reward_str_xp} XP STR)`);
+      console.log(`⏭️ Missão já existe (configuração preservada): "${existing.title}" (+${existing.reward_str_xp} XP STR)`);
     }
   }
 

@@ -16,7 +16,12 @@ export const router = {
 
   navigate(path) {
     const cleanPath = path.replace(/^#?\/?/, '');
-    window.location.hash = `#/${cleanPath}`;
+    const targetHash = `#/${cleanPath}`;
+    if (window.location.hash === targetHash) {
+      this.handleRouting();
+    } else {
+      window.location.hash = targetHash;
+    }
   },
 
   getPath() {
